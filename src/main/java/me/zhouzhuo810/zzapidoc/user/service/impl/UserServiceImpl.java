@@ -3,6 +3,7 @@ package me.zhouzhuo810.zzapidoc.user.service.impl;
 import me.zhouzhuo810.zzapidoc.common.dao.BaseDao;
 import me.zhouzhuo810.zzapidoc.common.result.BaseResult;
 import me.zhouzhuo810.zzapidoc.common.service.impl.BaseServiceImpl;
+import me.zhouzhuo810.zzapidoc.common.utils.MapUtils;
 import me.zhouzhuo810.zzapidoc.common.utils.StringUtils;
 import me.zhouzhuo810.zzapidoc.user.dao.UserDao;
 import me.zhouzhuo810.zzapidoc.user.entity.UserEntity;
@@ -11,6 +12,7 @@ import me.zhouzhuo810.zzapidoc.user.utils.UserUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -32,15 +34,19 @@ public class UserServiceImpl extends BaseServiceImpl<UserEntity> implements User
     @Override
     public BaseResult doLogin(String phone, String password) {
         if (StringUtils.isEmpty(phone))
-            return new BaseResult(0, "手机号不能为空！");
+            return new BaseResult(0, "手机号不能为空！", new HashMap<String, String>());
         if (StringUtils.isEmpty(password))
-            return new BaseResult(0, "密码不能为空！");
+            return new BaseResult(0, "密码不能为空！", new HashMap<String, String>());
         List<UserEntity> userEntities = getDAO().executeCriteria(UserUtils.getPhoneCriterion(phone));
         if (userEntities == null || userEntities.size() == 0)
-            return new BaseResult(0, "用户不存在！");
+            return new BaseResult(0, "用户不存在！", new HashMap<String, String>());
         UserEntity userEntity = getDAO().executeCriteriaForObject(UserUtils.getPhoneAndPasswordCriterion(phone, password));
-        if (userEntity== null)
-            return new BaseResult(0, "用户名或密码错误！");
-        return new BaseResult(1, "登录成功！");
+        if (userEntity == null)
+            return new BaseResult(0, "用户名或密码错误！", new HashMap<String, String>());
+        MapUtils map = new MapUtils();
+        map.put("id", userEntity.getId());
+        map.put("pic", userEntity.getPic());
+        map.put("name", userEntity.getName());
+        return new BaseResult(1, "登录成功！", map.build());
     }
 }

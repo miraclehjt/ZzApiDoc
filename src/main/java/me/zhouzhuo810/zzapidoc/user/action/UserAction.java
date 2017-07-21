@@ -33,7 +33,7 @@ public class UserAction extends BaseController<UserEntity> {
 
 
     @ResponseBody
-    @RequestMapping(value = "/userLogin", method = RequestMethod.GET)
+    @RequestMapping(value = "/userLogin", method = RequestMethod.POST)
     public BaseResult doLogin(
             @RequestParam(value = "phone") String phone,
             @RequestParam(value = "password") String password

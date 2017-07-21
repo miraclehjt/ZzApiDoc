@@ -11,18 +11,28 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "user")
-public class UserEntity extends BaseEntity{
+public class UserEntity extends BaseEntity {
 
-    @Column(name = "Name")
+    @Column(name = "Name", length = 50)
     private String name;
-    @Column(name = "Phone")
+    @Column(name = "Phone", length = 50)
     private String phone;
-    @Column(name = "Password")
+    @Column(name = "Password", length = 50)
     private String password;
-    @Column(name = "Sex")
+    @Column(name = "Sex", length = 10)
     private String sex;
-    @Column(name = "Email")
+    @Column(name = "Email", length = 50)
     private String email;
+    @Column(name = "Image")
+    private String pic;
+
+    public String getPic() {
+        return pic;
+    }
+
+    public void setPic(String pic) {
+        this.pic = pic;
+    }
 
     public String getName() {
         return name;
