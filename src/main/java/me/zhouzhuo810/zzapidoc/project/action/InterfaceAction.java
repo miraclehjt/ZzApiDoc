@@ -7,6 +7,11 @@ import me.zhouzhuo810.zzapidoc.project.entity.InterfaceEntity;
 import me.zhouzhuo810.zzapidoc.project.entity.ProjectEntity;
 import me.zhouzhuo810.zzapidoc.project.service.InterfaceService;
 import me.zhouzhuo810.zzapidoc.project.service.ProjectService;
+import org.apache.commons.io.FileUtils;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -14,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
+import java.io.File;
+import java.io.IOException;
 
 /**
  * Created by admin on 2017/7/22.
@@ -65,7 +72,7 @@ public class InterfaceAction extends BaseController<InterfaceEntity> {
 ]
 */
     @ResponseBody
-    @RequestMapping(value = "/addInterface", method = RequestMethod.GET)
+    @RequestMapping(value = "/addInterface", method = RequestMethod.POST)
     public BaseResult addInterface(
             @RequestParam(value = "name") String name,
             @RequestParam(value = "path") String path,
@@ -81,7 +88,7 @@ public class InterfaceAction extends BaseController<InterfaceEntity> {
     }
 
     @ResponseBody
-    @RequestMapping(value = "/updateInterface", method = RequestMethod.GET)
+    @RequestMapping(value = "/updateInterface", method = RequestMethod.POST)
     public BaseResult updateInterface(
             @RequestParam(value = "interfaceId") String interfaceId,
             @RequestParam(value = "name") String name,
@@ -98,7 +105,7 @@ public class InterfaceAction extends BaseController<InterfaceEntity> {
     }
 
     @ResponseBody
-    @RequestMapping(value = "/deleteInterface", method = RequestMethod.GET)
+    @RequestMapping(value = "/deleteInterface", method = RequestMethod.POST)
     public BaseResult deleteInterface(
             @RequestParam(value = "id") String id,
             @RequestParam(value = "userId") String userId
@@ -125,5 +132,12 @@ public class InterfaceAction extends BaseController<InterfaceEntity> {
         return getService().getInterfaceDetails(interfaceId, userId);
     }
 
-
+    @ResponseBody
+    @RequestMapping(value = "/downloadJson", method = RequestMethod.GET)
+    public ResponseEntity<byte[]> download(
+            @RequestParam(value = "projectId") String projectId,
+            @RequestParam(value = "userId") String userId
+    ) throws IOException {
+        return getService().download(projectId, userId);
+    }
 }

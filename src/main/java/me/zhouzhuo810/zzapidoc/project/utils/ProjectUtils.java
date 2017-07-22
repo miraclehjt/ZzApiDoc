@@ -11,14 +11,16 @@ import org.hibernate.criterion.Restrictions;
 public class ProjectUtils {
     public static Criterion[] getProjectByUserId(String userId) {
         return new Criterion[]{
-                Restrictions.or(
-                        Restrictions.eq("deleteFlag", BaseEntity.DELETE_FLAG_NO),
-                        Restrictions.eq("property", ProjectEntity.PROPERTY_PRIVATE),
-                        Restrictions.eq("CreateUserId", userId)
-                ,
-                        Restrictions.eq("deleteFlag", BaseEntity.DELETE_FLAG_NO),
-                        Restrictions.eq("property", ProjectEntity.PROPERTY_PUBLIC)
-                )
+                        Restrictions.or(
+                                Restrictions.and(
+                                        Restrictions.eq("deleteFlag", BaseEntity.DELETE_FLAG_NO),
+                                        Restrictions.eq("property", ProjectEntity.PROPERTY_PUBLIC))
+                                ,Restrictions.and(
+                                        Restrictions.eq("deleteFlag", BaseEntity.DELETE_FLAG_NO),
+                                        Restrictions.eq("property", ProjectEntity.PROPERTY_PRIVATE),
+                                        Restrictions.eq("createUserID", userId)
+                                )
+                        )
         };
     }
 }

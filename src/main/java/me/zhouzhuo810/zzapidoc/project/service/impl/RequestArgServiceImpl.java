@@ -27,4 +27,9 @@ public class RequestArgServiceImpl extends BaseServiceImpl<RequestArgEntity> imp
     public RequestArgDao getBaseDao() {
         return (RequestArgDao) this.baseDao;
     }
+
+    @Override
+    public void deleteByInterfaceId(String interfaceId) {
+        getBaseDao().deleteByInterfaceId(interfaceId);
+    }
 }

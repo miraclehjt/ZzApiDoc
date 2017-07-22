@@ -31,7 +31,7 @@ public class ProjectAction extends BaseController<ProjectEntity> {
     }
 
     @ResponseBody
-    @RequestMapping(value = "/addProject", method = RequestMethod.GET)
+    @RequestMapping(value = "/addProject", method = RequestMethod.POST)
     public BaseResult addProject(
             @RequestParam(value = "name") String name,
             @RequestParam(value = "property") String property,
@@ -42,7 +42,7 @@ public class ProjectAction extends BaseController<ProjectEntity> {
     }
 
     @ResponseBody
-    @RequestMapping(value = "/updateProject", method = RequestMethod.GET)
+    @RequestMapping(value = "/updateProject", method = RequestMethod.POST)
     public BaseResult updateProject(
             @RequestParam(value = "projectId") String projectId,
             @RequestParam(value = "name") String name,
@@ -54,7 +54,7 @@ public class ProjectAction extends BaseController<ProjectEntity> {
     }
 
     @ResponseBody
-    @RequestMapping(value = "/deleteProject", method = RequestMethod.GET)
+    @RequestMapping(value = "/deleteProject", method = RequestMethod.POST)
     public BaseResult deleteProject(
             @RequestParam(value = "id") String id,
             @RequestParam(value = "userId") String userId

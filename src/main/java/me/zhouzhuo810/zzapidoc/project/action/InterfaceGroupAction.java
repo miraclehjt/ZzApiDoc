@@ -33,7 +33,7 @@ public class InterfaceGroupAction extends BaseController<InterfaceGroupEntity> {
     }
 
     @ResponseBody
-    @RequestMapping(value = "/addInterfaceGroup", method = RequestMethod.GET)
+    @RequestMapping(value = "/addInterfaceGroup", method = RequestMethod.POST)
     public BaseResult addInterfaceGroup(
             @RequestParam(value = "name") String name,
             @RequestParam(value = "projectId") String projectId,
@@ -43,7 +43,7 @@ public class InterfaceGroupAction extends BaseController<InterfaceGroupEntity> {
     }
 
     @ResponseBody
-    @RequestMapping(value = "/updateInterfaceGroup", method = RequestMethod.GET)
+    @RequestMapping(value = "/updateInterfaceGroup", method = RequestMethod.POST)
     public BaseResult updateInterfaceGroup(
             @RequestParam(value = "InterfaceGroupId") String InterfaceGroupId,
             @RequestParam(value = "name") String name,
@@ -54,7 +54,7 @@ public class InterfaceGroupAction extends BaseController<InterfaceGroupEntity> {
     }
 
     @ResponseBody
-    @RequestMapping(value = "/deleteInterfaceGroup", method = RequestMethod.GET)
+    @RequestMapping(value = "/deleteInterfaceGroup", method = RequestMethod.POST)
     public BaseResult deleteInterfaceGroup(
             @RequestParam(value = "id") String id,
             @RequestParam(value = "userId") String userId

@@ -9,7 +9,7 @@ import java.io.*;
  */
 public class FileUtils {
 
-    public static String saveFileToServer(MultipartFile multipartFile, String path)
+    public static String saveFileToServer(String content, String path)
             throws IOException {
         // 创建目录
         File dir = new File(path);
@@ -17,20 +17,15 @@ public class FileUtils {
             dir.mkdir();
         }
         // 读取文件流并保持在指定路径
-        InputStream inputStream = multipartFile.getInputStream();
-        OutputStream outputStream = new FileOutputStream(path
-                + multipartFile.getOriginalFilename());
-        byte[] buffer = multipartFile.getBytes();
-        int byteSum = 0;
-        int byteRead = 0;
-        while ((byteRead = inputStream.read(buffer)) != -1) {
-            byteSum += byteRead;
-            outputStream.write(buffer, 0, byteRead);
-            outputStream.flush();
-        }
+        String filename = System.currentTimeMillis()+".json";
+        String mPath = path
+                + filename;
+        OutputStream outputStream = new FileOutputStream(mPath);
+        byte[] buffer = content.getBytes();
+        outputStream.write(buffer);
+        outputStream.flush();
         outputStream.close();
-        inputStream.close();
-        return path + multipartFile.getOriginalFilename();
+        return filename;
     }
 
 

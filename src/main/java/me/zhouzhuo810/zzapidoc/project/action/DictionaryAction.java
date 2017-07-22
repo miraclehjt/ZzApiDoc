@@ -31,7 +31,7 @@ public class DictionaryAction extends BaseController<DictionaryEntity> {
     }
 
     @ResponseBody
-    @RequestMapping(value = "/addDictionary", method = RequestMethod.GET)
+    @RequestMapping(value = "/addDictionary", method = RequestMethod.POST)
     public BaseResult addDictionary(
             @RequestParam(value = "name") String name,
             @RequestParam(value = "type") String type,
