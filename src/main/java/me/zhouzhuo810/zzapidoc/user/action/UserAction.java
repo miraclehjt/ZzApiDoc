@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 
@@ -33,11 +34,24 @@ public class UserAction extends BaseController<UserEntity> {
 
 
     @ResponseBody
-    @RequestMapping(value = "/userLogin", method = RequestMethod.POST)
+    @RequestMapping(value = "/userLogin", method = RequestMethod.GET)
     public BaseResult doLogin(
             @RequestParam(value = "phone") String phone,
             @RequestParam(value = "password") String password
     ) {
         return getService().doLogin(phone, password);
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/userRegister", method = RequestMethod.GET)
+    public BaseResult doResigter(
+            @RequestParam(value = "phone") String phone,
+            @RequestParam(value = "password") String password,
+            @RequestParam(value = "name", required = false) String name,
+            @RequestParam(value = "sex", required = false) String sex,
+            @RequestParam(value = "email",required = false) String email
+
+    ) {
+        return getService().doRegister(phone, password, name, sex, email);
     }
 }

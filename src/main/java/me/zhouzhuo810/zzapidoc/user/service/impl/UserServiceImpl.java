@@ -3,13 +3,17 @@ package me.zhouzhuo810.zzapidoc.user.service.impl;
 import me.zhouzhuo810.zzapidoc.common.dao.BaseDao;
 import me.zhouzhuo810.zzapidoc.common.result.BaseResult;
 import me.zhouzhuo810.zzapidoc.common.service.impl.BaseServiceImpl;
+import me.zhouzhuo810.zzapidoc.common.utils.FileUtils;
 import me.zhouzhuo810.zzapidoc.common.utils.MapUtils;
 import me.zhouzhuo810.zzapidoc.common.utils.StringUtils;
 import me.zhouzhuo810.zzapidoc.user.dao.UserDao;
 import me.zhouzhuo810.zzapidoc.user.entity.UserEntity;
 import me.zhouzhuo810.zzapidoc.user.service.UserService;
 import me.zhouzhuo810.zzapidoc.user.utils.UserUtils;
+import org.omg.IOP.ServiceContext;
+import org.omg.IOP.ServiceContextHelper;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.util.HashMap;
@@ -48,5 +52,29 @@ public class UserServiceImpl extends BaseServiceImpl<UserEntity> implements User
         map.put("pic", userEntity.getPic());
         map.put("name", userEntity.getName());
         return new BaseResult(1, "登录成功！", map.build());
+    }
+
+    @Override
+    public BaseResult doRegister(String phone, String password, String name, String sex, String email) {
+        if (StringUtils.isEmpty(phone))
+            return new BaseResult(0, "手机号不能为空！", new HashMap<String, String>());
+        if (StringUtils.isEmpty(password))
+            return new BaseResult(0, "密码不能为空！", new HashMap<String, String>());
+        UserEntity entity = new UserEntity();
+        entity.setName(name);
+        entity.setPhone(phone);
+        entity.setEmail(email);
+        entity.setSex(sex);
+        entity.setPassword(password);
+        try {
+            getDAO().save(entity);
+            String id = entity.getId();
+            MapUtils map = new MapUtils();
+            map.put("id", id);
+            return new BaseResult(1, "注册成功！", map.build());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new BaseResult(0 , "注册失败！", new HashMap<String, String>());
+        }
     }
 }
