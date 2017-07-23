@@ -16,4 +16,12 @@ public class ResponseArgUtils {
         };
     }
 
+    public static Criterion[] getArgByInterfaceIdAndPid(String interfaceId, String pid) {
+        return new Criterion[]{
+                Restrictions.eq("deleteFlag", BaseEntity.DELETE_FLAG_NO),
+                Restrictions.eq("interfaceId", interfaceId),
+                Restrictions.eq("pid", pid)
+        };
+    }
+
 }

@@ -18,7 +18,7 @@ public class FileUtils {
         }
         // 读取文件流并保持在指定路径
         String filename = System.currentTimeMillis()+".json";
-        String mPath = path
+        String mPath = path + File.separator
                 + filename;
         OutputStream outputStream = new FileOutputStream(mPath);
         byte[] buffer = content.getBytes();

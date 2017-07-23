@@ -14,4 +14,12 @@ public class InterfaceUtils {
                 Restrictions.eq("projectId", projectId)
         };
     }
+
+    public static Criterion[] getInterfaceByGroupId(String projectId, String groupIds) {
+        return new Criterion[]{
+                Restrictions.eq("deleteFlag", BaseEntity.DELETE_FLAG_NO),
+                Restrictions.eq("projectId", projectId),
+                Restrictions.eq("groupId", groupIds)
+        };
+    }
 }
