@@ -41,6 +41,14 @@ public class InterfaceGroupAction extends BaseController<InterfaceGroupEntity> {
     ) {
         return getService().addInterfaceGroup(name, projectId, userId);
     }
+    @ResponseBody
+    @RequestMapping(value = "/getAllInterfaceGroup", method = RequestMethod.GET)
+    public BaseResult getAllInterfaceGroup(
+            @RequestParam(value = "projectId") String projectId,
+            @RequestParam(value = "userId") String userId
+    ) {
+        return getService().getAllInterfaceGroup(projectId, userId);
+    }
 
     @ResponseBody
     @RequestMapping(value = "/updateInterfaceGroup", method = RequestMethod.POST)

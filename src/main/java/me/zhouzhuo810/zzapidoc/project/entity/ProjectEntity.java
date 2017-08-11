@@ -1,6 +1,7 @@
 package me.zhouzhuo810.zzapidoc.project.entity;
 
 import me.zhouzhuo810.zzapidoc.common.entity.BaseEntity;
+import org.hibernate.annotations.Formula;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -25,6 +26,17 @@ public class ProjectEntity extends BaseEntity {
 
     @Column(name = "Note",columnDefinition = "TEXT")
     private String note;
+
+    @Formula("(SELECT count(*) FROM interfaces i WHERE i.ProjectId = ID AND i.DelFlag = 0)")
+    private int interfaceNo;
+
+    public int getInterfaceNo() {
+        return interfaceNo;
+    }
+
+    public void setInterfaceNo(int interfaceNo) {
+        this.interfaceNo = interfaceNo;
+    }
 
     public String getProperty() {
         return property;

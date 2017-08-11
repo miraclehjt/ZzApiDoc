@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.HashMap;
 
 public abstract class BaseController<E extends BaseEntity> {
 
@@ -139,7 +140,7 @@ public abstract class BaseController<E extends BaseEntity> {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     public BaseResult resolveException(MissingServletRequestParameterException errors) {
-        return new BaseResult(0, errors.getParameterName() + " 不能为空");
+        return new BaseResult(0, errors.getParameterName() + " 不能为空", new HashMap<String,String>());
     }
 
     public Class<E> getEntityClass() {

@@ -34,6 +34,28 @@ public class InterfaceEntity extends BaseEntity {
     @Column(name = "Path", length = 255)
     private String path;
 
+    @Formula("(SELECT count(*) FROM request_args r WHERE r.InterfaceId = ID AND r.DelFlag = 0)")
+    private int requestParamsNo;
+
+    @Formula("(SELECT count(*) FROM response_args r WHERE r.InterfaceId = ID AND r.DelFlag = 0)")
+    private int responseParamsNo;
+
+    public int getRequestParamsNo() {
+        return requestParamsNo;
+    }
+
+    public void setRequestParamsNo(int requestParamsNo) {
+        this.requestParamsNo = requestParamsNo;
+    }
+
+    public int getResponseParamsNo() {
+        return responseParamsNo;
+    }
+
+    public void setResponseParamsNo(int responseParamsNo) {
+        this.responseParamsNo = responseParamsNo;
+    }
+
     public String getHttpMethodName() {
         return httpMethodName;
     }

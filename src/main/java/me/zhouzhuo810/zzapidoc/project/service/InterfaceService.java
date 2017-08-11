@@ -20,6 +20,8 @@ public interface InterfaceService extends BaseService<InterfaceEntity> {
 
     BaseResult getAllInterface(String projectId, String userId);
 
+    BaseResult getInterfaceByGroupId(String groupId, String userId);
+
     BaseResult getInterfaceDetails(String interfaceId, String userId);
 
     ResponseEntity<byte[]> download(String projectId, String userId);

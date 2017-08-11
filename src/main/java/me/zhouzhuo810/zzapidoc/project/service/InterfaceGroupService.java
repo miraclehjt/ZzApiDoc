@@ -14,4 +14,6 @@ public interface InterfaceGroupService extends BaseService<InterfaceGroupEntity>
     BaseResult updateInterfaceGroup(String interfaceGroupId, String name, String projectId, String userId);
 
     BaseResult deleteInterfaceGroup(String id, String userId);
+
+    BaseResult getAllInterfaceGroup(String projectId, String userId);
 }

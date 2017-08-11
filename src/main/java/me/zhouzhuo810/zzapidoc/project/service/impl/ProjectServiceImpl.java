@@ -3,6 +3,7 @@ package me.zhouzhuo810.zzapidoc.project.service.impl;
 import me.zhouzhuo810.zzapidoc.common.dao.BaseDao;
 import me.zhouzhuo810.zzapidoc.common.result.BaseResult;
 import me.zhouzhuo810.zzapidoc.common.service.impl.BaseServiceImpl;
+import me.zhouzhuo810.zzapidoc.common.utils.DataUtils;
 import me.zhouzhuo810.zzapidoc.common.utils.MapUtils;
 import me.zhouzhuo810.zzapidoc.project.dao.ProjectDao;
 import me.zhouzhuo810.zzapidoc.project.entity.InterfaceEntity;
@@ -126,7 +127,9 @@ public class ProjectServiceImpl extends BaseServiceImpl<ProjectEntity> implement
             map.put("name", entity.getName());
             map.put("note", entity.getNote());
             map.put("property", entity.getProperty());
+            map.put("interfaceNo", entity.getInterfaceNo());
             map.put("createUserName", entity.getCreateUserName());
+            map.put("createTime", DataUtils.formatDate(entity.getCreateTime()));
             result.add(map.build());
         }
         return new BaseResult(1, "ok", result);

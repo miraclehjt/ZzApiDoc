@@ -124,6 +124,16 @@ public class InterfaceAction extends BaseController<InterfaceEntity> {
 
 
     @ResponseBody
+    @RequestMapping(value = "/getInterfaceByGroupId", method = RequestMethod.GET)
+    public BaseResult getInterfaceByGroupId(
+            @RequestParam(value = "groupId") String groupId,
+            @RequestParam(value = "userId") String userId
+    ) {
+        return getService().getInterfaceByGroupId(groupId, userId);
+    }
+
+
+    @ResponseBody
     @RequestMapping(value = "/getInterfaceDetails", method = RequestMethod.GET)
     public BaseResult getInterfaceDetails(
             @RequestParam(value = "interfaceId") String interfaceId,

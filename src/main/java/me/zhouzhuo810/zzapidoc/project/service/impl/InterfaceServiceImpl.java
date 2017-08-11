@@ -259,6 +259,36 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
             map.put("name", entity.getName());
             map.put("method", entity.getHttpMethodName());
             map.put("group", entity.getGroupName());
+            map.put("createTime", DataUtils.formatDate(entity.getCreateTime()));
+            map.put("createUserName", entity.getCreateUserName());
+            map.put("requestParamsNo", entity.getRequestParamsNo());
+            map.put("responseParamsNo", entity.getResponseParamsNo());
+            result.add(map.build());
+        }
+        return new BaseResult(1, "ok", result);
+    }
+
+    @Override
+    public BaseResult getInterfaceByGroupId(String groupId, String userId) {
+        UserEntity user = mUserService.get(userId);
+        if (user == null) {
+            return new BaseResult(0, "用户不合法");
+        }
+        List<InterfaceEntity> list = getBaseDao().executeCriteria(InterfaceUtils.getInterfaceByGroupId(groupId));
+        if (list == null) {
+            return new BaseResult(0, "暂无数据");
+        }
+        List<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
+        for (InterfaceEntity entity : list) {
+            MapUtils map = new MapUtils();
+            map.put("id", entity.getId());
+            map.put("name", entity.getName());
+            map.put("method", entity.getHttpMethodName());
+            map.put("group", entity.getGroupName());
+            map.put("createTime", DataUtils.formatDate(entity.getCreateTime()));
+            map.put("createUserName", entity.getCreateUserName());
+            map.put("requestParamsNo", entity.getRequestParamsNo());
+            map.put("responseParamsNo", entity.getResponseParamsNo());
             result.add(map.build());
         }
         return new BaseResult(1, "ok", result);
@@ -349,7 +379,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                         .key("name").value(interfaceGroupEntity.getName())
                         .key("createTime").value(DataUtils.formatDate(interfaceGroupEntity.getCreateTime()))
                         .key("createUser").value(interfaceGroupEntity.getCreateUserName());
-                List<InterfaceEntity> list = getBaseDao().executeCriteria(InterfaceUtils.getInterfaceByGroupId(projectId, interfaceGroupEntity.getId()));
+                List<InterfaceEntity> list = getBaseDao().executeCriteria(InterfaceUtils.getInterfaceByGroupId(interfaceGroupEntity.getId()));
                 if (list == null) {
                     continue;
                 }
