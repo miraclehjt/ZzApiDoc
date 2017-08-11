@@ -17,9 +17,10 @@ public class FileUtils {
             dir.mkdir();
         }
         // 读取文件流并保持在指定路径
-        String filename = System.currentTimeMillis()+".json";
+        String filename = System.currentTimeMillis()+".txt";
         String mPath = path + File.separator
                 + filename;
+        System.out.println(path);
         OutputStream outputStream = new FileOutputStream(mPath);
         byte[] buffer = content.getBytes();
         outputStream.write(buffer);
