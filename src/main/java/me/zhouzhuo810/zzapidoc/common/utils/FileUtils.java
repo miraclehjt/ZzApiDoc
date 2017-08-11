@@ -17,7 +17,7 @@ public class FileUtils {
             dir.mkdir();
         }
         // 读取文件流并保持在指定路径
-        String filename = System.currentTimeMillis()+".txt";
+        String filename = System.currentTimeMillis() + ".txt";
         String mPath = path + File.separator
                 + filename;
         System.out.println(path);
@@ -29,5 +29,18 @@ public class FileUtils {
         return filename;
     }
 
-
+    public static void deleteFiles(String dir) {
+        File file = new File(dir);
+        if (!file.exists()) {
+            return;
+        }
+        if (file.isDirectory()) {
+            File[] files = file.listFiles();
+            if (files != null && files.length > 0) {
+                for (File file1 : files) {
+                    file1.delete();
+                }
+            }
+        }
+    }
 }

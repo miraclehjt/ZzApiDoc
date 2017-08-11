@@ -1,6 +1,9 @@
 package me.zhouzhuo810.zzapidoc.project.service.impl;
 
+import me.zhouzhuo810.zzapidoc.cache.entity.CacheEntity;
+import me.zhouzhuo810.zzapidoc.cache.service.CacheService;
 import me.zhouzhuo810.zzapidoc.common.dao.BaseDao;
+import me.zhouzhuo810.zzapidoc.common.entity.BaseEntity;
 import me.zhouzhuo810.zzapidoc.common.result.BaseResult;
 import me.zhouzhuo810.zzapidoc.common.service.impl.BaseServiceImpl;
 import me.zhouzhuo810.zzapidoc.common.utils.DataUtils;
@@ -13,6 +16,8 @@ import me.zhouzhuo810.zzapidoc.project.utils.ResponseArgUtils;
 import me.zhouzhuo810.zzapidoc.user.entity.UserEntity;
 import me.zhouzhuo810.zzapidoc.user.service.UserService;
 import org.apache.commons.io.FileUtils;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Restrictions;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONStringer;
@@ -51,6 +56,10 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
 
     @Resource(name = "interfaceGroupServiceImpl")
     InterfaceGroupService mInterfaceGroupService;
+
+    @Resource(name = "cacheServiceImpl")
+    CacheService mCacheService;
+
 
     @Override
     @Resource(name = "interfaceDaoImpl")
@@ -425,7 +434,19 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
             if (resource != null) {
                 String path = resource.getPath();
                 if (path != null) {
-                    String mPath = new File(path).getParent();
+                    String mPath = new File(path).getParent() + File.separator + "JSON";
+                    CacheEntity cacheEntity = new CacheEntity();
+                    cacheEntity.setCachePath(mPath);
+                    try {
+                        List<CacheEntity> cacheEntities = mCacheService.executeCriteria(new Criterion[]{
+                                Restrictions.eq("deleteFlag", BaseEntity.DELETE_FLAG_NO),
+                                Restrictions.eq("cachePath", mPath)});
+                        if (cacheEntities == null || cacheEntities.size() == 0) {
+                            mCacheService.save(cacheEntity);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                     String fileName = me.zhouzhuo810.zzapidoc.common.utils.FileUtils.saveFileToServer(stringer.toString(), mPath);
                     HttpHeaders headers = new HttpHeaders();
                     headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
