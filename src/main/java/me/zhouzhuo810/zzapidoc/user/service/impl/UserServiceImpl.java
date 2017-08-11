@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -75,6 +76,31 @@ public class UserServiceImpl extends BaseServiceImpl<UserEntity> implements User
         } catch (Exception e) {
             e.printStackTrace();
             return new BaseResult(0 , "注册失败！", new HashMap<String, String>());
+        }
+    }
+
+    @Override
+    public BaseResult revisePswd(String userId, String oldPswd, String newPswd) {
+        UserEntity userEntity = getDAO().get(userId);
+        if (userEntity == null) {
+            return new BaseResult(0, "用户名或密码错误！");
+        }
+        if (oldPswd==null) {
+
+        }
+        if (!userEntity.getPassword().equals(oldPswd)) {
+            return new BaseResult(0, "原密码错误！");
+        }
+        userEntity.setPassword(newPswd);
+        userEntity.setModifyTime(new Date());
+        userEntity.setModifyUserID(userEntity.getId());
+        userEntity.setModifyUserName(userEntity.getName());
+        try {
+            getDAO().update(userEntity);
+            return new BaseResult(1, "修改成功！");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new BaseResult(0, "修改失败！"+e.toString());
         }
     }
 }

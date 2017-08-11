@@ -49,9 +49,19 @@ public class UserAction extends BaseController<UserEntity> {
             @RequestParam(value = "password") String password,
             @RequestParam(value = "name", required = false) String name,
             @RequestParam(value = "sex", required = false) String sex,
-            @RequestParam(value = "email",required = false) String email
+            @RequestParam(value = "email", required = false) String email
 
     ) {
         return getService().doRegister(phone, password, name, sex, email);
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/updateUserPassword", method = RequestMethod.POST)
+    public BaseResult updateUserPassword(
+            @RequestParam(value = "userId") String userId,
+            @RequestParam(value = "oldPassword") String oldPassword,
+            @RequestParam(value = "newPassword", required = false) String newPassword
+    ) {
+        return getService().revisePswd(userId, oldPassword, newPassword);
     }
 }

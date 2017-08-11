@@ -13,4 +13,6 @@ public interface UserService extends BaseService<UserEntity> {
     BaseResult doLogin(String phone, String password);
 
     BaseResult doRegister(String phone, String password, String name, String sex, String email);
+
+    BaseResult revisePswd(String userId, String oldPswd, String newPswd);
 }
