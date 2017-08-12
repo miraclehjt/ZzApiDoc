@@ -143,12 +143,14 @@ public class RequestArgServiceImpl extends BaseServiceImpl<RequestArgEntity> imp
         List<RequestArgEntity> globals = getBaseDao().executeCriteria(ResponseArgUtils.getGlobal(projectId));
 
         List<RequestArgEntity> args = getBaseDao().executeCriteria(ResponseArgUtils.getArgByInterfaceIdAndPid(interfaceId, pid));
-        if (args == null && globals == null) {
-            return new BaseResult(0, "暂无数据");
+        if (args == null) {
+            if (pid != null && pid.equals("0") && globals == null) {
+                return new BaseResult(0, "暂无数据");
+            }
         }
         List<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
 
-        if (globals != null) {
+        if (pid != null && pid.equals("0") && globals != null) {
             for (RequestArgEntity arg : globals) {
                 MapUtils map = new MapUtils();
                 map.put("id", arg.getId());

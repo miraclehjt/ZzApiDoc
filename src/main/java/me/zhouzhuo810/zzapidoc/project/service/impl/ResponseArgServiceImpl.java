@@ -142,12 +142,14 @@ public class ResponseArgServiceImpl extends BaseServiceImpl<ResponseArgEntity> i
         List<ResponseArgEntity> globals = getBaseDao().executeCriteria(ResponseArgUtils.getGlobal(projectId));
 
         List<ResponseArgEntity> args = getBaseDao().executeCriteria(ResponseArgUtils.getArgByInterfaceIdAndPid(interfaceId, pid));
-        if (args == null && globals == null) {
-            return new BaseResult(0, "暂无数据");
+        if (args == null) {
+            if (pid != null && pid.equals("0") && globals == null) {
+                return new BaseResult(0, "暂无数据");
+            }
         }
         List<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
 
-        if (globals != null) {
+        if (pid != null && pid.equals("0") && globals != null) {
             for (ResponseArgEntity arg : globals) {
                 MapUtils map = new MapUtils();
                 map.put("id", arg.getId());
@@ -182,11 +184,11 @@ public class ResponseArgServiceImpl extends BaseServiceImpl<ResponseArgEntity> i
     public BaseResult getResponseArgDetails(String id, String userId) {
         UserEntity user = mUserService.get(userId);
         if (user == null) {
-            return new BaseResult(0, "用户不合法", new HashMap<String,String >());
+            return new BaseResult(0, "用户不合法", new HashMap<String, String>());
         }
         ResponseArgEntity arg = getBaseDao().get(id);
         if (arg == null) {
-            return new BaseResult(0, "参数不存在或已被删除！", new HashMap<String,String >());
+            return new BaseResult(0, "参数不存在或已被删除！", new HashMap<String, String>());
         }
         MapUtils map = new MapUtils();
         map.put("id", arg.getId());
