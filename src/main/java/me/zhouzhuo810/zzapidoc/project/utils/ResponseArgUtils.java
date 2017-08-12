@@ -24,4 +24,13 @@ public class ResponseArgUtils {
         };
     }
 
+
+    public static Criterion[] getGlobal(String projectId) {
+        return new Criterion[] {
+                Restrictions.eq("deleteFlag", BaseEntity.DELETE_FLAG_NO),
+                Restrictions.eq("projectId", projectId),
+                Restrictions.eq("isGlobal", true)
+        };
+    }
+
 }

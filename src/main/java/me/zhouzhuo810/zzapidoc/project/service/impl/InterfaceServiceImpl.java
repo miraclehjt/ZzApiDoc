@@ -60,7 +60,6 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
     @Resource(name = "cacheServiceImpl")
     CacheService mCacheService;
 
-
     @Override
     @Resource(name = "interfaceDaoImpl")
     public void setBaseDao(BaseDao<InterfaceEntity> baseDao) {
@@ -266,6 +265,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
             MapUtils map = new MapUtils();
             map.put("id", entity.getId());
             map.put("name", entity.getName());
+            map.put("path", entity.getPath());
             map.put("method", entity.getHttpMethodName());
             map.put("group", entity.getGroupName());
             map.put("createTime", DataUtils.formatDate(entity.getCreateTime()));
@@ -278,12 +278,20 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
     }
 
     @Override
-    public BaseResult getInterfaceByGroupId(String groupId, String userId) {
+    public BaseResult getInterfaceByGroupId(String projectId, String groupId, String userId) {
         UserEntity user = mUserService.get(userId);
         if (user == null) {
             return new BaseResult(0, "用户不合法");
         }
+        InterfaceGroupEntity group = mInterfaceGroupService.get(groupId);
+        if (group == null) {
+            return new BaseResult(0, "分组不存在或已被删除");
+        }
         List<InterfaceEntity> list = getBaseDao().executeCriteria(InterfaceUtils.getInterfaceByGroupId(groupId));
+        List<RequestArgEntity> globalRequestArgs = mRequestArgService.getGlobalRequestArgs(projectId);
+        int globalReqSize = globalRequestArgs == null ? 0 : globalRequestArgs.size();
+        List<ResponseArgEntity> globalResponseArgs = mResponseArgService.getGlobalResponseArgs(projectId);
+        int globalResSize = globalResponseArgs == null ? 0 : globalResponseArgs.size();
         if (list == null) {
             return new BaseResult(0, "暂无数据");
         }
@@ -294,10 +302,12 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
             map.put("name", entity.getName());
             map.put("method", entity.getHttpMethodName());
             map.put("group", entity.getGroupName());
+            map.put("ip", group.getIp());
+            map.put("path", entity.getPath());
             map.put("createTime", DataUtils.formatDate(entity.getCreateTime()));
             map.put("createUserName", entity.getCreateUserName());
-            map.put("requestParamsNo", entity.getRequestParamsNo());
-            map.put("responseParamsNo", entity.getResponseParamsNo());
+            map.put("requestParamsNo", entity.getRequestParamsNo()+globalReqSize);
+            map.put("responseParamsNo", entity.getResponseParamsNo()+globalResSize);
             result.add(map.build());
         }
         return new BaseResult(1, "ok", result);
@@ -380,12 +390,17 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
             /*分组数组开始*/
             stringer.object()
                     .key("name").value("默认模块")
+                   /*请求参数*/
+                    .key("requestArgs").value(globalRequestToJson(projectId))
+                    /*返回参数*/
+                     .key("responseArgs").value(globalResponseToJson(projectId))
                     .key("folders").array();
             for (InterfaceGroupEntity interfaceGroupEntity : groups) {
                 /*分组基本信息*/
                 stringer.object()
                         .key("id").value(interfaceGroupEntity.getId())
                         .key("name").value(interfaceGroupEntity.getName())
+                        .key("ip").value(interfaceGroupEntity.getIp())
                         .key("createTime").value(DataUtils.formatDate(interfaceGroupEntity.getCreateTime()))
                         .key("createUser").value(interfaceGroupEntity.getCreateUserName());
                 List<InterfaceEntity> list = getBaseDao().executeCriteria(InterfaceUtils.getInterfaceByGroupId(interfaceGroupEntity.getId()));
@@ -409,7 +424,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                     stringer.key("requestArgs").value(requestToJson(entity.getId(), "0"));
 
                     /*返回参数*/
-                    stringer.key("responseArgs").value(responseToJson(entity.getId(), "0"));
+                    stringer.key("responseArgs").value(responseToJson(projectId, entity.getId(), "0"));
 
                     /*接口信息结束*/
                     stringer.endObject();
@@ -498,10 +513,40 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
         return stringer.toString();
     }
 
-    private String responseToJson(String interfaceId, String pid) {
+    private String responseToJson(String projectId, String interfaceId, String pid) {
         JSONStringer stringer = new JSONStringer();
         List<ResponseArgEntity> responseArgEntities = mResponseArgService.executeCriteria(ResponseArgUtils.getArgByInterfaceIdAndPid(interfaceId, pid));
+        List<ResponseArgEntity> globals = mResponseArgService.executeCriteria(ResponseArgUtils.getGlobal(projectId));
         stringer.array();
+        if (globals != null) {
+            for (ResponseArgEntity responseArgEntity : globals) {
+                stringer.object()
+                        .key("id").value(responseArgEntity.getId())
+                        .key("name").value(responseArgEntity.getName())
+                        .key("pid").value(responseArgEntity.getPid())
+                        .key("typeId").value(responseArgEntity.getTypeId())
+                        .key("description").value(responseArgEntity.getNote() == null ? "" : responseArgEntity.getNote());
+                switch (responseArgEntity.getTypeId()) {
+                    case ResponseArgEntity.TYPE_STRING:
+                        stringer.key("type").value("string");
+                        stringer.key("children").array().endArray();
+                        break;
+                    case ResponseArgEntity.TYPE_NUMBER:
+                        stringer.key("type").value("number");
+                        stringer.key("children").array().endArray();
+                        break;
+                    case ResponseArgEntity.TYPE_ARRAY_OBJECT:
+                        stringer.key("type").value("array[object]");
+                        responseToChildJson(stringer, interfaceId, responseArgEntity.getId());
+                        break;
+                    case ResponseArgEntity.TYPE_OBJECT:
+                        stringer.key("type").value("object");
+                        stringer.key("children").array().endArray();
+                        break;
+                }
+                stringer.endObject();
+            }
+        }
         if (responseArgEntities != null) {
             for (ResponseArgEntity responseArgEntity : responseArgEntities) {
                 stringer.object()
@@ -522,6 +567,73 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                     case ResponseArgEntity.TYPE_ARRAY_OBJECT:
                         stringer.key("type").value("array[object]");
                         responseToChildJson(stringer, interfaceId, responseArgEntity.getId());
+                        break;
+                    case ResponseArgEntity.TYPE_OBJECT:
+                        stringer.key("type").value("object");
+                        stringer.key("children").array().endArray();
+                        break;
+                }
+                stringer.endObject();
+            }
+        }
+        stringer.endArray();
+        return stringer.toString();
+    }
+
+
+    private String globalRequestToJson(String projectId) {
+        JSONStringer stringer = new JSONStringer();
+        List<RequestArgEntity> requestArgEntities = mRequestArgService.executeCriteria(ResponseArgUtils.getGlobal(projectId));
+        stringer.array();
+        if (requestArgEntities != null) {
+            for (RequestArgEntity req : requestArgEntities) {
+                stringer.object()
+                        .key("id").value(req.getId())
+                        .key("name").value(req.getName())
+                        .key("pid").value(req.getPid())
+                        .key("typeId").value(req.getTypeId())
+                        .key("description").value(req.getNote() == null ? "" : req.getNote());
+                switch (req.getTypeId()) {
+                    case ResponseArgEntity.TYPE_STRING:
+                        stringer.key("type").value("string");
+                        stringer.key("children").array().endArray();
+                        break;
+                    case ResponseArgEntity.TYPE_NUMBER:
+                        stringer.key("type").value("number");
+                        stringer.key("children").array().endArray();
+                        break;
+                    case ResponseArgEntity.TYPE_OBJECT:
+                        stringer.key("type").value("object");
+                        stringer.key("children").array().endArray();
+                        break;
+                }
+                stringer.endObject();
+            }
+        }
+        stringer.endArray();
+        return stringer.toString();
+    }
+
+    private String globalResponseToJson(String projectId) {
+        JSONStringer stringer = new JSONStringer();
+        List<ResponseArgEntity> responseArgEntities = mResponseArgService.executeCriteria(ResponseArgUtils.getGlobal(projectId));
+        stringer.array();
+        if (responseArgEntities != null) {
+            for (ResponseArgEntity responseArgEntity : responseArgEntities) {
+                stringer.object()
+                        .key("id").value(responseArgEntity.getId())
+                        .key("name").value(responseArgEntity.getName())
+                        .key("pid").value(responseArgEntity.getPid())
+                        .key("typeId").value(responseArgEntity.getTypeId())
+                        .key("description").value(responseArgEntity.getNote() == null ? "" : responseArgEntity.getNote());
+                switch (responseArgEntity.getTypeId()) {
+                    case ResponseArgEntity.TYPE_STRING:
+                        stringer.key("type").value("string");
+                        stringer.key("children").array().endArray();
+                        break;
+                    case ResponseArgEntity.TYPE_NUMBER:
+                        stringer.key("type").value("number");
+                        stringer.key("children").array().endArray();
                         break;
                     case ResponseArgEntity.TYPE_OBJECT:
                         stringer.key("type").value("object");

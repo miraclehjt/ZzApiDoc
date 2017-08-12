@@ -9,9 +9,9 @@ import me.zhouzhuo810.zzapidoc.project.entity.InterfaceGroupEntity;
  */
 public interface InterfaceGroupService extends BaseService<InterfaceGroupEntity> {
 
-    BaseResult addInterfaceGroup(String name, String projectId, String userId);
+    BaseResult addInterfaceGroup(String name, String projectId, String ip, String userId);
 
-    BaseResult updateInterfaceGroup(String interfaceGroupId, String name, String projectId, String userId);
+    BaseResult updateInterfaceGroup(String interfaceGroupId, String name, String projectId, String ip, String userId);
 
     BaseResult deleteInterfaceGroup(String id, String userId);
 

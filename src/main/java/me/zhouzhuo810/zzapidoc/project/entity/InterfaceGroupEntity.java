@@ -18,9 +18,18 @@ public class InterfaceGroupEntity extends BaseEntity {
     private String name;
     @Column(name = "ProjectId", length = 50)
     private String projectId;
-
+    @Column(name = "Ip", length = 255)
+    private String ip;
     @Formula("(SELECT count(*) FROM interfaces i WHERE i.GroupId = ID AND i.DelFlag = 0)")
     private int interfaceNo;
+
+    public String getIp() {
+        return ip;
+    }
+
+    public void setIp(String ip) {
+        this.ip = ip;
+    }
 
     public int getInterfaceNo() {
         return interfaceNo;

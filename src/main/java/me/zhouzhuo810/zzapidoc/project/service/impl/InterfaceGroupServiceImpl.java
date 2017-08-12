@@ -42,11 +42,12 @@ public class InterfaceGroupServiceImpl extends BaseServiceImpl<InterfaceGroupEnt
 
 
     @Override
-    public BaseResult addInterfaceGroup(String name, String projectId, String userId) {
+    public BaseResult addInterfaceGroup(String name, String projectId, String ip, String userId) {
         UserEntity user = mUserService.get(userId);
         InterfaceGroupEntity entity = new InterfaceGroupEntity();
         entity.setName(name);
         entity.setProjectId(projectId);
+        entity.setIp(ip);
         if (user != null) {
             entity.setCreateUserID(user.getId());
             entity.setCreateUserName(user.getName());
@@ -63,12 +64,13 @@ public class InterfaceGroupServiceImpl extends BaseServiceImpl<InterfaceGroupEnt
     }
 
     @Override
-    public BaseResult updateInterfaceGroup(String interfaceGroupId, String name, String projectId, String userId) {
+    public BaseResult updateInterfaceGroup(String interfaceGroupId, String name, String projectId,String ip, String userId) {
         UserEntity user = mUserService.get(userId);
         InterfaceGroupEntity entity = getBaseDao().get(interfaceGroupId);
         if (entity == null) {
             return new BaseResult(0, "该接口分组不存在或已被删除！");
         }
+        entity.setIp(ip);
         entity.setName(name);
         entity.setProjectId(projectId);
         if (user != null) {
@@ -124,6 +126,7 @@ public class InterfaceGroupServiceImpl extends BaseServiceImpl<InterfaceGroupEnt
             MapUtils map = new MapUtils();
             map.put("id", group.getId());
             map.put("name", group.getName());
+            map.put("ip", group.getIp());
             map.put("interfaceNo", group.getInterfaceNo());
             map.put("createTime", DataUtils.formatDate(group.getCreateTime()));
             map.put("createUserName", group.getCreateUserName());

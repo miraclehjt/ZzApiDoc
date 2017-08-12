@@ -8,6 +8,8 @@ import me.zhouzhuo810.zzapidoc.common.utils.MapUtils;
 import me.zhouzhuo810.zzapidoc.project.dao.ProjectDao;
 import me.zhouzhuo810.zzapidoc.project.entity.InterfaceEntity;
 import me.zhouzhuo810.zzapidoc.project.entity.ProjectEntity;
+import me.zhouzhuo810.zzapidoc.project.entity.RequestArgEntity;
+import me.zhouzhuo810.zzapidoc.project.entity.ResponseArgEntity;
 import me.zhouzhuo810.zzapidoc.project.service.ProjectService;
 import me.zhouzhuo810.zzapidoc.project.utils.ProjectUtils;
 import me.zhouzhuo810.zzapidoc.user.entity.UserEntity;
@@ -24,7 +26,7 @@ import java.util.Map;
  * Created by admin on 2017/7/22.
  */
 @Service
-public class ProjectServiceImpl extends BaseServiceImpl<ProjectEntity> implements ProjectService{
+public class ProjectServiceImpl extends BaseServiceImpl<ProjectEntity> implements ProjectService {
 
     @Resource(name = "userServiceImpl")
     UserService mUserService;
@@ -43,14 +45,15 @@ public class ProjectServiceImpl extends BaseServiceImpl<ProjectEntity> implement
     @Override
     public BaseResult addProject(String name, String note, String property, String userId) {
         UserEntity user = mUserService.get(userId);
+        if (user == null) {
+            return new BaseResult(0, "用户不合法！", new HashMap<String, String>());
+        }
         ProjectEntity entity = new ProjectEntity();
         entity.setName(name);
         entity.setNote(note);
         entity.setProperty(property);
-        if (user != null) {
-            entity.setCreateUserID(user.getId());
-            entity.setCreateUserName(user.getName());
-        }
+        entity.setCreateUserID(user.getId());
+        entity.setCreateUserName(user.getName());
         try {
             getBaseDao().save(entity);
             String id = entity.getId();
@@ -65,22 +68,23 @@ public class ProjectServiceImpl extends BaseServiceImpl<ProjectEntity> implement
 
     @Override
     public BaseResult deleteProject(String id, String userId) {
+        UserEntity user = mUserService.get(userId);
+        if (user == null) {
+            return new BaseResult(0, "用户不合法！", new HashMap<String, String>());
+        }
         ProjectEntity entity = getBaseDao().get(id);
         if (entity == null) {
-            return new BaseResult(0 , "该项目不存在或已被删除！");
+            return new BaseResult(0, "该项目不存在或已被删除！");
         }
-        UserEntity user = mUserService.get(userId);
-        if (user != null) {
-            entity.setModifyUserID(user.getId());
-            entity.setModifyUserName(user.getName());
-        }
+        entity.setModifyUserID(user.getId());
+        entity.setModifyUserName(user.getName());
         try {
             update(entity);
         } catch (Exception e) {
             e.printStackTrace();
         }
         try {
-            getBaseDao().deleteLogicByIds(new String[] {id});
+            getBaseDao().deleteLogicByIds(new String[]{id});
             return new BaseResult(1, "刪除成功！");
         } catch (Exception e) {
             e.printStackTrace();
@@ -91,16 +95,17 @@ public class ProjectServiceImpl extends BaseServiceImpl<ProjectEntity> implement
     @Override
     public BaseResult updateProject(String projectId, String name, String note, String property, String userId) {
         UserEntity user = mUserService.get(userId);
+        if (user == null) {
+            return new BaseResult(0, "用户不合法！", new HashMap<String, String>());
+        }
         ProjectEntity entity = getBaseDao().get(projectId);
         if (entity == null)
-            return new BaseResult(0 , "该工程不存在或已被删除！");
+            return new BaseResult(0, "该工程不存在或已被删除！");
         entity.setName(name);
         entity.setNote(note);
         entity.setProperty(property);
-        if (user != null) {
-            entity.setModifyUserID(user.getId());
-            entity.setModifyUserName(user.getName());
-        }
+        entity.setModifyUserID(user.getId());
+        entity.setModifyUserName(user.getName());
         try {
             getBaseDao().update(entity);
             return new BaseResult(1, "修改成功！");
@@ -120,7 +125,7 @@ public class ProjectServiceImpl extends BaseServiceImpl<ProjectEntity> implement
         if (list == null) {
             return new BaseResult(0, "暂无数据");
         }
-        List<Map<String,Object>> result  = new ArrayList<Map<String, Object>>();
+        List<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
         for (ProjectEntity entity : list) {
             MapUtils map = new MapUtils();
             map.put("id", entity.getId());
@@ -137,9 +142,13 @@ public class ProjectServiceImpl extends BaseServiceImpl<ProjectEntity> implement
 
     @Override
     public BaseResult getProjectDetails(String projectId, String userId) {
+        UserEntity user = mUserService.get(userId);
+        if (user == null) {
+            return new BaseResult(0, "用户不合法！", new HashMap<String, String>());
+        }
         ProjectEntity entity = getBaseDao().get(projectId);
         if (entity == null) {
-            return new BaseResult(0, "项目不存在或已被删除！", new HashMap<String,String>());
+            return new BaseResult(0, "项目不存在或已被删除！", new HashMap<String, String>());
         }
         MapUtils map = new MapUtils();
         map.put("id", entity.getId());
@@ -149,4 +158,5 @@ public class ProjectServiceImpl extends BaseServiceImpl<ProjectEntity> implement
         map.put("createUserName", entity.getCreateUserName());
         return new BaseResult(1, "ok", map.build());
     }
+
 }

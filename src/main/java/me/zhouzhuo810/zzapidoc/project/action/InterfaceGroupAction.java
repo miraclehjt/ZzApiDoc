@@ -4,9 +4,7 @@ import me.zhouzhuo810.zzapidoc.common.action.BaseController;
 import me.zhouzhuo810.zzapidoc.common.result.BaseResult;
 import me.zhouzhuo810.zzapidoc.common.service.BaseService;
 import me.zhouzhuo810.zzapidoc.project.entity.InterfaceGroupEntity;
-import me.zhouzhuo810.zzapidoc.project.entity.InterfaceGroupEntity;
 import me.zhouzhuo810.zzapidoc.project.service.InterfaceGroupService;
-import me.zhouzhuo810.zzapidoc.project.service.InterfaceService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -37,9 +35,10 @@ public class InterfaceGroupAction extends BaseController<InterfaceGroupEntity> {
     public BaseResult addInterfaceGroup(
             @RequestParam(value = "name") String name,
             @RequestParam(value = "projectId") String projectId,
+            @RequestParam(value = "ip") String ip,
             @RequestParam(value = "userId") String userId
     ) {
-        return getService().addInterfaceGroup(name, projectId, userId);
+        return getService().addInterfaceGroup(name, projectId, ip, userId);
     }
     @ResponseBody
     @RequestMapping(value = "/getAllInterfaceGroup", method = RequestMethod.GET)
@@ -53,12 +52,13 @@ public class InterfaceGroupAction extends BaseController<InterfaceGroupEntity> {
     @ResponseBody
     @RequestMapping(value = "/updateInterfaceGroup", method = RequestMethod.POST)
     public BaseResult updateInterfaceGroup(
-            @RequestParam(value = "InterfaceGroupId") String InterfaceGroupId,
+            @RequestParam(value = "interfaceGroupId") String interfaceGroupId,
             @RequestParam(value = "name") String name,
             @RequestParam(value = "projectId") String projectId,
+            @RequestParam(value = "ip") String ip,
             @RequestParam(value = "userId") String userId
     ) {
-        return getService().updateInterfaceGroup(InterfaceGroupId, name, projectId, userId);
+        return getService().updateInterfaceGroup(interfaceGroupId, name, projectId, ip, userId);
     }
 
     @ResponseBody

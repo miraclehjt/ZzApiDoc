@@ -32,6 +32,16 @@ public class ResponseArgEntity extends BaseEntity {
     private String note;
     @Column(name = "Pid", length = 50)
     private String pid;
+    @Column(name = "IsGlobal")
+    private Boolean isGlobal = false;
+
+    public Boolean getGlobal() {
+        return isGlobal;
+    }
+
+    public void setGlobal(Boolean global) {
+        isGlobal = global;
+    }
 
     public Integer getTypeId() {
         return typeId;

@@ -39,9 +39,10 @@ public class ResponseArgAction extends BaseController<ResponseArgEntity> {
             @RequestParam(value = "projectId") String projectId,
             @RequestParam(value = "interfaceId") String interfaceId,
             @RequestParam(value = "note", required = false) String note,
-            @RequestParam(value = "userId") String userId
+            @RequestParam(value = "userId") String userId,
+            @RequestParam(value = "isGlobal") boolean isGlobal
     ) {
-        return getService().addResponseArg(pid, name, type, projectId, interfaceId, note, userId);
+        return getService().addResponseArg(pid, name, type, projectId, interfaceId, note, userId, isGlobal);
     }
 
     @ResponseBody
@@ -53,9 +54,10 @@ public class ResponseArgAction extends BaseController<ResponseArgEntity> {
             @RequestParam(value = "type") int type,
             @RequestParam(value = "interfaceId") String interfaceId,
             @RequestParam(value = "note") String note,
-            @RequestParam(value = "userId") String userId
+            @RequestParam(value = "userId") String userId,
+            @RequestParam(value = "isGlobal") boolean isGlobal
     ) {
-        return getService().updateResponseArg(pid, responseArgId, name, type, interfaceId, note, userId);
+        return getService().updateResponseArg(pid, responseArgId, name, type, interfaceId, note, userId, isGlobal);
     }
 
     @ResponseBody
