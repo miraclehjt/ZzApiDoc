@@ -8,7 +8,6 @@ import me.zhouzhuo810.zzapidoc.common.utils.DataUtils;
 import me.zhouzhuo810.zzapidoc.common.utils.MapUtils;
 import me.zhouzhuo810.zzapidoc.project.dao.RequestHeaderDao;
 import me.zhouzhuo810.zzapidoc.project.entity.InterfaceEntity;
-import me.zhouzhuo810.zzapidoc.project.entity.RequestArgEntity;
 import me.zhouzhuo810.zzapidoc.project.entity.RequestHeaderEntity;
 import me.zhouzhuo810.zzapidoc.project.service.InterfaceService;
 import me.zhouzhuo810.zzapidoc.project.service.RequestHeaderService;

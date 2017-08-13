@@ -15,6 +15,7 @@ import me.zhouzhuo810.zzapidoc.project.dao.InterfaceDao;
 import me.zhouzhuo810.zzapidoc.project.entity.*;
 import me.zhouzhuo810.zzapidoc.project.service.*;
 import me.zhouzhuo810.zzapidoc.project.utils.InterfaceUtils;
+import me.zhouzhuo810.zzapidoc.project.utils.PdfReportM1HeaderFooter;
 import me.zhouzhuo810.zzapidoc.project.utils.ResponseArgUtils;
 import me.zhouzhuo810.zzapidoc.user.entity.UserEntity;
 import me.zhouzhuo810.zzapidoc.user.service.UserService;
@@ -810,6 +811,8 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                     Document document = new Document(PageSize.A4);
                     try {
                         PdfWriter pdfWriter = PdfWriter.getInstance(document, new FileOutputStream(filePath));
+                        PdfReportM1HeaderFooter footer=new PdfReportM1HeaderFooter();
+                        pdfWriter.setPageEvent(footer);
                         //打开文档
                         document.open();
 
