@@ -161,6 +161,7 @@ public class RequestArgServiceImpl extends BaseServiceImpl<RequestArgEntity> imp
                 map.put("name", arg.getName());
                 map.put("note", arg.getNote());
                 map.put("pid", arg.getPid());
+                map.put("require", arg.getRequire() == null ? true : arg.getRequire());
                 map.put("type", arg.getTypeId());
                 map.put("createTime", DataUtils.formatDate(arg.getCreateTime()));
                 map.put("createUserName", arg.getCreateUserName());
@@ -175,6 +176,7 @@ public class RequestArgServiceImpl extends BaseServiceImpl<RequestArgEntity> imp
                 map.put("name", arg.getName());
                 map.put("note", arg.getNote());
                 map.put("pid", arg.getPid());
+                map.put("require", arg.getRequire() == null ? true : arg.getRequire());
                 map.put("type", arg.getTypeId());
                 map.put("createTime", DataUtils.formatDate(arg.getCreateTime()));
                 map.put("createUserName", arg.getCreateUserName());
@@ -199,6 +201,7 @@ public class RequestArgServiceImpl extends BaseServiceImpl<RequestArgEntity> imp
         map.put("id", arg.getId());
         map.put("name", arg.getName());
         map.put("note", arg.getNote());
+        map.put("require", arg.getRequire() == null ? true : arg.getRequire());;
         map.put("pid", arg.getPid());
         map.put("type", arg.getTypeId());
         map.put("createTime", DataUtils.formatDate(arg.getCreateTime()));
