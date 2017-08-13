@@ -53,7 +53,8 @@ public class RequestArgServiceImpl extends BaseServiceImpl<RequestArgEntity> imp
     }
 
     @Override
-    public BaseResult addRequestArg(String pid, String name, int type, String projectId, String interfaceId, String note, String userId, boolean isGlobal) {
+    public BaseResult addRequestArg(String pid, String name, int type, String projectId, String interfaceId,
+                                    String note, String userId, boolean isRequire, boolean isGlobal) {
         UserEntity user = mUserService.get(userId);
         if (user == null) {
             return new BaseResult(0, "用户不合法");
@@ -65,6 +66,7 @@ public class RequestArgServiceImpl extends BaseServiceImpl<RequestArgEntity> imp
         arg.setInterfaceId(interfaceId);
         arg.setCreateUserID(user.getId());
         arg.setCreateUserName(user.getName());
+        arg.setRequire(isRequire);
         arg.setTypeId(type);
         arg.setGlobal(isGlobal);
         arg.setPid(pid == null ? "0" : pid);
@@ -78,7 +80,8 @@ public class RequestArgServiceImpl extends BaseServiceImpl<RequestArgEntity> imp
     }
 
     @Override
-    public BaseResult updateRequestArg(String pid, String requestArgId, String name, int type, String interfaceId, String note, String userId, boolean isGlobal) {
+    public BaseResult updateRequestArg(String pid, String requestArgId, String name, int type,
+                                       String interfaceId, String note, String userId, boolean isRequire, boolean isGlobal) {
         UserEntity user = mUserService.get(userId);
         if (user == null) {
             return new BaseResult(0, "用户不合法");
@@ -91,6 +94,7 @@ public class RequestArgServiceImpl extends BaseServiceImpl<RequestArgEntity> imp
         arg.setNote(note);
         arg.setInterfaceId(interfaceId);
         arg.setTypeId(type);
+        arg.setRequire(isRequire);
         arg.setModifyTime(new Date());
         arg.setModifyUserID(user.getId());
         arg.setGlobal(isGlobal);

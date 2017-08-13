@@ -33,12 +33,22 @@ public class InterfaceEntity extends BaseEntity {
     private String groupName;
     @Column(name = "Path", length = 255)
     private String path;
+    @Column(name = "Example", columnDefinition = "TEXT")
+    private String example;
 
     @Formula("(SELECT count(*) FROM request_args r WHERE r.InterfaceId = ID AND r.DelFlag = 0)")
     private int requestParamsNo;
 
     @Formula("(SELECT count(*) FROM response_args r WHERE r.InterfaceId = ID AND r.DelFlag = 0)")
     private int responseParamsNo;
+
+    public String getExample() {
+        return example;
+    }
+
+    public void setExample(String example) {
+        this.example = example;
+    }
 
     public int getRequestParamsNo() {
         return requestParamsNo;

@@ -14,9 +14,9 @@ public interface RequestArgService extends BaseService<RequestArgEntity> {
 
     void deleteByInterfaceId(String interfaceId);
 
-    BaseResult addRequestArg(String pid, String name, int type, String projectId, String interfaceId, String note, String userId, boolean isGlobal);
+    BaseResult addRequestArg(String pid, String name, int type, String projectId, String interfaceId, String note, String userId, boolean isRequire, boolean isGlobal);
 
-    BaseResult updateRequestArg(String pid, String requestArgId, String name, int type, String interfaceId, String note, String userId, boolean isGlobal);
+    BaseResult updateRequestArg(String pid, String requestArgId, String name, int type, String interfaceId, String note, String userId, boolean isRequire, boolean isGlobal);
 
     BaseResult deleteRequestArg(String id, String userId);
 

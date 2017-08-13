@@ -144,6 +144,16 @@ public class InterfaceAction extends BaseController<InterfaceEntity> {
     }
 
     @ResponseBody
+    @RequestMapping(value = "/addInterfaceExample", method = RequestMethod.POST)
+    public BaseResult addInterfaceExample(
+            @RequestParam(value = "interfaceId") String interfaceId,
+            @RequestParam(value = "example") String example,
+            @RequestParam(value = "userId") String userId
+    ) {
+        return getService().addInterfaceExample(interfaceId, example, userId);
+    }
+
+    @ResponseBody
     @RequestMapping(value = "/downloadJson", method = RequestMethod.GET)
     public ResponseEntity<byte[]> download(
             @RequestParam(value = "projectId") String projectId,
@@ -151,4 +161,15 @@ public class InterfaceAction extends BaseController<InterfaceEntity> {
     ) throws IOException {
         return getService().download(projectId, userId);
     }
+
+    @ResponseBody
+    @RequestMapping(value = "/downloadPdf", method = RequestMethod.GET)
+    public ResponseEntity<byte[]> downloadPdf(
+            @RequestParam(value = "projectId") String projectId,
+            @RequestParam(value = "userId") String userId
+    ) throws IOException {
+        return getService().downloadPdf(projectId, userId);
+    }
+
+
 }

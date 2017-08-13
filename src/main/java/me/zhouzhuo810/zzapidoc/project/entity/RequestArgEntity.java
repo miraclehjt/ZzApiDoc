@@ -27,6 +27,16 @@ public class RequestArgEntity extends BaseEntity {
     private String pid;
     @Column(name = "IsGlobal")
     private Boolean isGlobal = false;
+    @Column(name = "IsRequire")
+    private Boolean isRequire = true;
+
+    public Boolean getRequire() {
+        return isRequire;
+    }
+
+    public void setRequire(Boolean require) {
+        isRequire = require;
+    }
 
     public Boolean getGlobal() {
         return isGlobal;

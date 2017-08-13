@@ -23,6 +23,7 @@
     <mvc:resources location="/upload/" mapping="/upload/**"/>
     <!--<mvc:resources location="/front/" mapping="/front/**"/>-->
     <mvc:resources location="/apk/" mapping="/apk/**"/>
+    <mvc:resources location="/font/" mapping="/font/**"/>
 
 
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
