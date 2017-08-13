@@ -35,12 +35,20 @@ public class InterfaceEntity extends BaseEntity {
     private String path;
     @Column(name = "Example", columnDefinition = "TEXT")
     private String example;
-
+    @Formula("(SELECT count(*) FROM request_header r WHERE r.InterfaceId = ID AND r.DelFlag = 0)")
+    private int requestHeadersNo;
     @Formula("(SELECT count(*) FROM request_args r WHERE r.InterfaceId = ID AND r.DelFlag = 0)")
     private int requestParamsNo;
-
     @Formula("(SELECT count(*) FROM response_args r WHERE r.InterfaceId = ID AND r.DelFlag = 0)")
     private int responseParamsNo;
+
+    public int getRequestHeadersNo() {
+        return requestHeadersNo;
+    }
+
+    public void setRequestHeadersNo(int requestHeadersNo) {
+        this.requestHeadersNo = requestHeadersNo;
+    }
 
     public String getExample() {
         return example;
