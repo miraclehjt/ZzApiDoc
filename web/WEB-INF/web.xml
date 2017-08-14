@@ -6,6 +6,11 @@
 
     <display-name>Archetype Created Web Application</display-name>
 
+    <context-param>
+        <param-name>webAppRootKey</param-name>
+        <param-value>webapp.root1</param-value>
+    </context-param>
+
     <!-- 字符集 过滤器 -->
     <filter>
         <filter-name>CharacterEncodingFilter</filter-name>

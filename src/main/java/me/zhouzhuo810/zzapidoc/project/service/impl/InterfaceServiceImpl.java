@@ -210,10 +210,14 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
             return new BaseResult(0, "该接口不存在或已被删除！");
         }
         entity.setName(name);
-        entity.setPath(path);
+        if (path.length() > 0) {
+            entity.setPath(path);
+        }
         entity.setProjectId(projectId);
         entity.setGroupId(groupId);
-        entity.setHttpMethodId(httpMethodId);
+        if (httpMethodId.length() > 0) {
+            entity.setHttpMethodId(httpMethodId);
+        }
         entity.setNote(note);
         entity.setModifyUserID(user.getId());
         entity.setModifyUserName(user.getName());
@@ -277,6 +281,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
             map.put("path", entity.getPath());
             map.put("method", entity.getHttpMethodName());
             map.put("group", entity.getGroupName());
+            map.put("note", entity.getNote() == null ? "" : entity.getNote());
             map.put("createTime", DataUtils.formatDate(entity.getCreateTime()));
             map.put("createUserName", entity.getCreateUserName());
             map.put("requestParamsNo", entity.getRequestParamsNo());
@@ -315,6 +320,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
             map.put("group", entity.getGroupName());
             map.put("ip", group.getIp());
             map.put("path", entity.getPath());
+            map.put("note", entity.getNote() == null ? "" : entity.getNote());
             map.put("createTime", DataUtils.formatDate(entity.getCreateTime()));
             map.put("createUserName", entity.getCreateUserName());
             map.put("requestHeadersNo", entity.getRequestHeadersNo() + globalHeadSize);
@@ -340,8 +346,8 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
         map.put("name", entity.getName());
         map.put("path", entity.getPath());
         map.put("groupName", entity.getGroupName());
+        map.put("note", entity.getNote() == null ? "" : entity.getNote());
         map.put("httpMethod", entity.getHttpMethodName());
-        map.put("note", entity.getNote());
         map.put("projectName", entity.getProjectName());
         map.put("createTime", DataUtils.formatDate(entity.getCreateTime()));
         map.put("createUserName", entity.getCreateUserName());
@@ -805,13 +811,13 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                     }
                     String realFileName = System.currentTimeMillis() + ".pdf";
                     String filePath = mPath + File.separator + realFileName;
-                    BaseFont bfChinese = BaseFont.createFont("STSong-Light", "UniGB-UCS2-H", BaseFont.NOT_EMBEDDED);
+                    BaseFont bfChinese = BaseFont.createFont(fontPath + "SIMYOU.TTF", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
                     Font fontChinese = new Font(bfChinese, 12, Font.NORMAL);
 
                     Document document = new Document(PageSize.A4);
                     try {
                         PdfWriter pdfWriter = PdfWriter.getInstance(document, new FileOutputStream(filePath));
-                        PdfReportM1HeaderFooter footer=new PdfReportM1HeaderFooter();
+                        PdfReportM1HeaderFooter footer = new PdfReportM1HeaderFooter();
                         pdfWriter.setPageEvent(footer);
                         //打开文档
                         document.open();
@@ -826,8 +832,11 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                         fontChinese.setStyle(Font.NORMAL);
 
                         addTextLine(document, "", null);
-                        addTextLine(document, "", null);
-                        addTextLine(document, "", null);
+                        addText(document, "创建人：", fontChinese);
+                        addTextLine(document, project.getCreateUserName(), fontChinese);
+                        addText(document, "创建时间：", fontChinese);
+                        addTextLine(document, DataUtils.formatDate(project.getCreateTime()), fontChinese);
+                        addText(document, "项目说明：", fontChinese);
                         addTextLine(document, project.getNote(), fontChinese);
 
                         List<InterfaceGroupEntity> groups = mInterfaceGroupService.executeCriteria(InterfaceUtils.getInterfaceByProjectId(projectId));
@@ -839,7 +848,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
 
                                 addMidTitle(document, (i + 1) + ". " + interfaceGroupEntity.getName(), fontChinese);
                                 fontChinese.setStyle(Font.NORMAL);
-                                addText(document, "创建用户：", fontChinese);
+                                addText(document, "创建人：", fontChinese);
                                 addTextLine(document, interfaceGroupEntity.getCreateUserName(), fontChinese);
                                 addText(document, "创建时间：", fontChinese);
                                 addTextLine(document, DataUtils.formatDate(interfaceGroupEntity.getCreateTime()), fontChinese);
@@ -856,6 +865,10 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
 
                                     addDuanLuo(document, (i + 1) + "." + (i1 + 1) + ". " + entity.getName(), fontChinese);
                                     fontChinese.setStyle(Font.NORMAL);
+                                    addText(document, "创建人：", fontChinese);
+                                    addTextLine(document, entity.getCreateUserName(), fontChinese);
+                                    addText(document, "创建时间：", fontChinese);
+                                    addTextLine(document, DataUtils.formatDate(entity.getCreateTime()), fontChinese);
                                     addText(document, "请求方式：", fontChinese);
                                     addTextLine(document, entity.getHttpMethodName(), null);
                                     addText(document, "请求地址：", fontChinese);

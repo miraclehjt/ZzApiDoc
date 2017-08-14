@@ -91,7 +91,7 @@ public class PdfReportM1HeaderFooter extends PdfPageEventHelper {
      * @see com.itextpdf.text.pdf.PdfPageEventHelper#onOpenDocument(com.itextpdf.text.pdf.PdfWriter, com.itextpdf.text.Document)
      */
     public void onOpenDocument(PdfWriter writer, Document document) {
-        total = writer.getDirectContent().createTemplate(50, 50);// 共 页 的矩形的长宽高
+        total = writer.getDirectContent().createTemplate(70, 70);// 共 页 的矩形的长宽高
     }
 
     /**
@@ -130,10 +130,10 @@ public class PdfReportM1HeaderFooter extends PdfPageEventHelper {
         PdfContentByte cb = writer.getDirectContent();
 
         //自己增加的
-        if (pageS == 1) {
-            Phrase footerLeft = new Phrase("978-1-4799-0530-031.00 ©2013 IEEE", fontDetail);
+/*        if (pageS == 1) {
+            Phrase footerLeft = new Phrase("", fontDetail);
             ColumnText.showTextAligned(cb, Element.ALIGN_LEFT, footerLeft, document.left(), document.bottom() - 20, 0);
-        }
+        }*/
 
         // 5.写入页脚1，x轴就是(右margin+左margin + right() -left()- len)/2.0F 再给偏移20F适合人类视觉感受，否则肉眼看上去就太偏左了 ,y轴就是底边界-20,否则就贴边重叠到数据体里了就不是页脚了；注意Y轴是从下往上累加的，最上方的Top值是大于Bottom好几百开外的。
         ColumnText.showTextAligned(cb, Element.ALIGN_CENTER, footer, (document.rightMargin() + document.right() + document.leftMargin() - document.left() - len) / 2.0F + 20F, document.bottom() - 20, 0);

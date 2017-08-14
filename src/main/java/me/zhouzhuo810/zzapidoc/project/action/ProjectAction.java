@@ -78,4 +78,14 @@ public class ProjectAction extends BaseController<ProjectEntity> {
     ) {
         return getService().getProjectDetails(projectId, userId);
     }
+
+    @ResponseBody
+    @RequestMapping(value = "/importProject", method = RequestMethod.POST)
+    public BaseResult importProject(
+            @RequestParam(value = "json") String json,
+            @RequestParam(value = "property") String property,
+            @RequestParam(value = "userId") String userId
+    ) {
+        return getService().importProject(json, property, userId);
+    }
 }

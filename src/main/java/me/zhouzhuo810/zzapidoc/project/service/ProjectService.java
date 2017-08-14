@@ -23,4 +23,5 @@ public interface ProjectService extends BaseService<ProjectEntity> {
 
     BaseResult getProjectDetails(String projectId, String userId);
 
+    BaseResult importProject(String json,String property, String userId);
 }
