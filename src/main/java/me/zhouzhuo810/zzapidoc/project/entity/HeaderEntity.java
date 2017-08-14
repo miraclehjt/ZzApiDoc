@@ -3,36 +3,34 @@ package me.zhouzhuo810.zzapidoc.project.entity;
 import java.util.List;
 
 /**
- * Created by admin on 2017/5/19.
+ * Created by admin on 2017/8/14.
  */
-public class ArgEntity {
+public class HeaderEntity {
 
-    private List<DataBean> data;
+    private List<HeaderDataEntity> data;
 
-    public List<DataBean> getData() {
+    public List<HeaderDataEntity> getData() {
         return data;
     }
 
-    public void setData(List<DataBean> data) {
+    public void setData(List<HeaderDataEntity> data) {
         this.data = data;
     }
 
-    public static class DataBean {
+    public static class HeaderDataEntity {
         /**
          * require : true
          * children : []
-         * type : string
-         * name : method
-         * description : 方法
-         * defaultValue : Submit
+         * name : test
+         * defaultValue : 123
+         * description : 啊哈哈哈哈
          */
 
         private String require;
-        private String type;
         private String name;
-        private String description;
         private String defaultValue;
-        private List<DataBean> children;
+        private String description;
+        private List<HeaderDataEntity> children;
 
         public String getRequire() {
             return require;
@@ -40,14 +38,6 @@ public class ArgEntity {
 
         public void setRequire(String require) {
             this.require = require;
-        }
-
-        public String getType() {
-            return type;
-        }
-
-        public void setType(String type) {
-            this.type = type;
         }
 
         public String getName() {
@@ -58,14 +48,6 @@ public class ArgEntity {
             this.name = name;
         }
 
-        public String getDescription() {
-            return description;
-        }
-
-        public void setDescription(String description) {
-            this.description = description;
-        }
-
         public String getDefaultValue() {
             return defaultValue;
         }
@@ -74,11 +56,19 @@ public class ArgEntity {
             this.defaultValue = defaultValue;
         }
 
-        public List<DataBean> getChildren() {
+        public String getDescription() {
+            return description;
+        }
+
+        public void setDescription(String description) {
+            this.description = description;
+        }
+
+        public List<HeaderDataEntity> getChildren() {
             return children;
         }
 
-        public void setChildren(List<DataBean> children) {
+        public void setChildren(List<HeaderDataEntity> children) {
             this.children = children;
         }
     }

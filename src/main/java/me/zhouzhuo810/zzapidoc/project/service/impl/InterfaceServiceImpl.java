@@ -349,9 +349,61 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
         map.put("note", entity.getNote() == null ? "" : entity.getNote());
         map.put("httpMethod", entity.getHttpMethodName());
         map.put("projectName", entity.getProjectName());
+        map.put("example", entity.getExample());
         map.put("createTime", DataUtils.formatDate(entity.getCreateTime()));
         map.put("createUserName", entity.getCreateUserName());
+        List<RequestHeaderEntity> globalRequestHeaders = mRequestHeaderService.getGlobalRequestHeaders(entity.getProjectId());
+        if (globalRequestHeaders != null) {
+            List<Map<String, Object>> response = new ArrayList<Map<String, Object>>();
+            for (RequestHeaderEntity arg : globalRequestHeaders) {
+                MapUtils m = new MapUtils();
+                m.put("id", arg.getId());
+                m.put("name", arg.getName());
+                m.put("value", arg.getValue());
+                m.put("note", arg.getNote() == null ? "" : arg.getNote());
+                m.put("createTime", DataUtils.formatDate(arg.getCreateTime()));
+                m.put("createUserName", arg.getCreateUserName());
+                m.put("interfaceId", arg.getInterfaceId());
+                m.put("projectId", arg.getProjectId());
+                m.put("isGlobal", true);
+                response.add(m.build());
+            }
+            map.put("globalrequestHeader", response);
+        }
 
+        List<RequestHeaderEntity> requestHeaderEntities = mRequestHeaderService.getBaseDao().executeCriteria(ResponseArgUtils.getArgByInterfaceId(interfaceId));
+        if (requestHeaderEntities != null) {
+            List<Map<String, Object>> response = new ArrayList<Map<String, Object>>();
+            for (RequestHeaderEntity arg : requestHeaderEntities) {
+                MapUtils m = new MapUtils();
+                m.put("id", arg.getId());
+                m.put("name", arg.getName());
+                m.put("value", arg.getValue());
+                m.put("note", arg.getNote() == null ? "" : arg.getNote());
+                m.put("createTime", DataUtils.formatDate(arg.getCreateTime()));
+                m.put("createUserName", arg.getCreateUserName());
+                m.put("interfaceId", arg.getInterfaceId());
+                m.put("projectId", arg.getProjectId());
+                m.put("isGlobal", false);
+                response.add(m.build());
+            }
+            map.put("requestHeader", response);
+        }
+        List<RequestArgEntity> globalRequestArgs = mRequestArgService.getGlobalRequestArgs(entity.getProjectId());
+        if (globalRequestArgs != null) {
+            List<Map<String, Object>> response = new ArrayList<Map<String, Object>>();
+            for (RequestArgEntity requestArgEntity : globalRequestArgs) {
+                MapUtils m = new MapUtils();
+                m.put("id", requestArgEntity.getId());
+                m.put("name", requestArgEntity.getName());
+                m.put("global", requestArgEntity.getGlobal() == null ? false : requestArgEntity.getGlobal());
+                m.put("note", requestArgEntity.getNote() == null ? "" : requestArgEntity.getNote());
+                m.put("pid", requestArgEntity.getPid());
+                m.put("typeId", requestArgEntity.getTypeId());
+                response.add(m.build());
+            }
+            map.put("globalRequestArgs", response);
+        }
         List<RequestArgEntity> requestArgEntities = mRequestArgService.executeCriteria(ResponseArgUtils.getArgByInterfaceId(interfaceId));
         if (requestArgEntities != null) {
             List<Map<String, Object>> request = new ArrayList<Map<String, Object>>();
@@ -360,11 +412,28 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                 m.put("id", requestArgEntity.getId());
                 m.put("name", requestArgEntity.getName());
                 m.put("pid", requestArgEntity.getPid());
+                m.put("global", requestArgEntity.getGlobal() == null ? false : requestArgEntity.getGlobal());
+                m.put("require", requestArgEntity.getRequire());
+                m.put("note", requestArgEntity.getNote() == null ? "" : requestArgEntity.getNote());
                 m.put("typeId", requestArgEntity.getTypeId());
-                m.put("note", requestArgEntity.getNote());
                 request.add(m.build());
             }
             map.put("requestArgs", request);
+        }
+        List<ResponseArgEntity> globalResponseArgs = mResponseArgService.getGlobalResponseArgs(entity.getProjectId());
+        if (globalResponseArgs != null) {
+            List<Map<String, Object>> response = new ArrayList<Map<String, Object>>();
+            for (ResponseArgEntity requestArgEntity : globalResponseArgs) {
+                MapUtils m = new MapUtils();
+                m.put("id", requestArgEntity.getId());
+                m.put("name", requestArgEntity.getName());
+                m.put("global", requestArgEntity.getGlobal() == null ? false : requestArgEntity.getGlobal());
+                m.put("note", requestArgEntity.getNote() == null ? "" : requestArgEntity.getNote());
+                m.put("pid", requestArgEntity.getPid());
+                m.put("typeId", requestArgEntity.getTypeId());
+                response.add(m.build());
+            }
+            map.put("globalResponseArgs", response);
         }
         List<ResponseArgEntity> responseArgEntities = mResponseArgService.executeCriteria(ResponseArgUtils.getArgByInterfaceId(interfaceId));
         if (responseArgEntities != null) {
@@ -373,9 +442,10 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                 MapUtils m = new MapUtils();
                 m.put("id", requestArgEntity.getId());
                 m.put("name", requestArgEntity.getName());
+                m.put("global", requestArgEntity.getGlobal() == null ? false : requestArgEntity.getGlobal());
+                m.put("note", requestArgEntity.getNote() == null ? "" : requestArgEntity.getNote());
                 m.put("pid", requestArgEntity.getPid());
                 m.put("typeId", requestArgEntity.getTypeId());
-                m.put("note", requestArgEntity.getNote());
                 response.add(m.build());
             }
             map.put("responseArgs", response);
@@ -423,6 +493,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
         stringer.object()
                 .key("project").object()
                 .key("name").value(project.getName())
+                .key("userId").value(project.getCreateUserID())
                 .key("description").value(project.getNote() == null ? "" : project.getNote())
                 .key("permission").value(project.getProperty())
                 .key("createTime").value(DataUtils.formatDate(project.getCreateTime()))
@@ -823,7 +894,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                         document.open();
 
                         document.addTitle(project.getName());
-                        document.addAuthor(project.getCreateUserName());
+                        document.addAuthor(project.getCreateUserName() == null ? "" : project.getCreateUserName());
                         document.addCreationDate();
                         document.addCreator("zhouzhuo810");
                         document.addSubject(project.getNote());

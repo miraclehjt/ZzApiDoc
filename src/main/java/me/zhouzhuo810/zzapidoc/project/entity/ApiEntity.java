@@ -119,8 +119,17 @@ public class ApiEntity {
         private String name;
         private String projectId;
         private String requestArgs;
+        private String responseArgs;
         private String requestHeaders;
         private List<FoldersBean> folders;
+
+        public String getResponseArgs() {
+            return responseArgs;
+        }
+
+        public void setResponseArgs(String responseArgs) {
+            this.responseArgs = responseArgs;
+        }
 
         public String getCreateTime() {
             return createTime;

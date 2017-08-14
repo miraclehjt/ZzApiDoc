@@ -3,6 +3,7 @@ package me.zhouzhuo810.zzapidoc.project.service.impl;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import me.zhouzhuo810.zzapidoc.common.dao.BaseDao;
+import me.zhouzhuo810.zzapidoc.common.entity.BaseEntity;
 import me.zhouzhuo810.zzapidoc.common.result.BaseResult;
 import me.zhouzhuo810.zzapidoc.common.service.impl.BaseServiceImpl;
 import me.zhouzhuo810.zzapidoc.common.utils.DataUtils;
@@ -13,6 +14,8 @@ import me.zhouzhuo810.zzapidoc.project.service.*;
 import me.zhouzhuo810.zzapidoc.project.utils.ProjectUtils;
 import me.zhouzhuo810.zzapidoc.user.entity.UserEntity;
 import me.zhouzhuo810.zzapidoc.user.service.UserService;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -44,6 +47,9 @@ public class ProjectServiceImpl extends BaseServiceImpl<ProjectEntity> implement
 
     @Resource(name = "responseArgServiceImpl")
     ResponseArgService mResponseArgService;
+
+    @Resource(name = "dictionaryServiceImpl")
+    DictionaryService mDictionaryService;
 
 
     @Override
@@ -192,7 +198,7 @@ public class ProjectServiceImpl extends BaseServiceImpl<ProjectEntity> implement
                 //开始导入项目
                 ProjectEntity mPro = new ProjectEntity();
                 String proUserId = api.getProject().getUserId();
-                if (property != null) {
+                if (proUserId != null) {
                     UserEntity proUser = mUserService.get(proUserId);
                     if (proUser == null) {
                         mPro.setCreateUserID(user.getId());
@@ -201,6 +207,9 @@ public class ProjectServiceImpl extends BaseServiceImpl<ProjectEntity> implement
                         mPro.setCreateUserID(proUser.getId());
                         mPro.setCreateUserName(proUser.getName());
                     }
+                } else {
+                    mPro.setCreateUserID(user.getId());
+                    mPro.setCreateUserName(user.getName());
                 }
                 String proName = api.getProject().getName();
                 String proNote = api.getProject().getDescription();
@@ -216,12 +225,12 @@ public class ProjectServiceImpl extends BaseServiceImpl<ProjectEntity> implement
                 if (modules != null) {
                     for (int i = 0; i < modules.size(); i++) {
                         ApiEntity.ModulesBean modulesBean = modules.get(i);
-                        //全局参数
+                        //全局请求参数
                         String requestArgs = modulesBean.getRequestArgs();
                         if (requestArgs != null && !requestArgs.equals("[]")) {
                             ArgEntity argEntity = gson.fromJson("{\"data\":" + requestArgs + "}", ArgEntity.class);
                             if (argEntity != null && argEntity.getData() != null) {
-                                //导入全局参数
+                                //导入全局请求参数
                                 List<ArgEntity.DataBean> data1 = argEntity.getData();
                                 for (int i4 = 0; i4 < data1.size(); i4++) {
                                     ArgEntity.DataBean dataBean1 = data1.get(i4);
@@ -255,10 +264,67 @@ public class ProjectServiceImpl extends BaseServiceImpl<ProjectEntity> implement
                                     }
                                     mRequestArgService.save(mReqArg);
                                 }
-                                //导入全局参数完毕
+                                //导入全局请求参数完毕
                             }
                         }
-                        //无全局参数
+                        //全局返回参数
+                        String globalRes = modulesBean.getResponseArgs();
+                        if (globalRes != null && !globalRes.equals("[]")) {
+                            ArgEntity responseArg = gson.fromJson("{\"data\":" + globalRes + "}", ArgEntity.class);
+                            if (responseArg != null && responseArg.getData() != null) {
+                                //导入全局返回参数
+                                List<ArgEntity.DataBean> data1 = responseArg.getData();
+                                for (ArgEntity.DataBean dataBean1 : data1) {
+                                    ResponseArgEntity mResArg = new ResponseArgEntity();
+                                    mResArg.setProjectId(mPro.getId());
+                                    mResArg.setInterfaceId("");
+                                    mResArg.setGlobal(true);
+                                    mResArg.setPid("0");
+                                    mResArg.setCreateUserID(user.getId());
+                                    mResArg.setCreateUserName(user.getName());
+                                    mResArg.setName(dataBean1.getName());
+                                    mResArg.setNote(dataBean1.getDescription());
+                                    String type = dataBean1.getType();
+                                    switch (type) {
+                                        case "string":
+                                            mResArg.setTypeId(0);
+                                            break;
+                                        case "number":
+                                            mResArg.setTypeId(1);
+                                            break;
+                                        case "object":
+                                            mResArg.setTypeId(2);
+                                            break;
+                                        case "array[object]":
+                                            mResArg.setTypeId(3);
+                                            break;
+                                        case "array[string]":
+                                            mResArg.setTypeId(4);
+                                            break;
+                                    }
+                                    mResponseArgService.save(mResArg);
+                                    importChildResponseArgs(dataBean1.getChildren(), mPro.getId(), "", user.getId(), user.getName(), true, mResArg.getId());
+                                }
+                                //导入全局返回参数完毕
+                            }
+                        }
+
+                        /*全局请求头*/
+                        String reqHeader = modulesBean.getRequestHeaders();
+                        HeaderEntity globalHead = gson.fromJson("{\"data\":" + reqHeader + "}", HeaderEntity.class);
+                        if (globalHead != null && globalHead.getData() != null) {
+                            List<HeaderEntity.HeaderDataEntity> data = globalHead.getData();
+                            for (HeaderEntity.HeaderDataEntity he : data) {
+                                RequestHeaderEntity h = new RequestHeaderEntity();
+                                h.setName(he.getName());
+                                h.setValue(he.getDefaultValue());
+                                h.setNote(he.getDescription());
+                                h.setGlobal(true);
+                                h.setInterfaceId("");
+                                h.setProjectId(mPro.getId());
+                                mRequestHeaderService.save(h);
+                            }
+                        }
 
                         //接口分组
                         List<ApiEntity.ModulesBean.FoldersBean> folders = modulesBean.getFolders();
@@ -289,56 +355,87 @@ public class ProjectServiceImpl extends BaseServiceImpl<ProjectEntity> implement
                                         mInterface.setProjectId(mPro.getId());
                                         mInterface.setExample(childrenBean.getExample());
                                         mInterface.setName(childrenBean.getName());
+                                        mInterface.setCreateUserID(user.getId());
+                                        mInterface.setCreateUserName(user.getName());
                                         mInterface.setNote(childrenBean.getDescription());
                                         mInterface.setProjectName(mPro.getName());
-                                        mInterface.setHttpMethodId();
-                                        mInterface.setHttpMethodName(childrenBean.getRequestMethod());
-                                        //实体类内容
-                                        StringBuilder sbEntity = new StringBuilder();
-                                        sbEntity.append("package ").append(packageName).append(".entity;");
-                                        sbEntity.append("\n");
-                                        sbEntity.append("\nimport java.util.List;");
-                                        sbEntity.append("\n/**");
-                                        sbEntity.append("\n * ").append(childrenBean.getName());
-                                        sbEntity.append("\n */");
-
-                                        //接口地址
-                                        String url = childrenBean.getUrl();
-                                        System.out.println(url);
-
-                                        //方法描述
-                                        String desc = childrenBean.getDescription();
-                                        sb.append("\n   /*");
-                                        sb.append("\n    * ").append(desc);
-                                        sb.append("\n    */");
-
-                                        //方法名
-                                        String m = url.substring(url.lastIndexOf("/") + 1, url.length());
-                                        //请求方式GET或POST
                                         String method = childrenBean.getRequestMethod();
-                                        if (method.equals("GET")) {
-                                            sb.append("\n   @GET").append("(\"").append(url).append("\")");
+                                        List<DictionaryEntity> dics = mDictionaryService.executeCriteria(new Criterion[]{
+                                                Restrictions.eq("deleteFlag", BaseEntity.DELETE_FLAG_NO),
+                                                Restrictions.eq("name", method)}
+                                        );
+                                        if (dics != null && dics.size() > 0) {
+                                            DictionaryEntity entity = dics.get(0);
+                                            mInterface.setHttpMethodId(entity.getId());
                                         } else {
-                                            sb.append("\n   @FormUrlEncoded");
-                                            sb.append("\n   @POST").append("(\"").append(url).append("\")");
+                                            DictionaryEntity dic = new DictionaryEntity();
+                                            dic.setType("method");
+                                            dic.setName(method);
+                                            dic.setPosition(0);
+                                            dic.setPid("0");
+                                            mDictionaryService.save(dic);
+                                            mInterface.setHttpMethodId(dic.getId());
                                         }
-//                                        System.out.println(method);
-
-                                        String beanClazz = m.substring(0, 1).toUpperCase() + m.substring(1, m.length()) + "Result";
-
+                                        mInterface.setPath(childrenBean.getUrl());
+                                        mInterfaceService.save(mInterface);
 
                                         //接口返回数据
                                         String responseData = childrenBean.getResponseArgs();
-                                        try {
-                                            sbEntity.append("\npublic class ").append(beanClazz).append(" {");
-                                            JSONArray root = new JSONArray(responseData);
-                                            generateJavaBean2(root, sbEntity);
-                                            sbEntity.append("\n}");
-                                            System.out.println(sbEntity.toString());
-                                            FileUtil.writeFile(path + File.separator + "entity", beanClazz + ".java", sbEntity.toString());
-                                        } catch (Exception e) {
-                                            e.printStackTrace();
-                                            System.out.println(url + "接口的返回json实例解析异常");
+                                        if (responseData != null && !responseData.equals("[]")) {
+                                            ArgEntity responseArg = gson.fromJson("{\"data\":" + responseData + "}", ArgEntity.class);
+                                            if (responseArg != null && responseArg.getData() != null) {
+                                                //导入返回参数
+                                                List<ArgEntity.DataBean> data1 = responseArg.getData();
+                                                for (ArgEntity.DataBean dataBean1 : data1) {
+                                                    ResponseArgEntity mResArg = new ResponseArgEntity();
+                                                    mResArg.setProjectId(mPro.getId());
+                                                    mResArg.setInterfaceId(mInterface.getId());
+                                                    mResArg.setGlobal(false);
+                                                    mResArg.setPid("0");
+                                                    mResArg.setCreateUserID(user.getId());
+                                                    mResArg.setCreateUserName(user.getName());
+                                                    mResArg.setName(dataBean1.getName());
+                                                    mResArg.setNote(dataBean1.getDescription());
+                                                    String type = dataBean1.getType();
+                                                    switch (type) {
+                                                        case "string":
+                                                            mResArg.setTypeId(0);
+                                                            break;
+                                                        case "number":
+                                                            mResArg.setTypeId(1);
+                                                            break;
+                                                        case "object":
+                                                            mResArg.setTypeId(2);
+                                                            break;
+                                                        case "array[object]":
+                                                            mResArg.setTypeId(3);
+                                                            break;
+                                                        case "array[string]":
+                                                            mResArg.setTypeId(4);
+                                                            break;
+                                                    }
+                                                    mResponseArgService.save(mResArg);
+                                                    importChildResponseArgs(dataBean1.getChildren(), mPro.getId(), mInterface.getId(), user.getId(), user.getName(), false, mResArg.getId());
+                                                }
+                                                //导入返回参数完毕
+                                            }
+                                        }
+
+                                        //请求头
+                                        String requestHeaders = childrenBean.getRequestHeaders();
+                                        HeaderEntity headers = gson.fromJson("{\"data\":" + requestHeaders + "}", HeaderEntity.class);
+                                        if (headers != null && headers.getData() != null) {
+                                            List<HeaderEntity.HeaderDataEntity> data = headers.getData();
+                                            for (HeaderEntity.HeaderDataEntity he : data) {
+                                                RequestHeaderEntity h = new RequestHeaderEntity();
+                                                h.setName(he.getName());
+                                                h.setValue(he.getDefaultValue());
+                                                h.setNote(he.getDescription());
+                                                h.setGlobal(false);
+                                                h.setInterfaceId(mInterface.getId());
+                                                h.setProjectId(mPro.getId());
+                                                mRequestHeaderService.save(h);
+                                            }
                                         }
 
                                         //TODO 创建实体类
@@ -346,50 +443,43 @@ public class ProjectServiceImpl extends BaseServiceImpl<ProjectEntity> implement
                                         String requestArgs1 = childrenBean.getRequestArgs();
                                         ArgEntity argEntity1 = gson.fromJson("{\"data\":" + requestArgs1 + "}", ArgEntity.class);
                                         if (argEntity1 != null && argEntity1.getData() != null) {
-
-                                            sb.append("\n   Observable<").append(beanClazz).append("> ").append(m).append("(");
                                             //有参数
                                             List<ArgEntity.DataBean> data = argEntity1.getData();
-                                            boolean has = false;
                                             for (ArgEntity.DataBean aData : data) {
-                                                has = true;
-                                                String name = aData.getName();
+                                                RequestArgEntity mReqArg = new RequestArgEntity();
+                                                mReqArg.setProjectId(mPro.getId());
+                                                mReqArg.setInterfaceId(mInterface.getId());
+                                                mReqArg.setGlobal(false);
+                                                mReqArg.setPid("0");
+                                                mReqArg.setCreateUserID(user.getId());
+                                                mReqArg.setCreateUserName(user.getName());
+                                                mReqArg.setRequire(aData.getRequire().equals("true"));
+                                                mReqArg.setName(aData.getName());
+                                                mReqArg.setNote(aData.getDescription());
                                                 String type = aData.getType();
-                                                if (method.equals("GET")) {
-                                                    if (type.equals("number")) {
-                                                        sb.append("@Query(\"").append(name).append("\") ").append("int ").append(name).append(",");
-                                                    } else {
-                                                        sb.append("@Query(\"").append(name).append("\") ").append("String ").append(name).append(",");
-                                                    }
-                                                } else {
-                                                    if (type.equals("number")) {
-                                                        sb.append("@Field(\"").append(name).append("\") ").append("int ").append(name).append(",");
-                                                    } else {
-                                                        sb.append("@Field(\"").append(name).append("\") ").append("String ").append(name).append(",");
-                                                    }
+                                                switch (type) {
+                                                    case "string":
+                                                        mReqArg.setTypeId(0);
+                                                        break;
+                                                    case "number":
+                                                        mReqArg.setTypeId(1);
+                                                        break;
+                                                    case "object":
+                                                        mReqArg.setTypeId(2);
+                                                        break;
+                                                    case "array[object]":
+                                                        mReqArg.setTypeId(3);
+                                                        break;
+                                                    case "array[string]":
+                                                        mReqArg.setTypeId(4);
+                                                        break;
                                                 }
+                                                mRequestArgService.save(mReqArg);
                                             }
-                                            if (has)
-                                                sb.deleteCharAt(sb.length() - 1);
-                                        } else {
-                                            //无参数
-                                            sb.append("\n   Observable<").append(beanClazz).append("> ").append(m).append("(");
                                         }
-                                        sb.append(");   ");
                                     }
                                 }
-                                sb.append("\n}");
-                                //TODO 创建Api
-                                FileUtil.writeFile(path, "Api" + i1 + ".java", sb.toString());
                             }
-                            sbApi.append("\n    private static CookieManager getCookieManager() {");
-                            sbApi.append("\n        CookieManager cookieManager = new CookieManager();");
-                            sbApi.append("\n        cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);");
-                            sbApi.append("\n        return cookieManager;");
-                            sbApi.append("\n    }");
-                            sbApi.append("\n}");
-                            //TODO 创建Api调用
-                            FileUtil.writeFile(path, "Api.java", sbApi.toString());
                         }
                     }
                 }
@@ -399,6 +489,42 @@ public class ProjectServiceImpl extends BaseServiceImpl<ProjectEntity> implement
             return new BaseResult(0, "导入失败！JSON格式不正确");
         }
         return new BaseResult(1, "导入成功！");
+    }
+
+    private void importChildResponseArgs(List<ArgEntity.DataBean> children, String projectId, String interfaceId, String userId, String userName, boolean global, String pid) throws Exception {
+        if (children != null && children.size() > 0) {
+            for (ArgEntity.DataBean child : children) {
+                ResponseArgEntity mResArg = new ResponseArgEntity();
+                mResArg.setProjectId(projectId);
+                mResArg.setInterfaceId(interfaceId);
+                mResArg.setGlobal(global);
+                mResArg.setPid(pid);
+                mResArg.setCreateUserID(userId);
+                mResArg.setCreateUserName(userName);
+                mResArg.setName(child.getName());
+                mResArg.setNote(child.getDescription());
+                String type = child.getType();
+                switch (type) {
+                    case "string":
+                        mResArg.setTypeId(0);
+                        break;
+                    case "number":
+                        mResArg.setTypeId(1);
+                        break;
+                    case "object":
+                        mResArg.setTypeId(2);
+                        break;
+                    case "array[object]":
+                        mResArg.setTypeId(3);
+                        break;
+                    case "array[string]":
+                        mResArg.setTypeId(4);
+                        break;
+                }
+                mResponseArgService.save(mResArg);
+                importChildResponseArgs(child.getChildren(), projectId, interfaceId, userId, userName, global, mResArg.getId());
+            }
+        }
     }
 
 }
