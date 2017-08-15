@@ -264,8 +264,11 @@ public class ProjectServiceImpl extends BaseServiceImpl<ProjectEntity> implement
                                         case "array":
                                             mReqArg.setTypeId(5);
                                             break;
-                                        case"file":
+                                        case "file":
                                             mReqArg.setTypeId(6);
+                                            break;
+                                        default:
+                                            mReqArg.setTypeId(7);
                                             break;
 
                                     }
@@ -311,8 +314,11 @@ public class ProjectServiceImpl extends BaseServiceImpl<ProjectEntity> implement
                                         case "array":
                                             mResArg.setTypeId(5);
                                             break;
-                                        case"file":
+                                        case "file":
                                             mResArg.setTypeId(6);
+                                            break;
+                                        default:
+                                            mResArg.setTypeId(7);
                                             break;
                                     }
                                     mResponseArgService.save(mResArg);
@@ -429,8 +435,11 @@ public class ProjectServiceImpl extends BaseServiceImpl<ProjectEntity> implement
                                                         case "array":
                                                             mResArg.setTypeId(5);
                                                             break;
-                                                        case"file":
+                                                        case "file":
                                                             mResArg.setTypeId(6);
+                                                            break;
+                                                        default:
+                                                            mResArg.setTypeId(7);
                                                             break;
                                                     }
                                                     mResponseArgService.save(mResArg);
@@ -495,8 +504,11 @@ public class ProjectServiceImpl extends BaseServiceImpl<ProjectEntity> implement
                                                     case "array":
                                                         mReqArg.setTypeId(5);
                                                         break;
-                                                    case"file":
+                                                    case "file":
                                                         mReqArg.setTypeId(6);
+                                                        break;
+                                                    default:
+                                                        mReqArg.setTypeId(7);
                                                         break;
                                                 }
                                                 mRequestArgService.save(mReqArg);
@@ -548,8 +560,11 @@ public class ProjectServiceImpl extends BaseServiceImpl<ProjectEntity> implement
                     case "array":
                         mResArg.setTypeId(5);
                         break;
-                    case"file":
+                    case "file":
                         mResArg.setTypeId(6);
+                        break;
+                    default:
+                        mResArg.setTypeId(7);
                         break;
                 }
                 mResponseArgService.save(mResArg);
