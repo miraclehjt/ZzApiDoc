@@ -25,6 +25,16 @@ public class UserEntity extends BaseEntity {
     private String email;
     @Column(name = "Image")
     private String pic;
+    @Column(name = "IsManager")
+    private Boolean isManager;
+
+    public Boolean getManager() {
+        return isManager;
+    }
+
+    public void setManager(Boolean manager) {
+        isManager = manager;
+    }
 
     public String getPic() {
         return pic;

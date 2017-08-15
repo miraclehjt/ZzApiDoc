@@ -261,6 +261,13 @@ public class ProjectServiceImpl extends BaseServiceImpl<ProjectEntity> implement
                                         case "array[string]":
                                             mReqArg.setTypeId(4);
                                             break;
+                                        case "array":
+                                            mReqArg.setTypeId(5);
+                                            break;
+                                        case"file":
+                                            mReqArg.setTypeId(6);
+                                            break;
+
                                     }
                                     mRequestArgService.save(mReqArg);
                                 }
@@ -300,6 +307,12 @@ public class ProjectServiceImpl extends BaseServiceImpl<ProjectEntity> implement
                                             break;
                                         case "array[string]":
                                             mResArg.setTypeId(4);
+                                            break;
+                                        case "array":
+                                            mResArg.setTypeId(5);
+                                            break;
+                                        case"file":
+                                            mResArg.setTypeId(6);
                                             break;
                                     }
                                     mResponseArgService.save(mResArg);
@@ -413,6 +426,12 @@ public class ProjectServiceImpl extends BaseServiceImpl<ProjectEntity> implement
                                                         case "array[string]":
                                                             mResArg.setTypeId(4);
                                                             break;
+                                                        case "array":
+                                                            mResArg.setTypeId(5);
+                                                            break;
+                                                        case"file":
+                                                            mResArg.setTypeId(6);
+                                                            break;
                                                     }
                                                     mResponseArgService.save(mResArg);
                                                     importChildResponseArgs(dataBean1.getChildren(), mPro.getId(), mInterface.getId(), user.getId(), user.getName(), false, mResArg.getId());
@@ -473,6 +492,12 @@ public class ProjectServiceImpl extends BaseServiceImpl<ProjectEntity> implement
                                                     case "array[string]":
                                                         mReqArg.setTypeId(4);
                                                         break;
+                                                    case "array":
+                                                        mReqArg.setTypeId(5);
+                                                        break;
+                                                    case"file":
+                                                        mReqArg.setTypeId(6);
+                                                        break;
                                                 }
                                                 mRequestArgService.save(mReqArg);
                                             }
@@ -519,6 +544,12 @@ public class ProjectServiceImpl extends BaseServiceImpl<ProjectEntity> implement
                         break;
                     case "array[string]":
                         mResArg.setTypeId(4);
+                        break;
+                    case "array":
+                        mResArg.setTypeId(5);
+                        break;
+                    case"file":
+                        mResArg.setTypeId(6);
                         break;
                 }
                 mResponseArgService.save(mResArg);

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
+import java.util.Date;
 
 /**
  * Created by zz on 2017/7/20.
@@ -41,5 +42,19 @@ public class UpdateAction extends BaseController<UpdateEntity> {
     ) {
         return getService().checkUpdate(versionCode);
     }
+
+
+    @ResponseBody
+    @RequestMapping(value = "/publishVersion", method = RequestMethod.POST)
+    public BaseResult publishVersion(
+            @RequestParam(value = "versionCode") int versionCode,
+            @RequestParam(value = "versionName") String versionName,
+            @RequestParam(value = "updateInfo") String updateInfo,
+            @RequestParam(value = "releaseDate") String releaseDate,
+            @RequestParam(value = "userId") String userId
+    ) {
+        return getService().publishVersion(versionCode, versionName, updateInfo, releaseDate, userId);
+    }
+
 
 }
