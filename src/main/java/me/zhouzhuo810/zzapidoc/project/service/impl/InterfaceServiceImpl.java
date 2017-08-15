@@ -627,6 +627,9 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                         .key("require").value(requestArgEntity.getRequire() == null ? true : requestArgEntity.getRequire())
                         .key("typeId").value(requestArgEntity.getTypeId())
                         .key("description").value(requestArgEntity.getNote() == null ? "" : requestArgEntity.getNote());
+                if (requestArgEntity.getTypeId()==null) {
+                    requestArgEntity.setTypeId(7);
+                }
                 switch (requestArgEntity.getTypeId()) {
                     case ResponseArgEntity.TYPE_STRING:
                         stringer.key("type").value("string");
@@ -642,6 +645,10 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                         break;
                     case ResponseArgEntity.TYPE_OBJECT:
                         stringer.key("type").value("object");
+                        stringer.key("children").array().endArray();
+                        break;
+                    default:
+                        stringer.key("type").value("未知");
                         stringer.key("children").array().endArray();
                         break;
                 }
@@ -682,6 +689,10 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                         stringer.key("type").value("object");
                         stringer.key("children").array().endArray();
                         break;
+                    default:
+                        stringer.key("type").value("未知");
+                        stringer.key("children").array().endArray();
+                        break;
                 }
                 stringer.endObject();
             }
@@ -694,6 +705,9 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                         .key("pid").value(responseArgEntity.getPid())
                         .key("typeId").value(responseArgEntity.getTypeId())
                         .key("description").value(responseArgEntity.getNote() == null ? "" : responseArgEntity.getNote());
+                if (responseArgEntity.getTypeId()==null) {
+                    responseArgEntity.setTypeId(7);
+                }
                 switch (responseArgEntity.getTypeId()) {
                     case ResponseArgEntity.TYPE_STRING:
                         stringer.key("type").value("string");
@@ -709,6 +723,10 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                         break;
                     case ResponseArgEntity.TYPE_OBJECT:
                         stringer.key("type").value("object");
+                        stringer.key("children").array().endArray();
+                        break;
+                    default:
+                        stringer.key("type").value("未知");
                         stringer.key("children").array().endArray();
                         break;
                 }
@@ -753,6 +771,9 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                         .key("require").value(req.getRequire() == null ? true : req.getRequire())
                         .key("typeId").value(req.getTypeId())
                         .key("description").value(req.getNote() == null ? "" : req.getNote());
+                if (req.getTypeId()==null) {
+                    req.setTypeId(7);
+                }
                 switch (req.getTypeId()) {
                     case ResponseArgEntity.TYPE_STRING:
                         stringer.key("type").value("string");
@@ -764,6 +785,10 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                         break;
                     case ResponseArgEntity.TYPE_OBJECT:
                         stringer.key("type").value("object");
+                        stringer.key("children").array().endArray();
+                        break;
+                    default:
+                        stringer.key("type").value("未知");
                         stringer.key("children").array().endArray();
                         break;
                 }
@@ -786,6 +811,9 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                         .key("pid").value(responseArgEntity.getPid())
                         .key("typeId").value(responseArgEntity.getTypeId())
                         .key("description").value(responseArgEntity.getNote() == null ? "" : responseArgEntity.getNote());
+                if (responseArgEntity.getTypeId()==null) {
+                    responseArgEntity.setTypeId(7);
+                }
                 switch (responseArgEntity.getTypeId()) {
                     case ResponseArgEntity.TYPE_STRING:
                         stringer.key("type").value("string");
@@ -797,6 +825,10 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                         break;
                     case ResponseArgEntity.TYPE_OBJECT:
                         stringer.key("type").value("object");
+                        stringer.key("children").array().endArray();
+                        break;
+                    default:
+                        stringer.key("type").value("未知");
                         stringer.key("children").array().endArray();
                         break;
                 }
@@ -818,6 +850,9 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                         .key("pid").value(responseArgEntity.getPid())
                         .key("typeId").value(responseArgEntity.getTypeId())
                         .key("description").value(responseArgEntity.getNote() == null ? "" : responseArgEntity.getNote());
+                if (responseArgEntity.getTypeId()==null) {
+                    responseArgEntity.setTypeId(7);
+                }
                 switch (responseArgEntity.getTypeId()) {
                     case ResponseArgEntity.TYPE_STRING:
                         stringer.key("type").value("string");
@@ -833,6 +868,10 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                         break;
                     case ResponseArgEntity.TYPE_OBJECT:
                         stringer.key("type").value("object");
+                        stringer.key("children").array().endArray();
+                        break;
+                    default:
+                        stringer.key("type").value("未知");
                         stringer.key("children").array().endArray();
                         break;
                 }
@@ -1151,6 +1190,9 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                 //单元格
                 cells[0] = new PdfPCell(new Paragraph(entity.getName()));//单元格内容
                 cells[1] = new PdfPCell(new Paragraph(entity.getRequire() == null ? "true" : (entity.getRequire() ? "true" : "false")));
+                if (entity.getTypeId()==null) {
+                    entity.setTypeId(7);
+                }
                 switch (entity.getTypeId()) {
                     case 0:
                         cells[2] = new PdfPCell(new Paragraph("string"));
@@ -1166,6 +1208,15 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                         break;
                     case 4:
                         cells[2] = new PdfPCell(new Paragraph("array[string]"));
+                        break;
+                    case 5:
+                        cells[2] = new PdfPCell(new Paragraph("array"));
+                        break;
+                    case 6:
+                        cells[2] = new PdfPCell(new Paragraph("file"));
+                        break;
+                    default:
+                        cells[2] = new PdfPCell(new Paragraph("未知"));
                         break;
                 }
                 cells[3] = new PdfPCell(new Paragraph(entity.getNote(), font));
@@ -1224,6 +1275,9 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                 //单元格
                 cells[0] = new PdfPCell(new Paragraph(entity.getName()));//单元格内容
                 cells[1] = new PdfPCell(new Paragraph(entity.getRequire() == null ? "true" : (entity.getRequire() ? "true" : "false")));
+                if (entity.getTypeId()==null) {
+                    entity.setTypeId(7);
+                }
                 switch (entity.getTypeId()) {
                     case 0:
                         cells[2] = new PdfPCell(new Paragraph("string"));
@@ -1239,6 +1293,15 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                         break;
                     case 4:
                         cells[2] = new PdfPCell(new Paragraph("array[string]"));
+                        break;
+                    case 5:
+                        cells[2] = new PdfPCell(new Paragraph("array"));
+                        break;
+                    case 6:
+                        cells[2] = new PdfPCell(new Paragraph("file"));
+                        break;
+                    default:
+                        cells[2] = new PdfPCell(new Paragraph("未知"));
                         break;
                 }
                 cells[3] = new PdfPCell(new Paragraph(entity.getNote(), font));
@@ -1298,6 +1361,9 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                 PdfPRow row = new PdfPRow(cells);
                 //单元格
                 cells[0] = new PdfPCell(new Paragraph(entity.getName() == null ? "" : entity.getName()));//单元格内容
+                if (entity.getTypeId()==null) {
+                    entity.setTypeId(7);
+                }
                 switch (entity.getTypeId()) {
                     case 0:
                         cells[1] = new PdfPCell(new Paragraph("string"));
@@ -1313,6 +1379,15 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                         break;
                     case 4:
                         cells[1] = new PdfPCell(new Paragraph("array[string]"));
+                        break;
+                    case 5:
+                        cells[1] = new PdfPCell(new Paragraph("array"));
+                        break;
+                    case 6:
+                        cells[1] = new PdfPCell(new Paragraph("file"));
+                        break;
+                    default:
+                        cells[1] = new PdfPCell(new Paragraph("未知"));
                         break;
                 }
                 cells[2] = new PdfPCell(new Paragraph(entity.getNote() == null ? "" : entity.getNote(), font));
@@ -1365,6 +1440,9 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                 PdfPRow row = new PdfPRow(cells);
                 //单元格
                 cells[0] = new PdfPCell(new Paragraph(entity.getName()));//单元格内容
+                if (entity.getTypeId()==null) {
+                    entity.setTypeId(7);
+                }
                 switch (entity.getTypeId()) {
                     case 0:
                         cells[1] = new PdfPCell(new Paragraph("string"));
@@ -1380,6 +1458,15 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                         break;
                     case 4:
                         cells[1] = new PdfPCell(new Paragraph("array[string]"));
+                        break;
+                    case 5:
+                        cells[1] = new PdfPCell(new Paragraph("array"));
+                        break;
+                    case 6:
+                        cells[1] = new PdfPCell(new Paragraph("file"));
+                        break;
+                    default:
+                        cells[1] = new PdfPCell(new Paragraph("未知"));
                         break;
                 }
                 cells[2] = new PdfPCell(new Paragraph(entity.getNote() == null ? "" : entity.getNote(), font));
@@ -1407,6 +1494,9 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                 PdfPRow row = new PdfPRow(cells);
                 //单元格
                 cells[0] = new PdfPCell(new Paragraph(spance + entity.getName()));//单元格内容
+                if (entity.getTypeId()==null) {
+                    entity.setTypeId(7);
+                }
                 switch (entity.getTypeId()) {
                     case 0:
                         cells[1] = new PdfPCell(new Paragraph("string"));
@@ -1422,6 +1512,15 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                         break;
                     case 4:
                         cells[1] = new PdfPCell(new Paragraph("array[string]"));
+                        break;
+                    case 5:
+                        cells[1] = new PdfPCell(new Paragraph("array"));
+                        break;
+                    case 6:
+                        cells[1] = new PdfPCell(new Paragraph("file"));
+                        break;
+                    default:
+                        cells[1] = new PdfPCell(new Paragraph("未知"));
                         break;
                 }
                 cells[2] = new PdfPCell(new Paragraph(entity.getNote() == null ? "" : entity.getNote(), font));
