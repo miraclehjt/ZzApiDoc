@@ -627,7 +627,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                         .key("require").value(requestArgEntity.getRequire() == null ? true : requestArgEntity.getRequire())
                         .key("typeId").value(requestArgEntity.getTypeId())
                         .key("description").value(requestArgEntity.getNote() == null ? "" : requestArgEntity.getNote());
-                if (requestArgEntity.getTypeId()==null) {
+                if (requestArgEntity.getTypeId() == null) {
                     requestArgEntity.setTypeId(7);
                 }
                 switch (requestArgEntity.getTypeId()) {
@@ -705,7 +705,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                         .key("pid").value(responseArgEntity.getPid())
                         .key("typeId").value(responseArgEntity.getTypeId())
                         .key("description").value(responseArgEntity.getNote() == null ? "" : responseArgEntity.getNote());
-                if (responseArgEntity.getTypeId()==null) {
+                if (responseArgEntity.getTypeId() == null) {
                     responseArgEntity.setTypeId(7);
                 }
                 switch (responseArgEntity.getTypeId()) {
@@ -771,7 +771,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                         .key("require").value(req.getRequire() == null ? true : req.getRequire())
                         .key("typeId").value(req.getTypeId())
                         .key("description").value(req.getNote() == null ? "" : req.getNote());
-                if (req.getTypeId()==null) {
+                if (req.getTypeId() == null) {
                     req.setTypeId(7);
                 }
                 switch (req.getTypeId()) {
@@ -811,7 +811,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                         .key("pid").value(responseArgEntity.getPid())
                         .key("typeId").value(responseArgEntity.getTypeId())
                         .key("description").value(responseArgEntity.getNote() == null ? "" : responseArgEntity.getNote());
-                if (responseArgEntity.getTypeId()==null) {
+                if (responseArgEntity.getTypeId() == null) {
                     responseArgEntity.setTypeId(7);
                 }
                 switch (responseArgEntity.getTypeId()) {
@@ -850,7 +850,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                         .key("pid").value(responseArgEntity.getPid())
                         .key("typeId").value(responseArgEntity.getTypeId())
                         .key("description").value(responseArgEntity.getNote() == null ? "" : responseArgEntity.getNote());
-                if (responseArgEntity.getTypeId()==null) {
+                if (responseArgEntity.getTypeId() == null) {
                     responseArgEntity.setTypeId(7);
                 }
                 switch (responseArgEntity.getTypeId()) {
@@ -942,11 +942,11 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                         fontChinese.setStyle(Font.NORMAL);
 
                         addTextLine(document, "", null);
-                        addText(document, "创建人：", fontChinese);
+                        addText(document, "创建人：", fontChinese, true);
                         addTextLine(document, project.getCreateUserName(), fontChinese);
-                        addText(document, "创建时间：", fontChinese);
+                        addText(document, "创建时间：", fontChinese, true);
                         addTextLine(document, DataUtils.formatDate(project.getCreateTime()), fontChinese);
-                        addText(document, "项目说明：", fontChinese);
+                        addText(document, "项目说明：", fontChinese, true);
                         addTextLine(document, project.getNote(), fontChinese);
 
                         List<InterfaceGroupEntity> groups = mInterfaceGroupService.executeCriteria(InterfaceUtils.getInterfaceByProjectId(projectId));
@@ -956,14 +956,17 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                             for (int i = 0; i < groups.size(); i++) {
                                 InterfaceGroupEntity interfaceGroupEntity = groups.get(i);
 
-                                addMidTitle(document, (i + 1) + ". " + interfaceGroupEntity.getName(), fontChinese);
+//                                Chapter chapter = addGroup(document, (i + 1) + ". " + interfaceGroupEntity.getName(), (i+1), fontChinese);
+                                Chapter chapter = addGroup(document, interfaceGroupEntity.getName(), (i + 1), fontChinese);
                                 fontChinese.setStyle(Font.NORMAL);
-                                addText(document, "创建人：", fontChinese);
+                                addText(document, "创建人：", fontChinese, true);
                                 addTextLine(document, interfaceGroupEntity.getCreateUserName(), fontChinese);
-                                addText(document, "创建时间：", fontChinese);
+                                addText(document, "创建时间：", fontChinese, true);
                                 addTextLine(document, DataUtils.formatDate(interfaceGroupEntity.getCreateTime()), fontChinese);
-                                addText(document, "服务器Ip地址：", fontChinese);
+                                addText(document, "服务器Ip地址：", fontChinese, true);
                                 addUnderLineText(document, interfaceGroupEntity.getIp(), fontPath);
+                                addTextLine(document, "", fontChinese);
+                                addTextLine(document, "", fontChinese);
 
                                 List<InterfaceEntity> list = getBaseDao().executeCriteria(InterfaceUtils.getInterfaceByGroupId(interfaceGroupEntity.getId()));
                                 if (list == null) {
@@ -973,18 +976,20 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                                 for (int i1 = 0; i1 < list.size(); i1++) {
                                     InterfaceEntity entity = list.get(i1);
 
-                                    addDuanLuo(document, (i + 1) + "." + (i1 + 1) + ". " + entity.getName(), fontChinese);
+//                                    addGroupItem(document, chapter, (i + 1) + "." + (i1 + 1) + ". " + entity.getName(), (i + 1), fontChinese);
+                                    addGroupItem(document, chapter, entity.getName(), (i1 + 1), fontChinese);
                                     fontChinese.setStyle(Font.NORMAL);
-                                    addText(document, "创建人：", fontChinese);
+                                    addText(document, "创建人：", fontChinese, true);
                                     addTextLine(document, entity.getCreateUserName(), fontChinese);
-                                    addText(document, "创建时间：", fontChinese);
+                                    addText(document, "创建时间：", fontChinese, true);
                                     addTextLine(document, DataUtils.formatDate(entity.getCreateTime()), fontChinese);
-                                    addText(document, "请求方式：", fontChinese);
-                                    addTextLine(document, entity.getHttpMethodName(), null);
-                                    addText(document, "请求地址：", fontChinese);
+                                    addText(document, "请求方式：", fontChinese, true);
+                                    addTextLine(document, entity.getHttpMethodName(), fontChinese);
+                                    addText(document, "请求地址：", fontChinese, true);
                                     addTextLine(document, entity.getPath(), null);
-                                    addText(document, "接口说明：", fontChinese);
+                                    addText(document, "接口说明：", fontChinese, true);
                                     addTextLine(document, entity.getNote(), fontChinese);
+                                    addTextLine(document, "", fontChinese);
 
                                     pdfAddRequestHeaders(document, projectId, entity.getId(), fontChinese);
                                     pdfAddRequestParams(document, projectId, entity.getId(), fontChinese);
@@ -1038,102 +1043,91 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
         List<RequestHeaderEntity> args = mRequestHeaderService.getBaseDao().executeCriteria(ResponseArgUtils.getArgByInterfaceId(id));
 
         if (globals != null && globals.size() > 0) {
-            addSmallTitle(document, "全局请求头", font);
-            font.setStyle(Font.NORMAL);
-            PdfPTable inter = new PdfPTable(3);
-            inter.setWidthPercentage(100); // 宽度100%填充
-            inter.setSpacingBefore(1f); // 前间距
-            inter.setSpacingAfter(4f); // 后间距
-            List<PdfPRow> listRow = inter.getRows();
             //设置列宽
             float[] columnWidths = {3f, 2f, 5f};
-            inter.setWidths(columnWidths);
-            //标题
-            PdfPCell cells1[] = new PdfPCell[3];
-            PdfPRow row1 = new PdfPRow(cells1);
-            //单元格
-            cells1[0] = new PdfPCell(new Paragraph("名称", font));//单元格内容
-            cells1[1] = new PdfPCell(new Paragraph("默认值", font));
-            cells1[2] = new PdfPCell(new Paragraph("说明", font));
-            cells1[0].setBackgroundColor(BaseColor.LIGHT_GRAY);
-            cells1[1].setBackgroundColor(BaseColor.LIGHT_GRAY);
-            cells1[2].setBackgroundColor(BaseColor.LIGHT_GRAY);
-            cells1[0].setPaddingTop(6f);
-            cells1[0].setPaddingBottom(6f);
-            cells1[1].setPaddingTop(6f);
-            cells1[1].setPaddingBottom(6f);
-            cells1[2].setPaddingTop(6f);
-            cells1[2].setPaddingBottom(6f);
-            //把第一行添加到集合
-            listRow.add(row1);
-            for (RequestHeaderEntity entity : globals) {
-                //行1
-                PdfPCell cells[] = new PdfPCell[3];
-                PdfPRow row = new PdfPRow(cells);
-                //单元格
-                cells[0] = new PdfPCell(new Paragraph(entity.getName()));//单元格内容
-                cells[1] = new PdfPCell(new Paragraph(entity.getValue() == null ? "" : entity.getValue()));
-                cells[2] = new PdfPCell(new Paragraph(entity.getNote() == null ? "" : entity.getNote(), font));
-                cells[0].setPaddingTop(4f);
-                cells[0].setPaddingBottom(4f);
-                cells[1].setPaddingTop(4f);
-                cells[1].setPaddingBottom(4f);
-                cells[2].setPaddingTop(4f);
-                cells[2].setPaddingBottom(4f);
-                //把第一行添加到集合
-                listRow.add(row);
+            String[][] values = new String[args.size()][3];
+            for (int i = 0; i < args.size(); i++) {
+                RequestHeaderEntity entity = args.get(i);
+                values[i][0] = entity.getName();
+                values[i][1] = entity.getValue() == null ? "" : entity.getValue();
+                values[i][2] = entity.getNote() == null ? "" : entity.getNote();
             }
-            document.add(inter);
+            addTable(document, "全局请求头", new String[]{"名称", "默认值", "说明"}, columnWidths, values, null, font);
         }
 
         if (args != null && args.size() > 0) {
-            addSmallTitle(document, "其他请求头", font);
-            font.setStyle(Font.NORMAL);
-            PdfPTable inter = new PdfPTable(3);
-            inter.setWidthPercentage(100); // 宽度100%填充
-            inter.setSpacingBefore(1f); // 前间距
-            inter.setSpacingAfter(4f); // 后间距
-            List<PdfPRow> listRow = inter.getRows();
             //设置列宽
             float[] columnWidths = {3f, 2f, 5f};
-            inter.setWidths(columnWidths);
-            //标题
-            PdfPCell cells1[] = new PdfPCell[3];
-            PdfPRow row1 = new PdfPRow(cells1);
-            //单元格
-            cells1[0] = new PdfPCell(new Paragraph("名称", font));//单元格内容
-            cells1[1] = new PdfPCell(new Paragraph("默认值", font));
-            cells1[2] = new PdfPCell(new Paragraph("说明", font));
-            cells1[0].setBackgroundColor(BaseColor.LIGHT_GRAY);
-            cells1[1].setBackgroundColor(BaseColor.LIGHT_GRAY);
-            cells1[2].setBackgroundColor(BaseColor.LIGHT_GRAY);
-            cells1[0].setPaddingTop(6f);
-            cells1[0].setPaddingBottom(6f);
-            cells1[1].setPaddingTop(6f);
-            cells1[1].setPaddingBottom(6f);
-            cells1[2].setPaddingTop(6f);
-            cells1[2].setPaddingBottom(6f);
-            //把第一行添加到集合
-            listRow.add(row1);
-            for (RequestHeaderEntity entity : args) {
-                //行1
-                PdfPCell cells[] = new PdfPCell[3];
-                PdfPRow row = new PdfPRow(cells);
-                //单元格
-                cells[0] = new PdfPCell(new Paragraph(entity.getName()));//单元格内容
-                cells[1] = new PdfPCell(new Paragraph(entity.getValue() == null ? "" : entity.getValue()));
-                cells[2] = new PdfPCell(new Paragraph(entity.getNote() == null ? "" : entity.getNote(), font));
-                cells[0].setPaddingTop(4f);
-                cells[0].setPaddingBottom(4f);
-                cells[1].setPaddingTop(4f);
-                cells[1].setPaddingBottom(4f);
-                cells[2].setPaddingTop(4f);
-                cells[2].setPaddingBottom(4f);
-                //把第一行添加到集合
-                listRow.add(row);
+            String[][] values = new String[args.size()][3];
+            for (int i = 0; i < args.size(); i++) {
+                RequestHeaderEntity entity = args.get(i);
+                values[i][0] = entity.getName();
+                values[i][1] = entity.getValue() == null ? "" : entity.getValue();
+                values[i][2] = entity.getNote() == null ? "" : entity.getNote();
             }
-            document.add(inter);
+            addTable(document, "其他请求头", new String[]{"名称", "默认值", "说明"}, columnWidths, values, null, font);
         }
+    }
+
+
+    /**
+     * 添加表格
+     *
+     * @param document     Document对象
+     * @param tableTitle   表格标题
+     * @param titles       标题
+     * @param widthRatio   标题宽的比例
+     * @param values       内容
+     * @param titleBgColor 标题行背景颜色
+     * @param font         字体
+     * @throws DocumentException 异常
+     */
+    private List<PdfPRow> addTable(Document document, String tableTitle, String[] titles, float[] widthRatio, String[][] values, BaseColor titleBgColor, Font font) throws DocumentException {
+        //添加表格标题
+        font.setSize(14f);
+        font.setStyle(Font.BOLD);
+        Chunk paragraph = new Chunk(tableTitle == null ? "" : tableTitle, font);
+        try {
+            document.add(paragraph);
+        } catch (DocumentException e) {
+            e.printStackTrace();
+        }
+        font.setSize(12f);
+        font.setStyle(Font.NORMAL);
+        //添加表格
+        PdfPTable inter = new PdfPTable(titles.length);
+        inter.setWidthPercentage(100); // 宽度100%填充
+        inter.setSpacingBefore(1f); // 前间距
+        inter.setSpacingAfter(1f); // 后间距
+        List<PdfPRow> listRow = inter.getRows(); //行
+        //设置列宽比例
+        inter.setWidths(widthRatio);
+        //标题
+        PdfPCell cells[] = new PdfPCell[titles.length];
+        PdfPRow titleRow = new PdfPRow(cells);
+        //单元格
+        for (int i = 0; i < titles.length; i++) {
+            cells[i] = new PdfPCell(new Paragraph(titles[i], font));
+            cells[i].setBackgroundColor(titleBgColor == null ? BaseColor.LIGHT_GRAY : titleBgColor);
+            cells[i].setPaddingTop(6f);
+            cells[i].setPaddingBottom(6f);
+        }
+        //把第一行添加到集合
+        listRow.add(titleRow);
+        for (String[] value : values) {
+            PdfPCell childCells[] = new PdfPCell[value.length];
+            PdfPRow row = new PdfPRow(childCells);
+            //添加列
+            for (int i = 0; i < value.length; i++) {
+                childCells[i] = new PdfPCell(new Paragraph(value[i], font));//单元格内容
+                childCells[i].setPaddingTop(4f);
+                childCells[i].setPaddingBottom(4f);
+            }
+            //添加行
+            listRow.add(row);
+        }
+        document.add(inter);
+        return listRow;
     }
 
 
@@ -1148,265 +1142,144 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
      */
     private void pdfAddRequestParams(Document document, String projectId, String id, Font font) throws DocumentException {
         List<RequestArgEntity> globals = mRequestArgService.getGlobalRequestArgs(projectId);
-        List<RequestArgEntity> args = mRequestArgService.getBaseDao().executeCriteria(ResponseArgUtils.getArgByInterfaceIdAndPid(id, "0"));
 
         if (globals != null && globals.size() > 0) {
-            addSmallTitle(document, "全局请求参数", font);
-            font.setStyle(Font.NORMAL);
-            PdfPTable inter = new PdfPTable(4);
-            inter.setWidthPercentage(100); // 宽度100%填充
-            inter.setSpacingBefore(1f); // 前间距
-            inter.setSpacingAfter(4f); // 后间距
-            List<PdfPRow> listRow = inter.getRows();
             //设置列宽
             float[] columnWidths = {3f, 1f, 2f, 5f};
-            inter.setWidths(columnWidths);
-            //标题
-            PdfPCell cells1[] = new PdfPCell[4];
-            PdfPRow row1 = new PdfPRow(cells1);
-            //单元格
-            cells1[0] = new PdfPCell(new Paragraph("名称", font));//单元格内容
-            cells1[1] = new PdfPCell(new Paragraph("必选", font));
-            cells1[2] = new PdfPCell(new Paragraph("类型", font));
-            cells1[3] = new PdfPCell(new Paragraph("说明", font));
-            cells1[0].setBackgroundColor(BaseColor.LIGHT_GRAY);
-            cells1[1].setBackgroundColor(BaseColor.LIGHT_GRAY);
-            cells1[2].setBackgroundColor(BaseColor.LIGHT_GRAY);
-            cells1[3].setBackgroundColor(BaseColor.LIGHT_GRAY);
-            cells1[0].setPaddingTop(6f);
-            cells1[0].setPaddingBottom(6f);
-            cells1[1].setPaddingTop(6f);
-            cells1[1].setPaddingBottom(6f);
-            cells1[2].setPaddingTop(6f);
-            cells1[2].setPaddingBottom(6f);
-            cells1[3].setPaddingTop(6f);
-            cells1[3].setPaddingBottom(6f);
-            //把第一行添加到集合
-            listRow.add(row1);
-            for (RequestArgEntity entity : globals) {
-                //行1
-                PdfPCell cells[] = new PdfPCell[4];
-                PdfPRow row = new PdfPRow(cells);
-                //单元格
-                cells[0] = new PdfPCell(new Paragraph(entity.getName()));//单元格内容
-                cells[1] = new PdfPCell(new Paragraph(entity.getRequire() == null ? "true" : (entity.getRequire() ? "true" : "false")));
-                if (entity.getTypeId()==null) {
+            String[][] values = new String[globals.size()][columnWidths.length];
+            for (int i = 0; i < globals.size(); i++) {
+                RequestArgEntity entity = globals.get(i);
+                values[i][0] = entity.getName() == null ? "" : entity.getName();
+                values[i][1] = entity.getRequire() == null ? "true" : (entity.getRequire() ? "true" : "false");
+                if (entity.getTypeId() == null) {
                     entity.setTypeId(7);
                 }
                 switch (entity.getTypeId()) {
                     case 0:
-                        cells[2] = new PdfPCell(new Paragraph("string"));
+                        values[i][2] = "string";
                         break;
                     case 1:
-                        cells[2] = new PdfPCell(new Paragraph("number"));
+                        values[i][2] = "number";
                         break;
                     case 2:
-                        cells[2] = new PdfPCell(new Paragraph("object"));
+                        values[i][2] = "object";
                         break;
                     case 3:
-                        cells[2] = new PdfPCell(new Paragraph("array[object]"));
+                        values[i][2] = "array[object]";
                         break;
                     case 4:
-                        cells[2] = new PdfPCell(new Paragraph("array[string]"));
+                        values[i][2] = "array[string]";
                         break;
                     case 5:
-                        cells[2] = new PdfPCell(new Paragraph("array"));
+                        values[i][2] = "array";
                         break;
                     case 6:
-                        cells[2] = new PdfPCell(new Paragraph("file"));
+                        values[i][2] = "file";
                         break;
                     default:
-                        cells[2] = new PdfPCell(new Paragraph("未知"));
+                        values[i][2] = "未知";
                         break;
                 }
-                cells[3] = new PdfPCell(new Paragraph(entity.getNote(), font));
-                cells[0].setPaddingTop(4f);
-                cells[0].setPaddingBottom(4f);
-                cells[1].setPaddingTop(4f);
-                cells[1].setPaddingBottom(4f);
-                cells[2].setPaddingTop(4f);
-                cells[2].setPaddingBottom(4f);
-                cells[3].setPaddingTop(4f);
-                cells[3].setPaddingBottom(4f);
-                //把第一行添加到集合
-                listRow.add(row);
+                values[i][3] = entity.getNote() == null ? "" : entity.getNote();
             }
-            document.add(inter);
+            addTable(document, "全局请求参数", new String[]{"名称", "必选", "类型", "说明"}, columnWidths, values, null, font);
         }
 
+        List<RequestArgEntity> args = mRequestArgService.getBaseDao().executeCriteria(ResponseArgUtils.getArgByInterfaceIdAndPid(id, "0"));
+
         if (args != null && args.size() > 0) {
-            addSmallTitle(document, "其他请求参数", font);
-            font.setStyle(Font.NORMAL);
-            PdfPTable inter = new PdfPTable(4);
-            inter.setWidthPercentage(100); // 宽度100%填充
-            inter.setSpacingBefore(1f); // 前间距
-            inter.setSpacingAfter(4f); // 后间距
-            inter.setPaddingTop(0);
-            List<PdfPRow> listRow = inter.getRows();
             //设置列宽
             float[] columnWidths = {3f, 1f, 2f, 5f};
-            inter.setWidths(columnWidths);
-            //标题
-            PdfPCell cells1[] = new PdfPCell[4];
-            PdfPRow row1 = new PdfPRow(cells1);
-            //单元格
-            cells1[0] = new PdfPCell(new Paragraph("名称", font));//单元格内容
-            cells1[1] = new PdfPCell(new Paragraph("必选", font));
-            cells1[2] = new PdfPCell(new Paragraph("类型", font));
-            cells1[3] = new PdfPCell(new Paragraph("说明", font));
-            cells1[0].setBackgroundColor(BaseColor.LIGHT_GRAY);
-            cells1[1].setBackgroundColor(BaseColor.LIGHT_GRAY);
-            cells1[2].setBackgroundColor(BaseColor.LIGHT_GRAY);
-            cells1[3].setBackgroundColor(BaseColor.LIGHT_GRAY);
-            cells1[0].setPaddingTop(6f);
-            cells1[0].setPaddingBottom(6f);
-            cells1[1].setPaddingTop(6f);
-            cells1[1].setPaddingBottom(6f);
-            cells1[2].setPaddingTop(6f);
-            cells1[2].setPaddingBottom(6f);
-            cells1[3].setPaddingTop(6f);
-            cells1[3].setPaddingBottom(6f);
-            //把第一行添加到集合
-            listRow.add(row1);
-            for (RequestArgEntity entity : args) {
-                //行1
-                PdfPCell cells[] = new PdfPCell[4];
-                PdfPRow row = new PdfPRow(cells);
-                //单元格
-                cells[0] = new PdfPCell(new Paragraph(entity.getName()));//单元格内容
-                cells[1] = new PdfPCell(new Paragraph(entity.getRequire() == null ? "true" : (entity.getRequire() ? "true" : "false")));
-                if (entity.getTypeId()==null) {
+            String[][] values = new String[args.size()][columnWidths.length];
+            for (int i = 0; i < args.size(); i++) {
+                RequestArgEntity entity = args.get(i);
+                values[i][0] = entity.getName() == null ? "" : entity.getName();
+                values[i][1] = entity.getRequire() == null ? "true" : (entity.getRequire() ? "true" : "false");
+                if (entity.getTypeId() == null) {
                     entity.setTypeId(7);
                 }
                 switch (entity.getTypeId()) {
                     case 0:
-                        cells[2] = new PdfPCell(new Paragraph("string"));
+                        values[i][2] = "string";
                         break;
                     case 1:
-                        cells[2] = new PdfPCell(new Paragraph("number"));
+                        values[i][2] = "number";
                         break;
                     case 2:
-                        cells[2] = new PdfPCell(new Paragraph("object"));
+                        values[i][2] = "object";
                         break;
                     case 3:
-                        cells[2] = new PdfPCell(new Paragraph("array[object]"));
+                        values[i][2] = "array[object]";
                         break;
                     case 4:
-                        cells[2] = new PdfPCell(new Paragraph("array[string]"));
+                        values[i][2] = "array[string]";
                         break;
                     case 5:
-                        cells[2] = new PdfPCell(new Paragraph("array"));
+                        values[i][2] = "array";
                         break;
                     case 6:
-                        cells[2] = new PdfPCell(new Paragraph("file"));
+                        values[i][2] = "file";
                         break;
                     default:
-                        cells[2] = new PdfPCell(new Paragraph("未知"));
+                        values[i][2] = "未知";
                         break;
                 }
-                cells[3] = new PdfPCell(new Paragraph(entity.getNote(), font));
-                cells[0].setPaddingTop(4f);
-                cells[0].setPaddingBottom(4f);
-                cells[1].setPaddingTop(4f);
-                cells[1].setPaddingBottom(4f);
-                cells[2].setPaddingTop(4f);
-                cells[2].setPaddingBottom(4f);
-                cells[3].setPaddingTop(4f);
-                cells[3].setPaddingBottom(4f);
-                //把第一行添加到集合
-                listRow.add(row);
+                values[i][3] = entity.getNote() == null ? "" : entity.getNote();
             }
-            document.add(inter);
+            addTable(document, "其他请求参数", new String[]{"名称", "必选", "类型", "说明"}, columnWidths, values, null, font);
+
         }
     }
 
 
     private void pdfAddResponseParams(Document document, String projectId, String id, Font font) throws DocumentException {
         List<ResponseArgEntity> globals = mResponseArgService.getGlobalResponseArgs(projectId);
-        List<ResponseArgEntity> args = mResponseArgService.getBaseDao().executeCriteria(ResponseArgUtils.getArgByInterfaceIdAndPid(id, "0"));
-
         if (globals != null && globals.size() > 0) {
-            addSmallTitle(document, "全局响应数据", font);
-            font.setStyle(Font.NORMAL);
-            PdfPTable inter = new PdfPTable(3);
-            inter.setWidthPercentage(100); // 宽度100%填充
-            inter.setSpacingBefore(1f); // 前间距
-            inter.setSpacingAfter(4f); // 后间距
-            inter.setPaddingTop(0);
-            List<PdfPRow> listRow = inter.getRows();
+
             //设置列宽
             float[] columnWidths = {3f, 2f, 4f};
-            inter.setWidths(columnWidths);
-            //标题
-            PdfPCell cells1[] = new PdfPCell[3];
-            PdfPRow row1 = new PdfPRow(cells1);
-            //单元格
-            cells1[0] = new PdfPCell(new Paragraph("名称", font));//单元格内容
-            cells1[1] = new PdfPCell(new Paragraph("类型", font));
-            cells1[2] = new PdfPCell(new Paragraph("说明", font));
-            cells1[0].setBackgroundColor(BaseColor.LIGHT_GRAY);
-            cells1[1].setBackgroundColor(BaseColor.LIGHT_GRAY);
-            cells1[2].setBackgroundColor(BaseColor.LIGHT_GRAY);
-            cells1[0].setPaddingTop(6f);
-            cells1[0].setPaddingBottom(6f);
-            cells1[1].setPaddingTop(6f);
-            cells1[1].setPaddingBottom(6f);
-            cells1[2].setPaddingTop(6f);
-            cells1[2].setPaddingBottom(6f);
-            //把第一行添加到集合
-            listRow.add(row1);
-            for (ResponseArgEntity entity : globals) {
-                //行1
-                PdfPCell cells[] = new PdfPCell[3];
-                PdfPRow row = new PdfPRow(cells);
-                //单元格
-                cells[0] = new PdfPCell(new Paragraph(entity.getName() == null ? "" : entity.getName()));//单元格内容
-                if (entity.getTypeId()==null) {
+            String[][] values = new String[globals.size()][3];
+            for (int i = 0; i < globals.size(); i++) {
+                ResponseArgEntity entity = globals.get(i);
+                values[i][0] = entity.getName() == null ? "" : entity.getName();
+                if (entity.getTypeId() == null) {
                     entity.setTypeId(7);
                 }
                 switch (entity.getTypeId()) {
                     case 0:
-                        cells[1] = new PdfPCell(new Paragraph("string"));
+                        values[i][1] = "string";
                         break;
                     case 1:
-                        cells[1] = new PdfPCell(new Paragraph("number"));
+                        values[i][1] = "number";
                         break;
                     case 2:
-                        cells[1] = new PdfPCell(new Paragraph("object"));
+                        values[i][1] = "object";
                         break;
                     case 3:
-                        cells[1] = new PdfPCell(new Paragraph("array[object]"));
+                        values[i][1] = "array[object]";
                         break;
                     case 4:
-                        cells[1] = new PdfPCell(new Paragraph("array[string]"));
+                        values[i][1] = "array[string]";
                         break;
                     case 5:
-                        cells[1] = new PdfPCell(new Paragraph("array"));
+                        values[i][1] = "array";
                         break;
                     case 6:
-                        cells[1] = new PdfPCell(new Paragraph("file"));
+                        values[i][1] = "file";
                         break;
                     default:
-                        cells[1] = new PdfPCell(new Paragraph("未知"));
+                        values[i][1] = "未知";
                         break;
                 }
-                cells[2] = new PdfPCell(new Paragraph(entity.getNote() == null ? "" : entity.getNote(), font));
-                cells[0].setPaddingTop(4f);
-                cells[0].setPaddingBottom(4f);
-                cells[1].setPaddingTop(4f);
-                cells[1].setPaddingBottom(4f);
-                cells[2].setPaddingTop(4f);
-                cells[2].setPaddingBottom(4f);
-
-                //把第一行添加到集合
-                listRow.add(row);
+                values[i][2] = entity.getNote() == null ? "" : entity.getNote();
             }
-            document.add(inter);
+            addTable(document, "全局响应数据", new String[]{"名称", "类型", "说明"}, columnWidths, values, null, font);
         }
-
+        List<ResponseArgEntity> args = mResponseArgService.getBaseDao().executeCriteria(ResponseArgUtils.getArgByInterfaceIdAndPid(id, "0"));
         if (args != null && args.size() > 0) {
             addSmallTitle(document, "其他响应数据", font);
             font.setStyle(Font.NORMAL);
+            font.setSize(12f);
             PdfPTable inter = new PdfPTable(3);
             inter.setWidthPercentage(100); // 宽度100%填充
             inter.setSpacingBefore(1f); // 前间距
@@ -1439,34 +1312,34 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                 PdfPCell cells[] = new PdfPCell[3];
                 PdfPRow row = new PdfPRow(cells);
                 //单元格
-                cells[0] = new PdfPCell(new Paragraph(entity.getName()));//单元格内容
-                if (entity.getTypeId()==null) {
+                cells[0] = new PdfPCell(new Paragraph(entity.getName(), font));//单元格内容
+                if (entity.getTypeId() == null) {
                     entity.setTypeId(7);
                 }
                 switch (entity.getTypeId()) {
                     case 0:
-                        cells[1] = new PdfPCell(new Paragraph("string"));
+                        cells[1] = new PdfPCell(new Paragraph("string", font));
                         break;
                     case 1:
-                        cells[1] = new PdfPCell(new Paragraph("number"));
+                        cells[1] = new PdfPCell(new Paragraph("number", font));
                         break;
                     case 2:
-                        cells[1] = new PdfPCell(new Paragraph("object"));
+                        cells[1] = new PdfPCell(new Paragraph("object", font));
                         break;
                     case 3:
-                        cells[1] = new PdfPCell(new Paragraph("array[object]"));
+                        cells[1] = new PdfPCell(new Paragraph("array[object]", font));
                         break;
                     case 4:
-                        cells[1] = new PdfPCell(new Paragraph("array[string]"));
+                        cells[1] = new PdfPCell(new Paragraph("array[string]", font));
                         break;
                     case 5:
-                        cells[1] = new PdfPCell(new Paragraph("array"));
+                        cells[1] = new PdfPCell(new Paragraph("array", font));
                         break;
                     case 6:
-                        cells[1] = new PdfPCell(new Paragraph("file"));
+                        cells[1] = new PdfPCell(new Paragraph("file", font));
                         break;
                     default:
-                        cells[1] = new PdfPCell(new Paragraph("未知"));
+                        cells[1] = new PdfPCell(new Paragraph("未知", font));
                         break;
                 }
                 cells[2] = new PdfPCell(new Paragraph(entity.getNote() == null ? "" : entity.getNote(), font));
@@ -1478,13 +1351,13 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                 cells[2].setPaddingBottom(4f);
                 //把第一行添加到集合
                 listRow.add(row);
-                pdfAddChildResponseParams("    ", listRow, projectId, id, entity.getId(), font);
+                pdfAddChildResponseParams("    ", listRow, id, entity.getId(), font);
             }
             document.add(inter);
         }
     }
 
-    private void pdfAddChildResponseParams(String spance, List<PdfPRow> listRow, String projectId, String id, String pid, Font font) throws DocumentException {
+    private void pdfAddChildResponseParams(String spance, List<PdfPRow> listRow, String id, String pid, Font font) throws DocumentException {
         List<ResponseArgEntity> args = mResponseArgService.getBaseDao().executeCriteria(ResponseArgUtils.getArgByInterfaceIdAndPid(id, pid));
         if (args != null && args.size() > 0) {
             //把第一行添加到集合
@@ -1493,34 +1366,34 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                 PdfPCell cells[] = new PdfPCell[3];
                 PdfPRow row = new PdfPRow(cells);
                 //单元格
-                cells[0] = new PdfPCell(new Paragraph(spance + entity.getName()));//单元格内容
-                if (entity.getTypeId()==null) {
+                cells[0] = new PdfPCell(new Paragraph(spance + entity.getName(), font));//单元格内容
+                if (entity.getTypeId() == null) {
                     entity.setTypeId(7);
                 }
                 switch (entity.getTypeId()) {
                     case 0:
-                        cells[1] = new PdfPCell(new Paragraph("string"));
+                        cells[1] = new PdfPCell(new Paragraph("string", font));
                         break;
                     case 1:
-                        cells[1] = new PdfPCell(new Paragraph("number"));
+                        cells[1] = new PdfPCell(new Paragraph("number", font));
                         break;
                     case 2:
-                        cells[1] = new PdfPCell(new Paragraph("object"));
+                        cells[1] = new PdfPCell(new Paragraph("object", font));
                         break;
                     case 3:
-                        cells[1] = new PdfPCell(new Paragraph("array[object]"));
+                        cells[1] = new PdfPCell(new Paragraph("array[object]", font));
                         break;
                     case 4:
-                        cells[1] = new PdfPCell(new Paragraph("array[string]"));
+                        cells[1] = new PdfPCell(new Paragraph("array[string]", font));
                         break;
                     case 5:
-                        cells[1] = new PdfPCell(new Paragraph("array"));
+                        cells[1] = new PdfPCell(new Paragraph("array", font));
                         break;
                     case 6:
-                        cells[1] = new PdfPCell(new Paragraph("file"));
+                        cells[1] = new PdfPCell(new Paragraph("file", font));
                         break;
                     default:
-                        cells[1] = new PdfPCell(new Paragraph("未知"));
+                        cells[1] = new PdfPCell(new Paragraph("未知", font));
                         break;
                 }
                 cells[2] = new PdfPCell(new Paragraph(entity.getNote() == null ? "" : entity.getNote(), font));
@@ -1532,7 +1405,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                 cells[2].setPaddingBottom(4f);
                 //把第一行添加到集合
                 listRow.add(row);
-                pdfAddChildResponseParams(spance + "    ", listRow, projectId, id, entity.getId(), font);
+                pdfAddChildResponseParams(spance + "    ", listRow, id, entity.getId(), font);
             }
         }
 
@@ -1559,27 +1432,89 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
         }
     }
 
-    private void addMidTitle(Document document, String text, Font font) {
+    /**
+     * 添加分组标题(带标签)
+     *
+     * @param document Document对象
+     * @param text     标题内容
+     * @param number   标题数字
+     * @param font     字体
+     * @return Chapter对象
+     */
+    private Chapter addGroup(Document document, String text, int number, Font font) {
+        addTextLine(document, "", font);
+        addTextLine(document, "", font);
         if (font != null) {
             font.setSize(22f);
             font.setStyle(Font.BOLD);
-            Paragraph paragraph = new Paragraph("\n\n" + (text == null ? "" : text), font);
+            Paragraph paragraph = new Paragraph((text == null ? "" : text), font);
+            Chapter chapter = new Chapter(paragraph, number);
+            chapter.setBookmarkOpen(true);
+            chapter.setBookmarkTitle(number + ". " + text);
+            chapter.setTriggerNewPage(false);
+            try {
+                document.add(chapter);
+            } catch (DocumentException e) {
+                e.printStackTrace();
+            }
+            return chapter;
+        } else {
+            Paragraph paragraph = new Paragraph((text == null ? "" : text));
+            Chapter chapter = new Chapter(paragraph, number);
+            chapter.setBookmarkOpen(true);
+            chapter.setBookmarkTitle(number + ". " + text);
+            chapter.setTriggerNewPage(false);
             try {
                 document.add(paragraph);
             } catch (DocumentException e) {
                 e.printStackTrace();
             }
-        } else {
-            Paragraph paragraph = new Paragraph("\n\n" + (text == null ? "" : text));
+            return chapter;
+        }
+    }
+
+
+    /**
+     * 添加组内小标题(带标签)
+     *
+     * @param document Document对象
+     * @param chapter  Chapter对象
+     * @param text     标题
+     * @param number   序号
+     * @param font     字体
+     */
+    private void addGroupItem(Document document, Chapter chapter, String text, int number, Font font) {
+        addTextLine(document, "", font);
+        if (font != null) {
+            font.setSize(18f);
+            font.setStyle(Font.BOLD);
+            Paragraph paragraph = new Paragraph((text == null ? "" : text), font);
+            Section section = chapter.addSection(paragraph);
+            section.setBookmarkOpen(true);
+            section.setBookmarkTitle(chapter.getNumberDepth() + "." + number + ". " + text);
+            section.setTriggerNewPage(false);
+            section.setNumberStyle(Section.NUMBERSTYLE_DOTTED_WITHOUT_FINAL_DOT);
             try {
-                document.add(paragraph);
+                document.add(section);
+            } catch (DocumentException e) {
+                e.printStackTrace();
+            }
+        } else {
+            Paragraph paragraph = new Paragraph((text == null ? "" : text));
+            Section section = chapter.addSection(paragraph);
+            section.setBookmarkOpen(true);
+            section.setBookmarkTitle(number + ". " + text);
+            section.setNumberStyle(Section.NUMBERSTYLE_DOTTED_WITHOUT_FINAL_DOT);
+            section.setTriggerNewPage(false);
+            try {
+                document.add(section);
             } catch (DocumentException e) {
                 e.printStackTrace();
             }
         }
     }
 
-    private void addText(Document document, String text, Font font) {
+    private void addText(Document document, String text, Font font, boolean bold) {
         if (font == null) {
             Chunk chunk = new Chunk(text == null ? "" : text);
             try {
@@ -1589,7 +1524,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
             }
         } else {
             font.setSize(12f);
-            font.setStyle(Font.NORMAL);
+            font.setStyle(bold ? Font.BOLD : Font.NORMAL);
             Chunk chunk = new Chunk(text == null ? "" : text, font);
             try {
                 document.add(chunk);
@@ -1619,35 +1554,24 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
         }
     }
 
-    private void addUnderLineText(Document document, String text, String path) throws IOException, DocumentException {
-        Font font = new Font(BaseFont.createFont(path + "Arial.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED), 12f, Font.UNDERLINE);
-        Chunk chunk = new Chunk(text == null ? "" : text, font);
-        try {
-            document.add(chunk);
-        } catch (DocumentException e) {
-            e.printStackTrace();
-        }
+    /**
+     * 添加下划线(带超链接)
+     *
+     * @param document Document对象
+     * @param text     链接文字
+     * @param fontPath 字体路径
+     * @throws IOException       异常
+     * @throws DocumentException 异常
+     */
+    private void addUnderLineText(Document document, String text, String fontPath) throws IOException, DocumentException {
+        Font font = new Font(BaseFont.createFont(fontPath + "Arial.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED), 12f, Font.UNDERLINE);
+        font.setColor(BaseColor.BLUE);
+        Anchor anchor = new Anchor(text, font);
+        anchor.setReference(text);
+        anchor.setName(text);
+        document.add(anchor);
     }
 
-    private void addDuanLuo(Document document, String text, Font font) {
-        if (font != null) {
-            font.setSize(18f);
-            font.setStyle(Font.BOLD);
-            Paragraph paragraph = new Paragraph("\n\n" + (text == null ? "" : text), font);
-            try {
-                document.add(paragraph);
-            } catch (DocumentException e) {
-                e.printStackTrace();
-            }
-        } else {
-            Paragraph paragraph = new Paragraph("\n\n" + (text == null ? "" : text));
-            try {
-                document.add(paragraph);
-            } catch (DocumentException e) {
-                e.printStackTrace();
-            }
-        }
-    }
 
     private void addSmallTitle(Document document, String text, Font font) {
         if (font != null) {
