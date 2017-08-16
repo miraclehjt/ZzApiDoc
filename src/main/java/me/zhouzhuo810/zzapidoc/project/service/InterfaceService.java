@@ -29,4 +29,6 @@ public interface InterfaceService extends BaseService<InterfaceEntity> {
     ResponseEntity<byte[]> downloadPdf(String projectId, String userId);
 
     BaseResult addInterfaceExample(String interfaceId, String example, String userId);
+
+    BaseResult generateEmptyExample(String interfaceId, String userId);
 }

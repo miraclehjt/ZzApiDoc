@@ -14,6 +14,7 @@ import me.zhouzhuo810.zzapidoc.project.dao.InterfaceDao;
 import me.zhouzhuo810.zzapidoc.project.entity.*;
 import me.zhouzhuo810.zzapidoc.project.service.*;
 import me.zhouzhuo810.zzapidoc.project.utils.InterfaceUtils;
+import me.zhouzhuo810.zzapidoc.project.utils.JSONTool;
 import me.zhouzhuo810.zzapidoc.project.utils.PdfReportM1HeaderFooter;
 import me.zhouzhuo810.zzapidoc.project.utils.ResponseArgUtils;
 import me.zhouzhuo810.zzapidoc.user.entity.UserEntity;
@@ -443,8 +444,8 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
             }
             map.put("globalResponseArgs", response);
         }
-        List<ResponseArgEntity> responseArgEntities = mResponseArgService.executeCriteria(ResponseArgUtils.getArgByInterfaceId(interfaceId));
-        if (responseArgEntities != null) {
+        List<ResponseArgEntity> responseArgEntities = mResponseArgService.executeCriteria(ResponseArgUtils.getArgByInterfaceIdAndPid(interfaceId, "0"));
+        if (responseArgEntities != null && responseArgEntities.size() > 0) {
             List<Map<String, Object>> response = new ArrayList<Map<String, Object>>();
             for (ResponseArgEntity requestArgEntity : responseArgEntities) {
                 MapUtils m = new MapUtils();
@@ -456,10 +457,29 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                 m.put("pid", requestArgEntity.getPid());
                 m.put("typeId", requestArgEntity.getTypeId());
                 response.add(m.build());
+                addChildResponseArg(response, "    ",interfaceId, requestArgEntity.getId());
             }
             map.put("responseArgs", response);
         }
         return new BaseResult(1, "ok", map.build());
+    }
+
+    private void addChildResponseArg(List<Map<String, Object>> response, String space, String interfaceId, String id) {
+        List<ResponseArgEntity> responseArgEntities = mResponseArgService.executeCriteria(ResponseArgUtils.getArgByInterfaceIdAndPid(interfaceId, id));
+        if (responseArgEntities != null && responseArgEntities.size() > 0) {
+            for (ResponseArgEntity requestArgEntity : responseArgEntities) {
+                MapUtils m = new MapUtils();
+                m.put("id", requestArgEntity.getId());
+                m.put("name", space+requestArgEntity.getName());
+                m.put("defValue", requestArgEntity.getDefaultValue() == null ? "" : requestArgEntity.getDefaultValue());
+                m.put("global", requestArgEntity.getGlobal() == null ? false : requestArgEntity.getGlobal());
+                m.put("note", requestArgEntity.getNote() == null ? "" : requestArgEntity.getNote());
+                m.put("pid", requestArgEntity.getPid());
+                m.put("typeId", requestArgEntity.getTypeId());
+                response.add(m.build());
+                addChildResponseArg(response, space+"    ", interfaceId, requestArgEntity.getId());
+            }
+        }
     }
 
 
@@ -467,7 +487,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
     public BaseResult addInterfaceExample(String interfaceId, String example, String userId) {
         UserEntity user = mUserService.get(userId);
         if (user == null) {
-            return new BaseResult(0, "用户不合法");
+            return new BaseResult(0, "用户不合法", new HashMap<String, String>());
         }
         InterfaceEntity entity = getBaseDao().get(interfaceId);
         if (entity == null) {
@@ -480,6 +500,229 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
         } catch (Exception e) {
             e.printStackTrace();
             return new BaseResult(0, "添加失败！", new HashMap<String, String>());
+        }
+    }
+
+    @Override
+    public BaseResult generateEmptyExample(String interfaceId, String userId) {
+        UserEntity user = mUserService.get(userId);
+        if (user == null) {
+            return new BaseResult(0, "用户不合法", new HashMap<String, String>());
+        }
+        InterfaceEntity entity = getBaseDao().get(interfaceId);
+        if (entity == null) {
+            return new BaseResult(0, "接口不存在或已被删除！", new HashMap<String, String>());
+        }
+        List<ResponseArgEntity> globalResponseArgs = mResponseArgService.getGlobalResponseArgs(entity.getProjectId());
+        JSONStringer stringer = new JSONStringer();
+        stringer.object();
+        if (globalResponseArgs != null) {
+            for (ResponseArgEntity resG : globalResponseArgs) {
+                if (resG.getTypeId() == null) {
+                    resG.setTypeId(7);
+                }
+                switch (resG.getTypeId()) {
+                    case ResponseArgEntity.TYPE_STRING:
+                        try {
+                            stringer.key(resG.getName()).value(resG.getNote()==null?"":resG.getNote());
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        break;
+                    case ResponseArgEntity.TYPE_NUMBER:
+                        try {
+                            stringer.key(resG.getName()).value(0);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        break;
+                    case ResponseArgEntity.TYPE_ARRAY:
+                        try {
+                            stringer.key(resG.getName()).array().endArray();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        break;
+                    case ResponseArgEntity.TYPE_FILE:
+                        try {
+                            stringer.key(resG.getName()).value("");
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        break;
+                    default:
+                        try {
+                            stringer.key(resG.getName()).value("");
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        break;
+                }
+            }
+        }
+        List<ResponseArgEntity> responseArgEntities = mResponseArgService.executeCriteria(ResponseArgUtils.getArgByInterfaceIdAndPid(interfaceId, "0"));
+        for (ResponseArgEntity res : responseArgEntities) {
+            if (res.getTypeId() == null) {
+                res.setTypeId(7);
+            }
+            switch (res.getTypeId()) {
+                case ResponseArgEntity.TYPE_STRING:
+                    try {
+                        stringer.key(res.getName()).value(res.getNote()==null?"":res.getNote());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case ResponseArgEntity.TYPE_NUMBER:
+                    try {
+                        stringer.key(res.getName()).value(0);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case ResponseArgEntity.TYPE_OBJECT:
+                    try {
+                        stringer.key(res.getName());
+                        stringer.object();
+                        generateChildExeample(stringer, interfaceId, res.getId());
+                        stringer.endObject();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case ResponseArgEntity.TYPE_ARRAY_OBJECT:
+                    try {
+                        stringer.key(res.getName());
+                        stringer.array();
+                        stringer.object();
+                        generateChildExeample(stringer, interfaceId, res.getId());
+                        stringer.endObject();
+                        stringer.endArray();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case ResponseArgEntity.TYPE_ARRAY_STRING:
+                    try {
+                        stringer.key(res.getName());
+                        stringer.array();
+                        stringer.value(0);
+                        stringer.value(1);
+                        stringer.endArray();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case ResponseArgEntity.TYPE_ARRAY:
+                    try {
+                        stringer.key(res.getName()).array().endArray();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case ResponseArgEntity.TYPE_FILE:
+                    try {
+                        stringer.key(res.getName()).value("");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                default:
+                    try {
+                        stringer.key(res.getName()).value("");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
+
+            }
+        }
+        stringer.endObject();
+        String result = stringer.toString();
+        String formatJson = new JSONTool().stringToJSON(result);
+        entity.setExample(formatJson);
+        try {
+            getBaseDao().update(entity);
+            return new BaseResult(1, "生成成功！", new HashMap<String, String>());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new BaseResult(0, "生成失败！", new HashMap<String, String>());
+        }
+    }
+
+    private void generateChildExeample(JSONStringer stringer, String interfaceId, String pid) {
+        List<ResponseArgEntity> responseArgEntities = mResponseArgService.executeCriteria(ResponseArgUtils.getArgByInterfaceIdAndPid(interfaceId, pid));
+        for (ResponseArgEntity res : responseArgEntities) {
+            switch (res.getTypeId()) {
+                case ResponseArgEntity.TYPE_STRING:
+                    try {
+                        stringer.key(res.getName()).value(res.getNote()==null?"":res.getNote());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case ResponseArgEntity.TYPE_NUMBER:
+                    try {
+                        stringer.key(res.getName()).value(0);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case ResponseArgEntity.TYPE_OBJECT:
+                    try {
+                        stringer.key(res.getName());
+                        stringer.object();
+                        generateChildExeample(stringer, interfaceId, res.getId());
+                        stringer.endObject();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case ResponseArgEntity.TYPE_ARRAY_OBJECT:
+                    try {
+                        stringer.key(res.getName());
+                        stringer.array();
+                        stringer.object();
+                        generateChildExeample(stringer, interfaceId, res.getId());
+                        stringer.endObject();
+                        stringer.endArray();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case ResponseArgEntity.TYPE_ARRAY_STRING:
+                    try {
+                        stringer.key(res.getName());
+                        stringer.array();
+                        stringer.value(0);
+                        stringer.value(1);
+                        stringer.endArray();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case ResponseArgEntity.TYPE_ARRAY:
+                    try {
+                        stringer.key(res.getName()).array().endArray();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case ResponseArgEntity.TYPE_FILE:
+                    try {
+                        stringer.key(res.getName()).value("");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                default:
+                    try {
+                        stringer.key(res.getName()).value("");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
+            }
         }
     }
 
@@ -657,6 +900,14 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                         stringer.key("type").value("object");
                         stringer.key("children").array().endArray();
                         break;
+                    case ResponseArgEntity.TYPE_ARRAY:
+                        stringer.key("type").value("array");
+                        stringer.key("children").array().endArray();
+                        break;
+                    case ResponseArgEntity.TYPE_FILE:
+                        stringer.key("type").value("file");
+                        stringer.key("children").array().endArray();
+                        break;
                     default:
                         stringer.key("type").value("未知");
                         stringer.key("children").array().endArray();
@@ -739,6 +990,14 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                         stringer.key("type").value("object");
                         responseToChildJson(stringer, interfaceId, responseArgEntity.getId());
                         break;
+                    case ResponseArgEntity.TYPE_ARRAY:
+                        stringer.key("type").value("array");
+                        stringer.key("children").array().endArray();
+                        break;
+                    case ResponseArgEntity.TYPE_FILE:
+                        stringer.key("type").value("file");
+                        stringer.key("children").array().endArray();
+                        break;
                     default:
                         stringer.key("type").value("未知");
                         stringer.key("children").array().endArray();
@@ -802,6 +1061,14 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                         stringer.key("type").value("object");
                         stringer.key("children").array().endArray();
                         break;
+                    case ResponseArgEntity.TYPE_ARRAY:
+                        stringer.key("type").value("array");
+                        stringer.key("children").array().endArray();
+                        break;
+                    case ResponseArgEntity.TYPE_FILE:
+                        stringer.key("type").value("file");
+                        stringer.key("children").array().endArray();
+                        break;
                     default:
                         stringer.key("type").value("未知");
                         stringer.key("children").array().endArray();
@@ -841,6 +1108,14 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                         break;
                     case ResponseArgEntity.TYPE_OBJECT:
                         stringer.key("type").value("object");
+                        stringer.key("children").array().endArray();
+                        break;
+                    case ResponseArgEntity.TYPE_ARRAY:
+                        stringer.key("type").value("array");
+                        stringer.key("children").array().endArray();
+                        break;
+                    case ResponseArgEntity.TYPE_FILE:
+                        stringer.key("type").value("file");
                         stringer.key("children").array().endArray();
                         break;
                     default:
@@ -886,6 +1161,14 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                     case ResponseArgEntity.TYPE_OBJECT:
                         stringer.key("type").value("object");
                         responseToChildJson(stringer, interfaceId, responseArgEntity.getId());
+                        break;
+                    case ResponseArgEntity.TYPE_ARRAY:
+                        stringer.key("type").value("array");
+                        stringer.key("children").array().endArray();
+                        break;
+                    case ResponseArgEntity.TYPE_FILE:
+                        stringer.key("type").value("file");
+                        stringer.key("children").array().endArray();
                         break;
                     default:
                         stringer.key("type").value("未知");

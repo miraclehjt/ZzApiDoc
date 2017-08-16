@@ -154,6 +154,15 @@ public class InterfaceAction extends BaseController<InterfaceEntity> {
     }
 
     @ResponseBody
+    @RequestMapping(value = "/generateEmptyExample", method = RequestMethod.GET)
+    public BaseResult generateEmptyExample(
+            @RequestParam(value = "interfaceId") String interfaceId,
+            @RequestParam(value = "userId") String userId
+    ) {
+        return getService().generateEmptyExample(interfaceId, userId);
+    }
+
+    @ResponseBody
     @RequestMapping(value = "/downloadJson", method = RequestMethod.GET)
     public ResponseEntity<byte[]> download(
             @RequestParam(value = "projectId") String projectId,
@@ -170,6 +179,7 @@ public class InterfaceAction extends BaseController<InterfaceEntity> {
     ) throws IOException {
         return getService().downloadPdf(projectId, userId);
     }
+
 
 
 }

@@ -5,7 +5,7 @@
       <paths name="192.168.0.169">
         <serverdata>
           <mappings>
-            <mapping deploy="/" local="$PROJECT_DIR$/classes/artifacts/ZzApiDoc" web="/" />
+            <mapping local="$PROJECT_DIR$" web="/" />
           </mappings>
         </serverdata>
       </paths>

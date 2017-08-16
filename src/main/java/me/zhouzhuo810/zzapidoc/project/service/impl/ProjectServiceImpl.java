@@ -99,13 +99,9 @@ public class ProjectServiceImpl extends BaseServiceImpl<ProjectEntity> implement
         }
         entity.setModifyUserID(user.getId());
         entity.setModifyUserName(user.getName());
+        entity.setDeleteFlag(BaseEntity.DELETE_FLAG_YES);
         try {
             update(entity);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        try {
-            getBaseDao().deleteLogicByIds(new String[]{id});
             return new BaseResult(1, "刪除成功！");
         } catch (Exception e) {
             e.printStackTrace();
@@ -244,7 +240,7 @@ public class ProjectServiceImpl extends BaseServiceImpl<ProjectEntity> implement
                                     mReqArg.setCreateUserName(user.getName());
                                     mReqArg.setRequire(dataBean1.getRequire().equals("true"));
                                     mReqArg.setName(dataBean1.getName());
-                                    mReqArg.setNote(dataBean1.getDescription());
+                                    mReqArg.setNote(dataBean1.getDescription()==null?"":dataBean1.getDescription());
                                     String type = dataBean1.getType();
                                     switch (type) {
                                         case "string":
@@ -295,7 +291,7 @@ public class ProjectServiceImpl extends BaseServiceImpl<ProjectEntity> implement
                                     mResArg.setCreateUserID(user.getId());
                                     mResArg.setCreateUserName(user.getName());
                                     mResArg.setName(dataBean1.getName());
-                                    mResArg.setNote(dataBean1.getDescription());
+                                    mResArg.setNote(dataBean1.getDescription()==null?"":dataBean1.getDescription());
                                     String type = dataBean1.getType();
                                     switch (type) {
                                         case "string":
@@ -339,7 +335,7 @@ public class ProjectServiceImpl extends BaseServiceImpl<ProjectEntity> implement
                                 RequestHeaderEntity h = new RequestHeaderEntity();
                                 h.setName(he.getName());
                                 h.setValue(he.getDefaultValue());
-                                h.setNote(he.getDescription());
+                                h.setNote(he.getDescription()==null?"":he.getDescription());
                                 h.setGlobal(true);
                                 h.setInterfaceId("");
                                 h.setProjectId(mPro.getId());
@@ -378,7 +374,7 @@ public class ProjectServiceImpl extends BaseServiceImpl<ProjectEntity> implement
                                         mInterface.setName(childrenBean.getName());
                                         mInterface.setCreateUserID(user.getId());
                                         mInterface.setCreateUserName(user.getName());
-                                        mInterface.setNote(childrenBean.getDescription());
+                                        mInterface.setNote(childrenBean.getDescription()==null?"":childrenBean.getDescription());
                                         mInterface.setProjectName(mPro.getName());
                                         String method = childrenBean.getRequestMethod();
                                         List<DictionaryEntity> dics = mDictionaryService.executeCriteria(new Criterion[]{
@@ -417,7 +413,7 @@ public class ProjectServiceImpl extends BaseServiceImpl<ProjectEntity> implement
                                                     mResArg.setCreateUserID(user.getId());
                                                     mResArg.setCreateUserName(user.getName());
                                                     mResArg.setName(dataBean1.getName());
-                                                    mResArg.setNote(dataBean1.getDescription());
+                                                    mResArg.setNote(dataBean1.getDescription()==null?"":dataBean1.getDescription());
                                                     String type = dataBean1.getType();
                                                     switch (type) {
                                                         case "string":
@@ -461,7 +457,7 @@ public class ProjectServiceImpl extends BaseServiceImpl<ProjectEntity> implement
                                                 RequestHeaderEntity h = new RequestHeaderEntity();
                                                 h.setName(he.getName());
                                                 h.setValue(he.getDefaultValue());
-                                                h.setNote(he.getDescription());
+                                                h.setNote(he.getDescription()==null?"":he.getDescription());
                                                 h.setGlobal(false);
                                                 h.setInterfaceId(mInterface.getId());
                                                 h.setProjectId(mPro.getId());
@@ -486,7 +482,7 @@ public class ProjectServiceImpl extends BaseServiceImpl<ProjectEntity> implement
                                                 mReqArg.setCreateUserName(user.getName());
                                                 mReqArg.setRequire(aData.getRequire().equals("true"));
                                                 mReqArg.setName(aData.getName());
-                                                mReqArg.setNote(aData.getDescription());
+                                                mReqArg.setNote(aData.getDescription()==null?"":aData.getDescription());
                                                 String type = aData.getType();
                                                 switch (type) {
                                                     case "string":
@@ -543,7 +539,7 @@ public class ProjectServiceImpl extends BaseServiceImpl<ProjectEntity> implement
                 mResArg.setCreateUserID(userId);
                 mResArg.setCreateUserName(userName);
                 mResArg.setName(child.getName());
-                mResArg.setNote(child.getDescription());
+                mResArg.setNote(child.getDescription()==null?"":child.getDescription());
                 String type = child.getType();
                 switch (type) {
                     case "string":

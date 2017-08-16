@@ -5,7 +5,7 @@
 [客户端地址](https://github.com/zhouzhuo810/ZzApiDoc-Android)
 
 ### 开发工具
-- InteliJ IDEA
+- InteliJ IDEA 2017.1.2
 
 
 ## v1.0开发完成
@@ -52,18 +52,36 @@
 19.修改密码 完成
   
 20.获取分组列表  完成
-
+  
 21.添加接口请求参数 完成
   
 22.删除接口请求参数 完成
-  
+   
 23.添加接口返回参数 完成
-  
+   
 24.删除接口返回参数 完成
-
+  
 25.获取某个分组的请求参数 完成
   
 26.获取某个分组的返回参数 完成
   
   
+```
+
+
+## License
+```text
+Copyright 2017 zhouzhuo810
+  
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+  
+   http://www.apache.org/licenses/LICENSE-2.0
+  
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 ```
