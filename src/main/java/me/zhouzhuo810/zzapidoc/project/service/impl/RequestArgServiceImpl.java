@@ -53,7 +53,7 @@ public class RequestArgServiceImpl extends BaseServiceImpl<RequestArgEntity> imp
     }
 
     @Override
-    public BaseResult addRequestArg(String pid, String name, int type, String projectId, String interfaceId,
+    public BaseResult addRequestArg(String pid, String name, String defValue, int type, String projectId, String interfaceId,
                                     String note, String userId, boolean isRequire, boolean isGlobal) {
         UserEntity user = mUserService.get(userId);
         if (user == null) {
@@ -62,6 +62,7 @@ public class RequestArgServiceImpl extends BaseServiceImpl<RequestArgEntity> imp
         RequestArgEntity arg = new RequestArgEntity();
         arg.setName(name);
         arg.setNote(note);
+        arg.setDefaultValue(defValue);
         arg.setProjectId(projectId);
         arg.setInterfaceId(interfaceId);
         arg.setCreateUserID(user.getId());
@@ -80,7 +81,7 @@ public class RequestArgServiceImpl extends BaseServiceImpl<RequestArgEntity> imp
     }
 
     @Override
-    public BaseResult updateRequestArg(String pid, String requestArgId, String name, int type,
+    public BaseResult updateRequestArg(String pid, String requestArgId, String name, String defValue, int type,
                                        String interfaceId, String note, String userId, boolean isRequire, boolean isGlobal) {
         UserEntity user = mUserService.get(userId);
         if (user == null) {
@@ -94,6 +95,7 @@ public class RequestArgServiceImpl extends BaseServiceImpl<RequestArgEntity> imp
         arg.setNote(note);
         arg.setInterfaceId(interfaceId);
         arg.setTypeId(type);
+        arg.setDefaultValue(defValue);
         arg.setRequire(isRequire);
         arg.setModifyTime(new Date());
         arg.setModifyUserID(user.getId());
@@ -161,6 +163,7 @@ public class RequestArgServiceImpl extends BaseServiceImpl<RequestArgEntity> imp
                 map.put("name", arg.getName());
                 map.put("note", arg.getNote());
                 map.put("pid", arg.getPid());
+                map.put("defValue", arg.getDefaultValue() == null ? "" : arg.getDefaultValue());
                 map.put("require", arg.getRequire() == null ? true : arg.getRequire());
                 map.put("type", arg.getTypeId());
                 map.put("createTime", DataUtils.formatDate(arg.getCreateTime()));
@@ -176,6 +179,7 @@ public class RequestArgServiceImpl extends BaseServiceImpl<RequestArgEntity> imp
                 map.put("name", arg.getName());
                 map.put("note", arg.getNote());
                 map.put("pid", arg.getPid());
+                map.put("defValue", arg.getDefaultValue() == null ? "" : arg.getDefaultValue());
                 map.put("require", arg.getRequire() == null ? true : arg.getRequire());
                 map.put("type", arg.getTypeId());
                 map.put("createTime", DataUtils.formatDate(arg.getCreateTime()));
@@ -201,6 +205,7 @@ public class RequestArgServiceImpl extends BaseServiceImpl<RequestArgEntity> imp
         map.put("id", arg.getId());
         map.put("name", arg.getName());
         map.put("note", arg.getNote());
+        map.put("defValue", arg.getDefaultValue() == null ? "" : arg.getDefaultValue());
         map.put("require", arg.getRequire() == null ? true : arg.getRequire());;
         map.put("pid", arg.getPid());
         map.put("type", arg.getTypeId());

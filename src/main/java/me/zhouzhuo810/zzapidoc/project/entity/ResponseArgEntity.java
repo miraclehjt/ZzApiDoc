@@ -34,6 +34,16 @@ public class ResponseArgEntity extends BaseEntity {
     private String pid;
     @Column(name = "IsGlobal")
     private Boolean isGlobal = false;
+    @Column(name = "DefaultValue", length = 255)
+    private String defaultValue;
+
+    public String getDefaultValue() {
+        return defaultValue;
+    }
+
+    public void setDefaultValue(String defaultValue) {
+        this.defaultValue = defaultValue;
+    }
 
     public Boolean getGlobal() {
         return isGlobal;

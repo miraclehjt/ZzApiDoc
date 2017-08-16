@@ -401,6 +401,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                 MapUtils m = new MapUtils();
                 m.put("id", requestArgEntity.getId());
                 m.put("name", requestArgEntity.getName());
+                m.put("defValue", requestArgEntity.getDefaultValue() == null ? "" : requestArgEntity.getDefaultValue());
                 m.put("global", requestArgEntity.getGlobal() == null ? false : requestArgEntity.getGlobal());
                 m.put("note", requestArgEntity.getNote() == null ? "" : requestArgEntity.getNote());
                 m.put("pid", requestArgEntity.getPid());
@@ -417,6 +418,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                 m.put("id", requestArgEntity.getId());
                 m.put("name", requestArgEntity.getName());
                 m.put("pid", requestArgEntity.getPid());
+                m.put("defValue", requestArgEntity.getDefaultValue() == null ? "" : requestArgEntity.getDefaultValue());
                 m.put("global", requestArgEntity.getGlobal() == null ? false : requestArgEntity.getGlobal());
                 m.put("require", requestArgEntity.getRequire());
                 m.put("note", requestArgEntity.getNote() == null ? "" : requestArgEntity.getNote());
@@ -432,6 +434,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                 MapUtils m = new MapUtils();
                 m.put("id", requestArgEntity.getId());
                 m.put("name", requestArgEntity.getName());
+                m.put("defValue", requestArgEntity.getDefaultValue() == null ? "" : requestArgEntity.getDefaultValue());
                 m.put("global", requestArgEntity.getGlobal() == null ? false : requestArgEntity.getGlobal());
                 m.put("note", requestArgEntity.getNote() == null ? "" : requestArgEntity.getNote());
                 m.put("pid", requestArgEntity.getPid());
@@ -447,6 +450,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                 MapUtils m = new MapUtils();
                 m.put("id", requestArgEntity.getId());
                 m.put("name", requestArgEntity.getName());
+                m.put("defValue", requestArgEntity.getDefaultValue() == null ? "" : requestArgEntity.getDefaultValue());
                 m.put("global", requestArgEntity.getGlobal() == null ? false : requestArgEntity.getGlobal());
                 m.put("note", requestArgEntity.getNote() == null ? "" : requestArgEntity.getNote());
                 m.put("pid", requestArgEntity.getPid());
@@ -629,6 +633,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                         .key("id").value(requestArgEntity.getId())
                         .key("name").value(requestArgEntity.getName())
                         .key("pid").value(requestArgEntity.getPid())
+                        .key("defaultValue").value(requestArgEntity.getDefaultValue() == null ? "" : requestArgEntity.getDefaultValue())
                         .key("require").value(requestArgEntity.getRequire() == null ? true : requestArgEntity.getRequire())
                         .key("typeId").value(requestArgEntity.getTypeId())
                         .key("description").value(requestArgEntity.getNote() == null ? "" : requestArgEntity.getNote());
@@ -667,13 +672,15 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
     private String responseToJson(String projectId, String interfaceId, String pid) {
         JSONStringer stringer = new JSONStringer();
         List<ResponseArgEntity> responseArgEntities = mResponseArgService.executeCriteria(ResponseArgUtils.getArgByInterfaceIdAndPid(interfaceId, pid));
-        List<ResponseArgEntity> globals = mResponseArgService.executeCriteria(ResponseArgUtils.getGlobal(projectId));
         stringer.array();
+
+/*        List<ResponseArgEntity> globals = mResponseArgService.executeCriteria(ResponseArgUtils.getGlobal(projectId));
         if (globals != null) {
             for (ResponseArgEntity responseArgEntity : globals) {
                 stringer.object()
                         .key("id").value(responseArgEntity.getId())
                         .key("name").value(responseArgEntity.getName())
+                        .key("defaultValue").value(responseArgEntity.getDefaultValue()==null?"":responseArgEntity.getDefaultValue())
                         .key("pid").value(responseArgEntity.getPid())
                         .key("typeId").value(responseArgEntity.getTypeId())
                         .key("description").value(responseArgEntity.getNote() == null ? "" : responseArgEntity.getNote());
@@ -701,12 +708,14 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                 }
                 stringer.endObject();
             }
-        }
+        }*/
+
         if (responseArgEntities != null) {
             for (ResponseArgEntity responseArgEntity : responseArgEntities) {
                 stringer.object()
                         .key("id").value(responseArgEntity.getId())
                         .key("name").value(responseArgEntity.getName())
+                        .key("defaultValue").value(responseArgEntity.getDefaultValue() == null ? "" : responseArgEntity.getDefaultValue())
                         .key("pid").value(responseArgEntity.getPid())
                         .key("typeId").value(responseArgEntity.getTypeId())
                         .key("description").value(responseArgEntity.getNote() == null ? "" : responseArgEntity.getNote());
@@ -728,7 +737,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                         break;
                     case ResponseArgEntity.TYPE_OBJECT:
                         stringer.key("type").value("object");
-                        stringer.key("children").array().endArray();
+                        responseToChildJson(stringer, interfaceId, responseArgEntity.getId());
                         break;
                     default:
                         stringer.key("type").value("未知");
@@ -773,6 +782,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                         .key("id").value(req.getId())
                         .key("name").value(req.getName())
                         .key("pid").value(req.getPid())
+                        .key("defaultValue").value(req.getDefaultValue() == null ? "" : req.getDefaultValue())
                         .key("require").value(req.getRequire() == null ? true : req.getRequire())
                         .key("typeId").value(req.getTypeId())
                         .key("description").value(req.getNote() == null ? "" : req.getNote());
@@ -814,6 +824,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                         .key("id").value(responseArgEntity.getId())
                         .key("name").value(responseArgEntity.getName())
                         .key("pid").value(responseArgEntity.getPid())
+                        .key("defaultValue").value(responseArgEntity.getDefaultValue() == null ? "" : responseArgEntity.getDefaultValue())
                         .key("typeId").value(responseArgEntity.getTypeId())
                         .key("description").value(responseArgEntity.getNote() == null ? "" : responseArgEntity.getNote());
                 if (responseArgEntity.getTypeId() == null) {
@@ -852,6 +863,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                 stringer.object()
                         .key("id").value(responseArgEntity.getId())
                         .key("name").value(responseArgEntity.getName())
+                        .key("defaultValue").value(responseArgEntity.getDefaultValue() == null ? "" : responseArgEntity.getDefaultValue())
                         .key("pid").value(responseArgEntity.getPid())
                         .key("typeId").value(responseArgEntity.getTypeId())
                         .key("description").value(responseArgEntity.getNote() == null ? "" : responseArgEntity.getNote());
@@ -873,7 +885,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                         break;
                     case ResponseArgEntity.TYPE_OBJECT:
                         stringer.key("type").value("object");
-                        stringer.key("children").array().endArray();
+                        responseToChildJson(stringer, interfaceId, responseArgEntity.getId());
                         break;
                     default:
                         stringer.key("type").value("未知");
@@ -981,7 +993,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                                 InterfaceEntity entity = list.get(i1);
 
 //                                    addGroupItem(document, chapter, (i + 1) + "." + (i1 + 1) + ". " + entity.getName(), (i + 1), fontChinese);
-                                addGroupItem(document, chapter, entity.getName(), (i+1), (i1 + 1), fontChinese);
+                                addGroupItem(document, chapter, entity.getName(), (i + 1), (i1 + 1), fontChinese);
                                 fontChinese.setStyle(Font.NORMAL);
                                 addText(document, "创建人：", fontChinese, true);
                                 addTextLine(document, entity.getCreateUserName(), fontChinese);
@@ -1149,7 +1161,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
 
         if (globals != null && globals.size() > 0) {
             //设置列宽
-            float[] columnWidths = {3f, 1f, 2f, 5f};
+            float[] columnWidths = {3f, 1f, 2f, 2f, 5f};
             String[][] values = new String[globals.size()][columnWidths.length];
             for (int i = 0; i < globals.size(); i++) {
                 RequestArgEntity entity = globals.get(i);
@@ -1184,16 +1196,17 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                         values[i][2] = "未知";
                         break;
                 }
-                values[i][3] = entity.getNote() == null ? "" : entity.getNote();
+                values[i][3] = entity.getDefaultValue() == null ? "" : entity.getDefaultValue();
+                values[i][4] = entity.getNote() == null ? "" : entity.getNote();
             }
-            addTable(document, "全局请求参数", new String[]{"名称", "必选", "类型", "说明"}, columnWidths, values, null, font);
+            addTable(document, "全局请求参数", new String[]{"名称", "必选", "类型", "默认值", "说明"}, columnWidths, values, null, font);
         }
 
         List<RequestArgEntity> args = mRequestArgService.getBaseDao().executeCriteria(ResponseArgUtils.getArgByInterfaceIdAndPid(id, "0"));
 
         if (args != null && args.size() > 0) {
             //设置列宽
-            float[] columnWidths = {3f, 1f, 2f, 5f};
+            float[] columnWidths = {3f, 1f, 2f, 2f, 5f};
             String[][] values = new String[args.size()][columnWidths.length];
             for (int i = 0; i < args.size(); i++) {
                 RequestArgEntity entity = args.get(i);
@@ -1228,9 +1241,10 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                         values[i][2] = "未知";
                         break;
                 }
-                values[i][3] = entity.getNote() == null ? "" : entity.getNote();
+                values[i][3] = entity.getDefaultValue() == null ? "" : entity.getDefaultValue();
+                values[i][4] = entity.getNote() == null ? "" : entity.getNote();
             }
-            addTable(document, "其他请求参数", new String[]{"名称", "必选", "类型", "说明"}, columnWidths, values, null, font);
+            addTable(document, "其他请求参数", new String[]{"名称", "必选", "类型", "默认值", "说明"}, columnWidths, values, null, font);
 
         }
     }
@@ -1241,8 +1255,8 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
         if (globals != null && globals.size() > 0) {
 
             //设置列宽
-            float[] columnWidths = {3f, 2f, 4f};
-            String[][] values = new String[globals.size()][3];
+            float[] columnWidths = {3f, 2f, 2f, 4f};
+            String[][] values = new String[globals.size()][columnWidths.length];
             for (int i = 0; i < globals.size(); i++) {
                 ResponseArgEntity entity = globals.get(i);
                 values[i][0] = entity.getName() == null ? "" : entity.getName();
@@ -1275,45 +1289,50 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                         values[i][1] = "未知";
                         break;
                 }
-                values[i][2] = entity.getNote() == null ? "" : entity.getNote();
+                values[i][2] = entity.getDefaultValue() == null ? "" : entity.getDefaultValue();
+                values[i][3] = entity.getNote() == null ? "" : entity.getNote();
             }
-            addTable(document, "全局响应数据", new String[]{"名称", "类型", "说明"}, columnWidths, values, null, font);
+            addTable(document, "全局响应数据", new String[]{"名称", "类型", "默认值", "说明"}, columnWidths, values, null, font);
         }
         List<ResponseArgEntity> args = mResponseArgService.getBaseDao().executeCriteria(ResponseArgUtils.getArgByInterfaceIdAndPid(id, "0"));
         if (args != null && args.size() > 0) {
             addSmallTitle(document, "其他响应数据", font);
             font.setStyle(Font.NORMAL);
             font.setSize(12f);
-            PdfPTable inter = new PdfPTable(3);
+            //设置列宽
+            float[] columnWidths = {3f, 2f, 2f, 4f};
+            PdfPTable inter = new PdfPTable(columnWidths.length);
             inter.setWidthPercentage(100); // 宽度100%填充
             inter.setSpacingBefore(1f); // 前间距
             inter.setSpacingAfter(4f); // 后间距
             inter.setPaddingTop(0);
             List<PdfPRow> listRow = inter.getRows();
-            //设置列宽
-            float[] columnWidths = {3f, 2f, 4f};
             inter.setWidths(columnWidths);
             //标题
-            PdfPCell cells1[] = new PdfPCell[3];
+            PdfPCell cells1[] = new PdfPCell[columnWidths.length];
             PdfPRow row1 = new PdfPRow(cells1);
             //单元格
             cells1[0] = new PdfPCell(new Paragraph("名称", font));//单元格内容
             cells1[1] = new PdfPCell(new Paragraph("类型", font));
-            cells1[2] = new PdfPCell(new Paragraph("说明", font));
+            cells1[2] = new PdfPCell(new Paragraph("默认值", font));
+            cells1[3] = new PdfPCell(new Paragraph("说明", font));
             cells1[0].setBackgroundColor(BaseColor.LIGHT_GRAY);
             cells1[1].setBackgroundColor(BaseColor.LIGHT_GRAY);
             cells1[2].setBackgroundColor(BaseColor.LIGHT_GRAY);
+            cells1[3].setBackgroundColor(BaseColor.LIGHT_GRAY);
             cells1[0].setPaddingTop(6f);
             cells1[0].setPaddingBottom(6f);
             cells1[1].setPaddingTop(6f);
             cells1[1].setPaddingBottom(6f);
             cells1[2].setPaddingTop(6f);
             cells1[2].setPaddingBottom(6f);
+            cells1[3].setPaddingTop(6f);
+            cells1[3].setPaddingBottom(6f);
             //把第一行添加到集合
             listRow.add(row1);
             for (ResponseArgEntity entity : args) {
                 //行1
-                PdfPCell cells[] = new PdfPCell[3];
+                PdfPCell cells[] = new PdfPCell[columnWidths.length];
                 PdfPRow row = new PdfPRow(cells);
                 //单元格
                 cells[0] = new PdfPCell(new Paragraph(entity.getName(), font));//单元格内容
@@ -1346,13 +1365,16 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                         cells[1] = new PdfPCell(new Paragraph("未知", font));
                         break;
                 }
-                cells[2] = new PdfPCell(new Paragraph(entity.getNote() == null ? "" : entity.getNote(), font));
+                cells[2] = new PdfPCell(new Paragraph(entity.getDefaultValue() == null ? "" : entity.getDefaultValue(), font));
+                cells[3] = new PdfPCell(new Paragraph(entity.getNote() == null ? "" : entity.getNote(), font));
                 cells[0].setPaddingTop(4f);
                 cells[0].setPaddingBottom(4f);
                 cells[1].setPaddingTop(4f);
                 cells[1].setPaddingBottom(4f);
                 cells[2].setPaddingTop(4f);
                 cells[2].setPaddingBottom(4f);
+                cells[3].setPaddingTop(4f);
+                cells[3].setPaddingBottom(4f);
                 //把第一行添加到集合
                 listRow.add(row);
                 pdfAddChildResponseParams("    ", listRow, id, entity.getId(), font);
@@ -1367,7 +1389,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
             //把第一行添加到集合
             for (ResponseArgEntity entity : args) {
                 //行1
-                PdfPCell cells[] = new PdfPCell[3];
+                PdfPCell cells[] = new PdfPCell[4];
                 PdfPRow row = new PdfPRow(cells);
                 //单元格
                 cells[0] = new PdfPCell(new Paragraph(spance + entity.getName(), font));//单元格内容
@@ -1400,13 +1422,16 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                         cells[1] = new PdfPCell(new Paragraph("未知", font));
                         break;
                 }
-                cells[2] = new PdfPCell(new Paragraph(entity.getNote() == null ? "" : entity.getNote(), font));
+                cells[2] = new PdfPCell(new Paragraph(entity.getDefaultValue() == null ? "" : entity.getDefaultValue(), font));
+                cells[3] = new PdfPCell(new Paragraph(entity.getNote() == null ? "" : entity.getNote(), font));
                 cells[0].setPaddingTop(4f);
                 cells[0].setPaddingBottom(4f);
                 cells[1].setPaddingTop(4f);
                 cells[1].setPaddingBottom(4f);
                 cells[2].setPaddingTop(4f);
                 cells[2].setPaddingBottom(4f);
+                cells[3].setPaddingTop(4f);
+                cells[3].setPaddingBottom(4f);
                 //把第一行添加到集合
                 listRow.add(row);
                 pdfAddChildResponseParams(spance + "    ", listRow, id, entity.getId(), font);

@@ -40,6 +40,7 @@ public class RequestArgAction extends BaseController<RequestArgEntity> {
             @RequestParam(value = "pid") String pid,
             @RequestParam(value = "name") String name,
             @RequestParam(value = "type") int type,
+            @RequestParam(value = "defValue", required = false) String defValue,
             @RequestParam(value = "projectId") String projectId,
             @RequestParam(value = "interfaceId") String interfaceId,
             @RequestParam(value = "note", required = false) String note,
@@ -47,7 +48,7 @@ public class RequestArgAction extends BaseController<RequestArgEntity> {
             @RequestParam(value = "isRequire") boolean isRequire,
             @RequestParam(value = "isGlobal") boolean isGlobal
     ) {
-        return getService().addRequestArg(pid, name, type, projectId, interfaceId, note, userId, isRequire, isGlobal);
+        return getService().addRequestArg(pid, name, defValue == null ? "" : defValue, type, projectId, interfaceId, note, userId, isRequire, isGlobal);
     }
 
     @ResponseBody
@@ -56,6 +57,7 @@ public class RequestArgAction extends BaseController<RequestArgEntity> {
             @RequestParam(value = "requestArgId") String requestArgId,
             @RequestParam(value = "pid") String pid,
             @RequestParam(value = "name") String name,
+            @RequestParam(value = "defValue", required = false) String defValue,
             @RequestParam(value = "type") int type,
             @RequestParam(value = "interfaceId") String interfaceId,
             @RequestParam(value = "note") String note,
@@ -63,7 +65,7 @@ public class RequestArgAction extends BaseController<RequestArgEntity> {
             @RequestParam(value = "isRequire") boolean isRequire,
             @RequestParam(value = "isGlobal") boolean isGlobal
     ) {
-        return getService().updateRequestArg(pid, requestArgId, name, type, interfaceId, note, userId, isRequire, isGlobal);
+        return getService().updateRequestArg(pid, requestArgId, name, defValue == null ? "" : defValue, type, interfaceId, note, userId, isRequire, isGlobal);
     }
 
     @ResponseBody
@@ -82,7 +84,7 @@ public class RequestArgAction extends BaseController<RequestArgEntity> {
             @RequestParam(value = "pid") String pid,
             @RequestParam(value = "userId") String userId
     ) {
-        return getService().getRequestArgByInterfaceIdAndPid(interfaceId,pid, userId);
+        return getService().getRequestArgByInterfaceIdAndPid(interfaceId, pid, userId);
     }
 
 

@@ -35,6 +35,7 @@ public class ResponseArgAction extends BaseController<ResponseArgEntity> {
     public BaseResult addResponseArg(
             @RequestParam(value = "pid") String pid,
             @RequestParam(value = "name") String name,
+            @RequestParam(value = "defValue", required = false) String defValue,
             @RequestParam(value = "type") int type,
             @RequestParam(value = "projectId") String projectId,
             @RequestParam(value = "interfaceId") String interfaceId,
@@ -42,7 +43,7 @@ public class ResponseArgAction extends BaseController<ResponseArgEntity> {
             @RequestParam(value = "userId") String userId,
             @RequestParam(value = "isGlobal") boolean isGlobal
     ) {
-        return getService().addResponseArg(pid, name, type, projectId, interfaceId, note, userId, isGlobal);
+        return getService().addResponseArg(pid, name, defValue == null ? "":defValue, type, projectId, interfaceId, note, userId, isGlobal);
     }
 
     @ResponseBody
@@ -51,13 +52,14 @@ public class ResponseArgAction extends BaseController<ResponseArgEntity> {
             @RequestParam(value = "responseArgId") String responseArgId,
             @RequestParam(value = "pid") String pid,
             @RequestParam(value = "name") String name,
+            @RequestParam(value = "defValue", required = false) String defValue,
             @RequestParam(value = "type") int type,
             @RequestParam(value = "interfaceId") String interfaceId,
             @RequestParam(value = "note") String note,
             @RequestParam(value = "userId") String userId,
             @RequestParam(value = "isGlobal") boolean isGlobal
     ) {
-        return getService().updateResponseArg(pid, responseArgId, name, type, interfaceId, note, userId, isGlobal);
+        return getService().updateResponseArg(pid, responseArgId, name, defValue == null ? "":defValue, type, interfaceId, note, userId, isGlobal);
     }
 
     @ResponseBody

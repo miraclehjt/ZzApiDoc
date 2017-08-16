@@ -29,6 +29,16 @@ public class RequestArgEntity extends BaseEntity {
     private Boolean isGlobal = false;
     @Column(name = "IsRequire")
     private Boolean isRequire = true;
+    @Column(name = "DefaultValue", length = 255)
+    private String defaultValue;
+
+    public String getDefaultValue() {
+        return defaultValue;
+    }
+
+    public void setDefaultValue(String defaultValue) {
+        this.defaultValue = defaultValue;
+    }
 
     public Boolean getRequire() {
         return isRequire;

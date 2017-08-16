@@ -239,6 +239,7 @@ public class ProjectServiceImpl extends BaseServiceImpl<ProjectEntity> implement
                                     mReqArg.setInterfaceId("");
                                     mReqArg.setGlobal(true);
                                     mReqArg.setPid("0");
+                                    mReqArg.setDefaultValue(dataBean1.getDefaultValue() == null ? "" : dataBean1.getDefaultValue());
                                     mReqArg.setCreateUserID(user.getId());
                                     mReqArg.setCreateUserName(user.getName());
                                     mReqArg.setRequire(dataBean1.getRequire().equals("true"));
@@ -289,6 +290,7 @@ public class ProjectServiceImpl extends BaseServiceImpl<ProjectEntity> implement
                                     mResArg.setProjectId(mPro.getId());
                                     mResArg.setInterfaceId("");
                                     mResArg.setGlobal(true);
+                                    mResArg.setDefaultValue(dataBean1.getDefaultValue() == null ? "" : dataBean1.getDefaultValue());
                                     mResArg.setPid("0");
                                     mResArg.setCreateUserID(user.getId());
                                     mResArg.setCreateUserName(user.getName());
@@ -410,6 +412,7 @@ public class ProjectServiceImpl extends BaseServiceImpl<ProjectEntity> implement
                                                     mResArg.setProjectId(mPro.getId());
                                                     mResArg.setInterfaceId(mInterface.getId());
                                                     mResArg.setGlobal(false);
+                                                    mResArg.setDefaultValue(dataBean1.getDefaultValue() == null ? "" : dataBean1.getDefaultValue());
                                                     mResArg.setPid("0");
                                                     mResArg.setCreateUserID(user.getId());
                                                     mResArg.setCreateUserName(user.getName());
@@ -466,7 +469,6 @@ public class ProjectServiceImpl extends BaseServiceImpl<ProjectEntity> implement
                                             }
                                         }
 
-                                        //TODO 创建实体类
                                         //接口请求参数
                                         String requestArgs1 = childrenBean.getRequestArgs();
                                         ArgEntity argEntity1 = gson.fromJson("{\"data\":" + requestArgs1 + "}", ArgEntity.class);
@@ -478,6 +480,7 @@ public class ProjectServiceImpl extends BaseServiceImpl<ProjectEntity> implement
                                                 mReqArg.setProjectId(mPro.getId());
                                                 mReqArg.setInterfaceId(mInterface.getId());
                                                 mReqArg.setGlobal(false);
+                                                mReqArg.setDefaultValue(aData.getDefaultValue() == null ? "" : aData.getDefaultValue());
                                                 mReqArg.setPid("0");
                                                 mReqArg.setCreateUserID(user.getId());
                                                 mReqArg.setCreateUserName(user.getName());
@@ -535,6 +538,7 @@ public class ProjectServiceImpl extends BaseServiceImpl<ProjectEntity> implement
                 mResArg.setProjectId(projectId);
                 mResArg.setInterfaceId(interfaceId);
                 mResArg.setGlobal(global);
+                mResArg.setDefaultValue(child.getDefaultValue() == null ? "" : child.getDefaultValue());
                 mResArg.setPid(pid);
                 mResArg.setCreateUserID(userId);
                 mResArg.setCreateUserName(userName);

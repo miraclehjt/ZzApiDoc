@@ -52,7 +52,7 @@ public class ResponseArgServiceImpl extends BaseServiceImpl<ResponseArgEntity> i
 
 
     @Override
-    public BaseResult addResponseArg(String pid, String name, int type, String projectId, String interfaceId, String note, String userId, boolean isGlobal) {
+    public BaseResult addResponseArg(String pid, String name, String defValue, int type, String projectId, String interfaceId, String note, String userId, boolean isGlobal) {
         UserEntity user = mUserService.get(userId);
         if (user == null) {
             return new BaseResult(0, "用户不合法");
@@ -60,6 +60,7 @@ public class ResponseArgServiceImpl extends BaseServiceImpl<ResponseArgEntity> i
         ResponseArgEntity arg = new ResponseArgEntity();
         arg.setName(name);
         arg.setNote(note);
+        arg.setDefaultValue(defValue);
         arg.setProjectId(projectId);
         arg.setInterfaceId(interfaceId);
         arg.setCreateUserID(user.getId());
@@ -77,7 +78,7 @@ public class ResponseArgServiceImpl extends BaseServiceImpl<ResponseArgEntity> i
     }
 
     @Override
-    public BaseResult updateResponseArg(String pid, String responseArgId, String name, int type, String interfaceId, String note, String userId, boolean isGlobal) {
+    public BaseResult updateResponseArg(String pid, String responseArgId, String name, String defValue, int type, String interfaceId, String note, String userId, boolean isGlobal) {
         UserEntity user = mUserService.get(userId);
         if (user == null) {
             return new BaseResult(0, "用户不合法");
@@ -88,6 +89,7 @@ public class ResponseArgServiceImpl extends BaseServiceImpl<ResponseArgEntity> i
         }
         arg.setName(name);
         arg.setNote(note);
+        arg.setDefaultValue(defValue);
         arg.setInterfaceId(interfaceId);
         arg.setTypeId(type);
         arg.setGlobal(isGlobal);
@@ -155,6 +157,7 @@ public class ResponseArgServiceImpl extends BaseServiceImpl<ResponseArgEntity> i
                 map.put("id", arg.getId());
                 map.put("name", arg.getName());
                 map.put("note", arg.getNote());
+                map.put("defValue", arg.getDefaultValue() == null ? "" : arg.getDefaultValue());
                 map.put("pid", arg.getPid());
                 map.put("type", arg.getTypeId());
                 map.put("createTime", DataUtils.formatDate(arg.getCreateTime()));
@@ -169,6 +172,7 @@ public class ResponseArgServiceImpl extends BaseServiceImpl<ResponseArgEntity> i
                 map.put("id", arg.getId());
                 map.put("name", arg.getName());
                 map.put("note", arg.getNote());
+                map.put("defValue", arg.getDefaultValue() == null ? "" : arg.getDefaultValue());
                 map.put("pid", arg.getPid());
                 map.put("type", arg.getTypeId());
                 map.put("createTime", DataUtils.formatDate(arg.getCreateTime()));
@@ -195,6 +199,7 @@ public class ResponseArgServiceImpl extends BaseServiceImpl<ResponseArgEntity> i
         map.put("name", arg.getName());
         map.put("note", arg.getNote());
         map.put("pid", arg.getPid());
+        map.put("defValue", arg.getDefaultValue() == null ? "" : arg.getDefaultValue());
         map.put("type", arg.getTypeId());
         map.put("createTime", DataUtils.formatDate(arg.getCreateTime()));
         map.put("createUserName", arg.getCreateUserName());
