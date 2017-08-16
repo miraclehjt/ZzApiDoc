@@ -6,6 +6,7 @@ import me.zhouzhuo810.zzapidoc.common.utils.FileUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.io.File;
 import java.util.List;
 
 /**
@@ -17,7 +18,7 @@ public class ScheduledJob {
     @Resource(name = "cacheServiceImpl")
     CacheService mCacheService;
 
-    public void jobTask() {
+    public void clearCacheTask() {
         List<CacheEntity> all = mCacheService.getAll();
         if (all != null && all.size() > 0) {
             for (CacheEntity cacheEntity : all) {

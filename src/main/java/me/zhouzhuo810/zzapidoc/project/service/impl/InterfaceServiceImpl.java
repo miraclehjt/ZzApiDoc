@@ -1,7 +1,6 @@
 package me.zhouzhuo810.zzapidoc.project.service.impl;
 
 import com.itextpdf.text.*;
-import com.itextpdf.text.Font;
 import com.itextpdf.text.pdf.*;
 import me.zhouzhuo810.zzapidoc.cache.entity.CacheEntity;
 import me.zhouzhuo810.zzapidoc.cache.service.CacheService;
@@ -20,6 +19,7 @@ import me.zhouzhuo810.zzapidoc.project.utils.ResponseArgUtils;
 import me.zhouzhuo810.zzapidoc.user.entity.UserEntity;
 import me.zhouzhuo810.zzapidoc.user.service.UserService;
 import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Logger;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 import org.json.JSONArray;
@@ -30,8 +30,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -47,6 +50,8 @@ import java.util.Map;
  */
 @Service
 public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> implements InterfaceService {
+
+    private static Logger LOGGER = Logger.getLogger(InterfaceServiceImpl.class.getSimpleName());
 
     @Resource(name = "userServiceImpl")
     UserService mUserService;
@@ -896,133 +901,131 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
             return null;
         }
         try {
-            ClassLoader classLoader = this.getClass().getClassLoader();
-            URL resource = classLoader.getResource("../../empty_file.txt");
-            if (resource != null) {
-                String path = resource.getPath();
-                if (path != null) {
-                    final String fontPath = new File(path).getParent() + File.separator + "font/";
-                    String mPath = new File(path).getParent() + File.separator + "PDF";
-                    File dir = new File(mPath);
-                    if (!dir.exists()) {
-                        dir.mkdirs();
+            HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+            String realPath = request.getRealPath("");
+            if (realPath != null) {
+                final String fontPath = realPath + File.separator + "font" + File.separator;
+                String mPath = realPath + File.separator + "PDF";
+                File dir = new File(mPath);
+                if (!dir.exists()) {
+                    dir.mkdirs();
+                }
+                CacheEntity cacheEntity = new CacheEntity();
+                cacheEntity.setCachePath(mPath);
+                try {
+                    List<CacheEntity> cacheEntities = mCacheService.executeCriteria(new Criterion[]{
+                            Restrictions.eq("deleteFlag", BaseEntity.DELETE_FLAG_NO),
+                            Restrictions.eq("cachePath", mPath)});
+                    if (cacheEntities == null || cacheEntities.size() == 0) {
+                        mCacheService.save(cacheEntity);
                     }
-                    CacheEntity cacheEntity = new CacheEntity();
-                    cacheEntity.setCachePath(mPath);
-                    try {
-                        List<CacheEntity> cacheEntities = mCacheService.executeCriteria(new Criterion[]{
-                                Restrictions.eq("deleteFlag", BaseEntity.DELETE_FLAG_NO),
-                                Restrictions.eq("cachePath", mPath)});
-                        if (cacheEntities == null || cacheEntities.size() == 0) {
-                            mCacheService.save(cacheEntity);
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    String realFileName = System.currentTimeMillis() + ".pdf";
-                    String filePath = mPath + File.separator + realFileName;
-                    BaseFont bfChinese = BaseFont.createFont(fontPath + "SIMYOU.TTF", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
-                    Font fontChinese = new Font(bfChinese, 12, Font.NORMAL);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    LOGGER.error("PDF ERROR", e);
+                }
+                String realFileName = System.currentTimeMillis() + ".pdf";
+                String filePath = mPath + File.separator + realFileName;
+                BaseFont bfChinese = BaseFont.createFont(fontPath + "SIMYOU.TTF", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
+                Font fontChinese = new Font(bfChinese, 12, Font.NORMAL);
 
-                    Document document = new Document(PageSize.A4);
-                    try {
-                        PdfWriter pdfWriter = PdfWriter.getInstance(document, new FileOutputStream(filePath));
-                        PdfReportM1HeaderFooter footer = new PdfReportM1HeaderFooter();
-                        pdfWriter.setPageEvent(footer);
-                        //打开文档
-                        document.open();
+                Document document = new Document(PageSize.A4);
+                try {
+                    PdfWriter pdfWriter = PdfWriter.getInstance(document, new FileOutputStream(filePath));
+                    PdfReportM1HeaderFooter footer = new PdfReportM1HeaderFooter();
+                    pdfWriter.setPageEvent(footer);
+                    //打开文档
+                    document.open();
 
-                        document.addTitle(project.getName());
-                        document.addAuthor(project.getCreateUserName() == null ? "" : project.getCreateUserName());
-                        document.addCreationDate();
-                        document.addCreator("zhouzhuo810");
-                        document.addSubject(project.getNote());
+                    document.addTitle(project.getName());
+                    document.addAuthor(project.getCreateUserName() == null ? "" : project.getCreateUserName());
+                    document.addCreationDate();
+                    document.addCreator("zhouzhuo810");
+                    document.addSubject(project.getNote());
 
-                        addLargeTitle(document, project.getName(), fontChinese);
-                        fontChinese.setStyle(Font.NORMAL);
+                    addLargeTitle(document, project.getName(), fontChinese);
+                    fontChinese.setStyle(Font.NORMAL);
 
-                        addTextLine(document, "", null);
-                        addText(document, "创建人：", fontChinese, true);
-                        addTextLine(document, project.getCreateUserName(), fontChinese);
-                        addText(document, "创建时间：", fontChinese, true);
-                        addTextLine(document, DataUtils.formatDate(project.getCreateTime()), fontChinese);
-                        addText(document, "项目说明：", fontChinese, true);
-                        addTextLine(document, project.getNote(), fontChinese);
+                    addTextLine(document, "", null);
+                    addText(document, "创建人：", fontChinese, true);
+                    addTextLine(document, project.getCreateUserName(), fontChinese);
+                    addText(document, "创建时间：", fontChinese, true);
+                    addTextLine(document, DataUtils.formatDate(project.getCreateTime()), fontChinese);
+                    addText(document, "项目说明：", fontChinese, true);
+                    addTextLine(document, project.getNote(), fontChinese);
 
-                        List<InterfaceGroupEntity> groups = mInterfaceGroupService.executeCriteria(InterfaceUtils.getInterfaceByProjectId(projectId));
+                    List<InterfaceGroupEntity> groups = mInterfaceGroupService.executeCriteria(InterfaceUtils.getInterfaceByProjectId(projectId));
                         /*模块数组开始*/
-                        if (groups != null) {
+                    if (groups != null) {
 
-                            for (int i = 0; i < groups.size(); i++) {
-                                InterfaceGroupEntity interfaceGroupEntity = groups.get(i);
+                        for (int i = 0; i < groups.size(); i++) {
+                            InterfaceGroupEntity interfaceGroupEntity = groups.get(i);
 
 //                                Chapter chapter = addGroup(document, (i + 1) + ". " + interfaceGroupEntity.getName(), (i+1), fontChinese);
-                                Chapter chapter = addGroup(document, interfaceGroupEntity.getName(), (i + 1), fontChinese);
-                                fontChinese.setStyle(Font.NORMAL);
-                                addText(document, "创建人：", fontChinese, true);
-                                addTextLine(document, interfaceGroupEntity.getCreateUserName(), fontChinese);
-                                addText(document, "创建时间：", fontChinese, true);
-                                addTextLine(document, DataUtils.formatDate(interfaceGroupEntity.getCreateTime()), fontChinese);
-                                addText(document, "服务器Ip地址：", fontChinese, true);
-                                addUnderLineText(document, interfaceGroupEntity.getIp(), fontPath);
-                                addTextLine(document, "", fontChinese);
-                                addTextLine(document, "", fontChinese);
+                            Chapter chapter = addGroup(document, interfaceGroupEntity.getName(), (i + 1), fontChinese);
+                            fontChinese.setStyle(Font.NORMAL);
+                            addText(document, "创建人：", fontChinese, true);
+                            addTextLine(document, interfaceGroupEntity.getCreateUserName(), fontChinese);
+                            addText(document, "创建时间：", fontChinese, true);
+                            addTextLine(document, DataUtils.formatDate(interfaceGroupEntity.getCreateTime()), fontChinese);
+                            addText(document, "服务器Ip地址：", fontChinese, true);
+                            addUnderLineText(document, interfaceGroupEntity.getIp(), fontPath);
+                            addTextLine(document, "", fontChinese);
+                            addTextLine(document, "", fontChinese);
 
-                                List<InterfaceEntity> list = getBaseDao().executeCriteria(InterfaceUtils.getInterfaceByGroupId(interfaceGroupEntity.getId()));
-                                if (list == null) {
-                                    continue;
-                                }
+                            List<InterfaceEntity> list = getBaseDao().executeCriteria(InterfaceUtils.getInterfaceByGroupId(interfaceGroupEntity.getId()));
+                            if (list == null) {
+                                continue;
+                            }
                                 /*组的接口数组*/
-                                for (int i1 = 0; i1 < list.size(); i1++) {
-                                    InterfaceEntity entity = list.get(i1);
+                            for (int i1 = 0; i1 < list.size(); i1++) {
+                                InterfaceEntity entity = list.get(i1);
 
 //                                    addGroupItem(document, chapter, (i + 1) + "." + (i1 + 1) + ". " + entity.getName(), (i + 1), fontChinese);
-                                    addGroupItem(document, chapter, entity.getName(), (i1 + 1), fontChinese);
-                                    fontChinese.setStyle(Font.NORMAL);
-                                    addText(document, "创建人：", fontChinese, true);
-                                    addTextLine(document, entity.getCreateUserName(), fontChinese);
-                                    addText(document, "创建时间：", fontChinese, true);
-                                    addTextLine(document, DataUtils.formatDate(entity.getCreateTime()), fontChinese);
-                                    addText(document, "请求方式：", fontChinese, true);
-                                    addTextLine(document, entity.getHttpMethodName(), fontChinese);
-                                    addText(document, "请求地址：", fontChinese, true);
-                                    addTextLine(document, entity.getPath(), null);
-                                    addText(document, "接口说明：", fontChinese, true);
-                                    addTextLine(document, entity.getNote(), fontChinese);
-                                    addTextLine(document, "", fontChinese);
+                                addGroupItem(document, chapter, entity.getName(), (i+1), (i1 + 1), fontChinese);
+                                fontChinese.setStyle(Font.NORMAL);
+                                addText(document, "创建人：", fontChinese, true);
+                                addTextLine(document, entity.getCreateUserName(), fontChinese);
+                                addText(document, "创建时间：", fontChinese, true);
+                                addTextLine(document, DataUtils.formatDate(entity.getCreateTime()), fontChinese);
+                                addText(document, "请求方式：", fontChinese, true);
+                                addTextLine(document, entity.getHttpMethodName(), fontChinese);
+                                addText(document, "请求地址：", fontChinese, true);
+                                addTextLine(document, entity.getPath(), null);
+                                addText(document, "接口说明：", fontChinese, true);
+                                addTextLine(document, entity.getNote(), fontChinese);
+                                addTextLine(document, "", fontChinese);
 
-                                    pdfAddRequestHeaders(document, projectId, entity.getId(), fontChinese);
-                                    pdfAddRequestParams(document, projectId, entity.getId(), fontChinese);
-                                    pdfAddResponseParams(document, projectId, entity.getId(), fontChinese);
+                                pdfAddRequestHeaders(document, projectId, entity.getId(), fontChinese);
+                                pdfAddRequestParams(document, projectId, entity.getId(), fontChinese);
+                                pdfAddResponseParams(document, projectId, entity.getId(), fontChinese);
 
-                                    addSmallTitle(document, "返回示例", fontChinese);
-                                    addTextLine(document, "\n", null);
-                                    fontChinese.setStyle(Font.NORMAL);
-                                    addTextLine(document, entity.getExample() == null ? "" : entity.getExample(), null);
+                                addSmallTitle(document, "返回示例", fontChinese);
+                                addTextLine(document, "\n", null);
+                                fontChinese.setStyle(Font.NORMAL);
+                                addTextLine(document, entity.getExample() == null ? "" : entity.getExample(), null);
 
-                                }
                             }
                         }
-                        //关闭文档
-                        document.close();
-                        //关闭书写器
-                        pdfWriter.close();
-
-                        HttpHeaders headers = new HttpHeaders();
-                        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-                        headers.setContentDispositionFormData("attachment", realFileName);
-                        return new ResponseEntity<byte[]>(FileUtils.readFileToByteArray(new File(mPath + File.separator + realFileName)), headers, HttpStatus.CREATED);
-                    } catch (DocumentException e) {
-                        e.printStackTrace();
-                    } catch (FileNotFoundException e) {
-                        e.printStackTrace();
                     }
+                    //关闭文档
+                    document.close();
+                    //关闭书写器
+                    pdfWriter.close();
+
+                    HttpHeaders headers = new HttpHeaders();
+                    headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+                    headers.setContentDispositionFormData("attachment", realFileName);
+                    return new ResponseEntity<byte[]>(FileUtils.readFileToByteArray(new File(mPath + File.separator + realFileName)), headers, HttpStatus.CREATED);
+                } catch (DocumentException | FileNotFoundException e) {
+                    e.printStackTrace();
+                    LOGGER.error("PDF ERROR", e);
                 }
+            } else {
+                LOGGER.error("path = null");
             }
-        } catch (IOException e) {
+        } catch (IOException | DocumentException e) {
             e.printStackTrace();
-        } catch (DocumentException e) {
-            e.printStackTrace();
+            LOGGER.error("PDF ERROR", e);
         }
 
         return null;
@@ -1091,6 +1094,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
             document.add(paragraph);
         } catch (DocumentException e) {
             e.printStackTrace();
+            LOGGER.error("PDF ERROR", e);
         }
         font.setSize(12f);
         font.setStyle(Font.NORMAL);
@@ -1421,6 +1425,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                 document.add(paragraph);
             } catch (DocumentException e) {
                 e.printStackTrace();
+                LOGGER.error("PDF ERROR", e);
             }
         } else {
             Paragraph paragraph = new Paragraph((text == null ? "" : text));
@@ -1428,6 +1433,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                 document.add(paragraph);
             } catch (DocumentException e) {
                 e.printStackTrace();
+                LOGGER.error("PDF ERROR", e);
             }
         }
     }
@@ -1456,6 +1462,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                 document.add(chapter);
             } catch (DocumentException e) {
                 e.printStackTrace();
+                LOGGER.error("PDF ERROR", e);
             }
             return chapter;
         } else {
@@ -1468,6 +1475,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                 document.add(paragraph);
             } catch (DocumentException e) {
                 e.printStackTrace();
+                LOGGER.error("PDF ERROR", e);
             }
             return chapter;
         }
@@ -1483,7 +1491,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
      * @param number   序号
      * @param font     字体
      */
-    private void addGroupItem(Document document, Chapter chapter, String text, int number, Font font) {
+    private void addGroupItem(Document document, Chapter chapter, String text, int groupNumber, int number, Font font) {
         addTextLine(document, "", font);
         if (font != null) {
             font.setSize(18f);
@@ -1491,25 +1499,27 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
             Paragraph paragraph = new Paragraph((text == null ? "" : text), font);
             Section section = chapter.addSection(paragraph);
             section.setBookmarkOpen(true);
-            section.setBookmarkTitle(chapter.getNumberDepth() + "." + number + ". " + text);
+            section.setBookmarkTitle(groupNumber + "." + number + ". " + text);
             section.setTriggerNewPage(false);
             section.setNumberStyle(Section.NUMBERSTYLE_DOTTED_WITHOUT_FINAL_DOT);
             try {
                 document.add(section);
             } catch (DocumentException e) {
                 e.printStackTrace();
+                LOGGER.error("PDF ERROR", e);
             }
         } else {
             Paragraph paragraph = new Paragraph((text == null ? "" : text));
             Section section = chapter.addSection(paragraph);
             section.setBookmarkOpen(true);
-            section.setBookmarkTitle(number + ". " + text);
+            section.setBookmarkTitle(groupNumber + "." + number + ". " + text);
             section.setNumberStyle(Section.NUMBERSTYLE_DOTTED_WITHOUT_FINAL_DOT);
             section.setTriggerNewPage(false);
             try {
                 document.add(section);
             } catch (DocumentException e) {
                 e.printStackTrace();
+                LOGGER.error("PDF ERROR", e);
             }
         }
     }
@@ -1521,6 +1531,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                 document.add(chunk);
             } catch (DocumentException e) {
                 e.printStackTrace();
+                LOGGER.error("PDF ERROR", e);
             }
         } else {
             font.setSize(12f);
@@ -1530,6 +1541,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                 document.add(chunk);
             } catch (DocumentException e) {
                 e.printStackTrace();
+                LOGGER.error("PDF ERROR", e);
             }
         }
     }
@@ -1541,6 +1553,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                 document.add(chunk);
             } catch (DocumentException e) {
                 e.printStackTrace();
+                LOGGER.error("PDF ERROR", e);
             }
         } else {
             font.setSize(12f);
@@ -1550,6 +1563,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                 document.add(chunk);
             } catch (DocumentException e) {
                 e.printStackTrace();
+                LOGGER.error("PDF ERROR", e);
             }
         }
     }
@@ -1582,6 +1596,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                 document.add(paragraph);
             } catch (DocumentException e) {
                 e.printStackTrace();
+                LOGGER.error("PDF ERROR", e);
             }
         } else {
             Chunk paragraph = new Chunk(text == null ? "" : text);
@@ -1589,6 +1604,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                 document.add(paragraph);
             } catch (DocumentException e) {
                 e.printStackTrace();
+                LOGGER.error("PDF ERROR", e);
             }
         }
 
