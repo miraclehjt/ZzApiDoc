@@ -21,6 +21,8 @@ public class ResponseArgEntity extends BaseEntity {
     public static final int TYPE_ARRAY_STRING = 4;
     public static final int TYPE_ARRAY = 5;
     public static final int TYPE_FILE = 6;
+    public static final int TYPE_UNKNOWN = 7;
+    public static final int TYPE_ARRAY_NUMBER = 8;
 
     @Column(name = "TypeId", length = 11)
     private Integer typeId = 0;

@@ -543,6 +543,28 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                             e.printStackTrace();
                         }
                         break;
+                    case ResponseArgEntity.TYPE_ARRAY_NUMBER:
+                        try {
+                            stringer.key(resG.getName());
+                            stringer.array();
+                            stringer.value(0);
+                            stringer.value(1);
+                            stringer.endArray();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        break;
+                    case ResponseArgEntity.TYPE_ARRAY_STRING:
+                        try {
+                            stringer.key(resG.getName());
+                            stringer.array();
+                            stringer.value("string1");
+                            stringer.value("string2");
+                            stringer.endArray();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        break;
                     case ResponseArgEntity.TYPE_FILE:
                         try {
                             stringer.key(resG.getName()).value("");
@@ -602,12 +624,23 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                         e.printStackTrace();
                     }
                     break;
-                case ResponseArgEntity.TYPE_ARRAY_STRING:
+                case ResponseArgEntity.TYPE_ARRAY_NUMBER:
                     try {
                         stringer.key(res.getName());
                         stringer.array();
                         stringer.value(0);
                         stringer.value(1);
+                        stringer.endArray();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case ResponseArgEntity.TYPE_ARRAY_STRING:
+                    try {
+                        stringer.key(res.getName());
+                        stringer.array();
+                        stringer.value("string1");
+                        stringer.value("string2");
                         stringer.endArray();
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -690,12 +723,23 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                         e.printStackTrace();
                     }
                     break;
-                case ResponseArgEntity.TYPE_ARRAY_STRING:
+                case ResponseArgEntity.TYPE_ARRAY_NUMBER:
                     try {
                         stringer.key(res.getName());
                         stringer.array();
                         stringer.value(0);
                         stringer.value(1);
+                        stringer.endArray();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case ResponseArgEntity.TYPE_ARRAY_STRING:
+                    try {
+                        stringer.key(res.getName());
+                        stringer.array();
+                        stringer.value("string1");
+                        stringer.value("string2");
                         stringer.endArray();
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -1475,6 +1519,9 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                     case 6:
                         values[i][2] = "file";
                         break;
+                    case 8:
+                        values[i][2] = "array[number]";
+                        break;
                     default:
                         values[i][2] = "未知";
                         break;
@@ -1519,6 +1566,9 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                         break;
                     case 6:
                         values[i][2] = "file";
+                        break;
+                    case 8:
+                        values[i][2] = "array[number]";
                         break;
                     default:
                         values[i][2] = "未知";
@@ -1567,6 +1617,9 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                         break;
                     case 6:
                         values[i][1] = "file";
+                        break;
+                    case 8:
+                        values[i][1] = "array[number]";
                         break;
                     default:
                         values[i][1] = "未知";
@@ -1644,6 +1697,9 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                     case 6:
                         cells[1] = new PdfPCell(new Paragraph("file", font));
                         break;
+                    case 8:
+                        cells[1] = new PdfPCell(new Paragraph("array[number]", font));
+                        break;
                     default:
                         cells[1] = new PdfPCell(new Paragraph("未知", font));
                         break;
@@ -1700,6 +1756,9 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                         break;
                     case 6:
                         cells[1] = new PdfPCell(new Paragraph("file", font));
+                        break;
+                    case 8:
+                        cells[1] = new PdfPCell(new Paragraph("array[number]", font));
                         break;
                     default:
                         cells[1] = new PdfPCell(new Paragraph("未知", font));
