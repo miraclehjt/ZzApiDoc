@@ -28,6 +28,46 @@ public class ApplicationEntity extends BaseEntity{
     private String logo;
     @Column(name = "ColorMain")
     private String colorMain;
+    @Column(name = "PackageName")
+    private String packageName;
+    @Column(name = "MultiDex")
+    private Boolean multiDex;
+    @Column(name = "MinifyEnabled")
+    private Boolean minifyEnabled;
+    @Column(name = "ApiId")
+    private String apiId;
+
+    public String getApiId() {
+        return apiId;
+    }
+
+    public void setApiId(String apiId) {
+        this.apiId = apiId;
+    }
+
+    public Boolean getMinifyEnabled() {
+        return minifyEnabled;
+    }
+
+    public void setMinifyEnabled(Boolean minifyEnabled) {
+        this.minifyEnabled = minifyEnabled;
+    }
+
+    public Boolean getMultiDex() {
+        return multiDex;
+    }
+
+    public void setMultiDex(Boolean multiDex) {
+        this.multiDex = multiDex;
+    }
+
+    public String getPackageName() {
+        return packageName;
+    }
+
+    public void setPackageName(String packageName) {
+        this.packageName = packageName;
+    }
 
     public String getColorMain() {
         return colorMain;
