@@ -43,7 +43,7 @@ public class InterfaceAction extends BaseController<InterfaceEntity> {
  *
 [
     {
-        "name": "code",
+        "name": "android",
         "typeId": 1,
         "note": ""
     },
