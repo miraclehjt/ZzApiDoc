@@ -1,13 +1,15 @@
 package me.zhouzhuo810.zzapidoc.android.action;
 
-import me.zhouzhuo810.zzapidoc.android.entity.ActivityEntity;
 import me.zhouzhuo810.zzapidoc.android.entity.FragmentEntity;
-import me.zhouzhuo810.zzapidoc.android.service.ActivityService;
+import me.zhouzhuo810.zzapidoc.android.entity.FragmentEntity;
+import me.zhouzhuo810.zzapidoc.android.service.FragmentService;
 import me.zhouzhuo810.zzapidoc.android.service.FragmentService;
 import me.zhouzhuo810.zzapidoc.common.action.BaseController;
+import me.zhouzhuo810.zzapidoc.common.result.BaseResult;
 import me.zhouzhuo810.zzapidoc.common.service.BaseService;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 
@@ -27,5 +29,38 @@ public class FragmentAction extends BaseController<FragmentEntity> {
     @Override
     public FragmentService getBaseService() {
         return (FragmentService) baseService;
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/addFragment", method = RequestMethod.POST)
+    public BaseResult addFragment(
+            @RequestParam(value = "name") String name,
+            @RequestParam(value = "title") String title,
+            @RequestParam(value = "showTitle") boolean showTitle,
+            @RequestParam(value = "type") int type,
+            @RequestParam(value = "position") int position,
+            @RequestParam(value = "appId", required = false) String appId,
+            @RequestParam(value = "activityId", required = false) String activityId,
+            @RequestParam(value = "userId") String userId
+    ) {
+        return getBaseService().addFragment(name, title, showTitle, type, position, appId,activityId, userId);
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/getAllMyFragment", method = RequestMethod.GET)
+    public BaseResult getAllMyFragment(
+            @RequestParam(value = "userId") String userId
+    ) {
+        return getBaseService().getAllMyFragment(userId);
+    }
+
+
+    @ResponseBody
+    @RequestMapping(value = "/deleteFragment", method = RequestMethod.POST)
+    public BaseResult deleteFragment(
+            @RequestParam(value = "userId") String userId,
+            @RequestParam(value = "id") String id
+    ) {
+        return getBaseService().deleteFragment(id, userId);
     }
 }

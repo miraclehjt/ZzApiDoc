@@ -20,6 +20,8 @@ public class WidgetEntity extends BaseEntity{
 
     @Column(name = "Type")
     private Integer type = TYPE_TITLE_BAR;
+    @Column(name = "Name")
+    private String name;
     @Column(name = "RelativeId")
     private String relativeId;
     @Column(name = "Title")
@@ -28,8 +30,8 @@ public class WidgetEntity extends BaseEntity{
     private String hint;
     @Column(name = "DefValue")
     private String defValue;
-    @Column(name = "TargetActId")
-    private String targetActId;
+    @Column(name = "ApplicationId")
+    private String applicationId;
     @Column(name = "LeftTitleText")
     private String leftTitleText;
     @Column(name = "RightTitleText")
@@ -50,6 +52,25 @@ public class WidgetEntity extends BaseEntity{
     private Boolean showLeftTitleLayout;
     @Column(name = "ShowRightTitleLayout")
     private Boolean showRightTitleLayout;
+    /*点击跳转的Activity*/
+    @Column(name = "targetActivityId")
+    private String targetActivityId;
+
+    public String getTargetActivityId() {
+        return targetActivityId;
+    }
+
+    public void setTargetActivityId(String targetActivityId) {
+        this.targetActivityId = targetActivityId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
     public Integer getType() {
         return type;
@@ -171,11 +192,11 @@ public class WidgetEntity extends BaseEntity{
         this.defValue = defValue;
     }
 
-    public String getTargetActId() {
-        return targetActId;
+    public String getApplicationId() {
+        return applicationId;
     }
 
-    public void setTargetActId(String targetActId) {
-        this.targetActId = targetActId;
+    public void setApplicationId(String applicationId) {
+        this.applicationId = applicationId;
     }
 }

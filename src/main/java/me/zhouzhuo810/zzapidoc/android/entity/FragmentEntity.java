@@ -24,6 +24,36 @@ public class FragmentEntity extends BaseEntity{
     private String name;
     @Column(name = "ShowTitle")
     private Boolean showTitle;
+    @Column(name = "ApplicationId")
+    private String applicationId;
+    @Column(name = "ActivityId")
+    private String activityId;
+    @Column(name = "Position")
+    private Integer position = 0;
+
+    public Integer getPosition() {
+        return position;
+    }
+
+    public void setPosition(Integer position) {
+        this.position = position;
+    }
+
+    public String getApplicationId() {
+        return applicationId;
+    }
+
+    public void setApplicationId(String applicationId) {
+        this.applicationId = applicationId;
+    }
+
+    public String getActivityId() {
+        return activityId;
+    }
+
+    public void setActivityId(String activityId) {
+        this.activityId = activityId;
+    }
 
     public Integer getType() {
         return type;
