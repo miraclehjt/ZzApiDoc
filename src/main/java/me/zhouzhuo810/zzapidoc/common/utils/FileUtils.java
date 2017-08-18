@@ -1,7 +1,10 @@
 package me.zhouzhuo810.zzapidoc.common.utils;
 
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.*;
 
 /**
@@ -43,4 +46,26 @@ public class FileUtils {
             }
         }
     }
+
+
+    public static String saveFile(byte[] data, String dirName, String fileName) {
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        String realPath = request.getRealPath("");
+        String newpath = realPath + File.separator + dirName;
+        File file = new File(newpath);
+        if (!file.exists()) {
+            file.mkdirs();
+        }
+        String filePath = newpath + File.separator + fileName;
+        try {
+            FileOutputStream fos = new FileOutputStream(new File(filePath), false);
+            fos.write(data);
+            fos.flush();
+            fos.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return filePath;
+    }
+
 }

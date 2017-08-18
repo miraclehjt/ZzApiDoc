@@ -3,6 +3,7 @@ package me.zhouzhuo810.zzapidoc.android.service;
 import me.zhouzhuo810.zzapidoc.android.entity.ApplicationEntity;
 import me.zhouzhuo810.zzapidoc.common.result.BaseResult;
 import me.zhouzhuo810.zzapidoc.common.service.BaseService;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Created by admin on 2017/8/17.
@@ -10,7 +11,7 @@ import me.zhouzhuo810.zzapidoc.common.service.BaseService;
 public interface ApplicationService extends BaseService<ApplicationEntity> {
 
     BaseResult addApplication(String appName, String versionName,
-                              String packageName, String logo,
+                              String packageName, MultipartFile logo,
                               String colorMain, int minSDK,
                               int compileSDK, int targetSDK,
                               int versionCode, boolean multiDex,

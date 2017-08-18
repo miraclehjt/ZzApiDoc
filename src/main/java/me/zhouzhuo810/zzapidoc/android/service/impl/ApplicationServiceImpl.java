@@ -7,14 +7,18 @@ import me.zhouzhuo810.zzapidoc.common.dao.BaseDao;
 import me.zhouzhuo810.zzapidoc.common.entity.BaseEntity;
 import me.zhouzhuo810.zzapidoc.common.result.BaseResult;
 import me.zhouzhuo810.zzapidoc.common.service.impl.BaseServiceImpl;
+import me.zhouzhuo810.zzapidoc.common.utils.DataUtils;
+import me.zhouzhuo810.zzapidoc.common.utils.FileUtils;
 import me.zhouzhuo810.zzapidoc.common.utils.MapUtils;
 import me.zhouzhuo810.zzapidoc.user.entity.UserEntity;
 import me.zhouzhuo810.zzapidoc.user.service.UserService;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +44,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
     }
 
     @Override
-    public BaseResult addApplication(String appName, String versionName, String packageName, String logo,
+    public BaseResult addApplication(String appName, String versionName, String packageName, MultipartFile logo,
                                      String colorMain, int minSDK, int compileSDK, int targetSDK, int versionCode,
                                      boolean multiDex, boolean minifyEnabled, String apiId, String userId) {
         UserEntity user = mUserService.get(userId);
@@ -54,7 +58,14 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
         entity.setAppName(appName);
         entity.setMinifyEnabled(minifyEnabled);
         entity.setColorMain(colorMain == null ? "#438cff" : "#" + colorMain);
-        entity.setLogo(logo == null ? "R.mipmap.ic_launcher" : "R.mipmap." + logo);
+        if (logo != null) {
+            try {
+                String path = FileUtils.saveFile(logo.getBytes(), "image", logo.getOriginalFilename());
+                entity.setLogo(path);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         entity.setPackageName(packageName);
         entity.setVersionCode(versionCode);
         entity.setVersionName(versionName);
@@ -107,6 +118,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
         List<Map<String, Object>> result = new ArrayList<>();
         for (ApplicationEntity applicationEntity : applicationEntities) {
             MapUtils map = new MapUtils();
+            map.put("id", applicationEntity.getId());
             map.put("appName", applicationEntity.getAppName());
             map.put("minSDK", applicationEntity.getMinSDK());
             map.put("compileSDK", applicationEntity.getCompileSDK());
@@ -114,6 +126,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
             map.put("versionCode", applicationEntity.getVersionCode());
             map.put("versionName", applicationEntity.getVersionName());
             map.put("logo", applicationEntity.getLogo());
+            map.put("createTime", DataUtils.formatDate(applicationEntity.getCreateTime()));
             map.put("colorMain", applicationEntity.getColorMain());
             map.put("packageName", applicationEntity.getPackageName());
             map.put("multiDex", applicationEntity.getMultiDex());
