@@ -34,6 +34,26 @@ public class ActivityEntity extends BaseEntity {
     private Boolean showTitleBar;
     @Column(name = "ApplicationId")
     private String applicationId;
+    @Column(name = "TargetActId")
+    private String targetActId;
+    @Column(name = "SplashDuration")
+    private Integer splashDuration;
+
+    public String getTargetActId() {
+        return targetActId;
+    }
+
+    public void setTargetActId(String targetActId) {
+        this.targetActId = targetActId;
+    }
+
+    public Integer getSplashDuration() {
+        return splashDuration;
+    }
+
+    public void setSplashDuration(Integer splashDuration) {
+        this.splashDuration = splashDuration;
+    }
 
     public void setType(Integer type) {
         this.type = type;

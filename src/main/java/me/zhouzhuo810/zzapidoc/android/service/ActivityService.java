@@ -11,11 +11,12 @@ import org.springframework.web.multipart.MultipartFile;
  */
 public interface ActivityService extends BaseService<ActivityEntity> {
     BaseResult addActivity(String name, String title,
-                              boolean showTitle, MultipartFile splashImg,
-                              int type, String appId,
-                              String userId);
+                           boolean showTitle, MultipartFile splashImg,
+                           int type, String appId,
+                           String targetActId, int splashDuration,
+                           String userId);
 
     BaseResult deleteActivity(String id, String userId);
 
-    BaseResult getAllMyActivity(String userId);
+    BaseResult getAllMyActivity(String appId, String userId);
 }
