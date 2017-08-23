@@ -48,9 +48,10 @@ public class ActivityAction extends BaseController<ActivityEntity> {
     @ResponseBody
     @RequestMapping(value = "/getAllMyActivity", method = RequestMethod.GET)
     public BaseResult getAllMyActivity(
+            @RequestParam(value = "appId") String appId,
             @RequestParam(value = "userId") String userId
     ) {
-        return getBaseService().getAllMyActivity(userId);
+        return getBaseService().getAllMyActivity(appId, userId);
     }
 
 

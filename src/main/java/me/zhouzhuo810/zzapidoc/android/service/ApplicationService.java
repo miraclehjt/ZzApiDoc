@@ -3,6 +3,7 @@ package me.zhouzhuo810.zzapidoc.android.service;
 import me.zhouzhuo810.zzapidoc.android.entity.ApplicationEntity;
 import me.zhouzhuo810.zzapidoc.common.result.BaseResult;
 import me.zhouzhuo810.zzapidoc.common.service.BaseService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -23,4 +24,6 @@ public interface ApplicationService extends BaseService<ApplicationEntity> {
     BaseResult deleteApplication(String id, String userId);
 
     BaseResult getAllMyApplication(String userId);
+
+    ResponseEntity<byte[]> downloadApplication(String appId, String userId);
 }

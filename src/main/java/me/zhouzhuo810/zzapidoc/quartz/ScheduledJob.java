@@ -3,6 +3,7 @@ package me.zhouzhuo810.zzapidoc.quartz;
 import me.zhouzhuo810.zzapidoc.cache.entity.CacheEntity;
 import me.zhouzhuo810.zzapidoc.cache.service.CacheService;
 import me.zhouzhuo810.zzapidoc.common.utils.FileUtils;
+import org.aspectj.util.FileUtil;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -24,7 +25,7 @@ public class ScheduledJob {
             for (CacheEntity cacheEntity : all) {
                 String path = cacheEntity.getCachePath();
                 if (path != null && path.length() > 0) {
-                    FileUtils.deleteFiles(path);
+                    FileUtil.deleteContents(new File(path));
                 }
             }
         }

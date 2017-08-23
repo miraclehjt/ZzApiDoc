@@ -100,13 +100,14 @@ public class ActivityServiceImpl extends BaseServiceImpl<ActivityEntity> impleme
     }
 
     @Override
-    public BaseResult getAllMyActivity(String userId) {
+    public BaseResult getAllMyActivity(String appId, String userId) {
         UserEntity user = mUserService.get(userId);
         if (user == null) {
             return new BaseResult(0, "用户不合法");
         }
         List<ActivityEntity> applicationEntities = getBaseDao().executeCriteria(new Criterion[]{
                 Restrictions.eq("deleteFlag", BaseEntity.DELETE_FLAG_NO),
+                Restrictions.eq("applicationId", appId),
                 Restrictions.eq("createUserID", user.getId())
         });
         if (applicationEntities == null) {

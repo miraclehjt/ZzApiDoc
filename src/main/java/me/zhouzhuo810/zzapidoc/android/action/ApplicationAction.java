@@ -5,12 +5,14 @@ import me.zhouzhuo810.zzapidoc.android.service.ApplicationService;
 import me.zhouzhuo810.zzapidoc.common.action.BaseController;
 import me.zhouzhuo810.zzapidoc.common.result.BaseResult;
 import me.zhouzhuo810.zzapidoc.common.service.BaseService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.io.File;
+import java.io.IOException;
 
 /**
  * Created by admin on 2017/8/17.
@@ -68,6 +70,16 @@ public class ApplicationAction extends BaseController<ApplicationEntity> {
             @RequestParam(value = "id") String id
     ) {
         return getBaseService().deleteApplication(id, userId);
+    }
+
+
+    @ResponseBody
+    @RequestMapping(value = "/downloadApplication", method = RequestMethod.GET)
+    public ResponseEntity<byte[]> downloadApplication(
+            @RequestParam(value = "appId") String appId,
+            @RequestParam(value = "userId") String userId
+    ) throws IOException {
+        return getBaseService().downloadApplication(appId, userId);
     }
 
 }
