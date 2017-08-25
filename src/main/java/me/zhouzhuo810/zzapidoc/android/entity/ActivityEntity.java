@@ -1,6 +1,7 @@
 package me.zhouzhuo810.zzapidoc.android.entity;
 
 import me.zhouzhuo810.zzapidoc.common.entity.BaseEntity;
+import org.hibernate.annotations.Formula;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -34,6 +35,36 @@ public class ActivityEntity extends BaseEntity {
     private Boolean showTitleBar;
     @Column(name = "ApplicationId")
     private String applicationId;
+    @Column(name = "TargetActId")
+    private String targetActId;
+    @Formula("(SELECT a.Name FROM activity a WHERE a.ID = TargetActId)")
+    private String targetActName;
+    @Column(name = "SplashSecond")
+    private Integer splashSecond = 5;
+
+    public String getTargetActName() {
+        return targetActName;
+    }
+
+    public void setTargetActName(String targetActName) {
+        this.targetActName = targetActName;
+    }
+
+    public String getTargetActId() {
+        return targetActId;
+    }
+
+    public void setTargetActId(String targetActId) {
+        this.targetActId = targetActId;
+    }
+
+    public Integer getSplashSecond() {
+        return splashSecond;
+    }
+
+    public void setSplashSecond(Integer splashSecond) {
+        this.splashSecond = splashSecond;
+    }
 
     public void setType(Integer type) {
         this.type = type;

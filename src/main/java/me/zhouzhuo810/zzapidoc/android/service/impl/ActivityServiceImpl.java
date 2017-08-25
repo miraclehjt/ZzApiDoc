@@ -49,7 +49,7 @@ public class ActivityServiceImpl extends BaseServiceImpl<ActivityEntity> impleme
 
     @Override
     public BaseResult addActivity(String name, String title, boolean showTitle,
-                                  MultipartFile splashImg, int type, String appId, String userId) {
+                                  MultipartFile splashImg, int splashSecond, int type, String appId, String targetActId, String userId) {
         UserEntity user = mUserService.get(userId);
         if (user == null) {
             return new BaseResult(0, "用户不合法");
@@ -58,7 +58,9 @@ public class ActivityServiceImpl extends BaseServiceImpl<ActivityEntity> impleme
         entity.setCreateUserID(user.getId());
         entity.setCreateUserName(user.getName());
         entity.setName(name);
+        entity.setTargetActId(targetActId);
         entity.setTitle(title);
+        entity.setSplashSecond(splashSecond == 0 ? 5 : splashSecond);
         entity.setShowTitleBar(showTitle);
         if (splashImg != null) {
             try {
@@ -121,9 +123,12 @@ public class ActivityServiceImpl extends BaseServiceImpl<ActivityEntity> impleme
             map.put("name", applicationEntity.getName());
             map.put("type", applicationEntity.getType());
             map.put("splashImg", applicationEntity.getSplashImg());
+            map.put("splashSecond", applicationEntity.getSplashSecond() == null ? 5 : applicationEntity.getSplashSecond());
             map.put("title", applicationEntity.getTitle());
             map.put("showTitle", applicationEntity.getShowTitleBar());
             map.put("appId", applicationEntity.getApplicationId());
+            map.put("targetActId", applicationEntity.getTargetActId());
+            map.put("targetActName", applicationEntity.getTargetActName());
             map.put("createTime", DataUtils.formatDate(applicationEntity.getCreateTime()));
             result.add(map.build());
         }
