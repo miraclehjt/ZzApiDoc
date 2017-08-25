@@ -12,11 +12,11 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "widget")
 public class WidgetEntity extends BaseEntity{
-    public static final int TYPE_TITLE_BAR = 1;
-    public static final int TYPE_SETTING_ITEM = 2;
-    public static final int TYPE_EDIT_ITEM = 3;
-    public static final int TYPE_INFO_ITEM = 4;
-    public static final int TYPE_BTN_ITEM = 5;
+    public static final int TYPE_TITLE_BAR = 0;
+    public static final int TYPE_SETTING_ITEM = 1;
+    public static final int TYPE_EDIT_ITEM = 2;
+    public static final int TYPE_INFO_ITEM = 3;
+    public static final int TYPE_BTN_ITEM = 4;
 
     @Column(name = "Type")
     private Integer type = TYPE_TITLE_BAR;

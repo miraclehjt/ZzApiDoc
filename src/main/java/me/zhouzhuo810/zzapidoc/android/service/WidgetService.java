@@ -13,7 +13,7 @@ public interface WidgetService extends BaseService<WidgetEntity> {
 
     BaseResult addWidget(String name, String title, int type, String defValue,
                          String hint, String leftTitleText, String rightTitleText,
-                         String leftTitleImg, String rightTitleImg, boolean showLeftTitleImg,
+                         MultipartFile leftTitleImg, MultipartFile rightTitleImg, boolean showLeftTitleImg,
                          boolean showRightTitleImg, boolean showLeftTitleText, boolean showRightTitleText,
                          boolean showLeftTitleLayout, boolean showRightTitleLayout,
                          String targetActId, String relativeId, String appId, String userId);
