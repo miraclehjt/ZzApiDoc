@@ -17,7 +17,7 @@ public class FileUtils {
         // 创建目录
         File dir = new File(path);
         if (!dir.exists()) {
-            dir.mkdir();
+            dir.mkdirs();
         }
         // 读取文件流并保持在指定路径
         String filename = System.currentTimeMillis() + ".txt";
@@ -37,7 +37,7 @@ public class FileUtils {
         // 创建目录
         File dir = new File(path);
         if (!dir.exists()) {
-            dir.mkdir();
+            dir.mkdirs();
         }
         // 读取文件流并保持在指定路径
         String mPath = path + File.separator

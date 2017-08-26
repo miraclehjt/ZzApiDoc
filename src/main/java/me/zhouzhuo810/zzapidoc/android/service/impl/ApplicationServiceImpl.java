@@ -267,11 +267,11 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 "    compileSdkVersion 25\n" +
                 "    buildToolsVersion \"25.0.3\"\n" +
                 "    defaultConfig {\n" +
-                "        applicationId \""+app.getPackageName()+"\"\n" +
-                "        minSdkVersion "+app.getMinSDK()+"\n" +
-                "        targetSdkVersion "+app.getTargetSDK()+"\n" +
-                "        versionCode "+app.getVersionCode()+"\n" +
-                "        versionName \""+app.getVersionName()+"\"\n" +
+                "        applicationId \"" + app.getPackageName() + "\"\n" +
+                "        minSdkVersion " + app.getMinSDK() + "\n" +
+                "        targetSdkVersion " + app.getTargetSDK() + "\n" +
+                "        versionCode " + app.getVersionCode() + "\n" +
+                "        versionName \"" + app.getVersionName() + "\"\n" +
                 "    }\n" +
                 "\n" +
                 "    applicationVariants.all {variant ->\n" +
@@ -280,9 +280,9 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 "            def fileName\n" +
                 "            if (outputFile != null && outputFile.name.endsWith('.apk')) {\n" +
                 "                if (variant.buildType.name.equals('release')) {\n" +
-                "                    fileName = \""+app.getAppName()+"_${defaultConfig.versionName}.apk\"\n" +
+                "                    fileName = \"" + app.getAppName() + "_${defaultConfig.versionName}.apk\"\n" +
                 "                } else if (variant.buildType.name.equals('debug')) {\n" +
-                "                    fileName = \""+app.getAppName()+"_${defaultConfig.versionName}_debug.apk\"\n" +
+                "                    fileName = \"" + app.getAppName() + "_${defaultConfig.versionName}_debug.apk\"\n" +
                 "                }\n" +
                 "                output.outputFile = new File(outputFile.parent, fileName)\n" +
                 "            }\n" +
@@ -445,9 +445,9 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 "    <application\n" +
                 "        android:name=\".MyApplication\"\n" +
                 "        android:allowBackup=\"true\"\n" +
-                "        android:icon=\"@mipmap/"+logoName+"\"\n" +
+                "        android:icon=\"@mipmap/" + logoName + "\"\n" +
                 "        android:label=\"@string/app_name\"\n" +
-                "        android:roundIcon=\"@mipmap/"+logoName+"\"\n" +
+                "        android:roundIcon=\"@mipmap/" + logoName + "\"\n" +
                 "        android:supportsRtl=\"true\"\n" +
                 "        android:theme=\"@style/AppTheme\">\n" +
                 "\n" +
@@ -464,6 +464,17 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 Restrictions.eq("applicationId", app.getId()),
                 Restrictions.eq("type", ActivityEntity.TYPE_SPLASH)
         });
+        String layoutPath = filePath
+                + File.separator + "res"
+                + File.separator + "layout";
+
+        String packagePath = packageName.replace(".", File.separator);
+        String javaPath = appDirPath
+                + File.separator + "app"
+                + File.separator + "src"
+                + File.separator + "main"
+                + File.separator + "java"
+                + File.separator + packagePath;
         if (activityEntities != null && activityEntities.size() > 0) {
             ActivityEntity activityEntity = activityEntities.get(0);
             sbManifest.append("        <activity\n" +
@@ -478,9 +489,6 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                     "            </intent-filter>\n" +
                     "        </activity>\n");
             /*layout*/
-            String layoutPath = filePath
-                    + File.separator + "res"
-                    + File.separator + "layout";
             FileUtils.saveFileToServer("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
                     "<FrameLayout xmlns:android=\"http://schemas.android.com/apk/res/android\"\n" +
                     "    android:layout_width=\"match_parent\"\n" +
@@ -510,14 +518,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                     "        android:visibility=\"gone\" />\n" +
                     "</FrameLayout>", layoutPath, "activity_splash.xml");
             /*java*/
-            String packagePath = packageName.replace(".", File.separator);
-            String javaPath = appDirPath
-                    + File.separator + "app"
-                    + File.separator + "src"
-                    + File.separator + "main"
-                    + File.separator + "java"
-                    + File.separator + packagePath;
-            FileUtils.saveFileToServer("package "+packageName+".ui.act;\n" +
+            FileUtils.saveFileToServer("package " + packageName + ".ui.act;\n" +
                     "\n" +
                     "import android.content.Intent;\n" +
                     "import android.os.Bundle;\n" +
@@ -528,7 +529,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                     "\n" +
                     "import java.util.concurrent.TimeUnit;\n" +
                     "\n" +
-                    "import "+packageName+".R;\n" +
+                    "import " + packageName + ".R;\n" +
                     "import rx.Observable;\n" +
                     "import rx.Subscriber;\n" +
                     "import rx.Subscription;\n" +
@@ -565,7 +566,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                     "    @Override\n" +
                     "    public void initData() {\n" +
                     "        tvJump.setVisibility(View.VISIBLE);\n" +
-                    "        final int duration = "+activityEntity.getSplashSecond()+";\n" +
+                    "        final int duration = " + activityEntity.getSplashSecond() + ";\n" +
                     "        tvJump.setText(duration + \"s 跳过\");\n" +
                     "        subscribe = Observable.interval(1, TimeUnit.SECONDS, Schedulers.io())\n" +
                     "                .take(duration)\n" +
@@ -582,7 +583,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                     "                    @Override\n" +
                     "                    public void onNext(Long aLong) {\n" +
                     "                        if ((duration - 1 - aLong) == 0) {\n" +
-                    "                            Intent intent = new Intent(SplashActivity.this, "+activityEntity.getTargetActName()+".class);\n" +
+                    "                            Intent intent = new Intent(SplashActivity.this, " + activityEntity.getTargetActName() + ".class);\n" +
                     "                            startActWithIntent(intent);\n" +
                     "                            closeAct();\n" +
                     "                        } else {\n" +
@@ -599,7 +600,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                     "            @Override\n" +
                     "            public void onClick(View v) {\n" +
                     "                subscribe.unsubscribe();\n" +
-                    "                Intent intent = new Intent(SplashActivity.this, "+activityEntity.getTargetActName()+".class);\n" +
+                    "                Intent intent = new Intent(SplashActivity.this, " + activityEntity.getTargetActName() + ".class);\n" +
                     "                startActWithIntent(intent);\n" +
                     "                closeAct();\n" +
                     "            }\n" +
@@ -630,7 +631,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                     "    public void restoreState(@Nullable Bundle bundle) {\n" +
                     "\n" +
                     "    }\n" +
-                    "}\n", javaPath, activityEntity.getName()+".java");
+                    "}\n", javaPath, activityEntity.getName() + ".java");
         }
 
         /*查找其他act*/
@@ -646,13 +647,33 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         "            android:configChanges=\"orientation|keyboardHidden|layoutDirection|screenSize|screenLayout\"\n" +
                         "            android:screenOrientation=\"portrait\"\n" +
                         "            android:windowSoftInputMode=\"stateAlwaysHidden\" />\n");
+                switch (activityEntity.getType()) {
+                    case ActivityEntity.TYPE_LV_ACT:
+                        generateLvActLayout(layoutPath, activityEntity, app);
+                        generateLvActJava(javaPath, activityEntity, app);
+                        break;
+                    case ActivityEntity.TYPE_RV_ACT:
 
+                        break;
+                    case ActivityEntity.TYPE_TAB_ACT:
+
+                        break;
+                    case ActivityEntity.TYPE_SETTING:
+
+                        break;
+                    case ActivityEntity.TYPE_SUBMIT:
+
+                        break;
+                    case ActivityEntity.TYPE_DETAILS:
+
+                        break;
+                }
 
             }
         }
         sbManifest.append("        <provider\n" +
                 "            android:name=\"android.support.v4.content.FileProvider\"\n" +
-                "            android:authorities=\"me.zhouzhuo810.zzapidoc.provider\"\n" +
+                "            android:authorities=\""+packageName+".provider\"\n" +
                 "            android:exported=\"false\"\n" +
                 "            android:grantUriPermissions=\"true\">\n" +
                 "            <meta-data\n" +
@@ -664,6 +685,296 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 "</manifest>");
 
         FileUtils.saveFileToServer(sbManifest.toString(), filePath, "AndroidManifest.xml");
+    }
+
+    private void generateLvActJava(String javaPath, ActivityEntity activityEntity, ApplicationEntity app) throws IOException {
+        String name = activityEntity.getName();
+        String packageName = app.getPackageName();
+        String javaCode=  "package "+packageName+".ui.act;\n" +
+                "\n" +
+                "import android.content.Intent;\n" +
+                "import android.os.Bundle;\n" +
+                "import android.support.annotation.Nullable;\n" +
+                "import android.support.v4.widget.SwipeRefreshLayout;\n" +
+                "import android.view.View;\n" +
+                "import android.widget.AdapterView;\n" +
+                "import android.widget.ListView;\n" +
+                "import android.widget.RelativeLayout;\n" +
+                "import android.widget.TextView;\n" +
+                "\n" +
+                "import java.util.ArrayList;\n" +
+                "import java.util.Arrays;\n" +
+                "import java.util.List;\n" +
+                "\n" +
+                "import "+packageName+".R;\n" +
+                "import "+packageName+".common.api.Api;\n" +
+                "import "+packageName+".common.base.BaseActivity;\n" +
+                "import "+packageName+".common.rx.RxHelper;\n" +
+                "import "+packageName+".common.utils.ToastUtils;\n" +
+                "import rx.Subscriber;\n" +
+                "\n" +
+                "/**\n" +
+                " * Created by zhouzhuo810 on 2017/8/11.\n" +
+                " */\n" +
+                "public class "+name+" extends BaseActivity {\n" +
+                "\n" +
+                "    private RelativeLayout rlBack;\n" +
+                "    private RelativeLayout rlRight;\n" +
+                "    private SwipeRefreshLayout refresh;\n" +
+                "    private ListView lv;\n" +
+                "    private TextView tvNoData;\n" +
+                "  //  private List<GetAllMyActivityResult.DataBean> list;\n" +
+                "  //  private ActivityListAdapter adapter;\n" +
+                "    private boolean choose;\n" +
+                "\n" +
+                "    @Override\n" +
+                "    public int getLayoutId() {\n" +
+                "        return R.layout.activity_activity_manage;\n" +
+                "    }\n" +
+                "\n" +
+                "    @Override\n" +
+                "    public boolean defaultBack() {\n" +
+                "        return false;\n" +
+                "    }\n" +
+                "\n" +
+                "    @Override\n" +
+                "    public void initView() {\n" +
+                "        rlBack = (RelativeLayout) findViewById(R.id.rl_back);\n" +
+                "        rlRight = (RelativeLayout) findViewById(R.id.rl_right);\n" +
+                "        refresh = (SwipeRefreshLayout) findViewById(R.id.refresh);\n" +
+                "        lv = (ListView) findViewById(R.id.lv);\n" +
+                "        tvNoData = (TextView) findViewById(R.id.tv_no_data);\n" +
+                "\n" +
+                "    //    list = new ArrayList<>();\n" +
+                "    //    adapter = new ActivityListAdapter(this, list, R.layout.list_item_interface_group, true);\n" +
+                "    //    lv.setAdapter(adapter);\n" +
+                "    }\n" +
+                "\n" +
+                "    @Override\n" +
+                "    public void initData() {\n" +
+                "        choose = getIntent().getBooleanExtra(\"choose\", false);\n" +
+                "    }\n" +
+                "\n" +
+                "    private void getData() {\n" +
+                "\n" +
+                "     /*   Api.getApi0()\n" +
+                "                .getAllMyActivity(appId, getUserId())\n" +
+                "                .compose(RxHelper.<GetAllMyActivityResult>io_main())\n" +
+                "                .subscribe(new Subscriber<GetAllMyActivityResult>() {\n" +
+                "                    @Override\n" +
+                "                    public void onCompleted() {\n" +
+                "\n" +
+                "                    }\n" +
+                "\n" +
+                "                    @Override\n" +
+                "                    public void onError(Throwable e) {\n" +
+                "                        stopRefresh(refresh);\n" +
+                "                    }\n" +
+                "\n" +
+                "                    @Override\n" +
+                "                    public void onNext(GetAllMyActivityResult getAllInterfaceGroupResult) {\n" +
+                "                        stopRefresh(refresh);\n" +
+                "                        if (getAllInterfaceGroupResult.getCode() == 1) {\n" +
+                "                            list = getAllInterfaceGroupResult.getData();\n" +
+                "                            adapter.setmDatas(list);\n" +
+                "                            adapter.notifyDataSetChanged();\n" +
+                "                            if (list == null || list.size() == 0) {\n" +
+                "                                tvNoData.setVisibility(View.VISIBLE);\n" +
+                "                            } else {\n" +
+                "                                tvNoData.setVisibility(View.GONE);\n" +
+                "                            }\n" +
+                "                        }\n" +
+                "                    }\n" +
+                "                });*/\n" +
+                "    }\n" +
+                "\n" +
+                "    @Override\n" +
+                "    public void initEvent() {\n" +
+                "        rlBack.setOnClickListener(new View.OnClickListener() {\n" +
+                "            @Override\n" +
+                "            public void onClick(View v) {\n" +
+                "                closeAct();\n" +
+                "            }\n" +
+                "        });\n" +
+                "\n" +
+                "        rlRight.setOnClickListener(new View.OnClickListener() {\n" +
+                "            @Override\n" +
+                "            public void onClick(View v) {\n" +
+                "            /*    Intent intent = new Intent("+name+".this, AddActivity.class);\n" +
+                "                intent.putExtra(\"appId\", appId);\n" +
+                "                startActWithIntent(intent);*/\n" +
+                "            }\n" +
+                "        });\n" +
+                "\n" +
+                "\n" +
+                "        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {\n" +
+                "            @Override\n" +
+                "            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {\n" +
+                "                if (choose) {\n" +
+                "                    Intent intent = new Intent();\n" +
+                "                    //intent.putExtra(\"id\", adapter.getmDatas().get(position).getId());\n" +
+                "                    //intent.putExtra(\"name\", adapter.getmDatas().get(position).getName());\n" +
+                "                    setResult(RESULT_OK, intent);\n" +
+                "                    closeAct();\n" +
+                "                } else {\n" +
+                "            /*        Intent intent = new Intent("+name+".this, WidgetManageActivity.class);\n" +
+                "                    intent.putExtra(\"appId\", appId);\n" +
+                "                    intent.putExtra(\"groupId\", adapter.getmDatas().get(position).getId());\n" +
+                "                    startActWithIntent(intent);*/\n" +
+                "                }\n" +
+                "            }\n" +
+                "        });\n" +
+                "\n" +
+                "        lv.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {\n" +
+                "            @Override\n" +
+                "            public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {\n" +
+                "                showListDialog(Arrays.asList(\"删除\"), true, null, new OnItemClick() {\n" +
+                "                    @Override\n" +
+                "                    public void onItemClick(int pos, String content) {\n" +
+                "                        switch (pos) {\n" +
+                "                            case 0:\n" +
+                "                                //deleteActivity(adapter.getmDatas().get(position).getId());\n" +
+                "                                break;\n" +
+                "                        }\n" +
+                "                    }\n" +
+                "                });\n" +
+                "                return true;\n" +
+                "            }\n" +
+                "        });\n" +
+                "\n" +
+                "        refresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {\n" +
+                "            @Override\n" +
+                "            public void onRefresh() {\n" +
+                "                getData();\n" +
+                "            }\n" +
+                "        });\n" +
+                "    }\n" +
+                "\n" +
+                "    private void deleteActivity(String id) {\n" +
+                "        showPd(getString(R.string.submiting_text), false);\n" +
+                "     /*   Api.getApi0()\n" +
+                "                .deleteActivity(id, getUserId())\n" +
+                "                .compose(RxHelper.<DeleteActivityResult>io_main())\n" +
+                "                .subscribe(new Subscriber<DeleteActivityResult>() {\n" +
+                "                    @Override\n" +
+                "                    public void onCompleted() {\n" +
+                "\n" +
+                "                    }\n" +
+                "\n" +
+                "                    @Override\n" +
+                "                    public void onError(Throwable e) {\n" +
+                "                        hidePd();\n" +
+                "                        ToastUtils.showCustomBgToast(getString(R.string.no_net_text) + e.toString());\n" +
+                "                    }\n" +
+                "\n" +
+                "                    @Override\n" +
+                "                    public void onNext(DeleteActivityResult deleteInterfaceGroupResult) {\n" +
+                "                        hidePd();\n" +
+                "                        ToastUtils.showCustomBgToast(deleteInterfaceGroupResult.getMsg());\n" +
+                "                        if (deleteInterfaceGroupResult.getCode() == 1) {\n" +
+                "                            startRefresh(refresh);\n" +
+                "                            getData();\n" +
+                "                        }\n" +
+                "                    }\n" +
+                "                });*/\n" +
+                "    }\n" +
+                "\n" +
+                "    @Override\n" +
+                "    public void resume() {\n" +
+                "        startRefresh(refresh);\n" +
+                "        getData();\n" +
+                "    }\n" +
+                "\n" +
+                "    @Override\n" +
+                "    public void pause() {\n" +
+                "\n" +
+                "    }\n" +
+                "\n" +
+                "    @Override\n" +
+                "    public void destroy() {\n" +
+                "\n" +
+                "    }\n" +
+                "\n" +
+                "    @Override\n" +
+                "    public void saveState(Bundle bundle) {\n" +
+                "\n" +
+                "    }\n" +
+                "\n" +
+                "    @Override\n" +
+                "    public void restoreState(@Nullable Bundle bundle) {\n" +
+                "\n" +
+                "    }\n" +
+                "}\n";
+        FileUtils.saveFileToServer(javaCode, javaPath, name+".java");
+    }
+
+    private void generateLvActLayout(String layoutPath, ActivityEntity activityEntity, ApplicationEntity app) throws IOException {
+        String name = activityEntity.getName();
+        String layoutName = "";
+        boolean isNotFirst = false;
+        for (int i = 0; i < name.length(); i++) {
+            char c = name.charAt(i);
+            if (c >= 'A' && c <= 'Z') {
+                if (isNotFirst) {
+                    layoutName += "_";
+                }
+                isNotFirst = true;
+            }
+            layoutName += c;
+        }
+        layoutName = layoutName.toLowerCase();
+        FileUtils.saveFileToServer("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
+                "<LinearLayout xmlns:android=\"http://schemas.android.com/apk/res/android\"\n" +
+                "    xmlns:app=\"http://schemas.android.com/apk/res-auto\"\n" +
+                "    android:layout_width=\"match_parent\"\n" +
+                "    android:layout_height=\"match_parent\"\n" +
+                "    android:background=\"@color/colorGrayBg\"\n" +
+                "    android:orientation=\"vertical\">\n" +
+                "\n" +
+                "    <zhouzhuo810.me.zzandframe.ui.widget.TitleBar\n" +
+                "        android:layout_width=\"match_parent\"\n" +
+                "        android:layout_height=\"120px\"\n" +
+                "        android:background=\"@color/colorMain\"\n" +
+                "        app:leftImg=\"@drawable/back\"\n" +
+                "        app:rightText=\"@string/add_text\"\n" +
+                "        app:showLeftImg=\"true\"\n" +
+                "        app:showLeftLayout=\"true\"\n" +
+                "        app:showRightImg=\"false\"\n" +
+                "        app:showRightLayout=\"true\"\n" +
+                "        app:showRightText=\"true\"\n" +
+                "        app:textColorAll=\"@color/colorWhite\"\n" +
+                "        app:titleText=\"@string/activity_manage_text\" />\n" +
+                "\n" +
+                "    <RelativeLayout\n" +
+                "        android:layout_width=\"match_parent\"\n" +
+                "        android:layout_height=\"match_parent\">\n" +
+                "\n" +
+                "        <android.support.v4.widget.SwipeRefreshLayout\n" +
+                "            android:id=\"@+id/refresh\"\n" +
+                "            android:layout_width=\"match_parent\"\n" +
+                "            android:layout_height=\"match_parent\">\n" +
+                "\n" +
+                "            <ListView\n" +
+                "                android:id=\"@+id/lv\"\n" +
+                "                android:layout_width=\"match_parent\"\n" +
+                "                android:layout_height=\"wrap_content\"\n" +
+                "                android:divider=\"@null\"\n" +
+                "                android:listSelector=\"@null\" />\n" +
+                "\n" +
+                "        </android.support.v4.widget.SwipeRefreshLayout>\n" +
+                "\n" +
+                "        <TextView\n" +
+                "            android:id=\"@+id/tv_no_data\"\n" +
+                "            android:layout_width=\"wrap_content\"\n" +
+                "            android:layout_height=\"wrap_content\"\n" +
+                "            android:layout_centerInParent=\"true\"\n" +
+                "            android:text=\"@string/no_data_text\"\n" +
+                "            android:textColor=\"#999\"\n" +
+                "            android:textSize=\"30px\"\n" +
+                "            android:visibility=\"gone\" />\n" +
+                "    </RelativeLayout>\n" +
+                "\n" +
+                "</LinearLayout>", layoutPath, layoutName + ".xml");
     }
 
     private void copyGradleWrapper(String rootPath, String appDirPath) throws IOException {
