@@ -1,6 +1,7 @@
 package me.zhouzhuo810.zzapidoc.android.entity;
 
 import me.zhouzhuo810.zzapidoc.common.entity.BaseEntity;
+import org.hibernate.annotations.Formula;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -36,8 +37,18 @@ public class ActivityEntity extends BaseEntity {
     private String applicationId;
     @Column(name = "TargetActId")
     private String targetActId;
-    @Column(name = "SplashDuration")
-    private Integer splashDuration;
+    @Formula("(SELECT a.Name FROM activity a WHERE a.ID = TargetActId)")
+    private String targetActName;
+    @Column(name = "SplashSecond")
+    private Integer splashSecond = 5;
+
+    public String getTargetActName() {
+        return targetActName;
+    }
+
+    public void setTargetActName(String targetActName) {
+        this.targetActName = targetActName;
+    }
 
     public String getTargetActId() {
         return targetActId;
@@ -47,12 +58,12 @@ public class ActivityEntity extends BaseEntity {
         this.targetActId = targetActId;
     }
 
-    public Integer getSplashDuration() {
-        return splashDuration;
+    public Integer getSplashSecond() {
+        return splashSecond;
     }
 
-    public void setSplashDuration(Integer splashDuration) {
-        this.splashDuration = splashDuration;
+    public void setSplashSecond(Integer splashSecond) {
+        this.splashSecond = splashSecond;
     }
 
     public void setType(Integer type) {

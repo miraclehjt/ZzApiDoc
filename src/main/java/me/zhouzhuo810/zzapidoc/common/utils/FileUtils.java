@@ -32,6 +32,25 @@ public class FileUtils {
         return filename;
     }
 
+    public static String saveFileToServer(String content, String path, String filename)
+            throws IOException {
+        // 创建目录
+        File dir = new File(path);
+        if (!dir.exists()) {
+            dir.mkdir();
+        }
+        // 读取文件流并保持在指定路径
+        String mPath = path + File.separator
+                + filename;
+        System.out.println(path);
+        OutputStream outputStream = new FileOutputStream(mPath);
+        byte[] buffer = content.getBytes();
+        outputStream.write(buffer);
+        outputStream.flush();
+        outputStream.close();
+        return filename;
+    }
+
     public static void deleteFiles(String dir) {
         File file = new File(dir);
         if (!file.exists()) {

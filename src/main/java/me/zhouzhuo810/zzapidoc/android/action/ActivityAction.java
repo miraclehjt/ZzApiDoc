@@ -40,11 +40,11 @@ public class ActivityAction extends BaseController<ActivityEntity> {
             @RequestParam(value = "type") int type,
             @RequestParam(value = "appId", required = false) String appId,
             @RequestParam(value = "targetActId", required = false) String targetActId,
-            @RequestParam(value = "splashDuration", required = false) int splashDuration,
+            @RequestParam(value = "splashSecond") int splashSecond,
             @RequestBody(required = false) MultipartFile splashImg,
             @RequestParam(value = "userId") String userId
     ) {
-        return getBaseService().addActivity(name, title, showTitle, splashImg, type, appId, targetActId, splashDuration, userId);
+        return getBaseService().addActivity(name, title, showTitle, splashImg, splashSecond, type, appId, targetActId, userId);
     }
 
     @ResponseBody

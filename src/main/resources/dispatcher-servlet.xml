@@ -26,6 +26,8 @@
     <mvc:resources location="/font/" mapping="/font/**"/>
     <mvc:resources location="/PDF/" mapping="/PDF/**"/>
     <mvc:resources location="/JSON/" mapping="/JSON/**"/>
+    <mvc:resources location="/APP/" mapping="/APP/**"/>
+    <mvc:resources location="/res/" mapping="/res/**"/>
 
 
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">

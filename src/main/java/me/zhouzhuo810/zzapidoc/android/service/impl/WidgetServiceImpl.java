@@ -12,14 +12,17 @@ import me.zhouzhuo810.zzapidoc.common.entity.BaseEntity;
 import me.zhouzhuo810.zzapidoc.common.result.BaseResult;
 import me.zhouzhuo810.zzapidoc.common.service.impl.BaseServiceImpl;
 import me.zhouzhuo810.zzapidoc.common.utils.DataUtils;
+import me.zhouzhuo810.zzapidoc.common.utils.FileUtils;
 import me.zhouzhuo810.zzapidoc.common.utils.MapUtils;
 import me.zhouzhuo810.zzapidoc.user.entity.UserEntity;
 import me.zhouzhuo810.zzapidoc.user.service.UserService;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -46,8 +49,8 @@ public class WidgetServiceImpl extends BaseServiceImpl<WidgetEntity> implements 
 
     @Override
     public BaseResult addWidget(String name, String title, int type, String defValue, String hint,
-                                String leftTitleText, String rightTitleText, String leftTitleImg,
-                                String rightTitleImg, boolean showLeftTitleImg, boolean showRightTitleImg,
+                                String leftTitleText, String rightTitleText, MultipartFile leftTitleImg,
+                                MultipartFile rightTitleImg, boolean showLeftTitleImg, boolean showRightTitleImg,
                                 boolean showLeftTitleText, boolean showRightTitleText, boolean showLeftTitleLayout,
                                 boolean showRightTitleLayout, String targetActId, String relativeId, String appId, String userId) {
         UserEntity user = mUserService.get(userId);
@@ -64,9 +67,23 @@ public class WidgetServiceImpl extends BaseServiceImpl<WidgetEntity> implements 
         entity.setDefValue(defValue);
         entity.setApplicationId(appId);
         entity.setTargetActivityId(targetActId);
-        entity.setLeftTitleImg(leftTitleImg);
+        if (leftTitleImg != null) {
+            try {
+                String path = FileUtils.saveFile(leftTitleImg.getBytes(), "image", leftTitleImg.getOriginalFilename());
+                entity.setLeftTitleImg(path);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        if (rightTitleImg != null) {
+            try {
+                String path = FileUtils.saveFile(rightTitleImg.getBytes(), "image", rightTitleImg.getOriginalFilename());
+                entity.setRightTitleImg(path);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         entity.setLeftTitleText(leftTitleText);
-        entity.setRightTitleImg(rightTitleImg);
         entity.setRightTitleText(rightTitleText);
         entity.setShowLeftTitleImg(showLeftTitleImg);
         entity.setShowRightTitleImg(showRightTitleImg);
