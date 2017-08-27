@@ -783,6 +783,42 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
         if (project == null) {
             return null;
         }
+        String json = convertToJson(project);
+        try {
+            ClassLoader classLoader = this.getClass().getClassLoader();
+            URL resource = classLoader.getResource("../../empty_file.txt");
+            if (resource != null) {
+                String path = resource.getPath();
+                if (path != null) {
+                    String mPath = new File(path).getParent() + File.separator + "JSON";
+                    CacheEntity cacheEntity = new CacheEntity();
+                    cacheEntity.setCachePath(mPath);
+                    try {
+                        List<CacheEntity> cacheEntities = mCacheService.executeCriteria(new Criterion[]{
+                                Restrictions.eq("deleteFlag", BaseEntity.DELETE_FLAG_NO),
+                                Restrictions.eq("cachePath", mPath)});
+                        if (cacheEntities == null || cacheEntities.size() == 0) {
+                            mCacheService.save(cacheEntity);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    String fileName = me.zhouzhuo810.zzapidoc.common.utils.FileUtils.saveFileToServer(json, mPath);
+                    HttpHeaders headers = new HttpHeaders();
+                    headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+                    headers.setContentDispositionFormData("attachment", fileName);
+                    return new ResponseEntity<byte[]>(FileUtils.readFileToByteArray(new File(mPath + File.separator + fileName)), headers, HttpStatus.CREATED);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+
+    }
+
+    @Override
+    public String convertToJson(ProjectEntity project) {
 
         JSONStringer stringer = new JSONStringer();
         /*工程*/
@@ -794,7 +830,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                 .key("permission").value(project.getProperty())
                 .key("createTime").value(DataUtils.formatDate(project.getCreateTime()))
                 .endObject();
-        List<InterfaceGroupEntity> groups = mInterfaceGroupService.executeCriteria(InterfaceUtils.getInterfaceByProjectId(projectId));
+        List<InterfaceGroupEntity> groups = mInterfaceGroupService.executeCriteria(InterfaceUtils.getInterfaceByProjectId(project.getId()));
         /*模块数组开始*/
         stringer
                 .key("modules").array();
@@ -803,10 +839,10 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
             stringer.object()
                     .key("name").value("默认模块")
                    /*请求参数*/
-                    .key("requestHeaders").value(globalHeaderToJson(projectId))
-                    .key("requestArgs").value(globalRequestToJson(projectId))
+                    .key("requestHeaders").value(globalHeaderToJson(project.getId()))
+                    .key("requestArgs").value(globalRequestToJson(project.getId()))
                     /*返回参数*/
-                    .key("responseArgs").value(globalResponseToJson(projectId))
+                    .key("responseArgs").value(globalResponseToJson(project.getId()))
                     .key("folders").array();
             for (InterfaceGroupEntity interfaceGroupEntity : groups) {
                 /*分组基本信息*/
@@ -837,7 +873,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                     stringer.key("requestArgs").value(requestToJson(entity.getId(), "0"));
 
                     /*返回参数*/
-                    stringer.key("responseArgs").value(responseToJson(projectId, entity.getId(), "0"));
+                    stringer.key("responseArgs").value(responseToJson(project.getId(), entity.getId(), "0"));
 
                     /*接口信息结束*/
                     stringer.endObject();
@@ -856,37 +892,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
         stringer.endArray();
         /*工程结束*/
         stringer.endObject();
-        try {
-            ClassLoader classLoader = this.getClass().getClassLoader();
-            URL resource = classLoader.getResource("../../empty_file.txt");
-            if (resource != null) {
-                String path = resource.getPath();
-                if (path != null) {
-                    String mPath = new File(path).getParent() + File.separator + "JSON";
-                    CacheEntity cacheEntity = new CacheEntity();
-                    cacheEntity.setCachePath(mPath);
-                    try {
-                        List<CacheEntity> cacheEntities = mCacheService.executeCriteria(new Criterion[]{
-                                Restrictions.eq("deleteFlag", BaseEntity.DELETE_FLAG_NO),
-                                Restrictions.eq("cachePath", mPath)});
-                        if (cacheEntities == null || cacheEntities.size() == 0) {
-                            mCacheService.save(cacheEntity);
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    String fileName = me.zhouzhuo810.zzapidoc.common.utils.FileUtils.saveFileToServer(stringer.toString(), mPath);
-                    HttpHeaders headers = new HttpHeaders();
-                    headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-                    headers.setContentDispositionFormData("attachment", fileName);
-                    return new ResponseEntity<byte[]>(FileUtils.readFileToByteArray(new File(mPath + File.separator + fileName)), headers, HttpStatus.CREATED);
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-
+        return stringer.toString();
     }
 
     private String headersToJson(String interfaceId) {

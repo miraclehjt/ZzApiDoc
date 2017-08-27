@@ -36,6 +36,7 @@ public class WidgetAction extends BaseController<WidgetEntity> {
     public BaseResult addWidget(
             @RequestParam(value = "name") String name,
             @RequestParam(value = "title") String title,
+            @RequestParam(value = "resId") String resId,
             @RequestParam(value = "type") int type,
             @RequestParam(value = "defValue") String defValue,
             @RequestParam(value = "hint", required = false) String hint,
@@ -54,7 +55,7 @@ public class WidgetAction extends BaseController<WidgetEntity> {
             @RequestParam(value = "appId", required = false) String appId,
             @RequestParam(value = "userId") String userId
     ) {
-        return getBaseService().addWidget(name, title, type, defValue, hint,
+        return getBaseService().addWidget(name, title, resId, type, defValue, hint,
                 leftTitleText, rightTitleText, leftTitleImg, rightTitleImg, showLeftTitleImg,
                 showRightTitleImg, showLeftTitleText, showRightTitleText, showLeftTitleLayout, showRightTitleLayout,
                 targetActId, relativeId, appId, userId);
@@ -63,9 +64,10 @@ public class WidgetAction extends BaseController<WidgetEntity> {
     @ResponseBody
     @RequestMapping(value = "/getAllMyWidget", method = RequestMethod.GET)
     public BaseResult getAllMyWidget(
-            @RequestParam(value = "userId") String userId
+            @RequestParam(value = "userId") String userId,
+            @RequestParam(value = "relativeId") String relativeId
     ) {
-        return getBaseService().getAllMyWidget(userId);
+        return getBaseService().getAllMyWidget(relativeId, userId);
     }
 
 

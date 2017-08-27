@@ -11,14 +11,14 @@ import org.springframework.web.multipart.MultipartFile;
  */
 public interface WidgetService extends BaseService<WidgetEntity> {
 
-    BaseResult addWidget(String name, String title, int type, String defValue,
+    BaseResult addWidget(String name, String title, String resId, int type, String defValue,
                          String hint, String leftTitleText, String rightTitleText,
                          MultipartFile leftTitleImg, MultipartFile rightTitleImg, boolean showLeftTitleImg,
                          boolean showRightTitleImg, boolean showLeftTitleText, boolean showRightTitleText,
                          boolean showLeftTitleLayout, boolean showRightTitleLayout,
                          String targetActId, String relativeId, String appId, String userId);
 
-    BaseResult getAllMyWidget(String userId);
+    BaseResult getAllMyWidget(String relativeId, String userId);
 
 
     BaseResult deleteWidget(String id, String userId);

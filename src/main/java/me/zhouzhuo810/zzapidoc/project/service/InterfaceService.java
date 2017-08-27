@@ -3,6 +3,7 @@ package me.zhouzhuo810.zzapidoc.project.service;
 import me.zhouzhuo810.zzapidoc.common.result.BaseResult;
 import me.zhouzhuo810.zzapidoc.common.service.BaseService;
 import me.zhouzhuo810.zzapidoc.project.entity.InterfaceEntity;
+import me.zhouzhuo810.zzapidoc.project.entity.ProjectEntity;
 import org.springframework.http.ResponseEntity;
 
 /**
@@ -31,4 +32,6 @@ public interface InterfaceService extends BaseService<InterfaceEntity> {
     BaseResult addInterfaceExample(String interfaceId, String example, String userId);
 
     BaseResult generateEmptyExample(String interfaceId, String userId);
+
+    String convertToJson(ProjectEntity project);
 }

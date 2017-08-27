@@ -26,6 +26,8 @@ public class WidgetEntity extends BaseEntity{
     private String relativeId;
     @Column(name = "Title")
     private String title;
+    @Column(name = "ResId")
+    private String resId;
     @Column(name = "Hint")
     private String hint;
     @Column(name = "DefValue")
@@ -55,6 +57,14 @@ public class WidgetEntity extends BaseEntity{
     /*点击跳转的Activity*/
     @Column(name = "targetActivityId")
     private String targetActivityId;
+
+    public String getResId() {
+        return resId;
+    }
+
+    public void setResId(String resId) {
+        this.resId = resId;
+    }
 
     public String getTargetActivityId() {
         return targetActivityId;

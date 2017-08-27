@@ -48,7 +48,7 @@ public class WidgetServiceImpl extends BaseServiceImpl<WidgetEntity> implements 
     }
 
     @Override
-    public BaseResult addWidget(String name, String title, int type, String defValue, String hint,
+    public BaseResult addWidget(String name, String title, String resId, int type, String defValue, String hint,
                                 String leftTitleText, String rightTitleText, MultipartFile leftTitleImg,
                                 MultipartFile rightTitleImg, boolean showLeftTitleImg, boolean showRightTitleImg,
                                 boolean showLeftTitleText, boolean showRightTitleText, boolean showLeftTitleLayout,
@@ -61,6 +61,7 @@ public class WidgetServiceImpl extends BaseServiceImpl<WidgetEntity> implements 
         entity.setCreateUserID(user.getId());
         entity.setCreateUserName(user.getName());
         entity.setName(name);
+        entity.setResId(resId);
         entity.setHint(hint);
         entity.setRelativeId(relativeId);
         entity.setTitle(title);
@@ -122,14 +123,15 @@ public class WidgetServiceImpl extends BaseServiceImpl<WidgetEntity> implements 
     }
 
     @Override
-    public BaseResult getAllMyWidget(String userId) {
+    public BaseResult getAllMyWidget(String relativeId, String userId) {
         UserEntity user = mUserService.get(userId);
         if (user == null) {
             return new BaseResult(0, "用户不合法");
         }
         List<WidgetEntity> applicationEntities = getBaseDao().executeCriteria(new Criterion[]{
                 Restrictions.eq("deleteFlag", BaseEntity.DELETE_FLAG_NO),
-                Restrictions.eq("createUserID", user.getId())
+                Restrictions.eq("createUserID", user.getId()),
+                Restrictions.eq("relativeId", relativeId)
         });
         if (applicationEntities == null) {
             return new BaseResult(1, "ok");
@@ -142,6 +144,7 @@ public class WidgetServiceImpl extends BaseServiceImpl<WidgetEntity> implements 
             map.put("name", applicationEntity.getName());
             map.put("type", applicationEntity.getType());
             map.put("title", applicationEntity.getTitle());
+            map.put("resId", applicationEntity.getResId());
             map.put("defValue", applicationEntity.getDefValue());
             map.put("hint", applicationEntity.getHint());
             map.put("leftTitleImg", applicationEntity.getLeftTitleImg());
@@ -157,6 +160,7 @@ public class WidgetServiceImpl extends BaseServiceImpl<WidgetEntity> implements 
             map.put("appId", applicationEntity.getApplicationId());
             map.put("targetActivityId", applicationEntity.getTargetActivityId());
             map.put("createTime", DataUtils.formatDate(applicationEntity.getCreateTime()));
+            map.put("createUserName", applicationEntity.getCreateUserName());
             result.add(map.build());
         }
         return new BaseResult(1, "ok", result);

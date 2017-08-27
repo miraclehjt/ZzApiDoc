@@ -3,9 +3,12 @@ package me.zhouzhuo810.zzapidoc.android.service.impl;
 import me.zhouzhuo810.zzapidoc.android.dao.ApplicationDao;
 import me.zhouzhuo810.zzapidoc.android.entity.ActivityEntity;
 import me.zhouzhuo810.zzapidoc.android.entity.ApplicationEntity;
+import me.zhouzhuo810.zzapidoc.android.entity.WidgetEntity;
 import me.zhouzhuo810.zzapidoc.android.service.ActivityService;
 import me.zhouzhuo810.zzapidoc.android.service.ApplicationService;
+import me.zhouzhuo810.zzapidoc.android.service.WidgetService;
 import me.zhouzhuo810.zzapidoc.android.utils.ZipUtils;
+import me.zhouzhuo810.zzapidoc.android.widget.apicreator.ApiTool;
 import me.zhouzhuo810.zzapidoc.cache.entity.CacheEntity;
 import me.zhouzhuo810.zzapidoc.cache.service.CacheService;
 import me.zhouzhuo810.zzapidoc.common.dao.BaseDao;
@@ -15,6 +18,9 @@ import me.zhouzhuo810.zzapidoc.common.service.impl.BaseServiceImpl;
 import me.zhouzhuo810.zzapidoc.common.utils.DataUtils;
 import me.zhouzhuo810.zzapidoc.common.utils.FileUtils;
 import me.zhouzhuo810.zzapidoc.common.utils.MapUtils;
+import me.zhouzhuo810.zzapidoc.project.entity.ProjectEntity;
+import me.zhouzhuo810.zzapidoc.project.service.InterfaceService;
+import me.zhouzhuo810.zzapidoc.project.service.ProjectService;
 import me.zhouzhuo810.zzapidoc.user.entity.UserEntity;
 import me.zhouzhuo810.zzapidoc.user.service.UserService;
 import org.apache.log4j.Logger;
@@ -54,6 +60,15 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
 
     @Resource(name = "activityServiceImpl")
     ActivityService mActivityService;
+
+    @Resource(name = "widgetServiceImpl")
+    WidgetService mWidgetService;
+
+    @Resource(name = "projectServiceImpl")
+    ProjectService mProjectService;
+
+    @Resource(name = "interfaceServiceImpl")
+    InterfaceService mInterfaceService;
 
 
     @Override
@@ -173,6 +188,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
             return null;
         }
 
+
         try {
             HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
             String realPath = request.getRealPath("");
@@ -196,6 +212,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                     LOGGER.error("APP ERROR", e);
                 }
 
+                /*Api*/
                 String appName = app.getAppName();
                 String appDirPath = mPath + File.separator + appName;
                 File appDir = new File(appDirPath);
@@ -205,6 +222,23 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 } else {
                     /*如果存在，删除该目录里的所有文件*/
                     FileUtils.deleteFiles(appDirPath);
+                }
+
+                if (app.getApiId() != null && app.getApiId().length() > 0) {
+                    ProjectEntity project = mProjectService.get(app.getApiId());
+                    if (project != null) {
+                        String packageName = app.getPackageName();
+                        String packagePath = packageName.replace(".", File.separator);
+                        String javaDir = appDirPath
+                                + File.separator + "app"
+                                + File.separator + "src"
+                                + File.separator + "main"
+                                + File.separator + "java"
+                                + File.separator + packagePath
+                                + File.separator + "common"
+                                + File.separator + "api";
+                        ApiTool.createApi(mInterfaceService.convertToJson(project), app.getPackageName(), javaDir);
+                    }
                 }
 
                 createSettingGradleFile(appDirPath);
@@ -233,6 +267,14 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
     }
 
     private void generateApp(String rootPath, String appDirPath, ApplicationEntity app) throws IOException {
+        StringBuilder sbStrings = new StringBuilder();
+        sbStrings.append("<resources>\n" +
+                "    <string name=\"app_name\">" + app.getAppName() + "</string>\n" +
+                "    <string name=\"ok_text\">确定</string>\n"+
+                "    <string name=\"cancel_text\">取消</string>\n"+
+                "    <string name=\"submitting_text\">提交中...</string>\n"+
+                "    <string name=\"loading_text\">加载中...</string>\n"+
+                "    <string name=\"no_data_text\">暂无数据</string>");
         String packageName = app.getPackageName();
         String packagePath = packageName.replace(".", File.separator);
         File javaDir = new File(appDirPath
@@ -245,7 +287,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
         if (!javaDir.exists()) {
             javaDir.mkdirs();
         }
-        generateJavaAndLayoutAndAndroidManifest(app, appDirPath, packageName);
+        generateJavaAndLayoutAndAndroidManifest(app, appDirPath, packageName, sbStrings);
         File resDir = new File(appDirPath + File.separator + "app"
                 + File.separator + "src"
                 + File.separator + "main"
@@ -255,6 +297,13 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
         }
 
         generateJavaAndRes(rootPath, appDirPath, app.getLogo(), app);
+
+        String valuesPath = appDirPath + File.separator + "app"
+                + File.separator + "src"
+                + File.separator + "main"
+                + File.separator + "res"
+                + File.separator + "values";
+        FileUtils.saveFileToServer(sbStrings.toString(),valuesPath, "strings.xml");
 
     }
 
@@ -405,10 +454,12 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 + File.separator + "res"
                 + File.separator + "xml";
         FileUtil.copyDir(new File(rootPath + File.separator + "res" + File.separator + "xml"), new File(xmlPath));
+        /*values*/
+        FileUtil.copyDir(new File(rootPath + File.separator + "res" + File.separator + "values"), new File(valuesPath));
 
     }
 
-    private void generateJavaAndLayoutAndAndroidManifest(ApplicationEntity app, String appDirPath, String packageName) throws IOException {
+    private void generateJavaAndLayoutAndAndroidManifest(ApplicationEntity app, String appDirPath, String packageName, StringBuilder sbStrings) throws IOException {
         String filePath = appDirPath
                 + File.separator + "app"
                 + File.separator + "src"
@@ -631,7 +682,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                     "    public void restoreState(@Nullable Bundle bundle) {\n" +
                     "\n" +
                     "    }\n" +
-                    "}\n", javaPath, activityEntity.getName() + ".java");
+                    "}\n", javaPath+File.separator+"ui"+File.separator+"act", activityEntity.getName() + ".java");
         }
 
         /*查找其他act*/
@@ -649,7 +700,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         "            android:windowSoftInputMode=\"stateAlwaysHidden\" />\n");
                 switch (activityEntity.getType()) {
                     case ActivityEntity.TYPE_LV_ACT:
-                        generateLvActLayout(layoutPath, activityEntity, app);
+                        generateLvActLayout(layoutPath, activityEntity, app, sbStrings);
                         generateLvActJava(javaPath, activityEntity, app);
                         break;
                     case ActivityEntity.TYPE_RV_ACT:
@@ -662,7 +713,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
 
                         break;
                     case ActivityEntity.TYPE_SUBMIT:
-
+                        generateSubmitActJavaAndLayout(layoutPath, javaPath, activityEntity, app, sbStrings);
                         break;
                     case ActivityEntity.TYPE_DETAILS:
 
@@ -673,7 +724,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
         }
         sbManifest.append("        <provider\n" +
                 "            android:name=\"android.support.v4.content.FileProvider\"\n" +
-                "            android:authorities=\""+packageName+".provider\"\n" +
+                "            android:authorities=\"" + packageName + ".provider\"\n" +
                 "            android:exported=\"false\"\n" +
                 "            android:grantUriPermissions=\"true\">\n" +
                 "            <meta-data\n" +
@@ -687,10 +738,266 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
         FileUtils.saveFileToServer(sbManifest.toString(), filePath, "AndroidManifest.xml");
     }
 
+    private void generateSubmitActJavaAndLayout(String layoutPath, String javaPath, ActivityEntity activityEntity, ApplicationEntity app, StringBuilder sbStrings) throws IOException {
+        List<WidgetEntity> widgetEntities = mWidgetService.executeCriteria(
+                new Criterion[]{
+                        Restrictions.eq("deleteFlag", BaseEntity.DELETE_FLAG_NO),
+                        Restrictions.eq("relativeId", activityEntity.getId())
+                }
+        );
+        String layoutName = "";
+        boolean isNotFirst = false;
+        for (int i = 0; i < activityEntity.getName().length(); i++) {
+            char c = activityEntity.getName().charAt(i);
+            if (c >= 'A' && c <= 'Z') {
+                if (isNotFirst) {
+                    layoutName += "_";
+                }
+                isNotFirst = true;
+            }
+            layoutName += c;
+        }
+        final String realLayoutName = layoutName.toLowerCase();
+        layoutName = layoutName.replace("activity_", "").replace("__", "_").toLowerCase();
+        /*layout*/
+        StringBuilder sbLayout = new StringBuilder();
+        sbLayout.append("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
+                "<LinearLayout xmlns:android=\"http://schemas.android.com/apk/res/android\"\n" +
+                "    xmlns:app=\"http://schemas.android.com/apk/res-auto\"\n" +
+                "    android:layout_width=\"match_parent\"\n" +
+                "    android:layout_height=\"match_parent\"\n" +
+                "    android:orientation=\"vertical\">\n");
+
+        /*java*/
+        StringBuilder sbJava = new StringBuilder();
+        sbJava.append("package "+app.getPackageName()+".ui.act;\n" +
+                "\n" +
+                "import android.os.Bundle;\n" +
+                "import android.support.annotation.Nullable;\n" +
+                "import android.widget.Button;\n" +
+                "import android.widget.EditText;\n" +
+                "import android.widget.ImageView;\n" +
+                "import android.widget.TextView;\n" +
+                "\n" +
+                "import "+app.getPackageName()+".R;\n" +
+                "import zhouzhuo810.me.zzandframe.ui.act.BaseActivity;\n" +
+                "import zhouzhuo810.me.zzandframe.ui.widget.TitleBar;\n" +
+                "\n" +
+                "/**\n" +
+                " *\n" +
+                " * Created by admin on 2017/8/27.\n" +
+                " */\n" +
+                "public class "+activityEntity.getName()+" extends BaseActivity {\n");
+        if (widgetEntities != null && widgetEntities.size() > 0) {
+            /*变量声明*/
+            StringBuilder sbDef = new StringBuilder();
+            StringBuilder sbInit = new StringBuilder();
+            StringBuilder sbEvent = new StringBuilder();
+            StringBuilder sbSubmit = new StringBuilder();
+            for (int i = 0; i < widgetEntities.size(); i++) {
+                WidgetEntity widgetEntity = widgetEntities.get(i);
+                switch (widgetEntity.getType()) {
+                    case WidgetEntity.TYPE_EDIT_ITEM:
+                        sbDef.append("\n    private EditText et_"+widgetEntity.getResId()+";");
+                        sbDef.append("\n    private ImageView iv_clear_"+widgetEntity.getResId()+";");
+                        sbInit.append("\n        et_"+widgetEntity.getResId()+" = (EditText) findViewById(R.id.et_"+widgetEntity.getResId()+");");
+                        sbInit.append("\n        iv_clear_"+widgetEntity.getResId()+" = (ImageView) findViewById(R.id.iv_clear_"+widgetEntity.getResId()+");");
+                        sbEvent.append("\n        setEditListener(et_"+widgetEntity.getResId()+", iv_clear_"+widgetEntity.getResId()+");");
+                        sbStrings.append("    <string name=\"" + widgetEntity.getResId() + "_text\">" + widgetEntity.getTitle() + "</string>\n");
+                        sbStrings.append("    <string name=\"" + widgetEntity.getResId() + "_hint_text\">请输入" + widgetEntity.getTitle() + "</string>\n");
+                        sbSubmit.append("\n        String "+widgetEntity.getResId()+" = et_"+widgetEntity.getResId()+".getText().toString().trim();");
+                        sbLayout.append("\n    <LinearLayout\n" +
+                                "        android:layout_width=\"match_parent\"\n" +
+                                "        android:layout_height=\"wrap_content\"\n" +
+                                "        android:background=\"@color/colorWhite\"\n" +
+                                "        android:gravity=\"center_vertical\"\n" +
+                                "        android:minHeight=\"130px\"\n" +
+                                "        android:orientation=\"horizontal\">\n" +
+                                "\n" +
+                                "        <TextView\n" +
+                                "            android:layout_width=\"280px\"\n" +
+                                "            android:layout_height=\"wrap_content\"\n" +
+                                "            android:layout_marginLeft=\"40px\"\n" +
+                                "            android:gravity=\"center|left\"\n" +
+                                "            android:text=\"@string/" + widgetEntity.getResId() + "_text\"\n" +
+                                "            android:textColor=\"#415868\"\n" +
+                                "            android:textSize=\"44px\" />\n" +
+                                "\n" +
+                                "        <EditText\n" +
+                                "            android:id=\"@+id/et_" + widgetEntity.getResId() + "\"\n" +
+                                "            android:layout_width=\"0dp\"\n" +
+                                "            android:layout_height=\"wrap_content\"\n" +
+                                "            android:layout_marginLeft=\"30px\"\n" +
+                                "            android:layout_marginRight=\"30px\"\n" +
+                                "            android:layout_weight=\"1\"\n" +
+                                "            android:background=\"@null\"\n" +
+                                "            android:gravity=\"right|center_vertical\"\n" +
+                                "            android:hint=\"@string/" + widgetEntity.getResId() + "_hint_text\"\n" +
+                                "            android:textColor=\"@color/colorBlack\"\n" +
+                                "            android:textSize=\"44px\" />\n" +
+                                "\n" +
+                                "        <ImageView\n" +
+                                "            android:id=\"@+id/iv_clear_" + widgetEntity.getResId() + "\"\n" +
+                                "            android:layout_width=\"60px\"\n" +
+                                "            android:layout_height=\"60px\"\n" +
+                                "            android:layout_marginRight=\"30px\"\n" +
+                                "            android:src=\"@drawable/clear\"\n" +
+                                "            android:visibility=\"gone\" />\n" +
+                                "    </LinearLayout>\n" +
+                                "\n" +
+                                "    <View\n" +
+                                "        android:layout_width=\"match_parent\"\n" +
+                                "        android:layout_height=\"1px\"\n" +
+                                "        android:layout_marginLeft=\"30px\"\n" +
+                                "        android:background=\"@color/colorGrayBg\" />");
+                        break;
+                    case WidgetEntity.TYPE_TITLE_BAR:
+                        sbDef.append("\n    private TitleBar title_bar;");
+                        sbInit.append("\n        title_bar = (TitleBar) findViewById(R.id.title_bar);");
+                        sbEvent.append("\n        title_bar.setOnTitleClickListener(new TitleBar.OnTitleClick() {\n" +
+                                "            @Override\n" +
+                                "            public void onLeftClick(ImageView imageView, TextView textView) {\n" +
+                                "                closeAct();\n" +
+                                "            }\n" +
+                                "\n" +
+                                "            @Override\n" +
+                                "            public void onTitleClick(TextView textView) {\n" +
+                                "\n" +
+                                "            }\n" +
+                                "\n" +
+                                "            @Override\n" +
+                                "            public void onRightClick(ImageView imageView, TextView textView) {\n" +
+                                "\n" +
+                                "            }\n" +
+                                "        });");
+                        sbStrings.append("    <string name=\"" + layoutName + "_text\">" + activityEntity.getTitle() + "</string>\n");
+                        sbLayout.append("\n    <zhouzhuo810.me.zzandframe.ui.widget.TitleBar\n" +
+                                "        android:id=\"@+id/title_bar\"\n" +
+                                "        android:layout_width=\"match_parent\"\n" +
+                                "        android:layout_height=\"@dimen/title_height\"\n" +
+                                "        android:background=\"@color/colorPrimary\"\n" +
+                                "        app:leftImg=\"@mipmap/ic_launcher\"\n" +
+                                "        app:showLeftImg=\"" + widgetEntity.getShowLeftTitleImg() + "\"\n" +
+                                "        app:showLeftLayout=\"" + widgetEntity.getShowLeftTitleLayout() + "\"\n" +
+                                "        app:showLeftText=\"" + widgetEntity.getShowLeftTitleText() + "\"\n" +
+                                "        app:textColorAll=\"@color/colorWhite\"\n" +
+                                "        app:textSizeTitle=\"@dimen/title_text_size\"\n" +
+                                "        app:titleText=\"@string/" + layoutName + "_text\" />");
+                        break;
+                    case WidgetEntity.TYPE_BTN_ITEM:
+                        sbDef.append("\n    private Button btn_"+widgetEntity.getResId()+";");
+                        sbInit.append("\n        btn_"+widgetEntity.getResId()+" = (Button) findViewById(R.id.btn_"+widgetEntity.getResId()+");");
+                        sbEvent.append("\n        btnLogin.setOnClickListener(new View.OnClickListener() {\n" +
+                                "            @Override\n" +
+                                "            public void onClick(View v) {\n" +
+                                "                doSubmit();\n" +
+                                "            }\n" +
+                                "        });");
+                        sbStrings.append("    <string name=\"" + widgetEntity.getResId() + "_text\">" + activityEntity.getTitle() + "</string>\n");
+                        sbLayout.append("\n    <Button\n" +
+                                "        android:id=\"@+id/btn_"+widgetEntity.getResId()+"\"\n" +
+                                "        android:layout_width=\"match_parent\"\n" +
+                                "        android:layout_height=\"120px\"\n" +
+                                "        android:layout_marginBottom=\"50px\"\n" +
+                                "        android:layout_marginLeft=\"40px\"\n" +
+                                "        android:layout_marginRight=\"40px\"\n" +
+                                "        android:layout_marginTop=\"40px\"\n" +
+                                "        android:background=\"@drawable/btn_save_selector\"\n" +
+                                "        android:text=\"@string/"+widgetEntity.getResId()+"_text\"\n" +
+                                "        android:textColor=\"#fff\"\n" +
+                                "        android:textSize=\"@dimen/submit_btn_text_size\" />");
+                        break;
+                }
+            }
+            sbJava.append(sbDef.toString())
+                    .append("\n\n    @Override\n" +
+                            "    public int getLayoutId() {\n" +
+                            "        return R.layout."+realLayoutName+";\n" +
+                            "    }\n")
+                    .append("    @Override\n" +
+                            "    public void initView() {\n")
+                    .append(sbInit.toString())
+                    .append("    }\n" +
+                            "\n" +
+                            "    @Override\n" +
+                            "    public void initData() {\n" +
+                            "\n" +
+                            "    }\n")
+                    .append("\n" +
+                            "    @Override\n" +
+                            "    public void initEvent() {\n")
+                    .append(sbEvent.toString())
+                    .append("\n    }\n" +
+                            "\n" +
+                            "    private void doSubmit() {\n")
+                    .append(sbSubmit.toString())
+                    .append("\n    }\n");
+        } else {
+            sbJava.append("\n\n    @Override\n" +
+                    "    public int getLayoutId() {\n" +
+                    "        return R.layout.activity_login;\n" +
+                    "    }\n" +
+                    "\n" +
+                    "    @Override\n" +
+                    "    public void initView() {\n" +
+                    "        \n" +
+                    "    }\n" +
+                    "\n" +
+                    "    @Override\n" +
+                    "    public void initData() {\n" +
+                    "\n" +
+                    "    }\n" +
+                    "\n" +
+                    "    @Override\n" +
+                    "    public void initEvent() {\n" +
+                    "        \n" +
+                    "    }");
+        }
+        sbJava.append("\n" +
+                "    @Override\n" +
+                "    public void resume() {\n" +
+                "\n" +
+                "    }\n" +
+                "\n" +
+                "    @Override\n" +
+                "       public void pause() {\n" +
+                "\n" +
+                "    }\n" +
+                "\n" +
+                "    @Override\n" +
+                "    public void destroy() {\n" +
+                "\n" +
+                "    }\n" +
+                "\n" +
+                "    @Override\n" +
+                "    public void saveState(Bundle bundle) {\n" +
+                "\n" +
+                "    }\n" +
+                "\n" +
+                "    @Override\n" +
+                "    public void restoreState(@Nullable Bundle bundle) {\n" +
+                "\n" +
+                "    }\n" +
+                "\n" +
+                "    @Override\n" +
+                "    public boolean defaultBack() {\n" +
+                "        return false;\n" +
+                "    }\n" +
+                "\n" +
+                "}\n");
+        sbLayout.append("\n" +
+                "</LinearLayout>");
+        FileUtils.saveFileToServer(sbLayout.toString(), layoutPath, realLayoutName+".xml");
+        FileUtils.saveFileToServer(sbJava.toString(), javaPath+File.separator+"ui"+File.separator+"act", activityEntity.getName()+".java");
+
+
+    }
+
+
     private void generateLvActJava(String javaPath, ActivityEntity activityEntity, ApplicationEntity app) throws IOException {
         String name = activityEntity.getName();
         String packageName = app.getPackageName();
-        String javaCode=  "package "+packageName+".ui.act;\n" +
+        String javaCode = "package " + packageName + ".ui.act;\n" +
                 "\n" +
                 "import android.content.Intent;\n" +
                 "import android.os.Bundle;\n" +
@@ -706,17 +1013,17 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 "import java.util.Arrays;\n" +
                 "import java.util.List;\n" +
                 "\n" +
-                "import "+packageName+".R;\n" +
-                "import "+packageName+".common.api.Api;\n" +
-                "import "+packageName+".common.base.BaseActivity;\n" +
-                "import "+packageName+".common.rx.RxHelper;\n" +
-                "import "+packageName+".common.utils.ToastUtils;\n" +
+                "import " + packageName + ".R;\n" +
+                "import " + packageName + ".common.api.Api;\n" +
+                "import " + packageName + ".common.base.BaseActivity;\n" +
+                "import " + packageName + ".common.rx.RxHelper;\n" +
+                "import " + packageName + ".common.utils.ToastUtils;\n" +
                 "import rx.Subscriber;\n" +
                 "\n" +
                 "/**\n" +
                 " * Created by zhouzhuo810 on 2017/8/11.\n" +
                 " */\n" +
-                "public class "+name+" extends BaseActivity {\n" +
+                "public class " + name + " extends BaseActivity {\n" +
                 "\n" +
                 "    private RelativeLayout rlBack;\n" +
                 "    private RelativeLayout rlRight;\n" +
@@ -800,7 +1107,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 "        rlRight.setOnClickListener(new View.OnClickListener() {\n" +
                 "            @Override\n" +
                 "            public void onClick(View v) {\n" +
-                "            /*    Intent intent = new Intent("+name+".this, AddActivity.class);\n" +
+                "            /*    Intent intent = new Intent(" + name + ".this, AddActivity.class);\n" +
                 "                intent.putExtra(\"appId\", appId);\n" +
                 "                startActWithIntent(intent);*/\n" +
                 "            }\n" +
@@ -817,7 +1124,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 "                    setResult(RESULT_OK, intent);\n" +
                 "                    closeAct();\n" +
                 "                } else {\n" +
-                "            /*        Intent intent = new Intent("+name+".this, WidgetManageActivity.class);\n" +
+                "            /*        Intent intent = new Intent(" + name + ".this, WidgetManageActivity.class);\n" +
                 "                    intent.putExtra(\"appId\", appId);\n" +
                 "                    intent.putExtra(\"groupId\", adapter.getmDatas().get(position).getId());\n" +
                 "                    startActWithIntent(intent);*/\n" +
@@ -905,10 +1212,10 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 "\n" +
                 "    }\n" +
                 "}\n";
-        FileUtils.saveFileToServer(javaCode, javaPath, name+".java");
+        FileUtils.saveFileToServer(javaCode, javaPath+File.separator+"ui"+File.separator+"act", name + ".java");
     }
 
-    private void generateLvActLayout(String layoutPath, ActivityEntity activityEntity, ApplicationEntity app) throws IOException {
+    private void generateLvActLayout(String layoutPath, ActivityEntity activityEntity, ApplicationEntity app, StringBuilder sbStrings) throws IOException {
         String name = activityEntity.getName();
         String layoutName = "";
         boolean isNotFirst = false;
@@ -923,6 +1230,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
             layoutName += c;
         }
         layoutName = layoutName.toLowerCase();
+        sbStrings.append("    <string name=\"" + layoutName + "_text\">" + activityEntity.getTitle() + "</string>\n");
         FileUtils.saveFileToServer("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
                 "<LinearLayout xmlns:android=\"http://schemas.android.com/apk/res/android\"\n" +
                 "    xmlns:app=\"http://schemas.android.com/apk/res-auto\"\n" +
@@ -943,7 +1251,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 "        app:showRightLayout=\"true\"\n" +
                 "        app:showRightText=\"true\"\n" +
                 "        app:textColorAll=\"@color/colorWhite\"\n" +
-                "        app:titleText=\"@string/activity_manage_text\" />\n" +
+                "        app:titleText=\"@string/" + layoutName + "_text\" />\n" +
                 "\n" +
                 "    <RelativeLayout\n" +
                 "        android:layout_width=\"match_parent\"\n" +
