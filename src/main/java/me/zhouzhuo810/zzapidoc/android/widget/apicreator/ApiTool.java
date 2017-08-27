@@ -48,7 +48,7 @@ public class ApiTool {
                                     if (folders != null) {
                                         //Api单例类
                                         StringBuilder sbApi = new StringBuilder();
-                                        sbApi.append("package ").append(packageName).append(";");
+                                        sbApi.append("package ").append(packageName).append(".common.api;");
                                         sbApi.append("\n");
                                         sbApi.append("\nimport java.io.File;");
                                         sbApi.append("\nimport java.net.CookieHandler;");
@@ -76,11 +76,11 @@ public class ApiTool {
                                             String ip = foldersBean.getIp();
                                             StringBuilder sb = new StringBuilder();
                                             //包名导入
-                                            sb.append("package ").append(packageName).append(";");
+                                            sb.append("package ").append(packageName).append(".common.api;");
                                             sb.append("\n");
                                             sb.append("\nimport retrofit2.http.*;");
                                             sb.append("\nimport rx.Observable;");
-                                            sb.append("\nimport ").append(packageName).append(".entity.*;");
+                                            sb.append("\nimport ").append(packageName).append(".common.api.entity.*;");
                                             sb.append("\n\n");
                                             sb.append("\n/**");
                                             sb.append("\n * ").append(foldersBean.getName());
@@ -131,7 +131,7 @@ public class ApiTool {
 
                                                     //实体类内容
                                                     StringBuilder sbEntity = new StringBuilder();
-                                                    sbEntity.append("package ").append(packageName).append(".entity;");
+                                                    sbEntity.append("package ").append(packageName).append(".common.api.entity;");
                                                     sbEntity.append("\n");
                                                     sbEntity.append("\nimport java.util.List;");
                                                     sbEntity.append("\n/**");
@@ -269,7 +269,7 @@ public class ApiTool {
                             if (folders != null) {
                                 //Api单例类
                                 StringBuilder sbApi = new StringBuilder();
-                                sbApi.append("package ").append(packageName).append(";");
+                                sbApi.append("package ").append(packageName).append(".common.api;");
                                 sbApi.append("\n");
                                 sbApi.append("\nimport java.io.File;");
                                 sbApi.append("\nimport java.net.CookieHandler;");
@@ -296,11 +296,11 @@ public class ApiTool {
                                     ApiEntity.ModulesBean.FoldersBean foldersBean = folders.get(i1);
                                     StringBuilder sb = new StringBuilder();
                                     //包名导入
-                                    sb.append("package ").append(packageName).append(";");
+                                    sb.append("package ").append(packageName).append(".common.api;");
                                     sb.append("\n");
                                     sb.append("\nimport retrofit2.http.*;");
                                     sb.append("\nimport rx.Observable;");
-                                    sb.append("\nimport ").append(packageName).append(".entity.*;");
+                                    sb.append("\nimport ").append(packageName).append(".common.api.entity.*;");
                                     sb.append("\n\n");
                                     sb.append("\n/**");
                                     sb.append("\n * ").append(foldersBean.getName());
@@ -348,7 +348,7 @@ public class ApiTool {
 
                                             //实体类内容
                                             StringBuilder sbEntity = new StringBuilder();
-                                            sbEntity.append("package ").append(packageName).append(".entity;");
+                                            sbEntity.append("package ").append(packageName).append(".common.api.entity;");
                                             sbEntity.append("\n");
                                             sbEntity.append("\nimport java.util.List;");
                                             sbEntity.append("\n/**");

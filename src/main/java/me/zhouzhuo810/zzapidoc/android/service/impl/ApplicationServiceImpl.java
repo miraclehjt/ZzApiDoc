@@ -287,7 +287,10 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 "    <string name=\"app_name\">" + app.getAppName() + "</string>\n" +
                 "    <string name=\"ok_text\">确定</string>\n"+
                 "    <string name=\"cancel_text\">取消</string>\n"+
+                "    <string name=\"delete_text\">删除</string>\n"+
+                "    <string name=\"revise_text\">修改</string>\n"+
                 "    <string name=\"submitting_text\">提交中...</string>\n"+
+                "    <string name=\"add_text\">新增</string>\n"+
                 "    <string name=\"loading_text\">加载中...</string>\n"+
                 "    <string name=\"no_data_text\">暂无数据</string>");
         String packageName = app.getPackageName();
@@ -427,10 +430,10 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
         /*colors*/
         String color = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
                 "<resources>\n" +
-                "    <color name=\"colorMain\">#" + app.getColorMain() + "</color>\n" +
-                "    <color name=\"colorPrimary\">#" + app.getColorMain() + "</color>\n" +
-                "    <color name=\"colorPrimaryDark\">#" + app.getColorMain() + "</color>\n" +
-                "    <color name=\"colorAccent\">#" + app.getColorMain() + "</color>\n" +
+                "    <color name=\"colorMain\">" + app.getColorMain() + "</color>\n" +
+                "    <color name=\"colorPrimary\">" + app.getColorMain() + "</color>\n" +
+                "    <color name=\"colorPrimaryDark\">" + app.getColorMain() + "</color>\n" +
+                "    <color name=\"colorAccent\">" + app.getColorMain() + "</color>\n" +
                 "    <color name=\"colorPress\">#1d61ce</color>\n" +
                 "    <color name=\"colorGrayBg\">#ecf4f8</color>\n" +
                 "    <color name=\"colorWhite\">#fff</color>\n" +
@@ -441,7 +444,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 "    <color name=\"colorLine\">#ccc</color>\n" +
                 "    <color name=\"colorText\">#222</color>\n" +
                 "    <color name=\"colorTabNormal\">#aac3d2</color>\n" +
-                "    <color name=\"colorTabPress\">#" + app.getColorMain() + "</color>\n" +
+                "    <color name=\"colorTabPress\">" + app.getColorMain() + "</color>\n" +
                 "    <color name=\"colorExit\">#d44a4a</color>\n" +
                 "    <color name=\"colorExitPress\">#dc5353</color>\n" +
                 "</resources>\n";
@@ -747,8 +750,8 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         "            android:windowSoftInputMode=\"stateAlwaysHidden\" />\n");
                 switch (activityEntity.getType()) {
                     case ActivityEntity.TYPE_LV_ACT:
-                        generateLvActLayout(layoutPath, activityEntity, app, sbStrings);
-                        generateLvActJava(javaPath, activityEntity, app);
+                        String layoutName = generateLvActLayout(layoutPath, activityEntity, app, sbStrings);
+                        generateLvActJava(layoutName, javaPath, activityEntity, app);
                         break;
                     case ActivityEntity.TYPE_RV_ACT:
 
@@ -821,6 +824,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 "\n" +
                 "import android.os.Bundle;\n" +
                 "import android.support.annotation.Nullable;\n" +
+                "import android.view.View;\n" +
                 "import android.widget.Button;\n" +
                 "import android.widget.EditText;\n" +
                 "import android.widget.ImageView;\n" +
@@ -844,6 +848,39 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
             for (int i = 0; i < widgetEntities.size(); i++) {
                 WidgetEntity widgetEntity = widgetEntities.get(i);
                 switch (widgetEntity.getType()) {
+                    case WidgetEntity.TYPE_TITLE_BAR:
+                        sbDef.append("\n    private TitleBar title_bar;");
+                        sbInit.append("\n        title_bar = (TitleBar) findViewById(R.id.title_bar);");
+                        sbEvent.append("\n        title_bar.setOnTitleClickListener(new TitleBar.OnTitleClick() {\n" +
+                                "            @Override\n" +
+                                "            public void onLeftClick(ImageView imageView, TextView textView) {\n" +
+                                "                closeAct();\n" +
+                                "            }\n" +
+                                "\n" +
+                                "            @Override\n" +
+                                "            public void onTitleClick(TextView textView) {\n" +
+                                "\n" +
+                                "            }\n" +
+                                "\n" +
+                                "            @Override\n" +
+                                "            public void onRightClick(ImageView imageView, TextView textView) {\n" +
+                                "\n" +
+                                "            }\n" +
+                                "        });");
+                        sbStrings.append("    <string name=\"" + layoutName + "_text\">" + activityEntity.getTitle() + "</string>\n");
+                        sbLayout.append("\n    <zhouzhuo810.me.zzandframe.ui.widget.TitleBar\n" +
+                                "        android:id=\"@+id/title_bar\"\n" +
+                                "        android:layout_width=\"match_parent\"\n" +
+                                "        android:layout_height=\"@dimen/title_height\"\n" +
+                                "        android:background=\"@color/colorPrimary\"\n" +
+                                "        app:leftImg=\"@mipmap/ic_launcher\"\n" +
+                                "        app:showLeftImg=\"" + widgetEntity.getShowLeftTitleImg() + "\"\n" +
+                                "        app:showLeftLayout=\"" + widgetEntity.getShowLeftTitleLayout() + "\"\n" +
+                                "        app:showLeftText=\"" + widgetEntity.getShowLeftTitleText() + "\"\n" +
+                                "        app:textColorAll=\"@color/colorWhite\"\n" +
+                                "        app:textSizeTitle=\"@dimen/title_text_size\"\n" +
+                                "        app:titleText=\"@string/" + layoutName + "_text\" />");
+                        break;
                     case WidgetEntity.TYPE_EDIT_ITEM:
                         sbDef.append("\n    private EditText et_"+widgetEntity.getResId()+";");
                         sbDef.append("\n    private ImageView iv_clear_"+widgetEntity.getResId()+";");
@@ -898,43 +935,10 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "        android:layout_marginLeft=\"30px\"\n" +
                                 "        android:background=\"@color/colorGrayBg\" />");
                         break;
-                    case WidgetEntity.TYPE_TITLE_BAR:
-                        sbDef.append("\n    private TitleBar title_bar;");
-                        sbInit.append("\n        title_bar = (TitleBar) findViewById(R.id.title_bar);");
-                        sbEvent.append("\n        title_bar.setOnTitleClickListener(new TitleBar.OnTitleClick() {\n" +
-                                "            @Override\n" +
-                                "            public void onLeftClick(ImageView imageView, TextView textView) {\n" +
-                                "                closeAct();\n" +
-                                "            }\n" +
-                                "\n" +
-                                "            @Override\n" +
-                                "            public void onTitleClick(TextView textView) {\n" +
-                                "\n" +
-                                "            }\n" +
-                                "\n" +
-                                "            @Override\n" +
-                                "            public void onRightClick(ImageView imageView, TextView textView) {\n" +
-                                "\n" +
-                                "            }\n" +
-                                "        });");
-                        sbStrings.append("    <string name=\"" + layoutName + "_text\">" + activityEntity.getTitle() + "</string>\n");
-                        sbLayout.append("\n    <zhouzhuo810.me.zzandframe.ui.widget.TitleBar\n" +
-                                "        android:id=\"@+id/title_bar\"\n" +
-                                "        android:layout_width=\"match_parent\"\n" +
-                                "        android:layout_height=\"@dimen/title_height\"\n" +
-                                "        android:background=\"@color/colorPrimary\"\n" +
-                                "        app:leftImg=\"@mipmap/ic_launcher\"\n" +
-                                "        app:showLeftImg=\"" + widgetEntity.getShowLeftTitleImg() + "\"\n" +
-                                "        app:showLeftLayout=\"" + widgetEntity.getShowLeftTitleLayout() + "\"\n" +
-                                "        app:showLeftText=\"" + widgetEntity.getShowLeftTitleText() + "\"\n" +
-                                "        app:textColorAll=\"@color/colorWhite\"\n" +
-                                "        app:textSizeTitle=\"@dimen/title_text_size\"\n" +
-                                "        app:titleText=\"@string/" + layoutName + "_text\" />");
-                        break;
                     case WidgetEntity.TYPE_BTN_ITEM:
                         sbDef.append("\n    private Button btn_"+widgetEntity.getResId()+";");
                         sbInit.append("\n        btn_"+widgetEntity.getResId()+" = (Button) findViewById(R.id.btn_"+widgetEntity.getResId()+");");
-                        sbEvent.append("\n        btnLogin.setOnClickListener(new View.OnClickListener() {\n" +
+                        sbEvent.append("\n        btn_"+widgetEntity.getResId()+".setOnClickListener(new View.OnClickListener() {\n" +
                                 "            @Override\n" +
                                 "            public void onClick(View v) {\n" +
                                 "                doSubmit();\n" +
@@ -1041,7 +1045,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
     }
 
 
-    private void generateLvActJava(String javaPath, ActivityEntity activityEntity, ApplicationEntity app) throws IOException {
+    private void generateLvActJava(String layoutName, String javaPath, ActivityEntity activityEntity, ApplicationEntity app) throws IOException {
         String name = activityEntity.getName();
         String packageName = app.getPackageName();
         String javaCode = "package " + packageName + ".ui.act;\n" +
@@ -1052,6 +1056,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 "import android.support.v4.widget.SwipeRefreshLayout;\n" +
                 "import android.view.View;\n" +
                 "import android.widget.AdapterView;\n" +
+                "import android.widget.ImageView;\n" +
                 "import android.widget.ListView;\n" +
                 "import android.widget.RelativeLayout;\n" +
                 "import android.widget.TextView;\n" +
@@ -1062,9 +1067,10 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 "\n" +
                 "import " + packageName + ".R;\n" +
                 "import " + packageName + ".common.api.Api;\n" +
-                "import " + packageName + ".common.base.BaseActivity;\n" +
-                "import " + packageName + ".common.rx.RxHelper;\n" +
-                "import " + packageName + ".common.utils.ToastUtils;\n" +
+                "import zhouzhuo810.me.zzandframe.ui.act.BaseActivity;\n" +
+                "import zhouzhuo810.me.zzandframe.common.rx.RxHelper;\n" +
+                "import zhouzhuo810.me.zzandframe.common.utils.ToastUtils;\n" +
+                "import zhouzhuo810.me.zzandframe.ui.widget.TitleBar;\n" +
                 "import rx.Subscriber;\n" +
                 "\n" +
                 "/**\n" +
@@ -1072,9 +1078,8 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 " */\n" +
                 "public class " + name + " extends BaseActivity {\n" +
                 "\n" +
-                "    private RelativeLayout rlBack;\n" +
-                "    private RelativeLayout rlRight;\n" +
                 "    private SwipeRefreshLayout refresh;\n" +
+                "    private TitleBar titleBar;\n" +
                 "    private ListView lv;\n" +
                 "    private TextView tvNoData;\n" +
                 "  //  private List<GetAllMyActivityResult.DataBean> list;\n" +
@@ -1083,7 +1088,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 "\n" +
                 "    @Override\n" +
                 "    public int getLayoutId() {\n" +
-                "        return R.layout.activity_activity_manage;\n" +
+                "        return R.layout."+layoutName+";\n" +
                 "    }\n" +
                 "\n" +
                 "    @Override\n" +
@@ -1093,8 +1098,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 "\n" +
                 "    @Override\n" +
                 "    public void initView() {\n" +
-                "        rlBack = (RelativeLayout) findViewById(R.id.rl_back);\n" +
-                "        rlRight = (RelativeLayout) findViewById(R.id.rl_right);\n" +
+                "        titleBar = (TitleBar) findViewById(R.id.title_bar);\n" +
                 "        refresh = (SwipeRefreshLayout) findViewById(R.id.refresh);\n" +
                 "        lv = (ListView) findViewById(R.id.lv);\n" +
                 "        tvNoData = (TextView) findViewById(R.id.tv_no_data);\n" +
@@ -1144,21 +1148,22 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 "\n" +
                 "    @Override\n" +
                 "    public void initEvent() {\n" +
-                "        rlBack.setOnClickListener(new View.OnClickListener() {\n" +
+                "        titleBar.setOnTitleClickListener(new TitleBar.OnTitleClick() {\n" +
                 "            @Override\n" +
-                "            public void onClick(View v) {\n" +
+                "            public void onLeftClick(ImageView imageView, TextView textView) {\n" +
                 "                closeAct();\n" +
                 "            }\n" +
-                "        });\n" +
                 "\n" +
-                "        rlRight.setOnClickListener(new View.OnClickListener() {\n" +
                 "            @Override\n" +
-                "            public void onClick(View v) {\n" +
-                "            /*    Intent intent = new Intent(" + name + ".this, AddActivity.class);\n" +
-                "                intent.putExtra(\"appId\", appId);\n" +
-                "                startActWithIntent(intent);*/\n" +
+                "            public void onTitleClick(TextView textView) {\n" +
+                "\n" +
                 "            }\n" +
-                "        });\n" +
+                "\n" +
+                "            @Override\n" +
+                "            public void onRightClick(ImageView imageView, TextView textView) {\n" +
+                "\n" +
+                "            }\n" +
+                "        });"+
                 "\n" +
                 "\n" +
                 "        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {\n" +
@@ -1182,7 +1187,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 "        lv.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {\n" +
                 "            @Override\n" +
                 "            public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {\n" +
-                "                showListDialog(Arrays.asList(\"删除\"), true, null, new OnItemClick() {\n" +
+                "                showListDialog(Arrays.asList(getString(R.string.delete_text)), true, null, new OnItemClick() {\n" +
                 "                    @Override\n" +
                 "                    public void onItemClick(int pos, String content) {\n" +
                 "                        switch (pos) {\n" +
@@ -1205,7 +1210,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 "    }\n" +
                 "\n" +
                 "    private void deleteActivity(String id) {\n" +
-                "        showPd(getString(R.string.submiting_text), false);\n" +
+                "        showPd(getString(R.string.submitting_text), false);\n" +
                 "     /*   Api.getApi0()\n" +
                 "                .deleteActivity(id, getUserId())\n" +
                 "                .compose(RxHelper.<DeleteActivityResult>io_main())\n" +
@@ -1262,7 +1267,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
         FileUtils.saveFileToServer(javaCode, javaPath+File.separator+"ui"+File.separator+"act", name + ".java");
     }
 
-    private void generateLvActLayout(String layoutPath, ActivityEntity activityEntity, ApplicationEntity app, StringBuilder sbStrings) throws IOException {
+    private String generateLvActLayout(String layoutPath, ActivityEntity activityEntity, ApplicationEntity app, StringBuilder sbStrings) throws IOException {
         String name = activityEntity.getName();
         String layoutName = "";
         boolean isNotFirst = false;
@@ -1330,6 +1335,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 "    </RelativeLayout>\n" +
                 "\n" +
                 "</LinearLayout>", layoutPath, layoutName + ".xml");
+        return layoutName;
     }
 
     private void copyGradleWrapper(String rootPath, String appDirPath) throws IOException {
@@ -1353,7 +1359,9 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 "allprojects {\n" +
                 "    repositories {\n" +
                 "        jcenter()\n" +
-                "        maven { url \"https://jitpack.io \" }\n" +
+                "        maven {\n" +
+                "            url \"https://jitpack.io\"\n" +
+                "        }\n" +
                 "    }\n" +
                 "}\n" +
                 "\n" +
@@ -1363,11 +1371,27 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
     }
 
     private void createGradleProperties(String appDirPath) throws IOException {
-        FileUtils.saveFileToServer("org.gradle.jvmargs=-Xmx1536m\n", appDirPath, "gradle.properties");
+        FileUtils.saveFileToServer("# Project-wide Gradle settings.\n" +
+                "\n" +
+                "# IDE (e.g. Android Studio) users:\n" +
+                "# Gradle settings configured through the IDE *will override*\n" +
+                "# any settings specified in this file.\n" +
+                "\n" +
+                "# For more details on how to configure your build environment visit\n" +
+                "# http://www.gradle.org/docs/current/userguide/build_environment.html\n" +
+                "\n" +
+                "# Specifies the JVM arguments used for the daemon process.\n" +
+                "# The setting is particularly useful for tweaking memory settings.\n" +
+                "org.gradle.jvmargs=-Xmx1536m\n" +
+                "\n" +
+                "# When configured, Gradle will run in incubating parallel mode.\n" +
+                "# This option should only be used with decoupled projects. More details, visit\n" +
+                "# http://www.gradle.org/docs/current/userguide/multi_project_builds.html#sec:decoupled_projects\n" +
+                "# org.gradle.parallel=true\n", appDirPath, "gradle.properties");
     }
 
     private void createSettingGradleFile(String appDirPath) throws IOException {
-        FileUtils.saveFileToServer("include ':app'\n", appDirPath, "setting.gradle");
+        FileUtils.saveFileToServer("include ':app'\n", appDirPath, "settings.gradle");
     }
 
 }
