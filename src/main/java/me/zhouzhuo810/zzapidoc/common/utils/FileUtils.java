@@ -6,6 +6,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
+import java.nio.charset.Charset;
 
 /**
  * Created by admin on 2017/7/22.
@@ -25,7 +26,7 @@ public class FileUtils {
                 + filename;
         System.out.println(path);
         OutputStream outputStream = new FileOutputStream(mPath);
-        byte[] buffer = content.getBytes();
+        byte[] buffer = content.getBytes(Charset.forName("utf-8"));
         outputStream.write(buffer);
         outputStream.flush();
         outputStream.close();
@@ -44,7 +45,7 @@ public class FileUtils {
                 + filename;
         System.out.println(path);
         OutputStream outputStream = new FileOutputStream(mPath);
-        byte[] buffer = content.getBytes();
+        byte[] buffer = content.getBytes(Charset.forName("utf-8"));
         outputStream.write(buffer);
         outputStream.flush();
         outputStream.close();

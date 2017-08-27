@@ -433,7 +433,7 @@ public class ApiTool {
                                     }
                                     sb.append("\n}");
                                     //TODO 创建Api
-                                    FileUtils.saveFileToServer(sbApi.toString(), path, "Api" + i1 + ".java");
+                                    FileUtils.saveFileToServer(sb.toString(), path, "Api" + i1 + ".java");
                                 }
                                 sbApi.append("\n    private static CookieManager getCookieManager() {");
                                 sbApi.append("\n        CookieManager cookieManager = new CookieManager();");

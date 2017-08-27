@@ -267,6 +267,21 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
     }
 
     private void generateApp(String rootPath, String appDirPath, ApplicationEntity app) throws IOException {
+
+        /*proguard file*/
+        FileUtil.copyFile(new File(rootPath
+                +File.separator+"res"
+                +File.separator+"proguard"
+                +File.separator+"proguard-rules.pro"
+        ), new File(appDirPath+File.separator+"app"+File.separator+"proguard-rules.pro"));
+
+        /*git ignore file*/
+        FileUtil.copyFile(new File(rootPath
+                +File.separator+"res"
+                +File.separator+"git"
+                +File.separator+".gitignore"
+        ), new File(appDirPath+File.separator+".gitignore"));
+
         StringBuilder sbStrings = new StringBuilder();
         sbStrings.append("<resources>\n" +
                 "    <string name=\"app_name\">" + app.getAppName() + "</string>\n" +
@@ -288,6 +303,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
             javaDir.mkdirs();
         }
         generateJavaAndLayoutAndAndroidManifest(app, appDirPath, packageName, sbStrings);
+        sbStrings.append("\n</resources>");
         File resDir = new File(appDirPath + File.separator + "app"
                 + File.separator + "src"
                 + File.separator + "main"
@@ -526,6 +542,37 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 + File.separator + "main"
                 + File.separator + "java"
                 + File.separator + packagePath;
+        /*MyApplication*/
+        FileUtils.saveFileToServer("package "+app.getPackageName()+";\n" +
+                "\n" +
+                "import android.content.Context;\n" +
+                "\n" +
+                "import zhouzhuo810.me.zzandframe.ui.app.BaseApplication;\n" +
+                "\n" +
+                "/**\n" +
+                " * Created by admin on 2017/8/27.\n" +
+                " */\n" +
+                "public class MyApplication extends BaseApplication {\n" +
+                "\n" +
+                "    private static MyApplication INSTANCE;\n" +
+                "\n" +
+                "    @Override\n" +
+                "    public void onCreate() {\n" +
+                "        super.onCreate();\n" +
+                "        INSTANCE = this;\n" +
+                "    }\n" +
+                "\n" +
+                "    public static MyApplication getContext() {\n" +
+                "        return INSTANCE;\n" +
+                "    }\n" +
+                "\n" +
+                "    @Override\n" +
+                "    protected void attachBaseContext(Context base) {\n" +
+                "        super.attachBaseContext(base);\n" +
+                "        \n" +
+                "    }\n" +
+                "}\n", javaPath, "MyApplication.java");
+
         if (activityEntities != null && activityEntities.size() > 0) {
             ActivityEntity activityEntity = activityEntities.get(0);
             sbManifest.append("        <activity\n" +
@@ -1306,9 +1353,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 "allprojects {\n" +
                 "    repositories {\n" +
                 "        jcenter()\n" +
-                "        maven { url \"https://jitpack.io \n" +
-                "\n" +
-                "\" }\n" +
+                "        maven { url \"https://jitpack.io \" }\n" +
                 "    }\n" +
                 "}\n" +
                 "\n" +
