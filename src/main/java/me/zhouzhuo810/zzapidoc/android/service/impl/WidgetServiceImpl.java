@@ -52,7 +52,7 @@ public class WidgetServiceImpl extends BaseServiceImpl<WidgetEntity> implements 
                                 String leftTitleText, String rightTitleText, MultipartFile leftTitleImg,
                                 MultipartFile rightTitleImg, boolean showLeftTitleImg, boolean showRightTitleImg,
                                 boolean showLeftTitleText, boolean showRightTitleText, boolean showLeftTitleLayout,
-                                boolean showRightTitleLayout, String targetActId, String relativeId, String appId, String userId) {
+                                boolean showRightTitleLayout, String targetActId, String relativeId, String targetApiId, String appId, String userId) {
         UserEntity user = mUserService.get(userId);
         if (user == null) {
             return new BaseResult(0, "用户不合法");
@@ -63,6 +63,7 @@ public class WidgetServiceImpl extends BaseServiceImpl<WidgetEntity> implements 
         entity.setName(name);
         entity.setResId(resId);
         entity.setHint(hint);
+        entity.setTargetApiId(targetApiId);
         entity.setRelativeId(relativeId);
         entity.setTitle(title);
         entity.setDefValue(defValue);

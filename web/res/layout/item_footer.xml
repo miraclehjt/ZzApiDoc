@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.zhy.autolayout.AutoLinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/tv_footer"
+        android:layout_width="match_parent"
+        android:layout_height="100px"
+        android:background="@color/colorGrayBg"
+        android:gravity="center"
+        android:text="1家客户"
+        android:textColor="#999"
+        android:textSize="30px" />
+</com.zhy.autolayout.AutoLinearLayout>

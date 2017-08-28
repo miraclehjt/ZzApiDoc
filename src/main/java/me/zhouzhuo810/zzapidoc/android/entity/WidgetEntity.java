@@ -11,12 +11,14 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "widget")
-public class WidgetEntity extends BaseEntity{
+public class WidgetEntity extends BaseEntity {
     public static final int TYPE_TITLE_BAR = 0;
     public static final int TYPE_SETTING_ITEM = 1;
     public static final int TYPE_EDIT_ITEM = 2;
     public static final int TYPE_INFO_ITEM = 3;
-    public static final int TYPE_BTN_ITEM = 4;
+    public static final int TYPE_SUBMIT_BTN_ITEM = 4;
+    public static final int TYPE_EXIT_BTN_ITEM = 5;
+    public static final int TYPE_LETTER_RV = 6;
 
     @Column(name = "Type")
     private Integer type = TYPE_TITLE_BAR;
@@ -57,6 +59,17 @@ public class WidgetEntity extends BaseEntity{
     /*点击跳转的Activity*/
     @Column(name = "targetActivityId")
     private String targetActivityId;
+    /*接口id*/
+    @Column(name = "targetApiId")
+    private String targetApiId;
+
+    public String getTargetApiId() {
+        return targetApiId;
+    }
+
+    public void setTargetApiId(String targetApiId) {
+        this.targetApiId = targetApiId;
+    }
 
     public String getResId() {
         return resId;

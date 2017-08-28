@@ -18,9 +18,11 @@ import me.zhouzhuo810.zzapidoc.common.service.impl.BaseServiceImpl;
 import me.zhouzhuo810.zzapidoc.common.utils.DataUtils;
 import me.zhouzhuo810.zzapidoc.common.utils.FileUtils;
 import me.zhouzhuo810.zzapidoc.common.utils.MapUtils;
+import me.zhouzhuo810.zzapidoc.project.entity.InterfaceEntity;
 import me.zhouzhuo810.zzapidoc.project.entity.ProjectEntity;
 import me.zhouzhuo810.zzapidoc.project.service.InterfaceService;
 import me.zhouzhuo810.zzapidoc.project.service.ProjectService;
+import me.zhouzhuo810.zzapidoc.project.service.RequestArgService;
 import me.zhouzhuo810.zzapidoc.user.entity.UserEntity;
 import me.zhouzhuo810.zzapidoc.user.service.UserService;
 import org.apache.log4j.Logger;
@@ -35,6 +37,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
+import sun.reflect.misc.FieldUtil;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -69,6 +72,9 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
 
     @Resource(name = "interfaceServiceImpl")
     InterfaceService mInterfaceService;
+
+    @Resource(name = "requestArgServiceImpl")
+    RequestArgService mRequestArgService;
 
 
     @Override
@@ -270,29 +276,31 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
 
         /*proguard file*/
         FileUtil.copyFile(new File(rootPath
-                +File.separator+"res"
-                +File.separator+"proguard"
-                +File.separator+"proguard-rules.pro"
-        ), new File(appDirPath+File.separator+"app"+File.separator+"proguard-rules.pro"));
+                + File.separator + "res"
+                + File.separator + "proguard"
+                + File.separator + "proguard-rules.pro"
+        ), new File(appDirPath + File.separator + "app" + File.separator + "proguard-rules.pro"));
 
         /*git ignore file*/
         FileUtil.copyFile(new File(rootPath
-                +File.separator+"res"
-                +File.separator+"git"
-                +File.separator+".gitignore"
-        ), new File(appDirPath+File.separator+".gitignore"));
+                + File.separator + "res"
+                + File.separator + "git"
+                + File.separator + ".gitignore"
+        ), new File(appDirPath + File.separator + ".gitignore"));
 
         StringBuilder sbStrings = new StringBuilder();
         sbStrings.append("<resources>\n" +
                 "    <string name=\"app_name\">" + app.getAppName() + "</string>\n" +
-                "    <string name=\"ok_text\">确定</string>\n"+
-                "    <string name=\"cancel_text\">取消</string>\n"+
-                "    <string name=\"delete_text\">删除</string>\n"+
-                "    <string name=\"revise_text\">修改</string>\n"+
-                "    <string name=\"submitting_text\">提交中...</string>\n"+
-                "    <string name=\"add_text\">新增</string>\n"+
-                "    <string name=\"loading_text\">加载中...</string>\n"+
-                "    <string name=\"no_data_text\">暂无数据</string>");
+                "    <string name=\"ok_text\">确定</string>\n" +
+                "    <string name=\"cancel_text\">取消</string>\n" +
+                "    <string name=\"delete_text\">删除</string>\n" +
+                "    <string name=\"revise_text\">修改</string>\n" +
+                "    <string name=\"search_text\">搜索</string>\n" +
+                "    <string name=\"no_net_text\">网络异常</string>\n" +
+                "    <string name=\"submitting_text\">提交中...</string>\n" +
+                "    <string name=\"add_text\">新增</string>\n" +
+                "    <string name=\"loading_text\">加载中...</string>\n" +
+                "    <string name=\"no_data_text\">暂无数据</string>\n");
         String packageName = app.getPackageName();
         String packagePath = packageName.replace(".", File.separator);
         File javaDir = new File(appDirPath
@@ -305,7 +313,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
         if (!javaDir.exists()) {
             javaDir.mkdirs();
         }
-        generateJavaAndLayoutAndAndroidManifest(app, appDirPath, packageName, sbStrings);
+        generateJavaAndLayoutAndAndroidManifest(rootPath, app, appDirPath, packageName, sbStrings);
         sbStrings.append("\n</resources>");
         File resDir = new File(appDirPath + File.separator + "app"
                 + File.separator + "src"
@@ -322,7 +330,8 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 + File.separator + "main"
                 + File.separator + "res"
                 + File.separator + "values";
-        FileUtils.saveFileToServer(sbStrings.toString(),valuesPath, "strings.xml");
+        FileUtils.saveFileToServer(sbStrings.toString(), valuesPath, "strings.xml");
+
 
     }
 
@@ -342,6 +351,10 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 "        versionName \"" + app.getVersionName() + "\"\n" +
                 "    }\n" +
                 "\n" +
+                "    aaptOptions {\n" +
+                "        cruncherEnabled false\n" +
+                "        useNewCruncher false\n" +
+                "    }\n\n" +
                 "    applicationVariants.all {variant ->\n" +
                 "        variant.outputs.each {output ->\n" +
                 "            def outputFile = output.outputFile\n" +
@@ -370,7 +383,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 "    //bugly\n" +
                 "    compile 'com.tencent.bugly:crashreport:latest.release'\n" +
                 "    //zzandframe\n" +
-                "    compile 'com.github.zhouzhuo810:ZzAndFrame:1.0.7'\n" +
+                "    compile 'com.github.zhouzhuo810:ZzAndFrame:1.0.8'\n" +
                 "    //xutils\n" +
                 "    compile 'org.xutils:xutils:3.1.26'\n" +
                 "    //Glide\n" +
@@ -385,7 +398,10 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 "    compile 'com.lzy.net:okgo:3.0.4'\n" +
                 "    //AndroidPickerView\n" +
                 "    compile 'com.contrarywind:Android-PickerView:3.2.5'\n" +
+                "    //Ucrop\n" +
                 "    compile 'com.github.yalantis:ucrop:2.2.1'\n" +
+                "    //SwipeRecyclerView\n" +
+                "    compile 'com.yanzhenjie:recyclerview-swipe:1.1.2'\n" +
                 "\n" +
                 "}\n", appDirPath + File.separator + "app", "build.gradle");
 
@@ -475,10 +491,18 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
         FileUtil.copyDir(new File(rootPath + File.separator + "res" + File.separator + "xml"), new File(xmlPath));
         /*values*/
         FileUtil.copyDir(new File(rootPath + File.separator + "res" + File.separator + "values"), new File(valuesPath));
+        String layoutPath = appDirPath
+                + File.separator + "app"
+                + File.separator + "src"
+                + File.separator + "main"
+                + File.separator + "res"
+                + File.separator + "layout";
+        /*layouts*/
+        FileUtil.copyDir(new File(rootPath + File.separator + "res" + File.separator + "layout"), new File(layoutPath));
 
     }
 
-    private void generateJavaAndLayoutAndAndroidManifest(ApplicationEntity app, String appDirPath, String packageName, StringBuilder sbStrings) throws IOException {
+    private void generateJavaAndLayoutAndAndroidManifest(String rootPath, ApplicationEntity app, String appDirPath, String packageName, StringBuilder sbStrings) throws IOException {
         String filePath = appDirPath
                 + File.separator + "app"
                 + File.separator + "src"
@@ -546,7 +570,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 + File.separator + "java"
                 + File.separator + packagePath;
         /*MyApplication*/
-        FileUtils.saveFileToServer("package "+app.getPackageName()+";\n" +
+        FileUtils.saveFileToServer("package " + app.getPackageName() + ";\n" +
                 "\n" +
                 "import android.content.Context;\n" +
                 "\n" +
@@ -575,6 +599,9 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 "        \n" +
                 "    }\n" +
                 "}\n", javaPath, "MyApplication.java");
+
+        /*custom widgets*/
+        generateWigets(rootPath, javaPath, app);
 
         if (activityEntities != null && activityEntities.size() > 0) {
             ActivityEntity activityEntity = activityEntities.get(0);
@@ -732,7 +759,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                     "    public void restoreState(@Nullable Bundle bundle) {\n" +
                     "\n" +
                     "    }\n" +
-                    "}\n", javaPath+File.separator+"ui"+File.separator+"act", activityEntity.getName() + ".java");
+                    "}\n", javaPath + File.separator + "ui" + File.separator + "act", activityEntity.getName() + ".java");
         }
 
         /*查找其他act*/
@@ -754,22 +781,21 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         generateLvActJava(layoutName, javaPath, activityEntity, app);
                         break;
                     case ActivityEntity.TYPE_RV_ACT:
-
+                        generateEmptyActJavaAndLayout(layoutPath, javaPath, activityEntity, app, sbStrings);
                         break;
                     case ActivityEntity.TYPE_TAB_ACT:
-
+                        generateEmptyActJavaAndLayout(layoutPath, javaPath, activityEntity, app, sbStrings);
                         break;
                     case ActivityEntity.TYPE_SETTING:
-
+                        generateEmptyActJavaAndLayout(layoutPath, javaPath, activityEntity, app, sbStrings);
                         break;
                     case ActivityEntity.TYPE_SUBMIT:
-                        generateSubmitActJavaAndLayout(layoutPath, javaPath, activityEntity, app, sbStrings);
+                        generateEmptyActJavaAndLayout(layoutPath, javaPath, activityEntity, app, sbStrings);
                         break;
                     case ActivityEntity.TYPE_DETAILS:
-
+                        generateEmptyActJavaAndLayout(layoutPath, javaPath, activityEntity, app, sbStrings);
                         break;
                 }
-
             }
         }
         sbManifest.append("        <provider\n" +
@@ -788,7 +814,453 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
         FileUtils.saveFileToServer(sbManifest.toString(), filePath, "AndroidManifest.xml");
     }
 
-    private void generateSubmitActJavaAndLayout(String layoutPath, String javaPath, ActivityEntity activityEntity, ApplicationEntity app, StringBuilder sbStrings) throws IOException {
+    private void generateWigets(String rootPath, String javaPath, ApplicationEntity app) throws IOException {
+        /*sidebar*/
+        String sideBarPath = javaPath + File.separator + "ui" + File.separator + "widget" + File.separator + "sidebar";
+        FileUtils.saveFileToServer("package "+app.getPackageName()+".ui.widget.sidebar;\n" +
+                "\n" +
+                "/**\n" +
+                " * Java汉字转换为拼音\n" +
+                " */\n" +
+                "public class CharacterParser {\n" +
+                "\n" +
+                "    private static int[] pyvalue = new int[]{-20319, -20317, -20304, -20295,\n" +
+                "            -20292, -20283, -20265, -20257, -20242, -20230, -20051, -20036,\n" +
+                "            -20032, -20026, -20002, -19990, -19986, -19982, -19976, -19805,\n" +
+                "            -19784, -19775, -19774, -19763, -19756, -19751, -19746, -19741,\n" +
+                "            -19739, -19728, -19725, -19715, -19540, -19531, -19525, -19515,\n" +
+                "            -19500, -19484, -19479, -19467, -19289, -19288, -19281, -19275,\n" +
+                "            -19270, -19263, -19261, -19249, -19243, -19242, -19238, -19235,\n" +
+                "            -19227, -19224, -19218, -19212, -19038, -19023, -19018, -19006,\n" +
+                "            -19003, -18996, -18977, -18961, -18952, -18783, -18774, -18773,\n" +
+                "            -18763, -18756, -18741, -18735, -18731, -18722, -18710, -18697,\n" +
+                "            -18696, -18526, -18518, -18501, -18490, -18478, -18463, -18448,\n" +
+                "            -18447, -18446, -18239, -18237, -18231, -18220, -18211, -18201,\n" +
+                "            -18184, -18183, -18181, -18012, -17997, -17988, -17970, -17964,\n" +
+                "            -17961, -17950, -17947, -17931, -17928, -17922, -17759, -17752,\n" +
+                "            -17733, -17730, -17721, -17703, -17701, -17697, -17692, -17683,\n" +
+                "            -17676, -17496, -17487, -17482, -17468, -17454, -17433, -17427,\n" +
+                "            -17417, -17202, -17185, -16983, -16970, -16942, -16915, -16733,\n" +
+                "            -16708, -16706, -16689, -16664, -16657, -16647, -16474, -16470,\n" +
+                "            -16465, -16459, -16452, -16448, -16433, -16429, -16427, -16423,\n" +
+                "            -16419, -16412, -16407, -16403, -16401, -16393, -16220, -16216,\n" +
+                "            -16212, -16205, -16202, -16187, -16180, -16171, -16169, -16158,\n" +
+                "            -16155, -15959, -15958, -15944, -15933, -15920, -15915, -15903,\n" +
+                "            -15889, -15878, -15707, -15701, -15681, -15667, -15661, -15659,\n" +
+                "            -15652, -15640, -15631, -15625, -15454, -15448, -15436, -15435,\n" +
+                "            -15419, -15416, -15408, -15394, -15385, -15377, -15375, -15369,\n" +
+                "            -15363, -15362, -15183, -15180, -15165, -15158, -15153, -15150,\n" +
+                "            -15149, -15144, -15143, -15141, -15140, -15139, -15128, -15121,\n" +
+                "            -15119, -15117, -15110, -15109, -14941, -14937, -14933, -14930,\n" +
+                "            -14929, -14928, -14926, -14922, -14921, -14914, -14908, -14902,\n" +
+                "            -14894, -14889, -14882, -14873, -14871, -14857, -14678, -14674,\n" +
+                "            -14670, -14668, -14663, -14654, -14645, -14630, -14594, -14429,\n" +
+                "            -14407, -14399, -14384, -14379, -14368, -14355, -14353, -14345,\n" +
+                "            -14170, -14159, -14151, -14149, -14145, -14140, -14137, -14135,\n" +
+                "            -14125, -14123, -14122, -14112, -14109, -14099, -14097, -14094,\n" +
+                "            -14092, -14090, -14087, -14083, -13917, -13914, -13910, -13907,\n" +
+                "            -13906, -13905, -13896, -13894, -13878, -13870, -13859, -13847,\n" +
+                "            -13831, -13658, -13611, -13601, -13406, -13404, -13400, -13398,\n" +
+                "            -13395, -13391, -13387, -13383, -13367, -13359, -13356, -13343,\n" +
+                "            -13340, -13329, -13326, -13318, -13147, -13138, -13120, -13107,\n" +
+                "            -13096, -13095, -13091, -13076, -13068, -13063, -13060, -12888,\n" +
+                "            -12875, -12871, -12860, -12858, -12852, -12849, -12838, -12831,\n" +
+                "            -12829, -12812, -12802, -12607, -12597, -12594, -12585, -12556,\n" +
+                "            -12359, -12346, -12320, -12300, -12120, -12099, -12089, -12074,\n" +
+                "            -12067, -12058, -12039, -11867, -11861, -11847, -11831, -11798,\n" +
+                "            -11781, -11604, -11589, -11536, -11358, -11340, -11339, -11324,\n" +
+                "            -11303, -11097, -11077, -11067, -11055, -11052, -11045, -11041,\n" +
+                "            -11038, -11024, -11020, -11019, -11018, -11014, -10838, -10832,\n" +
+                "            -10815, -10800, -10790, -10780, -10764, -10587, -10544, -10533,\n" +
+                "            -10519, -10331, -10329, -10328, -10322, -10315, -10309, -10307,\n" +
+                "            -10296, -10281, -10274, -10270, -10262, -10260, -10256, -10254};\n" +
+                "    public static String[] pystr = new String[]{\"a\", \"ai\", \"an\", \"ang\", \"ao\",\n" +
+                "            \"ba\", \"bai\", \"ban\", \"bang\", \"bao\", \"bei\", \"ben\", \"beng\", \"bi\",\n" +
+                "            \"bian\", \"biao\", \"bie\", \"bin\", \"bing\", \"bo\", \"bu\", \"ca\", \"cai\",\n" +
+                "            \"can\", \"cang\", \"cao\", \"ce\", \"ceng\", \"cha\", \"chai\", \"chan\", \"chang\",\n" +
+                "            \"chao\", \"che\", \"chen\", \"cheng\", \"chi\", \"chong\", \"chou\", \"chu\",\n" +
+                "            \"chuai\", \"chuan\", \"chuang\", \"chui\", \"chun\", \"chuo\", \"ci\", \"cong\",\n" +
+                "            \"cou\", \"cu\", \"cuan\", \"cui\", \"cun\", \"cuo\", \"da\", \"dai\", \"dan\",\n" +
+                "            \"dang\", \"dao\", \"de\", \"deng\", \"di\", \"dian\", \"diao\", \"die\", \"ding\",\n" +
+                "            \"diu\", \"dong\", \"dou\", \"du\", \"duan\", \"dui\", \"dun\", \"duo\", \"e\", \"en\",\n" +
+                "            \"er\", \"fa\", \"fan\", \"fang\", \"fei\", \"fen\", \"feng\", \"fo\", \"fou\", \"fu\",\n" +
+                "            \"ga\", \"gai\", \"gan\", \"gang\", \"gao\", \"ge\", \"gei\", \"gen\", \"geng\",\n" +
+                "            \"gong\", \"gou\", \"gu\", \"gua\", \"guai\", \"guan\", \"guang\", \"gui\", \"gun\",\n" +
+                "            \"guo\", \"ha\", \"hai\", \"han\", \"hang\", \"hao\", \"he\", \"hei\", \"hen\",\n" +
+                "            \"heng\", \"hong\", \"hou\", \"hu\", \"hua\", \"huai\", \"huan\", \"huang\", \"hui\",\n" +
+                "            \"hun\", \"huo\", \"ji\", \"jia\", \"jian\", \"jiang\", \"jiao\", \"jie\", \"jin\",\n" +
+                "            \"jing\", \"jiong\", \"jiu\", \"ju\", \"juan\", \"jue\", \"jun\", \"ka\", \"kai\",\n" +
+                "            \"kan\", \"kang\", \"kao\", \"ke\", \"ken\", \"keng\", \"kong\", \"kou\", \"ku\",\n" +
+                "            \"kua\", \"kuai\", \"kuan\", \"kuang\", \"kui\", \"kun\", \"kuo\", \"la\", \"lai\",\n" +
+                "            \"lan\", \"lang\", \"lao\", \"le\", \"lei\", \"leng\", \"li\", \"lia\", \"lian\",\n" +
+                "            \"liang\", \"liao\", \"lie\", \"lin\", \"ling\", \"liu\", \"long\", \"lou\", \"lu\",\n" +
+                "            \"lv\", \"luan\", \"lue\", \"lun\", \"luo\", \"ma\", \"mai\", \"man\", \"mang\",\n" +
+                "            \"mao\", \"me\", \"mei\", \"men\", \"meng\", \"mi\", \"mian\", \"miao\", \"mie\",\n" +
+                "            \"min\", \"ming\", \"miu\", \"mo\", \"mou\", \"mu\", \"na\", \"nai\", \"nan\",\n" +
+                "            \"nang\", \"nao\", \"ne\", \"nei\", \"nen\", \"neng\", \"ni\", \"nian\", \"niang\",\n" +
+                "            \"niao\", \"nie\", \"nin\", \"ning\", \"niu\", \"nong\", \"nu\", \"nv\", \"nuan\",\n" +
+                "            \"nue\", \"nuo\", \"o\", \"ou\", \"pa\", \"pai\", \"pan\", \"pang\", \"pao\", \"pei\",\n" +
+                "            \"pen\", \"peng\", \"pi\", \"pian\", \"piao\", \"pie\", \"pin\", \"ping\", \"po\",\n" +
+                "            \"pu\", \"qi\", \"qia\", \"qian\", \"qiang\", \"qiao\", \"qie\", \"qin\", \"qing\",\n" +
+                "            \"qiong\", \"qiu\", \"qu\", \"quan\", \"que\", \"qun\", \"ran\", \"rang\", \"rao\",\n" +
+                "            \"re\", \"ren\", \"reng\", \"ri\", \"rong\", \"rou\", \"ru\", \"ruan\", \"rui\",\n" +
+                "            \"run\", \"ruo\", \"sa\", \"sai\", \"san\", \"sang\", \"sao\", \"se\", \"sen\",\n" +
+                "            \"seng\", \"sha\", \"shai\", \"shan\", \"shang\", \"shao\", \"she\", \"shen\",\n" +
+                "            \"sheng\", \"shi\", \"shou\", \"shu\", \"shua\", \"shuai\", \"shuan\", \"shuang\",\n" +
+                "            \"shui\", \"shun\", \"shuo\", \"si\", \"song\", \"sou\", \"su\", \"suan\", \"sui\",\n" +
+                "            \"sun\", \"suo\", \"ta\", \"tai\", \"tan\", \"tang\", \"tao\", \"te\", \"teng\",\n" +
+                "            \"ti\", \"tian\", \"tiao\", \"tie\", \"ting\", \"tong\", \"tou\", \"tu\", \"tuan\",\n" +
+                "            \"tui\", \"tun\", \"tuo\", \"wa\", \"wai\", \"wan\", \"wang\", \"wei\", \"wen\",\n" +
+                "            \"weng\", \"wo\", \"wu\", \"xi\", \"xia\", \"xian\", \"xiang\", \"xiao\", \"xie\",\n" +
+                "            \"xin\", \"xing\", \"xiong\", \"xiu\", \"xu\", \"xuan\", \"xue\", \"xun\", \"ya\",\n" +
+                "            \"yan\", \"yang\", \"yao\", \"ye\", \"yi\", \"yin\", \"ying\", \"yo\", \"yong\",\n" +
+                "            \"you\", \"yu\", \"yuan\", \"yue\", \"yun\", \"za\", \"zai\", \"zan\", \"zang\",\n" +
+                "            \"zao\", \"ze\", \"zei\", \"zen\", \"zeng\", \"zha\", \"zhai\", \"zhan\", \"zhang\",\n" +
+                "            \"zhao\", \"zhe\", \"zhen\", \"zheng\", \"zhi\", \"zhong\", \"zhou\", \"zhu\",\n" +
+                "            \"zhua\", \"zhuai\", \"zhuan\", \"zhuang\", \"zhui\", \"zhun\", \"zhuo\", \"zi\",\n" +
+                "            \"zong\", \"zou\", \"zu\", \"zuan\", \"zui\", \"zun\", \"zuo\"};\n" +
+                "    private StringBuilder buffer;\n" +
+                "    private String resource;\n" +
+                "    private static CharacterParser characterParser = new CharacterParser();\n" +
+                "\n" +
+                "    public static CharacterParser getInstance() {\n" +
+                "        return characterParser;\n" +
+                "    }\n" +
+                "\n" +
+                "    public String getResource() {\n" +
+                "        return resource;\n" +
+                "    }\n" +
+                "\n" +
+                "    public void setResource(String resource) {\n" +
+                "        this.resource = resource;\n" +
+                "    }\n" +
+                "\n" +
+                "    /**\n" +
+                "     * 汉字转成ASCII码 * * @param chs * @return\n" +
+                "     */\n" +
+                "    private int getChsAscii(String chs) {\n" +
+                "        int asc = 0;\n" +
+                "        try {\n" +
+                "            byte[] bytes = chs.getBytes(\"gb2312\");\n" +
+                "            if (bytes == null || bytes.length > 2 || bytes.length <= 0) {\n" +
+                "                throw new RuntimeException(\"illegal resource string\");\n" +
+                "            }\n" +
+                "            if (bytes.length == 1) {\n" +
+                "                asc = bytes[0];\n" +
+                "            }\n" +
+                "            if (bytes.length == 2) {\n" +
+                "                int hightByte = 256 + bytes[0];\n" +
+                "                int lowByte = 256 + bytes[1];\n" +
+                "                asc = (256 * hightByte + lowByte) - 256 * 256;\n" +
+                "            }\n" +
+                "        } catch (Exception e) {\n" +
+                "            System.out\n" +
+                "                    .println(\"ERROR:ChineseSpelling.class-getChsAscii(String chs)\"\n" +
+                "                            + e);\n" +
+                "        }\n" +
+                "        return asc;\n" +
+                "    }\n" +
+                "\n" +
+                "    /**\n" +
+                "     * 单字解析 * * @param str * @return\n" +
+                "     */\n" +
+                "    public String convert(String str) {\n" +
+                "        String result = null;\n" +
+                "        int ascii = getChsAscii(str);\n" +
+                "        if (ascii > 0 && ascii < 160) {\n" +
+                "            result = String.valueOf((char) ascii);\n" +
+                "        } else {\n" +
+                "            for (int i = (pyvalue.length - 1); i >= 0; i--) {\n" +
+                "                if (pyvalue[i] <= ascii) {\n" +
+                "                    result = pystr[i];\n" +
+                "                    break;\n" +
+                "                }\n" +
+                "            }\n" +
+                "        }\n" +
+                "        return result;\n" +
+                "    }\n" +
+                "\n" +
+                "    /**\n" +
+                "     * 词组解析 * * @param chs * @return\n" +
+                "     */\n" +
+                "    public String getSelling(String chs) {\n" +
+                "        String key, value;\n" +
+                "        buffer = new StringBuilder();\n" +
+                "\n" +
+                "        if (chs!=null && chs.length()>0){\n" +
+                "            for (int i = 0; i < chs.length(); i++) {\n" +
+                "                key = chs.substring(i, i + 1);\n" +
+                "                if (key.getBytes().length >= 2) {\n" +
+                "                    value = (String) convert(key);\n" +
+                "                    if (value == null) {\n" +
+                "                        value = chs;\n" +
+                "                    }\n" +
+                "                } else {\n" +
+                "                    value = key;\n" +
+                "                }\n" +
+                "                buffer.append(value);\n" +
+                "            }\n" +
+                "        }\n" +
+                "\n" +
+                "\n" +
+                "        return buffer.toString();\n" +
+                "    }\n" +
+                "\n" +
+                "    public String getSpelling() {\n" +
+                "        return this.getSelling(this.getResource());\n" +
+                "    }\n" +
+                "\n" +
+                "}\n", sideBarPath, "CharacterParser.java");
+        FileUtils.saveFileToServer("package "+app.getPackageName()+".ui.widget.sidebar;\n" +
+                "\n" +
+                "import java.util.Comparator;\n" +
+                "\n" +
+                "/**\n" +
+                " * @author\n" +
+                " */\n" +
+                "public class PinyinComparator implements Comparator<SortModel> {\n" +
+                "\n" +
+                "    @Override\n" +
+                "    public int compare(SortModel lhs, SortModel rhs) {\n" +
+                "        if (lhs.getSortLetters().equals(\"@\")\n" +
+                "                || rhs.getSortLetters().equals(\"#\")) {\n" +
+                "            if (lhs.isNumber() && rhs.isNumber()) {\n" +
+                "                if (lhs.isMac() && rhs.isMac()) {\n" +
+                "                    int a = 0;\n" +
+                "                    int b = 0;\n" +
+                "                    try {\n" +
+                "                        a = Integer.parseInt(lhs.getFullName());\n" +
+                "                    } catch (Exception e) {\n" +
+                "                         e.printStackTrace();\n" +
+                "                        a=0;\n" +
+                "                    }\n" +
+                "                    try {\n" +
+                "                        b = Integer.parseInt(rhs.getFullName());\n" +
+                "                    } catch (Exception e) {\n" +
+                "                         e.printStackTrace();\n" +
+                "                        b=0;\n" +
+                "                    }\n" +
+                "//                    Log.e(\"ttt\", \"isMac \" + a + \", \" + b);\n" +
+                "                    if (a > b)\n" +
+                "                        return 1;\n" +
+                "                    else if (a == b) {\n" +
+                "                        return 0;\n" +
+                "                    } else {\n" +
+                "                        return -1;\n" +
+                "                    }\n" +
+                "                }\n" +
+                "                int c = lhs.getFullName().compareTo(rhs.getFullName());\n" +
+                "                if (c > 0) {\n" +
+                "                    return 1;\n" +
+                "                } else if (c == 0) {\n" +
+                "                    return  0;\n" +
+                "                } else {\n" +
+                "                    return -1;\n" +
+                "                }\n" +
+                "            } else {\n" +
+                "                return -1;\n" +
+                "            }\n" +
+                "        } else if (lhs.getSortLetters().equals(\"#\")\n" +
+                "                || rhs.getSortLetters().equals(\"@\")) {\n" +
+                "            return 1;\n" +
+                "        } else {\n" +
+                "            int c = lhs.getSortLetters().compareTo(rhs.getSortLetters());\n" +
+                "            if (c > 0) {\n" +
+                "                return 1;\n" +
+                "            } else if (c == 0) {\n" +
+                "                return  0;\n" +
+                "            } else {\n" +
+                "                return -1;\n" +
+                "            }\n" +
+                "        }\n" +
+                "    }\n" +
+                "\n" +
+                "}\n", sideBarPath, "PinyinComparator.java");
+
+        FileUtils.saveFileToServer("package "+app.getPackageName()+".ui.widget.sidebar;\n" +
+                "\n" +
+                "import android.content.Context;\n" +
+                "import android.graphics.Bitmap;\n" +
+                "import android.graphics.Canvas;\n" +
+                "import android.graphics.Color;\n" +
+                "import android.graphics.Paint;\n" +
+                "import android.util.AttributeSet;\n" +
+                "import android.view.MotionEvent;\n" +
+                "import android.view.View;\n" +
+                "\n" +
+                "import "+app.getPackageName()+".R;\n" +
+                "\n" +
+                "\n" +
+                "/**\n" +
+                " * Created by zz on 2016/5/12.\n" +
+                " */\n" +
+                "public class SideBar extends View {\n" +
+                "\n" +
+                "    public static final String TAG = SideBar.class.getSimpleName();\n" +
+                "\n" +
+                "    private String[] letters;\n" +
+                "\n" +
+                "    private OnLetterTouchListener letterTouchListener;\n" +
+                "\n" +
+                "    private float itemHeight = -1;\n" +
+                "\n" +
+                "    private Paint paint;\n" +
+                "\n" +
+                "    // 26个字母\n" +
+                "    public static String[] b = {\"A\", \"B\", \"C\", \"D\", \"E\", \"F\", \"G\", \"H\", \"I\",\n" +
+                "            \"J\", \"K\", \"L\", \"M\", \"N\", \"O\", \"P\", \"Q\", \"R\", \"S\", \"T\", \"U\", \"V\",\n" +
+                "            \"W\", \"X\", \"Y\", \"Z\", \"#\"};\n" +
+                "\n" +
+                "    private int position = -1;\n" +
+                "\n" +
+                "    public interface OnLetterTouchListener {\n" +
+                "        void onLetterTouch(String letter, int position);\n" +
+                "\n" +
+                "        void onActionUp();\n" +
+                "    }\n" +
+                "\n" +
+                "\n" +
+                "    public SideBar(Context context) {\n" +
+                "        super(context);\n" +
+                "\n" +
+                "        init(context);\n" +
+                "    }\n" +
+                "\n" +
+                "    public SideBar(Context context, AttributeSet attrs) {\n" +
+                "        super(context, attrs);\n" +
+                "\n" +
+                "        init(context);\n" +
+                "    }\n" +
+                "\n" +
+                "    public SideBar(Context context, AttributeSet attrs, int defStyleAttr) {\n" +
+                "        super(context, attrs, defStyleAttr);\n" +
+                "\n" +
+                "        init(context);\n" +
+                "    }\n" +
+                "\n" +
+                "    private void init(Context context) {\n" +
+                "        paint = new Paint();\n" +
+                "        paint.setColor(getResources().getColor(R.color.colorGrayB));\n" +
+                "        paint.setFlags(Paint.ANTI_ALIAS_FLAG);\n" +
+                "\n" +
+                "        setShowString(b);\n" +
+                "    }\n" +
+                "\n" +
+                "\n" +
+                "    @Override\n" +
+                "    protected void onDraw(Canvas canvas) {\n" +
+                "        super.onDraw(canvas);\n" +
+                "\n" +
+                "        if (letters == null) {\n" +
+                "            return;\n" +
+                "        }\n" +
+                "\n" +
+                "        if (itemHeight == -1) {\n" +
+                "            itemHeight = getHeight() / letters.length;\n" +
+                "            paint.setTextSize(itemHeight - 4);\n" +
+                "        }\n" +
+                "        float widthCenter = getMeasuredWidth() / 2.0f;\n" +
+                "        for (int i = 0; i < letters.length; i++) {\n" +
+                "            if (position == i) {\n" +
+                "                paint.setColor(Color.parseColor(\"#438CFF\"));\n" +
+                "            } else {\n" +
+                "                paint.setColor(getResources().getColor(R.color.colorGrayB));\n" +
+                "            }\n" +
+                "            canvas.drawText(letters[i], widthCenter - paint.measureText(letters[i]) / 2, itemHeight * i + itemHeight, paint);\n" +
+                "        }\n" +
+                "    }\n" +
+                "\n" +
+                "\n" +
+                "    @Override\n" +
+                "    public boolean onTouchEvent(MotionEvent event) {\n" +
+                "        super.onTouchEvent(event);\n" +
+                "        if (letterTouchListener == null || letters == null) {\n" +
+                "            return false;\n" +
+                "        }\n" +
+                "\n" +
+                "        switch (event.getAction()) {\n" +
+                "            case MotionEvent.ACTION_DOWN:\n" +
+                "            case MotionEvent.ACTION_MOVE:\n" +
+                "                position = (int) (event.getY() / itemHeight);\n" +
+                "                if (position >= 0 && position < letters.length) {\n" +
+                "                    invalidate();\n" +
+                "                    letterTouchListener.onLetterTouch(letters[position], position);\n" +
+                "                }\n" +
+                "                return true;\n" +
+                "            case MotionEvent.ACTION_OUTSIDE:\n" +
+                "            case MotionEvent.ACTION_UP:\n" +
+                "                position = -1;\n" +
+                "                invalidate();\n" +
+                "                letterTouchListener.onActionUp();\n" +
+                "                return true;\n" +
+                "        }\n" +
+                "        return false;\n" +
+                "    }\n" +
+                "\n" +
+                "\n" +
+                "    public void setShowString(String[] letters) {\n" +
+                "        this.letters = letters;\n" +
+                "    }\n" +
+                "\n" +
+                "\n" +
+                "    public void setLetterTouchListener(OnLetterTouchListener letterTouchListener) {\n" +
+                "        this.letterTouchListener = letterTouchListener;\n" +
+                "    }\n" +
+                "}\n", sideBarPath, "SideBar.java");
+        FileUtils.saveFileToServer("package "+app.getPackageName()+".ui.widget.sidebar;\n" +
+                "\n" +
+                "public class SortModel {\n" +
+                "\n" +
+                "    private boolean isMac;\n" +
+                "    private boolean isNumber;\n" +
+                "    private String fullName;\n" +
+                "    private String name;//显示的数据\n" +
+                "    private String sortLetters;//显示数据拼音的首字母\n" +
+                "\n" +
+                "    public String getName() {\n" +
+                "        return name;\n" +
+                "    }\n" +
+                "\n" +
+                "    public void setName(String name) {\n" +
+                "        this.name = name;\n" +
+                "    }\n" +
+                "\n" +
+                "    public String getSortLetters() {\n" +
+                "        return sortLetters;\n" +
+                "    }\n" +
+                "\n" +
+                "    public void setSortLetters(String sortLetters) {\n" +
+                "        this.sortLetters = sortLetters;\n" +
+                "    }\n" +
+                "\n" +
+                "    public boolean isMac() {\n" +
+                "        return isMac;\n" +
+                "    }\n" +
+                "\n" +
+                "    public void setMac(boolean mac) {\n" +
+                "        isMac = mac;\n" +
+                "    }\n" +
+                "\n" +
+                "    public boolean isNumber() {\n" +
+                "        return isNumber;\n" +
+                "    }\n" +
+                "\n" +
+                "    public void setNumber(boolean number) {\n" +
+                "        isNumber = number;\n" +
+                "    }\n" +
+                "\n" +
+                "    public String getFullName() {\n" +
+                "        return fullName;\n" +
+                "    }\n" +
+                "\n" +
+                "    public void setFullName(String fullName) {\n" +
+                "        this.fullName = fullName;\n" +
+                "    }\n" +
+                "}\n", sideBarPath, "SortModel.java");
+
+    }
+
+    private void generateEmptyActJavaAndLayout(String layoutPath, String javaPath, ActivityEntity activityEntity, ApplicationEntity app, StringBuilder sbStrings) throws IOException {
         List<WidgetEntity> widgetEntities = mWidgetService.executeCriteria(
                 new Criterion[]{
                         Restrictions.eq("deleteFlag", BaseEntity.DELETE_FLAG_NO),
@@ -820,25 +1292,28 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
 
         /*java*/
         StringBuilder sbJava = new StringBuilder();
-        sbJava.append("package "+app.getPackageName()+".ui.act;\n" +
-                "\n" +
-                "import android.os.Bundle;\n" +
-                "import android.support.annotation.Nullable;\n" +
-                "import android.view.View;\n" +
-                "import android.widget.Button;\n" +
-                "import android.widget.EditText;\n" +
-                "import android.widget.ImageView;\n" +
-                "import android.widget.TextView;\n" +
-                "\n" +
-                "import "+app.getPackageName()+".R;\n" +
-                "import zhouzhuo810.me.zzandframe.ui.act.BaseActivity;\n" +
-                "import zhouzhuo810.me.zzandframe.ui.widget.TitleBar;\n" +
-                "\n" +
-                "/**\n" +
-                " *\n" +
-                " * Created by admin on 2017/8/27.\n" +
-                " */\n" +
-                "public class "+activityEntity.getName()+" extends BaseActivity {\n");
+        StringBuilder sbImp = new StringBuilder();
+        sbImp.append(
+                "\nimport android.os.Bundle;\n" +
+                        "import android.support.annotation.Nullable;\n" +
+                        "import android.content.Intent;\n" +
+                        "import android.view.View;\n" +
+                        "import android.view.ViewGroup;\n" +
+                        "import android.widget.Button;\n" +
+                        "import android.widget.EditText;\n" +
+                        "import android.widget.ImageView;\n" +
+                        "import android.widget.TextView;\n" +
+                        "import android.widget.LinearLayout;\n" +
+                        "\n" +
+                        "import " + app.getPackageName() + ".R;\n" +
+                        "import zhouzhuo810.me.zzandframe.ui.act.BaseActivity;\n" +
+                        "import " + app.getPackageName() + ".common.api.Api;\n" +
+                        "import " + app.getPackageName() + ".common.api.entity.*;\n" +
+                        "import rx.Subscriber;\n" +
+                        "import zhouzhuo810.me.zzandframe.common.rx.RxHelper;\n" +
+                        "import zhouzhuo810.me.zzandframe.common.utils.ToastUtils;\n" +
+                        "import zhouzhuo810.me.zzandframe.ui.widget.TitleBar;\n");
+
         if (widgetEntities != null && widgetEntities.size() > 0) {
             /*变量声明*/
             StringBuilder sbDef = new StringBuilder();
@@ -882,14 +1357,14 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "        app:titleText=\"@string/" + layoutName + "_text\" />");
                         break;
                     case WidgetEntity.TYPE_EDIT_ITEM:
-                        sbDef.append("\n    private EditText et_"+widgetEntity.getResId()+";");
-                        sbDef.append("\n    private ImageView iv_clear_"+widgetEntity.getResId()+";");
-                        sbInit.append("\n        et_"+widgetEntity.getResId()+" = (EditText) findViewById(R.id.et_"+widgetEntity.getResId()+");");
-                        sbInit.append("\n        iv_clear_"+widgetEntity.getResId()+" = (ImageView) findViewById(R.id.iv_clear_"+widgetEntity.getResId()+");");
-                        sbEvent.append("\n        setEditListener(et_"+widgetEntity.getResId()+", iv_clear_"+widgetEntity.getResId()+");");
+                        sbDef.append("\n    private EditText et_" + widgetEntity.getResId() + ";");
+                        sbDef.append("\n    private ImageView iv_clear_" + widgetEntity.getResId() + ";");
+                        sbInit.append("\n        et_" + widgetEntity.getResId() + " = (EditText) findViewById(R.id.et_" + widgetEntity.getResId() + ");");
+                        sbInit.append("\n        iv_clear_" + widgetEntity.getResId() + " = (ImageView) findViewById(R.id.iv_clear_" + widgetEntity.getResId() + ");");
+                        sbEvent.append("\n        setEditListener(et_" + widgetEntity.getResId() + ", iv_clear_" + widgetEntity.getResId() + ");");
                         sbStrings.append("    <string name=\"" + widgetEntity.getResId() + "_text\">" + widgetEntity.getTitle() + "</string>\n");
                         sbStrings.append("    <string name=\"" + widgetEntity.getResId() + "_hint_text\">请输入" + widgetEntity.getTitle() + "</string>\n");
-                        sbSubmit.append("\n        String "+widgetEntity.getResId()+" = et_"+widgetEntity.getResId()+".getText().toString().trim();");
+                        sbSubmit.append("\n        String " + widgetEntity.getResId() + " = et_" + widgetEntity.getResId() + ".getText().toString().trim();");
                         sbLayout.append("\n    <LinearLayout\n" +
                                 "        android:layout_width=\"match_parent\"\n" +
                                 "        android:layout_height=\"wrap_content\"\n" +
@@ -935,10 +1410,10 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "        android:layout_marginLeft=\"30px\"\n" +
                                 "        android:background=\"@color/colorGrayBg\" />");
                         break;
-                    case WidgetEntity.TYPE_BTN_ITEM:
-                        sbDef.append("\n    private Button btn_"+widgetEntity.getResId()+";");
-                        sbInit.append("\n        btn_"+widgetEntity.getResId()+" = (Button) findViewById(R.id.btn_"+widgetEntity.getResId()+");");
-                        sbEvent.append("\n        btn_"+widgetEntity.getResId()+".setOnClickListener(new View.OnClickListener() {\n" +
+                    case WidgetEntity.TYPE_SUBMIT_BTN_ITEM:
+                        sbDef.append("\n    private Button btn_" + widgetEntity.getResId() + ";");
+                        sbInit.append("\n        btn_" + widgetEntity.getResId() + " = (Button) findViewById(R.id.btn_" + widgetEntity.getResId() + ");");
+                        sbEvent.append("\n        btn_" + widgetEntity.getResId() + ".setOnClickListener(new View.OnClickListener() {\n" +
                                 "            @Override\n" +
                                 "            public void onClick(View v) {\n" +
                                 "                doSubmit();\n" +
@@ -946,7 +1421,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "        });");
                         sbStrings.append("    <string name=\"" + widgetEntity.getResId() + "_text\">" + activityEntity.getTitle() + "</string>\n");
                         sbLayout.append("\n    <Button\n" +
-                                "        android:id=\"@+id/btn_"+widgetEntity.getResId()+"\"\n" +
+                                "        android:id=\"@+id/btn_" + widgetEntity.getResId() + "\"\n" +
                                 "        android:layout_width=\"match_parent\"\n" +
                                 "        android:layout_height=\"120px\"\n" +
                                 "        android:layout_marginBottom=\"50px\"\n" +
@@ -954,16 +1429,398 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "        android:layout_marginRight=\"40px\"\n" +
                                 "        android:layout_marginTop=\"40px\"\n" +
                                 "        android:background=\"@drawable/btn_save_selector\"\n" +
-                                "        android:text=\"@string/"+widgetEntity.getResId()+"_text\"\n" +
+                                "        android:text=\"@string/" + widgetEntity.getResId() + "_text\"\n" +
                                 "        android:textColor=\"#fff\"\n" +
                                 "        android:textSize=\"@dimen/submit_btn_text_size\" />");
+                        InterfaceEntity interfaceEntity = mInterfaceService.get(widgetEntity.getTargetApiId());
+                        if (interfaceEntity != null) {
+                            int requestParamsNo = interfaceEntity.getRequestParamsNo();
+                            ActivityEntity targetAct = mActivityService.get(widgetEntity.getTargetActivityId());
+                            String url = interfaceEntity.getPath();
+                            String m = url.substring(url.lastIndexOf("/") + 1, url.length());
+                            String beanClazz = m.substring(0, 1).toUpperCase() + m.substring(1, m.length()) + "Result";
+                            sbStrings.append("    <string name=\"" + widgetEntity.getResId() + "ing_text\">" + activityEntity.getTitle() + "中...</string>\n");
+                            sbSubmit.append("\n        showPd(getString(R.string." + widgetEntity.getResId() + "ing_text), false);\n" +
+                                    "        Api.getApi0()\n" +
+                                    "                .userLogin(");
+                            if (requestParamsNo > 0) {
+                                for (int i1 = 0; i1 < requestParamsNo; i1++) {
+                                    sbSubmit.append("\"\", ");
+                                }
+                                sbSubmit.deleteCharAt(sbSubmit.length() - 1);
+                                sbSubmit.deleteCharAt(sbSubmit.length() - 1);
+                            }
+                            sbSubmit.append(
+                                    ")\n" +
+                                            "                .compose(RxHelper.<" + beanClazz + ">io_main())\n" +
+                                            "                .subscribe(new Subscriber<" + beanClazz + ">() {\n" +
+                                            "                    @Override\n" +
+                                            "                    public void onCompleted() {\n" +
+                                            "\n" +
+                                            "                    }\n" +
+                                            "\n" +
+                                            "                    @Override\n" +
+                                            "                    public void onError(Throwable e) {\n" +
+                                            "                        hidePd();\n" +
+                                            "                        ToastUtils.showCustomBgToast(getString(R.string.no_net_text) + e.toString());\n" +
+                                            "                    }\n" +
+                                            "\n" +
+                                            "                    @Override\n" +
+                                            "                    public void onNext(" + beanClazz + " result) {\n" +
+                                            "                        hidePd();\n" +
+                                            "                        ToastUtils.showCustomBgToast(result.getMsg());\n" +
+                                            "                        if (result.getCode() == 1) {\n" +
+                                            "                            Intent intent = new Intent(LoginActivity.this, " + (targetAct == null ? "MainActivity" : targetAct.getName()) + ".class);\n" +
+                                            "                            startActWithIntent(intent);\n" +
+                                            "                            closeAct();\n" +
+                                            "                        }\n" +
+                                            "                    }\n" +
+                                            "                });");
+                        }
                         break;
+                    case WidgetEntity.TYPE_EXIT_BTN_ITEM:
+                        sbDef.append("\n    private Button btn_" + widgetEntity.getResId() + ";");
+                        sbInit.append("\n        btn_" + widgetEntity.getResId() + " = (Button) findViewById(R.id.btn_" + widgetEntity.getResId() + ");");
+                        sbEvent.append("\n        btn_" + widgetEntity.getResId() + ".setOnClickListener(new View.OnClickListener() {\n" +
+                                "            @Override\n" +
+                                "            public void onClick(View v) {\n" +
+                                "                doSubmit();\n" +
+                                "            }\n" +
+                                "        });");
+                        sbStrings.append("    <string name=\"" + widgetEntity.getResId() + "_text\">" + activityEntity.getTitle() + "</string>\n");
+                        sbLayout.append("\n    <Button\n" +
+                                "        android:id=\"@+id/btn_" + widgetEntity.getResId() + "\"\n" +
+                                "        android:layout_width=\"match_parent\"\n" +
+                                "        android:layout_height=\"120px\"\n" +
+                                "        android:layout_marginBottom=\"50px\"\n" +
+                                "        android:layout_marginLeft=\"40px\"\n" +
+                                "        android:layout_marginRight=\"40px\"\n" +
+                                "        android:layout_marginTop=\"40px\"\n" +
+                                "        android:background=\"@drawable/btn_exit_selector\"\n" +
+                                "        android:text=\"@string/" + widgetEntity.getResId() + "_text\"\n" +
+                                "        android:textColor=\"#fff\"\n" +
+                                "        android:textSize=\"@dimen/submit_btn_text_size\" />");
+                        sbSubmit.append("        btn_" + widgetEntity.getResId() + ".setOnClickListener(new View.OnClickListener() {\n" +
+                                "            @Override\n" +
+                                "            public void onClick(View v) {\n" +
+                                "                showTwoBtnDialog(getString(R.string." + widgetEntity.getResId() + "_text), \"确定\" + getString(R.string." + widgetEntity.getResId() + "_text) + \"吗？\", true, new OnTwoBtnClick() {\n" +
+                                "                    @Override\n" +
+                                "                    public void onOk() {\n" +
+                                "                        //TODO something\n" +
+                                "                    }\n" +
+                                "\n" +
+                                "                    @Override\n" +
+                                "                    public void onCancel() {\n" +
+                                "\n" +
+                                "                    }\n" +
+                                "                });\n" +
+                                "            }\n" +
+                                "        });");
+                        break;
+                    case WidgetEntity.TYPE_LETTER_RV:
+                        InterfaceEntity inter = mInterfaceService.get(widgetEntity.getTargetApiId());
+                        String clazz = "TestResult";
+                        if (inter != null) {
+                            int requestParamsNo = inter.getRequestParamsNo();
+                            ActivityEntity targetAct = mActivityService.get(widgetEntity.getTargetActivityId());
+                            String url = inter.getPath();
+                            String m = url.substring(url.lastIndexOf("/") + 1, url.length());
+                            String beanClazz = m.substring(0, 1).toUpperCase() + m.substring(1, m.length()) + "Result";
+                            clazz = beanClazz;
+                        }
+                        StringBuilder sbAdapter = new StringBuilder();
+                        sbAdapter.append("package "+app.getPackageName()+".ui;\n" +
+                                "\n" +
+                                "import android.content.Context;\n" +
+                                "import android.widget.SectionIndexer;\n" +
+                                "\n" +
+                                "import java.util.List;\n" +
+                                "import java.util.ArrayList;\n" +
+                                "\n" +
+                                "import "+app.getPackageName()+".R;\n" +
+                                "import "+app.getPackageName()+".common.api.entity."+clazz+";\n" +
+                                "import zhouzhuo810.me.zzandframe.common.rule.ISearch;\n" +
+                                "import zhouzhuo810.me.zzandframe.ui.adapter.RvAutoBaseAdapter;\n" +
+                                "\n" +
+                                "/**\n" +
+                                " * Created by zz on 2017/8/28.\n" +
+                                " */\n" +
+                                "public class "+widgetEntity.getResId().substring(0,1).toUpperCase()+widgetEntity.getResId().substring(1)+"ListAdapter extends RvAutoBaseAdapter<"+clazz+".DataEntity> implements ISearch<"+clazz+".DataEntity>,SectionIndexer {\n" +
+                                "\n" +
+                                "    public "+widgetEntity.getResId().substring(0,1).toUpperCase()+widgetEntity.getResId().substring(1)+"ListAdapter(Context context, List<"+clazz+".DataEntity> data) {\n" +
+                                "        super(context, data);\n" +
+                                "    }\n" +
+                                "\n" +
+                                "    @Override\n" +
+                                "    protected int getLayoutId(int type) {\n" +
+                                "        return R.layout.list_item_"+widgetEntity.getResId()+";\n" +
+                                "    }\n" +
+                                "\n" +
+                                "    @Override\n" +
+                                "    protected void fillData(ViewHolder viewHolder, "+clazz+".DataEntity dataEntity, int position) {\n" +
+                                "        \n" +
+                                "    }\n" +
+                                "\n" +
+                                "    @Override\n" +
+                                "    public void startSearch(String s) {\n" +
+                                "        List<"+clazz+".DataEntity> msgs = new ArrayList<>();\n" +
+                                "        for ("+clazz+".DataEntity mData : data) {\n" +
+                                "            if (mData.toSearch().contains(s)) {\n" +
+                                "                msgs.add(mData);\n" +
+                                "            }\n" +
+                                "        }\n" +
+                                "        updateAll(msgs);\n" +
+                                "    }\n" +
+                                "\n" +
+                                "    @Override\n" +
+                                "    public void cancelSearch(List<"+clazz+".DataEntity> list) {\n" +
+                                "        updateAll(list);\n" +
+                                "    }\n" +
+                                "\n" +
+                                "    @Override\n" +
+                                "    public Object[] getSections() {\n" +
+                                "        return new Object[0];\n" +
+                                "    }\n" +
+                                "\n" +
+                                "    @Override\n" +
+                                "    public int getPositionForSection(int sectionIndex) {\n" +
+                                "        for (int i = 0; i < getItemCount(); i++) {\n" +
+                                "            String sortStr = data.get(i).getSortLetters();\n" +
+                                "            char firstChar = sortStr.toUpperCase().charAt(0);\n" +
+                                "            if (firstChar == sectionIndex) {\n" +
+                                "                return i;\n" +
+                                "            }\n" +
+                                "        }\n" +
+                                "\n" +
+                                "        return -1;\n" +
+                                "    }\n" +
+                                "\n" +
+                                "    @Override\n" +
+                                "    public int getSectionForPosition(int position) {\n" +
+                                "        if (data == null)\n" +
+                                "            return -1;\n" +
+                                "        if (position >= data.size()) {\n" +
+                                "            return -1;\n" +
+                                "        }\n" +
+                                "        return data.get(position).getSortLetters() == null ? -1 : data.get(position).getSortLetters().charAt(0);\n" +
+                                "    }\n" +
+                                "}\n");
+                        FileUtils.saveFileToServer(sbAdapter.toString(), javaPath+File.separator+"ui"+File.separator+"adapter", widgetEntity.getResId().substring(0,1).toUpperCase()+widgetEntity.getResId().substring(1)+"ListAdapter.java");
+                        /*list_item*/
+                        FileUtils.saveFileToServer("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
+                                "<com.zhy.autolayout.AutoLinearLayout xmlns:android=\"http://schemas.android.com/apk/res/android\"\n" +
+                                "    android:layout_width=\"match_parent\"\n" +
+                                "    android:layout_height=\"match_parent\"\n" +
+                                "    android:orientation=\"vertical\">\n" +
+                                "\n" +
+                                "</com.zhy.autolayout.AutoLinearLayout>", layoutPath, "list_item_"+widgetEntity.getResId()+".xml");
+
+                        sbImp.append("import "+app.getPackageName()+".ui.widget.sidebar.CharacterParser;\n" +
+                                "import "+app.getPackageName()+".ui.widget.sidebar.PinyinComparator;\n" +
+                                "import "+app.getPackageName()+".ui.widget.sidebar.SideBar;\n" +
+                                "import android.Manifest;\n" +
+                                "import android.graphics.Color;\n" +
+                                "import android.text.Editable;\n" +
+                                "import android.text.TextWatcher;\n" +
+                                "import android.view.LayoutInflater;\n" +
+                                "import com.tbruyelle.rxpermissions.RxPermissions;\n" +
+                                "import android.support.v4.widget.SwipeRefreshLayout;\n" +
+                                "import android.support.v7.widget.LinearLayoutManager;\n" +
+                                "import com.yanzhenjie.recyclerview.swipe.SwipeMenu;\n" +
+                                "import com.yanzhenjie.recyclerview.swipe.SwipeMenuCreator;\n" +
+                                "import com.yanzhenjie.recyclerview.swipe.SwipeItemClickListener;\n" +
+                                "import com.yanzhenjie.recyclerview.swipe.SwipeMenuBridge;\n" +
+                                "import com.yanzhenjie.recyclerview.swipe.SwipeMenuItem;\n" +
+                                "import com.yanzhenjie.recyclerview.swipe.SwipeMenuItemClickListener;\n" +
+                                "import com.yanzhenjie.recyclerview.swipe.SwipeMenuRecyclerView;\n" +
+                                "import com.zhy.autolayout.utils.AutoUtils;\n" +
+                                "\n" +
+                                "import java.util.ArrayList;\n" +
+                                "import java.util.Collections;\n" +
+                                "import java.util.List;\n"+
+                                "import rx.functions.Action1;\n");
+                        sbDef.append("    private View header;\n" +
+                                "    private SwipeRefreshLayout refreshLayout;\n" +
+                                "    private SwipeMenuRecyclerView lv;\n" +
+                                "    private List<"+clazz+".DataEntity> list;\n" +
+                                "    private SideBar sideBar;\n" +
+                                "    private TextView tv_toast;\n" +
+                                "\n" +
+                                "    /**\n" +
+                                "     * 汉字转换成拼音的类\n" +
+                                "     */\n" +
+                                "    private CharacterParser characterParser;\n" +
+                                "\n" +
+                                "    /**\n" +
+                                "     * 根据拼音来排列ListView里面的数据类\n" +
+                                "     */\n" +
+                                "    private PinyinComparator pinyinComparator;\n" +
+                                "    private "+widgetEntity.getResId().substring(0,1).toUpperCase()+widgetEntity.getResId().substring(1)+"ListAdapter adapter;\n" +
+                                "    private RxPermissions rxPermissions;\n" +
+                                "    private EditText et_search;\n" +
+                                "    private TextView tv_footer;");
+                        sbInit.append("\n        rxPermissions = new RxPermissions(this);\n" +
+                                "        refreshLayout = (SwipeRefreshLayout) findViewById(R.id.refresh);\n" +
+                                "        lv = (SwipeMenuRecyclerView) findViewById(R.id.lv);\n" +
+                                "\n" +
+                                "        lv.setLayoutManager(new LinearLayoutManager(this));\n" +
+                                "\n" +
+                                "        sideBar = (SideBar) findViewById(R.id.side_bar);\n" +
+                                "        tv_toast = (TextView) findViewById(R.id.tv_toast);\n" +
+                                "\n" +
+                                "        header = LayoutInflater.from("+activityEntity.getName()+".this).inflate(R.layout.item_header_search, lv, false);\n" +
+                                "        AutoUtils.auto(header);\n" +
+                                "        et_search = (EditText) header.findViewById(R.id.et_search);\n" +
+                                "        lv.addHeaderView(header);\n" +
+                                "\n" +
+                                "        View footer = LayoutInflater.from("+activityEntity.getName()+".this).inflate(R.layout.item_footer, lv, false);\n" +
+                                "        AutoUtils.auto(footer);\n" +
+                                "        tv_footer = (TextView) footer.findViewById(R.id.tv_footer);\n" +
+                                "        lv.addFooterView(footer);\n" +
+                                "\n" +
+                                "        list = new ArrayList<>();\n" +
+                                "        //实例化汉字转拼音类\n" +
+                                "        characterParser = CharacterParser.getInstance();\n" +
+                                "\n" +
+                                "        pinyinComparator = new PinyinComparator();\n" +
+                                "\n" +
+                                "        adapter = new "+widgetEntity.getResId().substring(0,1).toUpperCase()+widgetEntity.getResId().substring(1)+"ListAdapter(this, list);\n" +
+                                "        lv.setAdapter(adapter);\n" +
+                                "\n" +
+                                "        lv.setSwipeMenuCreator(new SwipeMenuCreator() {\n" +
+                                "            @Override\n" +
+                                "            public void onCreateMenu(SwipeMenu swipeLeftMenu, SwipeMenu swipeRightMenu, int viewType) {\n" +
+                                "                SwipeMenuItem callItem = new SwipeMenuItem("+activityEntity.getName()+".this);\n" +
+                                "                callItem.setImage(R.drawable.delete)\n" +
+                                "                        .setWidth(AutoUtils.getPercentWidthSize(250))\n" +
+                                "                        .setHeight(ViewGroup.LayoutParams.MATCH_PARENT)\n" +
+                                "                        .setBackgroundColor(Color.rgb(224, 232, 238));\n" +
+                                "                swipeRightMenu.addMenuItem(callItem);\n" +
+                                "\n" +
+                                "            }\n" +
+                                "        });");
+                        sbEvent.append("\n       refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {\n" +
+                                "            @Override\n" +
+                                "            public void onRefresh() {\n" +
+                                "                //getContacts();\n" +
+                                "            }\n" +
+                                "        });\n" +
+                                "\n" +
+                                "        //设置右侧触摸监听\n" +
+                                "        sideBar.setLetterTouchListener(new SideBar.OnLetterTouchListener() {\n" +
+                                "            @Override\n" +
+                                "            public void onLetterTouch(String letter, int position) {\n" +
+                                "                tv_toast.setVisibility(View.VISIBLE);\n" +
+                                "                tv_toast.setText(letter);\n" +
+                                "                //该字母首次出现的位置\n" +
+                                "                if (position != -1 && adapter.getPositionForSection(letter.charAt(0)) != -1) {\n" +
+                                "                    ((LinearLayoutManager) lv.getLayoutManager()).scrollToPositionWithOffset(adapter.getPositionForSection(letter.charAt(0)) + 1, 0);\n" +
+                                "                }\n" +
+                                "            }\n" +
+                                "\n" +
+                                "            @Override\n" +
+                                "            public void onActionUp() {\n" +
+                                "                tv_toast.setVisibility(View.INVISIBLE);\n" +
+                                "            }\n" +
+                                "        });\n" +
+                                "\n" +
+                                "\n" +
+                                "        lv.setSwipeItemClickListener(new SwipeItemClickListener() {\n" +
+                                "            @Override\n" +
+                                "            public void onItemClick(View itemView, int position) {\n" +
+                                "            }\n" +
+                                "        });\n" +
+                                "\n" +
+                                "        lv.setSwipeMenuItemClickListener(new SwipeMenuItemClickListener() {\n" +
+                                "            @Override\n" +
+                                "            public void onItemClick(SwipeMenuBridge menuBridge) {\n" +
+                                "                switch (menuBridge.getPosition()) {\n" +
+                                "                    case 0:\n" +
+                                "                        //String id = list.get(menuBridge.getAdapterPosition()).getId();\n" +
+                                "                        //delete(id);\n" +
+                                "                        break;\n" +
+                                "                }\n" +
+                                "            }\n" +
+                                "        });\n" +
+                                "\n" +
+                                "        et_search.addTextChangedListener(new TextWatcher() {\n" +
+                                "            @Override\n" +
+                                "            public void beforeTextChanged(CharSequence s, int start, int count, int after) {\n" +
+                                "\n" +
+                                "            }\n" +
+                                "\n" +
+                                "            @Override\n" +
+                                "            public void onTextChanged(CharSequence s, int start, int before, int count) {\n" +
+                                "\n" +
+                                "            }\n" +
+                                "\n" +
+                                "            @Override\n" +
+                                "            public void afterTextChanged(Editable s) {\n" +
+                                "                if (s.length() == 0) {\n" +
+                                "                    adapter.cancelSearch(list);\n" +
+                                "                } else {\n" +
+                                "                    adapter.startSearch(s.toString());\n" +
+                                "                }\n" +
+                                "                //tv_footer.setText(adapter.getItemCount() + getString(R.string.unit_contact));\n" +
+                                "            }\n" +
+                                "        });");
+                        sbLayout.append("\n" +
+                                "    <FrameLayout\n" +
+                                "        android:layout_width=\"match_parent\"\n" +
+                                "        android:layout_height=\"match_parent\">\n" +
+                                "\n" +
+                                "        <android.support.v4.widget.SwipeRefreshLayout\n" +
+                                "            android:id=\"@+id/refresh\"\n" +
+                                "            android:layout_width=\"match_parent\"\n" +
+                                "            android:layout_height=\"match_parent\">\n" +
+                                "\n" +
+                                "            <com.yanzhenjie.recyclerview.swipe.SwipeMenuRecyclerView\n" +
+                                "                android:id=\"@+id/lv\"\n" +
+                                "                android:layout_width=\"match_parent\"\n" +
+                                "                android:layout_height=\"match_parent\"\n" +
+                                "                android:divider=\"@null\"\n" +
+                                "                android:dividerHeight=\"0dp\"\n" +
+                                "                android:listSelector=\"@color/colorTransparent\" />\n" +
+                                "\n" +
+                                "        </android.support.v4.widget.SwipeRefreshLayout>\n" +
+                                "\n" +
+                                "        <TextView\n" +
+                                "            android:id=\"@+id/tv_toast\"\n" +
+                                "            android:layout_width=\"260px\"\n" +
+                                "            android:layout_height=\"200px\"\n" +
+                                "            android:layout_gravity=\"center\"\n" +
+                                "            android:background=\"@drawable/sort_lv_bg\"\n" +
+                                "            android:gravity=\"center\"\n" +
+                                "            android:textColor=\"@android:color/white\"\n" +
+                                "            android:textSize=\"56px\"\n" +
+                                "            android:visibility=\"invisible\" />\n" +
+                                "\n" +
+                                "        <" + app.getPackageName() + ".ui.widget.sidebar.SideBar\n" +
+                                "            android:id=\"@+id/side_bar\"\n" +
+                                "            android:layout_width=\"70px\"\n" +
+                                "            android:layout_height=\"match_parent\"\n" +
+                                "            android:layout_gravity=\"right|center_vertical\"\n" +
+                                "            android:layout_marginBottom=\"90px\"\n" +
+                                "            android:layout_marginTop=\"90px\" />\n" +
+                                "    </FrameLayout>\n" +
+                                "\n");
+                        break;
+
                 }
             }
-            sbJava.append(sbDef.toString())
+            sbJava.append("package " + app.getPackageName() + ".ui.act;\n" +
+                    "\n")
+                    .append(sbImp.toString())
+                    .append("\n" +
+                            "/**\n" +
+                            " *\n" +
+                            " * Created by admin on 2017/8/27.\n" +
+                            " */\n" +
+                            "public class " + activityEntity.getName() + " extends BaseActivity {\n")
+                    .append(sbDef.toString())
                     .append("\n\n    @Override\n" +
                             "    public int getLayoutId() {\n" +
-                            "        return R.layout."+realLayoutName+";\n" +
+                            "        return R.layout." + realLayoutName + ";\n" +
                             "    }\n")
                     .append("    @Override\n" +
                             "    public void initView() {\n")
@@ -1038,8 +1895,8 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 "}\n");
         sbLayout.append("\n" +
                 "</LinearLayout>");
-        FileUtils.saveFileToServer(sbLayout.toString(), layoutPath, realLayoutName+".xml");
-        FileUtils.saveFileToServer(sbJava.toString(), javaPath+File.separator+"ui"+File.separator+"act", activityEntity.getName()+".java");
+        FileUtils.saveFileToServer(sbLayout.toString(), layoutPath, realLayoutName + ".xml");
+        FileUtils.saveFileToServer(sbJava.toString(), javaPath + File.separator + "ui" + File.separator + "act", activityEntity.getName() + ".java");
 
 
     }
@@ -1088,7 +1945,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 "\n" +
                 "    @Override\n" +
                 "    public int getLayoutId() {\n" +
-                "        return R.layout."+layoutName+";\n" +
+                "        return R.layout." + layoutName + ";\n" +
                 "    }\n" +
                 "\n" +
                 "    @Override\n" +
@@ -1104,7 +1961,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 "        tvNoData = (TextView) findViewById(R.id.tv_no_data);\n" +
                 "\n" +
                 "    //    list = new ArrayList<>();\n" +
-                "    //    adapter = new ActivityListAdapter(this, list, R.layout.list_item_interface_group, true);\n" +
+                "    //    adapter = new ActivityListAdapter(this, list, R.layout.list_item_interface_group);\n" +
                 "    //    lv.setAdapter(adapter);\n" +
                 "    }\n" +
                 "\n" +
@@ -1163,7 +2020,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 "            public void onRightClick(ImageView imageView, TextView textView) {\n" +
                 "\n" +
                 "            }\n" +
-                "        });"+
+                "        });" +
                 "\n" +
                 "\n" +
                 "        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {\n" +
@@ -1264,7 +2121,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 "\n" +
                 "    }\n" +
                 "}\n";
-        FileUtils.saveFileToServer(javaCode, javaPath+File.separator+"ui"+File.separator+"act", name + ".java");
+        FileUtils.saveFileToServer(javaCode, javaPath + File.separator + "ui" + File.separator + "act", name + ".java");
     }
 
     private String generateLvActLayout(String layoutPath, ActivityEntity activityEntity, ApplicationEntity app, StringBuilder sbStrings) throws IOException {

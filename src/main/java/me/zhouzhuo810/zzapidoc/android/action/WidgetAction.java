@@ -52,13 +52,14 @@ public class WidgetAction extends BaseController<WidgetEntity> {
             @RequestParam(value = "showRightTitleLayout", required = false) boolean showRightTitleLayout,
             @RequestParam(value = "targetActId", required = false) String targetActId,
             @RequestParam(value = "relativeId") String relativeId,
+            @RequestParam(value = "targetApiId", required = false) String targetApiId,
             @RequestParam(value = "appId", required = false) String appId,
             @RequestParam(value = "userId") String userId
     ) {
         return getBaseService().addWidget(name, title, resId, type, defValue, hint,
                 leftTitleText, rightTitleText, leftTitleImg, rightTitleImg, showLeftTitleImg,
                 showRightTitleImg, showLeftTitleText, showRightTitleText, showLeftTitleLayout, showRightTitleLayout,
-                targetActId, relativeId, appId, userId);
+                targetActId, relativeId, targetApiId, appId, userId);
     }
 
     @ResponseBody

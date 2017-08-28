@@ -277,6 +277,7 @@ public class ApiTool {
                                 sbApi.append("\nimport java.net.CookiePolicy;");
                                 sbApi.append("\nimport java.util.concurrent.TimeUnit;");
                                 sbApi.append("\n\n");
+                                sbApi.append("\nimport "+packageName+".MyApplication;");
                                 sbApi.append("\nimport okhttp3.Cache;");
                                 sbApi.append("\nimport okhttp3.OkHttpClient;");
                                 sbApi.append("\nimport okhttp3.logging.HttpLoggingInterceptor;");
@@ -308,11 +309,11 @@ public class ApiTool {
                                     sb.append("\npublic interface Api").append(i1).append(" {");
                                     sbApi.append("\n    private static final String SERVER_IP").append(i1).append(" = ").append("\"\";");
                                     sbApi.append("\n    private static Api").append(i1).append(" api").append(i1).append(";");
-                                    sbApi.append("\n    public static Api").append(i1).append(" getApi").append(i1).append("(Context context) {");
+                                    sbApi.append("\n    public static Api").append(i1).append(" getApi").append(i1).append("() {");
                                     sbApi.append("\n        if (api").append(i1).append(" == null) {");
                                     sbApi.append("\n            synchronized (Api.class) {");
                                     sbApi.append("\n                if (api").append(i1).append(" == null) {");
-                                    sbApi.append("\n                    File cache = context.getCacheDir();");
+                                    sbApi.append("\n                    File cache = MyApplication.getContext().getCacheDir();");
                                     sbApi.append("\n                    HttpLoggingInterceptor logging = new HttpLoggingInterceptor();");
                                     sbApi.append("\n                    logging.setLevel(HttpLoggingInterceptor.Level.BASIC);");
                                     sbApi.append("\n                    HttpLoggingInterceptor logging1 = new HttpLoggingInterceptor();");
