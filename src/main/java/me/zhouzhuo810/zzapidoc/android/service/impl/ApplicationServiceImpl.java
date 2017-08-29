@@ -1901,7 +1901,6 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
 
     }
 
-
     private void generateLvActJava(String layoutName, String javaPath, ActivityEntity activityEntity, ApplicationEntity app) throws IOException {
         String name = activityEntity.getName();
         String packageName = app.getPackageName();
