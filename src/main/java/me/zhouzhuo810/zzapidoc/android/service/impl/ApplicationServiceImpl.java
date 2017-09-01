@@ -27,6 +27,7 @@ import me.zhouzhuo810.zzapidoc.user.entity.UserEntity;
 import me.zhouzhuo810.zzapidoc.user.service.UserService;
 import org.apache.log4j.Logger;
 import org.aspectj.util.FileUtil;
+import org.gradle.tooling.*;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.http.HttpHeaders;
@@ -41,8 +42,10 @@ import sun.reflect.misc.FieldUtil;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -194,7 +197,6 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
             return null;
         }
 
-
         try {
             HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
             String realPath = request.getRealPath("");
@@ -253,6 +255,8 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 copyGradleWrapper(realPath, appDirPath);
                 generateApp(realPath, appDirPath, app);
 
+//                buildLauncher(appDirPath, realPath+File.separator+"apk");
+
                 /*压缩文件*/
                 String zipName = System.currentTimeMillis() + ".zip";
                 String zipPath = mPath + File.separator + zipName;
@@ -271,6 +275,60 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
         }
         return null;
     }
+
+    public boolean buildLauncher(final String projectPath, final String targetApkDir) {
+        final String apkPath = projectPath
+                +File.separator+"app"
+                +File.separator+"build"
+                +File.separator+"outputs"
+                +File.separator+"apk";
+        ProjectConnection connection = GradleConnector.newConnector().
+                forProjectDirectory(new File(projectPath)).connect();
+        String buildResult = "";
+        try {
+            BuildLauncher build = connection.newBuild();
+            build.forTasks("clean", "assembleDebug");
+            ByteArrayOutputStream baoStream = new ByteArrayOutputStream(1024);
+            PrintStream cacheStream = new PrintStream(baoStream);
+            //PrintStream oldStream = System.out;
+            System.setOut(cacheStream);//不打印到控制台
+
+            build.setStandardOutput(System.out);
+            build.setStandardError(System.err);
+            build.run(new ResultHandler<Void>() {
+                @Override
+                public void onComplete(Void aVoid) {
+                    try {
+                        FileUtil.copyDir(new File(apkPath), new File(targetApkDir));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    /*压缩完毕，删除源文件*/
+                    FileUtil.deleteContents(new File(projectPath));
+                }
+
+                @Override
+                public void onFailure(GradleConnectionException e) {
+                  /*压缩完毕，删除源文件*/
+                    FileUtil.deleteContents(new File(projectPath));
+                }
+            });
+
+//            buildResult = baoStream.toString();
+            //System.setOut(oldStream);//还原到控制台输出
+
+            //打印写入文件
+//            FileOutputStream fo = new FileOutputStream("./gradle.out",true);
+//            System.setOut(new PrintStream(fo));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            connection.close();
+        }
+        return buildResult.contains("BUILD SUCCESSFUL");
+    }
+
 
     private void generateApp(String rootPath, String appDirPath, ApplicationEntity app) throws IOException {
 
@@ -2249,5 +2307,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
     private void createSettingGradleFile(String appDirPath) throws IOException {
         FileUtils.saveFileToServer("include ':app'\n", appDirPath, "settings.gradle");
     }
+
+
 
 }

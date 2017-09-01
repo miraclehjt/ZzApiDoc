@@ -21,7 +21,6 @@ import java.io.IOException;
 @RequestMapping(value = "v1/application")
 public class ApplicationAction extends BaseController<ApplicationEntity> {
 
-
     @Override
     @Resource(name = "applicationServiceImpl")
     public void setBaseService(BaseService<ApplicationEntity> baseService) {
