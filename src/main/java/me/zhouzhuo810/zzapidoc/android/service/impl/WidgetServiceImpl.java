@@ -52,7 +52,10 @@ public class WidgetServiceImpl extends BaseServiceImpl<WidgetEntity> implements 
                                 String leftTitleText, String rightTitleText, MultipartFile leftTitleImg,
                                 MultipartFile rightTitleImg, boolean showLeftTitleImg, boolean showRightTitleImg,
                                 boolean showLeftTitleText, boolean showRightTitleText, boolean showLeftTitleLayout,
-                                boolean showRightTitleLayout, String targetActId, String relativeId, String targetApiId, String appId, String userId) {
+                                boolean showRightTitleLayout,String pid, String background, int width, int height,
+                                double weight, int marginLeft, int marginRight, int marginTop, int marginBottom,
+                                int paddingLeft, int paddingRight, int paddingTop, int paddingBottom, String gravity,
+                                String targetActId, String relativeId, String targetApiId, String appId, String userId) {
         UserEntity user = mUserService.get(userId);
         if (user == null) {
             return new BaseResult(0, "用户不合法");
@@ -65,6 +68,20 @@ public class WidgetServiceImpl extends BaseServiceImpl<WidgetEntity> implements 
         entity.setHint(hint);
         entity.setTargetApiId(targetApiId);
         entity.setRelativeId(relativeId);
+        entity.setPid(pid==null?"0":pid);
+        entity.setBackground(background==null?"@android:color/transparent":background);
+        entity.setWidth(width);
+        entity.setHeight(height);
+        entity.setGravity(gravity);
+        entity.setWeight(weight);
+        entity.setMarginLeft(marginLeft);
+        entity.setMarginRight(marginRight);
+        entity.setMarginTop(marginTop);
+        entity.setMarginBottom(marginBottom);
+        entity.setPaddingLeft(paddingLeft);
+        entity.setPaddingRight(paddingRight);
+        entity.setPaddingTop(paddingTop);
+        entity.setPaddingBottom(paddingBottom);
         entity.setTitle(title);
         entity.setDefValue(defValue);
         entity.setApplicationId(appId);

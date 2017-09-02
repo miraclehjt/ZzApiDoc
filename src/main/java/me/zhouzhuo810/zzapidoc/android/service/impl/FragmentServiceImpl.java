@@ -1,9 +1,6 @@
 package me.zhouzhuo810.zzapidoc.android.service.impl;
 
-import me.zhouzhuo810.zzapidoc.android.dao.ApplicationDao;
 import me.zhouzhuo810.zzapidoc.android.dao.FragmentDao;
-import me.zhouzhuo810.zzapidoc.android.entity.FragmentEntity;
-import me.zhouzhuo810.zzapidoc.android.entity.ApplicationEntity;
 import me.zhouzhuo810.zzapidoc.android.entity.FragmentEntity;
 import me.zhouzhuo810.zzapidoc.android.service.FragmentService;
 import me.zhouzhuo810.zzapidoc.common.dao.BaseDao;
@@ -11,17 +8,14 @@ import me.zhouzhuo810.zzapidoc.common.entity.BaseEntity;
 import me.zhouzhuo810.zzapidoc.common.result.BaseResult;
 import me.zhouzhuo810.zzapidoc.common.service.impl.BaseServiceImpl;
 import me.zhouzhuo810.zzapidoc.common.utils.DataUtils;
-import me.zhouzhuo810.zzapidoc.common.utils.FileUtils;
 import me.zhouzhuo810.zzapidoc.common.utils.MapUtils;
 import me.zhouzhuo810.zzapidoc.user.entity.UserEntity;
 import me.zhouzhuo810.zzapidoc.user.service.UserService;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +41,8 @@ public class FragmentServiceImpl extends BaseServiceImpl<FragmentEntity> impleme
     }
 
     @Override
-    public BaseResult addFragment(String name, String title, boolean showTitle, int type, int position ,String appId, String activityId, String userId) {
+    public BaseResult addFragment(String name, String title, boolean showTitle, int type,
+                                  int position ,String appId, String activityId, String userId) {
         UserEntity user = mUserService.get(userId);
         if (user == null) {
             return new BaseResult(0, "用户不合法");

@@ -16,6 +16,9 @@ public interface WidgetService extends BaseService<WidgetEntity> {
                          MultipartFile leftTitleImg, MultipartFile rightTitleImg, boolean showLeftTitleImg,
                          boolean showRightTitleImg, boolean showLeftTitleText, boolean showRightTitleText,
                          boolean showLeftTitleLayout, boolean showRightTitleLayout,
+                         String pid, String background, int width, int height, double weight, int marginLeft,
+                         int marginRight, int marginTop, int marginBottom, int paddingLeft, int paddingRight,
+                         int paddingTop, int paddingBottom, String gravity,
                          String targetActId, String relativeId, String targetApiId, String appId, String userId);
 
     BaseResult getAllMyWidget(String relativeId, String userId);

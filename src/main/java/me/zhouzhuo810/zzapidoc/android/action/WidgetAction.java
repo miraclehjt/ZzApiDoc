@@ -50,6 +50,20 @@ public class WidgetAction extends BaseController<WidgetEntity> {
             @RequestParam(value = "showRightTitleText", required = false) boolean showRightTitleText,
             @RequestParam(value = "showLeftTitleLayout", required = false) boolean showLeftTitleLayout,
             @RequestParam(value = "showRightTitleLayout", required = false) boolean showRightTitleLayout,
+            @RequestParam(value = "pid", required = false) String pid,
+            @RequestParam(value = "background", required = false) String background,
+            @RequestParam(value = "width", required = false) int width,
+            @RequestParam(value = "height", required = false) int height,
+            @RequestParam(value = "weight", required = false) double weight,
+            @RequestParam(value = "marginLeft", required = false) int marginLeft,
+            @RequestParam(value = "marginRight", required = false) int marginRight,
+            @RequestParam(value = "marginTop", required = false) int marginTop,
+            @RequestParam(value = "marginBottom", required = false) int marginBottom,
+            @RequestParam(value = "paddingLeft", required = false) int paddingLeft,
+            @RequestParam(value = "paddingRight", required = false) int paddingRight,
+            @RequestParam(value = "paddingTop", required = false) int paddingTop,
+            @RequestParam(value = "paddingBottom", required = false) int paddingBottom,
+            @RequestParam(value = "gravity", required = false) String gravity,
             @RequestParam(value = "targetActId", required = false) String targetActId,
             @RequestParam(value = "relativeId") String relativeId,
             @RequestParam(value = "targetApiId", required = false) String targetApiId,
@@ -59,7 +73,8 @@ public class WidgetAction extends BaseController<WidgetEntity> {
         return getBaseService().addWidget(name, title, resId, type, defValue, hint,
                 leftTitleText, rightTitleText, leftTitleImg, rightTitleImg, showLeftTitleImg,
                 showRightTitleImg, showLeftTitleText, showRightTitleText, showLeftTitleLayout, showRightTitleLayout,
-                targetActId, relativeId, targetApiId, appId, userId);
+                pid, background, width, height, weight, marginLeft, marginRight, marginTop, marginBottom, paddingLeft,
+                paddingRight, paddingTop, paddingBottom, gravity, targetActId, relativeId, targetApiId, appId, userId);
     }
 
     @ResponseBody
