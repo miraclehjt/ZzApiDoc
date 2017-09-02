@@ -307,7 +307,7 @@ public class ApiTool {
                                     sb.append("\n * ").append(foldersBean.getName());
                                     sb.append("\n */");
                                     sb.append("\npublic interface Api").append(i1).append(" {");
-                                    sbApi.append("\n    private static final String SERVER_IP").append(i1).append(" = ").append("\"\";");
+                                    sbApi.append("\n    private static final String SERVER_IP").append(i1).append(" = ").append("\"").append(foldersBean.getIp() == null ? "http://www.baidu.com/" : foldersBean.getIp()).append("\";");
                                     sbApi.append("\n    private static Api").append(i1).append(" api").append(i1).append(";");
                                     sbApi.append("\n    public static Api").append(i1).append(" getApi").append(i1).append("() {");
                                     sbApi.append("\n        if (api").append(i1).append(" == null) {");

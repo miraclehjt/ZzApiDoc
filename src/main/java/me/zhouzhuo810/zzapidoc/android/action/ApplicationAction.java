@@ -73,6 +73,15 @@ public class ApplicationAction extends BaseController<ApplicationEntity> {
 
 
     @ResponseBody
+    @RequestMapping(value = "/downloadApk", method = RequestMethod.GET)
+    public ResponseEntity<byte[]> downloadApk(
+            @RequestParam(value = "appId") String appId,
+            @RequestParam(value = "userId") String userId
+    ) throws IOException {
+        return getBaseService().downloadApk(appId, userId);
+    }
+
+    @ResponseBody
     @RequestMapping(value = "/downloadApplication", method = RequestMethod.GET)
     public ResponseEntity<byte[]> downloadApplication(
             @RequestParam(value = "appId") String appId,

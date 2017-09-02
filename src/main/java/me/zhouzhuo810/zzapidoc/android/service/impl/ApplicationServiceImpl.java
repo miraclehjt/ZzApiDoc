@@ -187,6 +187,104 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
     }
 
     @Override
+    public ResponseEntity<byte[]> downloadApk(String appId, String userId) {
+        UserEntity user = mUserService.get(userId);
+        if (user == null) {
+            return null;
+        }
+        ApplicationEntity app = getBaseDao().get(appId);
+        if (app == null) {
+            return null;
+        }
+
+        try {
+            HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+            String realPath = request.getRealPath("");
+            if (realPath != null) {
+                String mPath = realPath + File.separator + "APP";
+                File dir = new File(mPath);
+                if (!dir.exists()) {
+                    dir.mkdirs();
+                }
+                CacheEntity cacheEntity = new CacheEntity();
+                cacheEntity.setCachePath(mPath);
+                try {
+                    List<CacheEntity> cacheEntities = mCacheService.executeCriteria(new Criterion[]{
+                            Restrictions.eq("deleteFlag", BaseEntity.DELETE_FLAG_NO),
+                            Restrictions.eq("cachePath", mPath)});
+                    if (cacheEntities == null || cacheEntities.size() == 0) {
+                        mCacheService.save(cacheEntity);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    LOGGER.error("APP ERROR", e);
+                }
+
+                /*Api*/
+                String appName = app.getAppName();
+                String appDirPath = mPath + File.separator + appName;
+                File appDir = new File(appDirPath);
+                if (!appDir.exists()) {
+                    /*如果不存在，创建app目录*/
+                    appDir.mkdirs();
+                } else {
+                    /*如果存在，删除该目录里的所有文件*/
+                    FileUtils.deleteFiles(appDirPath);
+                }
+
+                if (app.getApiId() != null && app.getApiId().length() > 0) {
+                    ProjectEntity project = mProjectService.get(app.getApiId());
+                    if (project != null) {
+                        String packageName = app.getPackageName();
+                        String packagePath = packageName.replace(".", File.separator);
+                        String javaDir = appDirPath
+                                + File.separator + "app"
+                                + File.separator + "src"
+                                + File.separator + "main"
+                                + File.separator + "java"
+                                + File.separator + packagePath
+                                + File.separator + "common"
+                                + File.separator + "api";
+                        ApiTool.createApi(mInterfaceService.convertToJson(project), app.getPackageName(), javaDir);
+                    }
+                }
+
+                createSettingGradleFile(appDirPath);
+                createGradleProperties(appDirPath);
+                createBuildGralde(appDirPath);
+                copyGradleWrapper(realPath, appDirPath);
+                generateApp(realPath, appDirPath, app);
+
+                String apkName = app.getAppName()+"_"+app.getVersionName()+"_debug.apk";
+
+                final String apkPath = appDirPath
+                        +File.separator+"app"
+                        +File.separator+"build"
+                        +File.separator+"outputs"
+                        +File.separator+"apk";
+
+                boolean success = buildLauncher(appDirPath, apkPath, realPath);
+                if (success) {
+                    /*压缩完毕，删除源文件*/
+                    FileUtil.deleteContents(new File(appDirPath));
+                } else {
+                 /*压缩完毕，删除源文件*/
+                    FileUtil.deleteContents(new File(appDirPath));
+                }
+
+                HttpHeaders headers = new HttpHeaders();
+                headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+                headers.setContentDispositionFormData("attachment", apkName);
+                return new ResponseEntity<byte[]>(org.apache.commons.io.FileUtils.readFileToByteArray(new File(realPath+File.separator+"apk"
+                        +File.separator+apkName)), headers, HttpStatus.CREATED);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
     public ResponseEntity<byte[]> downloadApplication(String appId, String userId) {
         UserEntity user = mUserService.get(userId);
         if (user == null) {
@@ -255,14 +353,12 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 copyGradleWrapper(realPath, appDirPath);
                 generateApp(realPath, appDirPath, app);
 
-//                buildLauncher(appDirPath, realPath+File.separator+"apk");
-
                 /*压缩文件*/
                 String zipName = System.currentTimeMillis() + ".zip";
                 String zipPath = mPath + File.separator + zipName;
                 ZipUtils.doCompress(appDirPath, zipPath);
 
-                /*压缩完毕，删除源文件*/
+                //压缩完毕，删除源文件
                 FileUtil.deleteContents(new File(appDirPath));
 
                 HttpHeaders headers = new HttpHeaders();
@@ -276,18 +372,13 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
         return null;
     }
 
-    public boolean buildLauncher(final String projectPath, final String targetApkDir) {
-        final String apkPath = projectPath
-                +File.separator+"app"
-                +File.separator+"build"
-                +File.separator+"outputs"
-                +File.separator+"apk";
+    public boolean buildLauncher(final String projectPath, final String apkPath, final String realPath) {
         ProjectConnection connection = GradleConnector.newConnector().
                 forProjectDirectory(new File(projectPath)).connect();
         String buildResult = "";
         try {
             BuildLauncher build = connection.newBuild();
-            build.forTasks("clean", "assembleDebug");
+            build.forTasks("assembleDebug");
             ByteArrayOutputStream baoStream = new ByteArrayOutputStream(1024);
             PrintStream cacheStream = new PrintStream(baoStream);
             //PrintStream oldStream = System.out;
@@ -299,28 +390,17 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 @Override
                 public void onComplete(Void aVoid) {
                     try {
-                        FileUtil.copyDir(new File(apkPath), new File(targetApkDir));
+                        FileUtil.copyDir(new File(apkPath), new File(realPath+File.separator+"apk"));
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                    /*压缩完毕，删除源文件*/
-                    FileUtil.deleteContents(new File(projectPath));
                 }
 
                 @Override
                 public void onFailure(GradleConnectionException e) {
-                  /*压缩完毕，删除源文件*/
-                    FileUtil.deleteContents(new File(projectPath));
+
                 }
             });
-
-//            buildResult = baoStream.toString();
-            //System.setOut(oldStream);//还原到控制台输出
-
-            //打印写入文件
-//            FileOutputStream fo = new FileOutputStream("./gradle.out",true);
-//            System.setOut(new PrintStream(fo));
-
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -338,6 +418,20 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 + File.separator + "proguard"
                 + File.separator + "proguard-rules.pro"
         ), new File(appDirPath + File.separator + "app" + File.separator + "proguard-rules.pro"));
+
+        /*sign file*/
+        FileUtil.copyFile(new File(rootPath
+                + File.separator + "res"
+                + File.separator + "sign"
+                + File.separator + "test.jks"
+        ), new File(appDirPath + File.separator + "app" + File.separator + "test.jks"));
+
+        /*local.properties*/
+        FileUtil.copyFile(new File(rootPath
+                + File.separator + "res"
+                + File.separator + "local"
+                + File.separator + "local.properties"
+        ), new File(appDirPath + File.separator+ "local.properties"));
 
         /*git ignore file*/
         FileUtil.copyFile(new File(rootPath
@@ -413,6 +507,20 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 "        cruncherEnabled false\n" +
                 "        useNewCruncher false\n" +
                 "    }\n\n" +
+                "    signingConfigs {\n" +
+                "        debugConfig {\n" +
+                "            storeFile file(\"test.jks\")\n" +
+                "            storePassword \"123456\"\n" +
+                "            keyAlias \"test\"\n" +
+                "            keyPassword \"123456\"\n" +
+                "        }\n" +
+                "        releaseConfig {\n" +
+                "            storeFile file(\"test.jks\")\n" +
+                "            storePassword \"123456\"\n" +
+                "            keyAlias \"test\"\n" +
+                "            keyPassword \"123456\"\n" +
+                "        }\n" +
+                "    }\n"+
                 "    applicationVariants.all {variant ->\n" +
                 "        variant.outputs.each {output ->\n" +
                 "            def outputFile = output.outputFile\n" +
@@ -429,11 +537,15 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 "    }\n" +
                 "\n" +
                 "    buildTypes {\n" +
+                "        debug {\n" +
+                "            signingConfig signingConfigs.debugConfig\n" +
+                "        }\n" +
                 "        release {\n" +
                 "            minifyEnabled false\n" +
+                "            signingConfig signingConfigs.releaseConfig\n" +
                 "            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'\n" +
                 "        }\n" +
-                "    }\n" +
+                "    }" +
                 "}\n" +
                 "\n" +
                 "dependencies {\n" +
@@ -685,20 +797,20 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                     "        android:id=\"@+id/iv_pic\"\n" +
                     "        android:layout_width=\"match_parent\"\n" +
                     "        android:layout_height=\"match_parent\"\n" +
-                    "        android:src=\"@mipmap/ic_launcher\" />\n" +
+                    "        android:src=\"@mipmap/"+logoName+"\" />\n" +
                     "\n" +
                     "    <TextView\n" +
                     "        android:id=\"@+id/tv_jump\"\n" +
                     "        android:layout_width=\"wrap_content\"\n" +
                     "        android:layout_height=\"wrap_content\"\n" +
                     "        android:layout_gravity=\"right|top\"\n" +
-                    "        android:layout_marginRight=\"30px\"\n" +
-                    "        android:layout_marginTop=\"30px\"\n" +
+                    "        android:layout_marginRight=\"50px\"\n" +
+                    "        android:layout_marginTop=\"50px\"\n" +
                     "        android:background=\"@drawable/btn_main_selector\"\n" +
-                    "        android:paddingBottom=\"6px\"\n" +
-                    "        android:paddingLeft=\"14px\"\n" +
-                    "        android:paddingRight=\"14px\"\n" +
-                    "        android:paddingTop=\"6px\"\n" +
+                    "        android:paddingBottom=\"8px\"\n" +
+                    "        android:paddingLeft=\"18px\"\n" +
+                    "        android:paddingRight=\"18px\"\n" +
+                    "        android:paddingTop=\"8px\"\n" +
                     "        android:textColor=\"@color/colorWhite\"\n" +
                     "        android:textSize=\"36px\"\n" +
                     "        android:visibility=\"gone\" />\n" +
@@ -1406,7 +1518,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "        android:layout_width=\"match_parent\"\n" +
                                 "        android:layout_height=\"@dimen/title_height\"\n" +
                                 "        android:background=\"@color/colorPrimary\"\n" +
-                                "        app:leftImg=\"@mipmap/ic_launcher\"\n" +
+                                "        app:leftImg=\"@drawable/back\"\n" +
                                 "        app:showLeftImg=\"" + widgetEntity.getShowLeftTitleImg() + "\"\n" +
                                 "        app:showLeftLayout=\"" + widgetEntity.getShowLeftTitleLayout() + "\"\n" +
                                 "        app:showLeftText=\"" + widgetEntity.getShowLeftTitleText() + "\"\n" +
@@ -1490,50 +1602,55 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "        android:text=\"@string/" + widgetEntity.getResId() + "_text\"\n" +
                                 "        android:textColor=\"#fff\"\n" +
                                 "        android:textSize=\"@dimen/submit_btn_text_size\" />");
-                        InterfaceEntity interfaceEntity = mInterfaceService.get(widgetEntity.getTargetApiId());
-                        if (interfaceEntity != null) {
-                            int requestParamsNo = interfaceEntity.getRequestParamsNo();
-                            ActivityEntity targetAct = mActivityService.get(widgetEntity.getTargetActivityId());
-                            String url = interfaceEntity.getPath();
-                            String m = url.substring(url.lastIndexOf("/") + 1, url.length());
-                            String beanClazz = m.substring(0, 1).toUpperCase() + m.substring(1, m.length()) + "Result";
-                            sbStrings.append("    <string name=\"" + widgetEntity.getResId() + "ing_text\">" + activityEntity.getTitle() + "中...</string>\n");
-                            sbSubmit.append("\n        showPd(getString(R.string." + widgetEntity.getResId() + "ing_text), false);\n" +
-                                    "        Api.getApi0()\n" +
-                                    "                .userLogin(");
-                            if (requestParamsNo > 0) {
-                                for (int i1 = 0; i1 < requestParamsNo; i1++) {
-                                    sbSubmit.append("\"\", ");
+                        if (widgetEntity.getTargetApiId() != null) {
+                            InterfaceEntity interfaceEntity = mInterfaceService.get(widgetEntity.getTargetApiId());
+                            if (interfaceEntity != null) {
+                                int requestParamsNo = interfaceEntity.getRequestParamsNo();
+                                ActivityEntity targetAct = null;
+                                if (widgetEntity.getTargetActivityId() != null && widgetEntity.getTargetActivityId().length() > 0) {
+                                    targetAct = mActivityService.get(widgetEntity.getTargetActivityId());
                                 }
-                                sbSubmit.deleteCharAt(sbSubmit.length() - 1);
-                                sbSubmit.deleteCharAt(sbSubmit.length() - 1);
+                                String url = interfaceEntity.getPath();
+                                String m = url.substring(url.lastIndexOf("/") + 1, url.length());
+                                String beanClazz = m.substring(0, 1).toUpperCase() + m.substring(1, m.length()) + "Result";
+                                sbStrings.append("    <string name=\"" + widgetEntity.getResId() + "ing_text\">" + activityEntity.getTitle() + "中...</string>\n");
+                                sbSubmit.append("\n        showPd(getString(R.string." + widgetEntity.getResId() + "ing_text), false);\n" +
+                                        "        Api.getApi0()\n" +
+                                        "                .userLogin(");
+                                if (requestParamsNo > 0) {
+                                    for (int i1 = 0; i1 < requestParamsNo; i1++) {
+                                        sbSubmit.append("\"\", ");
+                                    }
+                                    sbSubmit.deleteCharAt(sbSubmit.length() - 1);
+                                    sbSubmit.deleteCharAt(sbSubmit.length() - 1);
+                                }
+                                sbSubmit.append(
+                                        ")\n" +
+                                                "                .compose(RxHelper.<" + beanClazz + ">io_main())\n" +
+                                                "                .subscribe(new Subscriber<" + beanClazz + ">() {\n" +
+                                                "                    @Override\n" +
+                                                "                    public void onCompleted() {\n" +
+                                                "\n" +
+                                                "                    }\n" +
+                                                "\n" +
+                                                "                    @Override\n" +
+                                                "                    public void onError(Throwable e) {\n" +
+                                                "                        hidePd();\n" +
+                                                "                        ToastUtils.showCustomBgToast(getString(R.string.no_net_text) + e.toString());\n" +
+                                                "                    }\n" +
+                                                "\n" +
+                                                "                    @Override\n" +
+                                                "                    public void onNext(" + beanClazz + " result) {\n" +
+                                                "                        hidePd();\n" +
+                                                "                        ToastUtils.showCustomBgToast(result.getMsg());\n" +
+                                                "                        if (result.getCode() == 1) {\n" +
+                                                "                            Intent intent = new Intent("+activityEntity.getName()+".this, " + (targetAct == null ? activityEntity.getName() : targetAct.getName()) + ".class);\n" +
+                                                "                            startActWithIntent(intent);\n" +
+                                                "                            closeAct();\n" +
+                                                "                        }\n" +
+                                                "                    }\n" +
+                                                "                });");
                             }
-                            sbSubmit.append(
-                                    ")\n" +
-                                            "                .compose(RxHelper.<" + beanClazz + ">io_main())\n" +
-                                            "                .subscribe(new Subscriber<" + beanClazz + ">() {\n" +
-                                            "                    @Override\n" +
-                                            "                    public void onCompleted() {\n" +
-                                            "\n" +
-                                            "                    }\n" +
-                                            "\n" +
-                                            "                    @Override\n" +
-                                            "                    public void onError(Throwable e) {\n" +
-                                            "                        hidePd();\n" +
-                                            "                        ToastUtils.showCustomBgToast(getString(R.string.no_net_text) + e.toString());\n" +
-                                            "                    }\n" +
-                                            "\n" +
-                                            "                    @Override\n" +
-                                            "                    public void onNext(" + beanClazz + " result) {\n" +
-                                            "                        hidePd();\n" +
-                                            "                        ToastUtils.showCustomBgToast(result.getMsg());\n" +
-                                            "                        if (result.getCode() == 1) {\n" +
-                                            "                            Intent intent = new Intent(LoginActivity.this, " + (targetAct == null ? "MainActivity" : targetAct.getName()) + ".class);\n" +
-                                            "                            startActWithIntent(intent);\n" +
-                                            "                            closeAct();\n" +
-                                            "                        }\n" +
-                                            "                    }\n" +
-                                            "                });");
                         }
                         break;
                     case WidgetEntity.TYPE_EXIT_BTN_ITEM:
@@ -1576,15 +1693,20 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "        });");
                         break;
                     case WidgetEntity.TYPE_LETTER_RV:
-                        InterfaceEntity inter = mInterfaceService.get(widgetEntity.getTargetApiId());
                         String clazz = "TestResult";
-                        if (inter != null) {
-                            int requestParamsNo = inter.getRequestParamsNo();
-                            ActivityEntity targetAct = mActivityService.get(widgetEntity.getTargetActivityId());
-                            String url = inter.getPath();
-                            String m = url.substring(url.lastIndexOf("/") + 1, url.length());
-                            String beanClazz = m.substring(0, 1).toUpperCase() + m.substring(1, m.length()) + "Result";
-                            clazz = beanClazz;
+                        if (widgetEntity.getTargetApiId() != null) {
+                            InterfaceEntity inter = mInterfaceService.get(widgetEntity.getTargetApiId());
+                            if (inter != null) {
+                                int requestParamsNo = inter.getRequestParamsNo();
+                                ActivityEntity targetAct = null;
+                                if (widgetEntity.getTargetActivityId() != null && widgetEntity.getTargetActivityId().length() > 0) {
+                                    targetAct = mActivityService.get(widgetEntity.getTargetActivityId());
+                                }
+                                String url = inter.getPath();
+                                String m = url.substring(url.lastIndexOf("/") + 1, url.length());
+                                String beanClazz = m.substring(0, 1).toUpperCase() + m.substring(1, m.length()) + "Result";
+                                clazz = beanClazz;
+                            }
                         }
                         StringBuilder sbAdapter = new StringBuilder();
                         sbAdapter.append("package "+app.getPackageName()+".ui;\n" +

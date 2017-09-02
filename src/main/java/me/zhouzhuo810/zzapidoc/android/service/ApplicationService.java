@@ -25,6 +25,8 @@ public interface ApplicationService extends BaseService<ApplicationEntity> {
 
     BaseResult getAllMyApplication(String userId);
 
+    ResponseEntity<byte[]> downloadApk(String appId, String userId);
+
     ResponseEntity<byte[]> downloadApplication(String appId, String userId);
 
 }
