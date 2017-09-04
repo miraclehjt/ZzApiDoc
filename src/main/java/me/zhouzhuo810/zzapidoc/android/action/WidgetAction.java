@@ -81,9 +81,10 @@ public class WidgetAction extends BaseController<WidgetEntity> {
     @RequestMapping(value = "/getAllMyWidget", method = RequestMethod.GET)
     public BaseResult getAllMyWidget(
             @RequestParam(value = "userId") String userId,
+            @RequestParam(value = "pid") String pid,
             @RequestParam(value = "relativeId") String relativeId
     ) {
-        return getBaseService().getAllMyWidget(relativeId, userId);
+        return getBaseService().getAllMyWidget(relativeId, pid, userId);
     }
 
 

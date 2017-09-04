@@ -141,7 +141,7 @@ public class WidgetServiceImpl extends BaseServiceImpl<WidgetEntity> implements 
     }
 
     @Override
-    public BaseResult getAllMyWidget(String relativeId, String userId) {
+    public BaseResult getAllMyWidget(String relativeId, String pid, String userId) {
         UserEntity user = mUserService.get(userId);
         if (user == null) {
             return new BaseResult(0, "用户不合法");
@@ -149,6 +149,7 @@ public class WidgetServiceImpl extends BaseServiceImpl<WidgetEntity> implements 
         List<WidgetEntity> applicationEntities = getBaseDao().executeCriteria(new Criterion[]{
                 Restrictions.eq("deleteFlag", BaseEntity.DELETE_FLAG_NO),
                 Restrictions.eq("createUserID", user.getId()),
+                Restrictions.eq("pid", pid),
                 Restrictions.eq("relativeId", relativeId)
         });
         if (applicationEntities == null) {

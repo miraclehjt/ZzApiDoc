@@ -21,7 +21,7 @@ public interface WidgetService extends BaseService<WidgetEntity> {
                          int paddingTop, int paddingBottom, String gravity,
                          String targetActId, String relativeId, String targetApiId, String appId, String userId);
 
-    BaseResult getAllMyWidget(String relativeId, String userId);
+    BaseResult getAllMyWidget(String relativeId, String pid, String userId);
 
 
     BaseResult deleteWidget(String id, String userId);
