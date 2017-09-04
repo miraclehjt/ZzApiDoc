@@ -55,7 +55,7 @@ public class WidgetServiceImpl extends BaseServiceImpl<WidgetEntity> implements 
                                 boolean showRightTitleLayout,String pid, String background, int width, int height,
                                 double weight, int marginLeft, int marginRight, int marginTop, int marginBottom,
                                 int paddingLeft, int paddingRight, int paddingTop, int paddingBottom, String gravity,
-                                String targetActId, String relativeId, String targetApiId, String appId, String userId) {
+                                String targetActId, String orientation, String relativeId, String targetApiId, String appId, String userId) {
         UserEntity user = mUserService.get(userId);
         if (user == null) {
             return new BaseResult(0, "用户不合法");
@@ -73,6 +73,7 @@ public class WidgetServiceImpl extends BaseServiceImpl<WidgetEntity> implements 
         entity.setWidth(width);
         entity.setHeight(height);
         entity.setGravity(gravity);
+        entity.setOrientation(orientation);
         entity.setWeight(weight);
         entity.setMarginLeft(marginLeft);
         entity.setMarginRight(marginRight);

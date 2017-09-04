@@ -873,7 +873,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                     stringer.key("requestArgs").value(requestToJson(entity.getId(), "0"));
 
                     /*返回参数*/
-                    stringer.key("responseArgs").value(responseToJson(project.getId(), entity.getId(), "0"));
+                    stringer.key("responseArgs").value(responseAndGlobalToJson(project.getId(), entity.getId(), "0"));
 
                     /*接口信息结束*/
                     stringer.endObject();
@@ -969,6 +969,97 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
         stringer.endArray();
         return stringer.toString();
     }
+
+    private String responseAndGlobalToJson(String projectId, String interfaceId, String pid) {
+        JSONStringer stringer = new JSONStringer();
+        List<ResponseArgEntity> responseArgEntities = mResponseArgService.executeCriteria(ResponseArgUtils.getArgByInterfaceIdAndPid(interfaceId, pid));
+        stringer.array();
+
+        List<ResponseArgEntity> globals = mResponseArgService.executeCriteria(ResponseArgUtils.getGlobal(projectId));
+        if (globals != null) {
+            for (ResponseArgEntity responseArgEntity : globals) {
+                stringer.object()
+                        .key("id").value(responseArgEntity.getId())
+                        .key("name").value(responseArgEntity.getName())
+                        .key("defaultValue").value(responseArgEntity.getDefaultValue()==null?"":responseArgEntity.getDefaultValue())
+                        .key("pid").value(responseArgEntity.getPid())
+                        .key("typeId").value(responseArgEntity.getTypeId())
+                        .key("description").value(responseArgEntity.getNote() == null ? "" : responseArgEntity.getNote());
+                switch (responseArgEntity.getTypeId()) {
+                    case ResponseArgEntity.TYPE_STRING:
+                        stringer.key("type").value("string");
+                        stringer.key("children").array().endArray();
+                        break;
+                    case ResponseArgEntity.TYPE_NUMBER:
+                        stringer.key("type").value("number");
+                        stringer.key("children").array().endArray();
+                        break;
+                    case ResponseArgEntity.TYPE_ARRAY_OBJECT:
+                        stringer.key("type").value("array[object]");
+                        responseToChildJson(stringer, interfaceId, responseArgEntity.getId());
+                        break;
+                    case ResponseArgEntity.TYPE_OBJECT:
+                        stringer.key("type").value("object");
+                        stringer.key("children").array().endArray();
+                        break;
+                    default:
+                        stringer.key("type").value("未知");
+                        stringer.key("children").array().endArray();
+                        break;
+                }
+                stringer.endObject();
+            }
+        }
+
+        if (responseArgEntities != null) {
+            for (ResponseArgEntity responseArgEntity : responseArgEntities) {
+                stringer.object()
+                        .key("id").value(responseArgEntity.getId())
+                        .key("name").value(responseArgEntity.getName())
+                        .key("defaultValue").value(responseArgEntity.getDefaultValue() == null ? "" : responseArgEntity.getDefaultValue())
+                        .key("pid").value(responseArgEntity.getPid())
+                        .key("typeId").value(responseArgEntity.getTypeId())
+                        .key("description").value(responseArgEntity.getNote() == null ? "" : responseArgEntity.getNote());
+                if (responseArgEntity.getTypeId() == null) {
+                    responseArgEntity.setTypeId(7);
+                }
+                switch (responseArgEntity.getTypeId()) {
+                    case ResponseArgEntity.TYPE_STRING:
+                        stringer.key("type").value("string");
+                        stringer.key("children").array().endArray();
+                        break;
+                    case ResponseArgEntity.TYPE_NUMBER:
+                        stringer.key("type").value("number");
+                        stringer.key("children").array().endArray();
+                        break;
+                    case ResponseArgEntity.TYPE_ARRAY_OBJECT:
+                        stringer.key("type").value("array[object]");
+                        responseToChildJson(stringer, interfaceId, responseArgEntity.getId());
+                        break;
+                    case ResponseArgEntity.TYPE_OBJECT:
+                        stringer.key("type").value("object");
+                        responseToChildJson(stringer, interfaceId, responseArgEntity.getId());
+                        break;
+                    case ResponseArgEntity.TYPE_ARRAY:
+                        stringer.key("type").value("array");
+                        stringer.key("children").array().endArray();
+                        break;
+                    case ResponseArgEntity.TYPE_FILE:
+                        stringer.key("type").value("file");
+                        stringer.key("children").array().endArray();
+                        break;
+                    default:
+                        stringer.key("type").value("未知");
+                        stringer.key("children").array().endArray();
+                        break;
+                }
+                stringer.endObject();
+            }
+        }
+        stringer.endArray();
+        return stringer.toString();
+    }
+
 
     private String responseToJson(String projectId, String interfaceId, String pid) {
         JSONStringer stringer = new JSONStringer();

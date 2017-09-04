@@ -14,19 +14,16 @@ import javax.persistence.Table;
 @Table(name = "activity")
 public class ActivityEntity extends BaseEntity {
 
-    public static final int TYPE_LV_ACT = 0;
-    public static final int TYPE_RV_ACT = 1;
-    public static final int TYPE_MAIN_ACT = 2;
-    public static final int TYPE_TAB_ACT = 3;
-    public static final int TYPE_SETTING = 4;
-    public static final int TYPE_SPLASH = 5;
-    public static final int TYPE_SUBMIT = 6;
-    public static final int TYPE_DETAILS = 7;
+    public static final int TYPE_EMPTY_ACT = 0;
+    public static final int TYPE_SPLASH = 1;
+    public static final int TYPE_GUIDE = 2;
+    public static final int TYPE_BOTTOM_FRAGMENT = 3;
+    public static final int TYPE_TOP_FRAGMENT = 4;
 
     @Column(name = "Name")
     private String name;
     @Column(name = "Type")
-    private Integer type = TYPE_LV_ACT;
+    private Integer type = TYPE_EMPTY_ACT;
     @Column(name = "Title")
     private String title;
     @Column(name = "SplashImg")

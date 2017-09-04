@@ -96,6 +96,16 @@ public class WidgetEntity extends BaseEntity {
     private Double weight;
     @Column(name = "Gravity")
     private String gravity;
+    @Column(name = "Orientation")
+    private String orientation;
+
+    public String getOrientation() {
+        return orientation;
+    }
+
+    public void setOrientation(String orientation) {
+        this.orientation = orientation;
+    }
 
     public String getGravity() {
         return gravity;

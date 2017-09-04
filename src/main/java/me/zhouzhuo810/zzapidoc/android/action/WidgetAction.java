@@ -65,6 +65,7 @@ public class WidgetAction extends BaseController<WidgetEntity> {
             @RequestParam(value = "paddingBottom", required = false) int paddingBottom,
             @RequestParam(value = "gravity", required = false) String gravity,
             @RequestParam(value = "targetActId", required = false) String targetActId,
+            @RequestParam(value = "orientation", required = false) String orientation,
             @RequestParam(value = "relativeId") String relativeId,
             @RequestParam(value = "targetApiId", required = false) String targetApiId,
             @RequestParam(value = "appId", required = false) String appId,
@@ -74,7 +75,7 @@ public class WidgetAction extends BaseController<WidgetEntity> {
                 leftTitleText, rightTitleText, leftTitleImg, rightTitleImg, showLeftTitleImg,
                 showRightTitleImg, showLeftTitleText, showRightTitleText, showLeftTitleLayout, showRightTitleLayout,
                 pid, background, width, height, weight, marginLeft, marginRight, marginTop, marginBottom, paddingLeft,
-                paddingRight, paddingTop, paddingBottom, gravity, targetActId, relativeId, targetApiId, appId, userId);
+                paddingRight, paddingTop, paddingBottom, gravity, targetActId, orientation, relativeId, targetApiId, appId, userId);
     }
 
     @ResponseBody
