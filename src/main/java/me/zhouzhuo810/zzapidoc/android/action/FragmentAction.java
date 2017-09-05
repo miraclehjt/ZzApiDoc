@@ -49,9 +49,10 @@ public class FragmentAction extends BaseController<FragmentEntity> {
     @ResponseBody
     @RequestMapping(value = "/getAllMyFragment", method = RequestMethod.GET)
     public BaseResult getAllMyFragment(
+            @RequestParam(value = "activityId") String activityId,
             @RequestParam(value = "userId") String userId
     ) {
-        return getBaseService().getAllMyFragment(userId);
+        return getBaseService().getAllMyFragment(activityId, userId);
     }
 
 

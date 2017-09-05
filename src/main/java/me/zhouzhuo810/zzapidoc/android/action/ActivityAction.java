@@ -37,6 +37,7 @@ public class ActivityAction extends BaseController<ActivityEntity> {
             @RequestParam(value = "name") String name,
             @RequestParam(value = "title") String title,
             @RequestParam(value = "showTitle") boolean showTitle,
+            @RequestParam(value = "isFirst") boolean isFirst,
             @RequestParam(value = "type") int type,
             @RequestParam(value = "appId", required = false) String appId,
             @RequestParam(value = "targetActId", required = false) String targetActId,
@@ -44,7 +45,7 @@ public class ActivityAction extends BaseController<ActivityEntity> {
             @RequestBody(required = false) MultipartFile splashImg,
             @RequestParam(value = "userId") String userId
     ) {
-        return getBaseService().addActivity(name, title, showTitle, splashImg, splashSecond, type, appId, targetActId, userId);
+        return getBaseService().addActivity(name, title, showTitle, isFirst, splashImg, splashSecond, type, appId, targetActId, userId);
     }
 
     @ResponseBody

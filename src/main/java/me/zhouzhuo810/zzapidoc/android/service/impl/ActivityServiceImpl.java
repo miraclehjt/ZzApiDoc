@@ -48,7 +48,7 @@ public class ActivityServiceImpl extends BaseServiceImpl<ActivityEntity> impleme
 
 
     @Override
-    public BaseResult addActivity(String name, String title, boolean showTitle,
+    public BaseResult addActivity(String name, String title, boolean showTitle, boolean isFirst,
                                   MultipartFile splashImg, int splashSecond, int type, String appId, String targetActId, String userId) {
         UserEntity user = mUserService.get(userId);
         if (user == null) {
@@ -58,6 +58,7 @@ public class ActivityServiceImpl extends BaseServiceImpl<ActivityEntity> impleme
         entity.setCreateUserID(user.getId());
         entity.setCreateUserName(user.getName());
         entity.setName(name);
+        entity.setFirst(isFirst);
         entity.setTargetActId(targetActId);
         entity.setTitle(title);
         entity.setSplashSecond(splashSecond == 0 ? 5 : splashSecond);

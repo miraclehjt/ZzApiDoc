@@ -3,9 +3,11 @@ package me.zhouzhuo810.zzapidoc.android.service.impl;
 import me.zhouzhuo810.zzapidoc.android.dao.ApplicationDao;
 import me.zhouzhuo810.zzapidoc.android.entity.ActivityEntity;
 import me.zhouzhuo810.zzapidoc.android.entity.ApplicationEntity;
+import me.zhouzhuo810.zzapidoc.android.entity.FragmentEntity;
 import me.zhouzhuo810.zzapidoc.android.entity.WidgetEntity;
 import me.zhouzhuo810.zzapidoc.android.service.ActivityService;
 import me.zhouzhuo810.zzapidoc.android.service.ApplicationService;
+import me.zhouzhuo810.zzapidoc.android.service.FragmentService;
 import me.zhouzhuo810.zzapidoc.android.service.WidgetService;
 import me.zhouzhuo810.zzapidoc.android.utils.ZipUtils;
 import me.zhouzhuo810.zzapidoc.android.widget.apicreator.ApiTool;
@@ -29,6 +31,7 @@ import org.apache.log4j.Logger;
 import org.aspectj.util.FileUtil;
 import org.gradle.tooling.*;
 import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -38,7 +41,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
-import sun.reflect.misc.FieldUtil;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -66,6 +68,9 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
 
     @Resource(name = "activityServiceImpl")
     ActivityService mActivityService;
+
+    @Resource(name = "fragmentServiceImpl")
+    FragmentService mFragmentService;
 
     @Resource(name = "widgetServiceImpl")
     WidgetService mWidgetService;
@@ -444,6 +449,8 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 + File.separator + ".gitignore"
         ), new File(appDirPath + File.separator + ".gitignore"));
 
+        StringBuilder sbArrays = new StringBuilder();
+        sbArrays.append("<resources>\n");
         StringBuilder sbStrings = new StringBuilder();
         sbStrings.append("<resources>\n" +
                 "    <string name=\"app_name\">" + app.getAppName() + "</string>\n" +
@@ -469,7 +476,8 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
         if (!javaDir.exists()) {
             javaDir.mkdirs();
         }
-        generateJavaAndLayoutAndAndroidManifest(rootPath, app, appDirPath, packageName, sbStrings);
+        generateJavaAndLayoutAndAndroidManifest(rootPath, app, appDirPath, packageName, sbStrings, sbArrays);
+        sbArrays.append("\n</resources>");
         sbStrings.append("\n</resources>");
         File resDir = new File(appDirPath + File.separator + "app"
                 + File.separator + "src"
@@ -487,6 +495,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 + File.separator + "res"
                 + File.separator + "values";
         FileUtils.saveFileToServer(sbStrings.toString(), valuesPath, "strings.xml");
+        FileUtils.saveFileToServer(sbArrays.toString(), valuesPath, "arrays.xml");
 
 
     }
@@ -676,7 +685,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
 
     }
 
-    private void generateJavaAndLayoutAndAndroidManifest(String rootPath, ApplicationEntity app, String appDirPath, String packageName, StringBuilder sbStrings) throws IOException {
+    private void generateJavaAndLayoutAndAndroidManifest(String rootPath, ApplicationEntity app, String appDirPath, String packageName, StringBuilder sbStrings, StringBuilder sbArrays) throws IOException {
         String filePath = appDirPath
                 + File.separator + "app"
                 + File.separator + "src"
@@ -775,7 +784,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 "}\n", javaPath, "MyApplication.java");
 
         /*custom widgets*/
-        generateWigets(rootPath, javaPath, app);
+        generateWidgets(rootPath, javaPath, app);
 
         if (activityEntities != null && activityEntities.size() > 0) {
             ActivityEntity activityEntity = activityEntities.get(0);
@@ -944,11 +953,25 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
         });
         if (activityEntities1 != null) {
             for (ActivityEntity activityEntity : activityEntities1) {
-                sbManifest.append("        <activity\n" +
-                        "            android:name=\".ui.act." + activityEntity.getName() + "\"\n" +
-                        "            android:configChanges=\"orientation|keyboardHidden|layoutDirection|screenSize|screenLayout\"\n" +
-                        "            android:screenOrientation=\"portrait\"\n" +
-                        "            android:windowSoftInputMode=\"stateAlwaysHidden\" />\n");
+                if (activityEntity.getFirst()) {
+                    sbManifest.append("        <activity\n" +
+                            "            android:name=\".ui.act." + activityEntity.getName() + "\"\n" +
+                            "            android:configChanges=\"orientation|keyboardHidden|layoutDirection|screenSize|screenLayout\"\n" +
+                            "            android:screenOrientation=\"portrait\"\n" +
+                            "            android:windowSoftInputMode=\"stateAlwaysHidden\">\n" +
+                            "            <intent-filter>\n" +
+                            "                <action android:name=\"android.intent.action.MAIN\" />\n" +
+                            "\n" +
+                            "                <category android:name=\"android.intent.category.LAUNCHER\" />\n" +
+                            "            </intent-filter>\n" +
+                            "        </activity>");
+                } else {
+                    sbManifest.append("        <activity\n" +
+                            "            android:name=\".ui.act." + activityEntity.getName() + "\"\n" +
+                            "            android:configChanges=\"orientation|keyboardHidden|layoutDirection|screenSize|screenLayout\"\n" +
+                            "            android:screenOrientation=\"portrait\"\n" +
+                            "            android:windowSoftInputMode=\"stateAlwaysHidden\" />\n");
+                }
                 switch (activityEntity.getType()) {
                     case ActivityEntity.TYPE_EMPTY_ACT:
                         generateEmptyActJavaAndLayout(layoutPath, javaPath, activityEntity, app, sbStrings);
@@ -957,10 +980,10 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
 
                         break;
                     case ActivityEntity.TYPE_BOTTOM_FRAGMENT:
-
+                        generateFgmActJavaAndLayout(layoutPath, javaPath, activityEntity, app, sbStrings, sbArrays);
                         break;
                     case ActivityEntity.TYPE_TOP_FRAGMENT:
-                        
+
                         break;
                 }
             }
@@ -981,7 +1004,297 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
         FileUtils.saveFileToServer(sbManifest.toString(), filePath, "AndroidManifest.xml");
     }
 
-    private void generateWigets(String rootPath, String javaPath, ApplicationEntity app) throws IOException {
+    private void generateFgmActJavaAndLayout(String layoutPath, String javaPath, ActivityEntity activityEntity, ApplicationEntity app, StringBuilder sbStrings, StringBuilder sbArrays) throws IOException {
+        String layoutName = "";
+        boolean isNotFirst = false;
+        for (int i = 0; i < activityEntity.getName().length(); i++) {
+            char c = activityEntity.getName().charAt(i);
+            if (c >= 'A' && c <= 'Z') {
+                if (isNotFirst) {
+                    layoutName += "_";
+                }
+                isNotFirst = true;
+            }
+            layoutName += c;
+        }
+        final String realLayoutName = layoutName.toLowerCase();
+        layoutName = layoutName.replace("activity_", "").replace("__", "_").toLowerCase();
+
+        /*layout*/
+        StringBuilder sbLayout = new StringBuilder();
+        sbLayout.append("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
+                "<LinearLayout xmlns:android=\"http://schemas.android.com/apk/res/android\"\n" +
+                "    xmlns:app=\"http://schemas.android.com/apk/res-auto\"\n" +
+                "    android:layout_width=\"match_parent\"\n" +
+                "    android:layout_height=\"match_parent\"\n" +
+                "    android:orientation=\"vertical\">\n" +
+                "\n" +
+                "    <FrameLayout\n" +
+                "        android:id=\"@+id/fgm_container\"\n" +
+                "        android:layout_width=\"match_parent\"\n" +
+                "        android:layout_height=\"0dp\"\n" +
+                "        android:layout_weight=\"1\">\n" +
+                "\n" +
+                "    </FrameLayout>\n" +
+                "\n" +
+                "    <zhouzhuo810.me.zzandframe.ui.widget.TabBar\n" +
+                "        android:id=\"@+id/tab_bar\"\n" +
+                "        android:layout_width=\"match_parent\"\n" +
+                "        android:layout_height=\"wrap_content\"\n" +
+                "        app:tb_tabNames=\"@array/tab_names_" + layoutName + "\"\n" +
+                "        app:tb_textColorNormal=\"@color/colorGrayB\"\n" +
+                "        app:tb_textColorPress=\"@color/colorPrimary\"\n" +
+                "        app:tb_tabCount=\"FOUR\"\n" +
+                "        app:tb_textSize=\"@dimen/tab_text_size\" />\n" +
+                "\n" +
+                "</LinearLayout>\n");
+
+        /*java*/
+        StringBuilder sbJava = new StringBuilder();
+        StringBuilder sbImp = new StringBuilder();
+        sbImp.append(
+                "\nimport android.os.Bundle;\n" +
+                        "import android.support.annotation.Nullable;\n" +
+                        "import android.content.Intent;\n" +
+                        "import android.view.View;\n" +
+                        "import android.view.ViewGroup;\n" +
+                        "import android.widget.Button;\n" +
+                        "import android.widget.CheckBox;\n" +
+                        "import android.widget.EditText;\n" +
+                        "import android.widget.ImageView;\n" +
+                        "import android.widget.TextView;\n" +
+                        "import android.widget.LinearLayout;\n" +
+                        "\n" +
+                        "import " + app.getPackageName() + ".R;\n" +
+                        "import zhouzhuo810.me.zzandframe.ui.act.BaseActivity;\n" +
+                        "import " + app.getPackageName() + ".common.api.Api;\n" +
+                        "import " + app.getPackageName() + ".common.api.entity.*;\n" +
+                        "import rx.Subscriber;\n" +
+                        "import zhouzhuo810.me.zzandframe.common.rx.RxHelper;\n" +
+                        "import zhouzhuo810.me.zzandframe.common.utils.ToastUtils;\n" +
+                        "import zhouzhuo810.me.zzandframe.ui.widget.TitleBar;\n");
+
+        StringBuilder sbDef = new StringBuilder();
+        StringBuilder sbInit = new StringBuilder();
+        StringBuilder sbEvent = new StringBuilder();
+        StringBuilder sbEditInfo = new StringBuilder();
+        StringBuilder sbMethods = new StringBuilder();
+        StringBuilder sbAttach = new StringBuilder();
+
+        sbAttach.append("\n" +
+                "    @Override\n" +
+                "    public void onAttachFragment(Fragment fragment) {\n" +
+                "        super.onAttachFragment(fragment);");
+        sbArrays.append("\n    <string-array name=\"tab_names_main\">");
+        fillFragment(app, activityEntity, layoutPath, javaPath, sbAttach, sbStrings, sbImp, sbJava, sbDef, sbInit, sbEvent, sbMethods, sbArrays);
+        sbArrays.append("\n    </string-array>");
+        sbAttach.append("\n    }\n");
+
+        sbJava.append("package " + app.getPackageName() + ".ui.act;\n" +
+                "\n")
+                .append(sbImp.toString())
+                .append("\n" +
+                        "/**\n" +
+                        " *\n" +
+                        " * Created by admin on 2017/8/27.\n" +
+                        " */\n" +
+                        "public class " + activityEntity.getName() + " extends BaseActivity {\n")
+                .append(sbDef.toString())
+                .append("\n\n    @Override\n" +
+                        "    public int getLayoutId() {\n" +
+                        "        return R.layout." + realLayoutName + ";\n" +
+                        "    }\n")
+                .append("    @Override\n" +
+                        "    public void initView() {\n")
+                .append(sbInit.toString())
+                .append("\n    }\n" +
+                        "\n" +
+                        "    @Override\n" +
+                        "    public void initData() {\n" +
+                        "\n" +
+                        "    }\n")
+                .append("\n" +
+                        "    @Override\n" +
+                        "    public void initEvent() {\n")
+                .append(sbEvent.toString())
+                .append("\n    }\n");
+
+        sbMethods.append(sbMethods.toString());
+
+        sbJava.append("\n" +
+                "    @Override\n" +
+                "    public void resume() {\n" +
+                "\n" +
+                "    }\n" +
+                "\n" +
+                "    @Override\n" +
+                "       public void pause() {\n" +
+                "\n" +
+                "    }\n" +
+                "\n" +
+                "    @Override\n" +
+                "    public void destroy() {\n" +
+                "\n" +
+                "    }\n" +
+                "\n" +
+                "    @Override\n" +
+                "    public void saveState(Bundle bundle) {\n" +
+                "\n" +
+                "    }\n" +
+                "\n" +
+                "    @Override\n" +
+                "    public void restoreState(@Nullable Bundle bundle) {\n" +
+                "\n" +
+                "    }\n" +
+                "\n" +
+                "    @Override\n" +
+                "    public boolean defaultBack() {\n" +
+                "        return false;\n" +
+                "    }\n" +
+                "\n" +
+                "}\n");
+        sbLayout.append("\n" +
+                "</LinearLayout>");
+
+
+        FileUtils.saveFileToServer(sbLayout.toString(), layoutPath, realLayoutName + ".xml");
+        FileUtils.saveFileToServer(sbJava.toString(), javaPath + File.separator + "ui" + File.separator + "act", activityEntity.getName() + ".java");
+
+    }
+
+    private void fillFragment(ApplicationEntity app, ActivityEntity activityEntity, String layoutPath, String javaPath, StringBuilder sbAttach, StringBuilder sbStrings,
+                              StringBuilder sbImp, StringBuilder sbJava, StringBuilder sbDef, StringBuilder sbInit, StringBuilder sbEvent,
+                              StringBuilder sbMethods, StringBuilder sbArrays) throws IOException {
+        sbDef.append("    private FrameLayout fgmContainer;\n" +
+                "    private TabBar tabBar;\n");
+        sbImp.append("import android.widget.FrameLayout;\n")
+                .append("import zhouzhuo810.me.zzandframe.ui.widget.TabBar;\n");
+        List<FragmentEntity> fragments = mFragmentService.executeCriteria(new Criterion[]{
+                Restrictions.eq("deleteFlag", BaseEntity.DELETE_FLAG_NO),
+                Restrictions.eq("activityId", activityEntity.getId())
+        }, Order.asc("position"));
+        if (fragments != null && fragments.size() > 0) {
+            for (FragmentEntity fragment : fragments) {
+                sbImp.append("\nimport me.zhouzhuo810.logintest.ui.fgm." + fragment.getName() + ";");
+                sbArrays.append("\n        <item>" + fragment.getTitle() + "</item>");
+
+                String layoutName = "";
+                boolean isNotFirst = false;
+                for (int i = 0; i < fragment.getName().length(); i++) {
+                    char c = fragment.getName().charAt(i);
+                    if (c >= 'A' && c <= 'Z') {
+                        if (isNotFirst) {
+                            layoutName += "_";
+                        }
+                        isNotFirst = true;
+                    }
+                    layoutName += c;
+                }
+                final String realLayoutName = layoutName.toLowerCase();
+                layoutName = layoutName.replace("fragment_", "").replace("__", "_").toLowerCase();
+                sbDef.append("\n    private " + fragment.getName() + " " + realLayoutName + ";");
+                sbAttach.append("\n        if (" + realLayoutName + " == null && fragment instanceof " + fragment.getName() + ") {\n" +
+                        "            " + realLayoutName + " = (" + fragment.getName() + ") fragment;\n" +
+                        "        }");
+
+                StringBuilder sbLayout1 = new StringBuilder();
+                StringBuilder sbImp1 = new StringBuilder();
+                StringBuilder sbJava1 = new StringBuilder();
+                StringBuilder sbDef1 = new StringBuilder();
+                StringBuilder sbInit1 = new StringBuilder();
+                StringBuilder sbEvent1 = new StringBuilder();
+                StringBuilder sbEditInfo1 = new StringBuilder();
+                StringBuilder sbMethods1 = new StringBuilder();
+
+                sbImp1.append(
+                        "\nimport android.os.Bundle;\n" +
+                                "import android.support.annotation.Nullable;\n" +
+                                "import android.content.Intent;\n" +
+                                "import android.view.View;\n" +
+                                "import android.view.ViewGroup;\n" +
+                                "import android.widget.Button;\n" +
+                                "import android.widget.CheckBox;\n" +
+                                "import android.widget.EditText;\n" +
+                                "import android.widget.ImageView;\n" +
+                                "import android.widget.TextView;\n" +
+                                "import android.widget.LinearLayout;\n" +
+                                "\n" +
+                                "import " + app.getPackageName() + ".R;\n" +
+                                "import zhouzhuo810.me.zzandframe.ui.fgm.BaseFragment;\n" +
+                                "import " + app.getPackageName() + ".common.api.Api;\n" +
+                                "import " + app.getPackageName() + ".common.api.entity.*;\n" +
+                                "import rx.Subscriber;\n" +
+                                "import zhouzhuo810.me.zzandframe.common.rx.RxHelper;\n" +
+                                "import zhouzhuo810.me.zzandframe.common.utils.ToastUtils;\n" +
+                                "import zhouzhuo810.me.zzandframe.ui.widget.TitleBar;\n");
+
+                fillFgmWidget(app, activityEntity, fragment, layoutName, layoutPath, javaPath, "0", sbStrings, sbLayout1, sbImp, sbJava, sbDef, sbInit, sbEvent, sbEditInfo1, sbMethods1);
+
+                sbJava1.append("package " + app.getPackageName() + ".ui.act;\n" +
+                        "\n")
+                        .append(sbImp1.toString())
+                        .append("\n" +
+                                "/**\n" +
+                                " *\n" +
+                                " * Created by admin on 2017/8/27.\n" +
+                                " */\n" +
+                                "public class " + activityEntity.getName() + " extends BaseFragment {\n")
+                        .append(sbDef1.toString())
+                        .append("\n\n    @Override\n" +
+                                "    public int getLayoutId() {\n" +
+                                "        return R.layout." + realLayoutName + ";\n" +
+                                "    }\n")
+                        .append("    @Override\n" +
+                                "    public void initView() {\n")
+                        .append(sbInit1.toString())
+                        .append("\n    }\n" +
+                                "\n" +
+                                "    @Override\n" +
+                                "    public void initData() {\n" +
+                                "\n" +
+                                "    }\n")
+                        .append("\n" +
+                                "    @Override\n" +
+                                "    public void initEvent() {\n")
+                        .append(sbEvent1.toString())
+                        .append("\n    }\n");
+
+                sbMethods.append(sbMethods.toString());
+
+                sbJava1.append("\n" +
+                        "    @Override\n" +
+                        "    public void resume() {\n" +
+                        "\n" +
+                        "    }\n" +
+                        "\n" +
+                        "    @Override\n" +
+                        "       public void destroyView() {\n" +
+                        "\n" +
+                        "    }\n" +
+                        "\n" +
+                        "    @Override\n" +
+                        "    public void saveState(Bundle bundle) {\n" +
+                        "\n" +
+                        "    }\n" +
+                        "\n" +
+                        "    @Override\n" +
+                        "    public void restoreState(@Nullable Bundle bundle) {\n" +
+                        "\n" +
+                        "    }\n" +
+                        "\n" +
+                        "}\n");
+                sbLayout1.append("\n" +
+                        "</LinearLayout>");
+
+
+                FileUtils.saveFileToServer(sbLayout1.toString(), layoutPath, realLayoutName + ".xml");
+                FileUtils.saveFileToServer(sbJava1.toString(), javaPath + File.separator + "ui" + File.separator + "fgm", fragment.getName() + ".java");
+
+            }
+        }
+    }
+
+    private void generateWidgets(String rootPath, String javaPath, ApplicationEntity app) throws IOException {
         /*sidebar*/
         String sideBarPath = javaPath + File.separator + "ui" + File.separator + "widget" + File.separator + "sidebar";
         FileUtils.saveFileToServer("package " + app.getPackageName() + ".ui.widget.sidebar;\n" +
@@ -1462,6 +1775,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         "import android.view.View;\n" +
                         "import android.view.ViewGroup;\n" +
                         "import android.widget.Button;\n" +
+                        "import android.widget.CheckBox;\n" +
                         "import android.widget.EditText;\n" +
                         "import android.widget.ImageView;\n" +
                         "import android.widget.TextView;\n" +
@@ -1479,9 +1793,10 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
         StringBuilder sbDef = new StringBuilder();
         StringBuilder sbInit = new StringBuilder();
         StringBuilder sbEvent = new StringBuilder();
-        StringBuilder sbSubmit = new StringBuilder();
+        StringBuilder sbEditInfo = new StringBuilder();
+        StringBuilder sbMethods = new StringBuilder();
 
-        fillWidget(app, activityEntity, layoutName, layoutPath, javaPath, "0", sbStrings, sbLayout, sbImp, sbJava, sbDef, sbInit, sbEvent, sbSubmit);
+        fillWidget(app, activityEntity, layoutName, layoutPath, javaPath, "0", sbStrings, sbLayout, sbImp, sbJava, sbDef, sbInit, sbEvent, sbEditInfo, sbMethods);
 
         sbJava.append("package " + app.getPackageName() + ".ui.act;\n" +
                 "\n")
@@ -1500,7 +1815,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 .append("    @Override\n" +
                         "    public void initView() {\n")
                 .append(sbInit.toString())
-                .append("    }\n" +
+                .append("\n    }\n" +
                         "\n" +
                         "    @Override\n" +
                         "    public void initData() {\n" +
@@ -1510,11 +1825,9 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         "    @Override\n" +
                         "    public void initEvent() {\n")
                 .append(sbEvent.toString())
-                .append("\n    }\n" +
-                        "\n" +
-                        "    private void doSubmit() {\n")
-                .append(sbSubmit.toString())
                 .append("\n    }\n");
+
+        sbMethods.append(sbMethods.toString());
 
         sbJava.append("\n" +
                 "    @Override\n" +
@@ -1559,9 +1872,597 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
     }
 
 
+    private void fillFgmWidget(ApplicationEntity app, ActivityEntity activityEntity, FragmentEntity fragmentEntity, String layoutName, String layoutPath, String javaPath,
+                               String pid, StringBuilder sbStrings, StringBuilder sbLayout, StringBuilder sbImp, StringBuilder sbJava,
+                               StringBuilder sbDef, StringBuilder sbInit, StringBuilder sbEvent, StringBuilder sbEditInfo, StringBuilder sbMethods) throws IOException {
+
+        List<WidgetEntity> widgetEntities = mWidgetService.executeCriteria(
+                new Criterion[]{
+                        Restrictions.eq("deleteFlag", BaseEntity.DELETE_FLAG_NO),
+                        Restrictions.eq("pid", pid),
+                        Restrictions.eq("relativeId", fragmentEntity.getId())
+                }
+        );
+
+        if (widgetEntities != null && widgetEntities.size() > 0) {
+            for (int i = 0; i < widgetEntities.size(); i++) {
+                WidgetEntity widgetEntity = widgetEntities.get(i);
+                int width = widgetEntity.getWidth();
+                int height = widgetEntity.getHeight();
+                String widthString = "wrap_content";
+                switch (width) {
+                    case -2:
+                        widthString = "wrap_content";
+                        break;
+                    case -1:
+                        widthString = "match_parent";
+                        break;
+                    default:
+                        widthString = width + "px";
+                        break;
+                }
+                String heightString = "wrap_content";
+                switch (height) {
+                    case -2:
+                        heightString = "wrap_content";
+                        break;
+                    case -1:
+                        heightString = "match_parent";
+                        break;
+                    default:
+                        heightString = height + "px";
+                        break;
+                }
+                switch (widgetEntity.getType()) {
+                    case WidgetEntity.TYPE_TITLE_BAR:
+                        sbDef.append("\n    private TitleBar title_bar;");
+                        sbInit.append("\n        title_bar = (TitleBar) rootView.findViewById(R.id.title_bar);");
+                        sbStrings.append("    <string name=\"" + layoutName + "_text\">" + fragmentEntity.getTitle() + "</string>\n");
+                        sbLayout.append("\n    <zhouzhuo810.me.zzandframe.ui.widget.TitleBar\n" +
+                                "        android:id=\"@+id/title_bar\"\n" +
+                                "        android:layout_width=\"match_parent\"\n" +
+                                "        android:layout_height=\"@dimen/title_height\"\n" +
+                                "        android:background=\"@color/colorPrimary\"\n" +
+                                "        app:showLeftLayout=\"false\"\n" +
+                                "        app:showRightLayout=\"false\"\n" +
+                                "        app:textColorAll=\"@color/colorWhite\"\n" +
+                                "        app:textSizeTitle=\"@dimen/title_text_size\"\n" +
+                                "        app:titleText=\"@string/"+layoutName+"_text\" />");
+                        break;
+                    case WidgetEntity.TYPE_EDIT_ITEM:
+                        sbDef.append("\n    private EditText et_" + widgetEntity.getResId() + ";");
+                        sbDef.append("\n    private ImageView iv_clear_" + widgetEntity.getResId() + ";");
+                        sbInit.append("\n        et_" + widgetEntity.getResId() + " = (EditText) rootView.findViewById(R.id.et_" + widgetEntity.getResId() + ");");
+                        sbInit.append("\n        iv_clear_" + widgetEntity.getResId() + " = (ImageView) rootView.findViewById(R.id.iv_clear_" + widgetEntity.getResId() + ");");
+                        sbEvent.append("\n        setEditListener(et_" + widgetEntity.getResId() + ", iv_clear_" + widgetEntity.getResId() + ");");
+                        sbStrings.append("    <string name=\"" + widgetEntity.getResId() + "_text\">" + widgetEntity.getTitle() + "</string>\n");
+                        sbStrings.append("    <string name=\"" + widgetEntity.getResId() + "_hint_text\">请输入" + widgetEntity.getTitle() + "</string>\n");
+                        sbEditInfo.append("\n        String " + widgetEntity.getResId() + " = et_" + widgetEntity.getResId() + ".getText().toString().trim();");
+                        sbLayout.append("\n    <LinearLayout\n" +
+                                "        android:layout_width=\"match_parent\"\n" +
+                                "        android:layout_height=\"wrap_content\"\n" +
+                                "        android:background=\"@color/colorWhite\"\n" +
+                                "        android:gravity=\"center_vertical\"\n" +
+                                "        android:minHeight=\"130px\"\n" +
+                                "        android:orientation=\"horizontal\">\n" +
+                                "\n" +
+                                "        <TextView\n" +
+                                "            android:layout_width=\"280px\"\n" +
+                                "            android:layout_height=\"wrap_content\"\n" +
+                                "            android:layout_marginLeft=\"40px\"\n" +
+                                "            android:gravity=\"center|left\"\n" +
+                                "            android:text=\"@string/" + widgetEntity.getResId() + "_text\"\n" +
+                                "            android:textColor=\"#415868\"\n" +
+                                "            android:textSize=\"44px\" />\n" +
+                                "\n" +
+                                "        <EditText\n" +
+                                "            android:id=\"@+id/et_" + widgetEntity.getResId() + "\"\n" +
+                                "            android:layout_width=\"0dp\"\n" +
+                                "            android:layout_height=\"wrap_content\"\n" +
+                                "            android:layout_marginLeft=\"30px\"\n" +
+                                "            android:layout_marginRight=\"30px\"\n" +
+                                "            android:layout_weight=\"1\"\n" +
+                                "            android:background=\"@null\"\n" +
+                                "            android:gravity=\"right|center_vertical\"\n" +
+                                "            android:hint=\"@string/" + widgetEntity.getResId() + "_hint_text\"\n" +
+                                "            android:textColor=\"@color/colorBlack\"\n" +
+                                "            android:textSize=\"44px\" />\n" +
+                                "\n" +
+                                "        <ImageView\n" +
+                                "            android:id=\"@+id/iv_clear_" + widgetEntity.getResId() + "\"\n" +
+                                "            android:layout_width=\"60px\"\n" +
+                                "            android:layout_height=\"60px\"\n" +
+                                "            android:layout_marginRight=\"30px\"\n" +
+                                "            android:src=\"@drawable/clear\"\n" +
+                                "            android:visibility=\"gone\" />\n" +
+                                "    </LinearLayout>\n" +
+                                "\n" +
+                                "    <View\n" +
+                                "        android:layout_width=\"match_parent\"\n" +
+                                "        android:layout_height=\"1px\"\n" +
+                                "        android:layout_marginLeft=\"30px\"\n" +
+                                "        android:background=\"@color/colorGrayBg\" />");
+                        break;
+                    case WidgetEntity.TYPE_SUBMIT_BTN_ITEM:
+                        sbDef.append("\n    private Button btn_" + widgetEntity.getResId() + ";");
+                        sbInit.append("\n        btn_" + widgetEntity.getResId() + " = (Button) rootView.findViewById(R.id.btn_" + widgetEntity.getResId() + ");");
+                        sbEvent.append("\n        btn_" + widgetEntity.getResId() + ".setOnClickListener(new View.OnClickListener() {\n" +
+                                "            @Override\n" +
+                                "            public void onClick(View v) {\n" +
+                                "                doSubmit();\n" +
+                                "            }\n" +
+                                "        });");
+                        sbStrings.append("    <string name=\"" + widgetEntity.getResId() + "_text\">" + fragmentEntity.getTitle() + "</string>\n");
+                        sbLayout.append("\n    <Button\n" +
+                                "        android:id=\"@+id/btn_" + widgetEntity.getResId() + "\"\n" +
+                                "        android:layout_width=\"match_parent\"\n" +
+                                "        android:layout_height=\"120px\"\n" +
+                                "        android:layout_marginBottom=\"50px\"\n" +
+                                "        android:layout_marginLeft=\"40px\"\n" +
+                                "        android:layout_marginRight=\"40px\"\n" +
+                                "        android:layout_marginTop=\"40px\"\n" +
+                                "        android:background=\"@drawable/btn_save_selector\"\n" +
+                                "        android:text=\"@string/" + widgetEntity.getResId() + "_text\"\n" +
+                                "        android:textColor=\"#fff\"\n" +
+                                "        android:textSize=\"@dimen/submit_btn_text_size\" />");
+                        if (widgetEntity.getTargetApiId() != null) {
+                            InterfaceEntity interfaceEntity = mInterfaceService.get(widgetEntity.getTargetApiId());
+                            if (interfaceEntity != null) {
+                                int requestParamsNo = interfaceEntity.getRequestParamsNo();
+                                ActivityEntity targetAct = null;
+                                if (widgetEntity.getTargetActivityId() != null && widgetEntity.getTargetActivityId().length() > 0) {
+                                    targetAct = mActivityService.get(widgetEntity.getTargetActivityId());
+                                }
+                                String url = interfaceEntity.getPath();
+                                String m = url.substring(url.lastIndexOf("/") + 1, url.length());
+                                String beanClazz = m.substring(0, 1).toUpperCase() + m.substring(1, m.length()) + "Result";
+                                sbStrings.append("    <string name=\"" + widgetEntity.getResId() + "ing_text\">" + fragmentEntity.getTitle() + "中...</string>\n");
+                                sbMethods.append("    public void do_" + widgetEntity.getResId() + "() {\n");
+                                sbMethods.append(sbEditInfo.toString());
+                                sbMethods.append("\n        showPd(getString(R.string." + widgetEntity.getResId() + "ing_text), false);\n" +
+                                        "        Api.getApi0()\n" +
+                                        "                .userLogin(");
+                                if (requestParamsNo > 0) {
+                                    for (int i1 = 0; i1 < requestParamsNo; i1++) {
+                                        sbMethods.append("\"\", ");
+                                    }
+                                    sbMethods.deleteCharAt(sbMethods.length() - 1);
+                                    sbMethods.deleteCharAt(sbMethods.length() - 1);
+                                }
+                                sbMethods.append(
+                                        ")\n" +
+                                                "                .compose(RxHelper.<" + beanClazz + ">io_main())\n" +
+                                                "                .subscribe(new Subscriber<" + beanClazz + ">() {\n" +
+                                                "                    @Override\n" +
+                                                "                    public void onCompleted() {\n" +
+                                                "\n" +
+                                                "                    }\n" +
+                                                "\n" +
+                                                "                    @Override\n" +
+                                                "                    public void onError(Throwable e) {\n" +
+                                                "                        hidePd();\n" +
+                                                "                        ToastUtils.showCustomBgToast(getString(R.string.no_net_text) + e.toString());\n" +
+                                                "                    }\n" +
+                                                "\n" +
+                                                "                    @Override\n" +
+                                                "                    public void onNext(" + beanClazz + " result) {\n" +
+                                                "                        hidePd();\n" +
+                                                "                        ToastUtils.showCustomBgToast(result.getMsg());\n" +
+                                                "                        if (result.getCode() == 1) {\n" +
+                                                "                            Intent intent = new Intent(getActivity(), " + (targetAct == null ? activityEntity.getName() : targetAct.getName()) + ".class);\n" +
+                                                "                            startActWithIntent(intent);\n" +
+                                                "                            closeAct();\n" +
+                                                "                        }\n" +
+                                                "                    }\n" +
+                                                "                });");
+                                sbMethods.append("    }\n");
+                            }
+                        } else {
+                            ActivityEntity targetAct = null;
+                            if (widgetEntity.getTargetActivityId() != null && widgetEntity.getTargetActivityId().length() > 0) {
+                                targetAct = mActivityService.get(widgetEntity.getTargetActivityId());
+                            }
+                            sbEvent.append("        btn_" + widgetEntity.getResId() + ".setOnClickListener(new View.OnClickListener() {\n" +
+                                    "            @Override\n" +
+                                    "            public void onClick(View v) {\n" +
+                                    "                Intent intent = new Intent(getActivity(), " + (targetAct == null ? activityEntity.getName() : targetAct.getName()) + ".class);\n" +
+                                    "                startActWithIntent(intent);\n" +
+                                    "                closeAct();\n" +
+                                    "            }\n" +
+                                    "        });");
+                        }
+                        break;
+                    case WidgetEntity.TYPE_EXIT_BTN_ITEM:
+                        sbDef.append("\n    private Button btn_" + widgetEntity.getResId() + ";");
+                        sbInit.append("\n        btn_" + widgetEntity.getResId() + " = (Button) rootView.findViewById(R.id.btn_" + widgetEntity.getResId() + ");");
+                        sbEvent.append("\n        btn_" + widgetEntity.getResId() + ".setOnClickListener(new View.OnClickListener() {\n" +
+                                "            @Override\n" +
+                                "            public void onClick(View v) {\n" +
+                                "                do_" + widgetEntity.getResId() + "();\n" +
+                                "            }\n" +
+                                "        });");
+                        sbStrings.append("    <string name=\"" + widgetEntity.getResId() + "_text\">" + activityEntity.getTitle() + "</string>\n");
+                        sbLayout.append("\n    <Button\n" +
+                                "        android:id=\"@+id/btn_" + widgetEntity.getResId() + "\"\n" +
+                                "        android:layout_width=\"match_parent\"\n" +
+                                "        android:layout_height=\"120px\"\n" +
+                                "        android:layout_marginBottom=\"50px\"\n" +
+                                "        android:layout_marginLeft=\"40px\"\n" +
+                                "        android:layout_marginRight=\"40px\"\n" +
+                                "        android:layout_marginTop=\"40px\"\n" +
+                                "        android:background=\"@drawable/btn_exit_selector\"\n" +
+                                "        android:text=\"@string/" + widgetEntity.getResId() + "_text\"\n" +
+                                "        android:textColor=\"#fff\"\n" +
+                                "        android:textSize=\"@dimen/submit_btn_text_size\" />");
+                        break;
+                    case WidgetEntity.TYPE_LETTER_RV:
+                        String clazz = "TestResult";
+                        if (widgetEntity.getTargetApiId() != null) {
+                            InterfaceEntity inter = mInterfaceService.get(widgetEntity.getTargetApiId());
+                            if (inter != null) {
+                                int requestParamsNo = inter.getRequestParamsNo();
+                                ActivityEntity targetAct = null;
+                                if (widgetEntity.getTargetActivityId() != null && widgetEntity.getTargetActivityId().length() > 0) {
+                                    targetAct = mActivityService.get(widgetEntity.getTargetActivityId());
+                                }
+                                String url = inter.getPath();
+                                String m = url.substring(url.lastIndexOf("/") + 1, url.length());
+                                String beanClazz = m.substring(0, 1).toUpperCase() + m.substring(1, m.length()) + "Result";
+                                clazz = beanClazz;
+                            }
+                        }
+                        StringBuilder sbAdapter = new StringBuilder();
+                        sbAdapter.append("package " + app.getPackageName() + ".ui;\n" +
+                                "\n" +
+                                "import android.content.Context;\n" +
+                                "import android.widget.SectionIndexer;\n" +
+                                "\n" +
+                                "import java.util.List;\n" +
+                                "import java.util.ArrayList;\n" +
+                                "\n" +
+                                "import " + app.getPackageName() + ".R;\n" +
+                                "import " + app.getPackageName() + ".common.api.entity." + clazz + ";\n" +
+                                "import zhouzhuo810.me.zzandframe.common.rule.ISearch;\n" +
+                                "import zhouzhuo810.me.zzandframe.ui.adapter.RvAutoBaseAdapter;\n" +
+                                "\n" +
+                                "/**\n" +
+                                " * Created by zz on 2017/8/28.\n" +
+                                " */\n" +
+                                "public class " + widgetEntity.getResId().substring(0, 1).toUpperCase() + widgetEntity.getResId().substring(1) + "ListAdapter extends RvAutoBaseAdapter<" + clazz + ".DataEntity> implements ISearch<" + clazz + ".DataEntity>,SectionIndexer {\n" +
+                                "\n" +
+                                "    public " + widgetEntity.getResId().substring(0, 1).toUpperCase() + widgetEntity.getResId().substring(1) + "ListAdapter(Context context, List<" + clazz + ".DataEntity> data) {\n" +
+                                "        super(context, data);\n" +
+                                "    }\n" +
+                                "\n" +
+                                "    @Override\n" +
+                                "    protected int getLayoutId(int type) {\n" +
+                                "        return R.layout.list_item_" + widgetEntity.getResId() + ";\n" +
+                                "    }\n" +
+                                "\n" +
+                                "    @Override\n" +
+                                "    protected void fillData(ViewHolder viewHolder, " + clazz + ".DataEntity dataEntity, int position) {\n" +
+                                "        \n" +
+                                "    }\n" +
+                                "\n" +
+                                "    @Override\n" +
+                                "    public void startSearch(String s) {\n" +
+                                "        List<" + clazz + ".DataEntity> msgs = new ArrayList<>();\n" +
+                                "        for (" + clazz + ".DataEntity mData : data) {\n" +
+                                "            if (mData.toSearch().contains(s)) {\n" +
+                                "                msgs.add(mData);\n" +
+                                "            }\n" +
+                                "        }\n" +
+                                "        updateAll(msgs);\n" +
+                                "    }\n" +
+                                "\n" +
+                                "    @Override\n" +
+                                "    public void cancelSearch(List<" + clazz + ".DataEntity> list) {\n" +
+                                "        updateAll(list);\n" +
+                                "    }\n" +
+                                "\n" +
+                                "    @Override\n" +
+                                "    public Object[] getSections() {\n" +
+                                "        return new Object[0];\n" +
+                                "    }\n" +
+                                "\n" +
+                                "    @Override\n" +
+                                "    public int getPositionForSection(int sectionIndex) {\n" +
+                                "        for (int i = 0; i < getItemCount(); i++) {\n" +
+                                "            String sortStr = data.get(i).getSortLetters();\n" +
+                                "            char firstChar = sortStr.toUpperCase().charAt(0);\n" +
+                                "            if (firstChar == sectionIndex) {\n" +
+                                "                return i;\n" +
+                                "            }\n" +
+                                "        }\n" +
+                                "\n" +
+                                "        return -1;\n" +
+                                "    }\n" +
+                                "\n" +
+                                "    @Override\n" +
+                                "    public int getSectionForPosition(int position) {\n" +
+                                "        if (data == null)\n" +
+                                "            return -1;\n" +
+                                "        if (position >= data.size()) {\n" +
+                                "            return -1;\n" +
+                                "        }\n" +
+                                "        return data.get(position).getSortLetters() == null ? -1 : data.get(position).getSortLetters().charAt(0);\n" +
+                                "    }\n" +
+                                "}\n");
+                        FileUtils.saveFileToServer(sbAdapter.toString(), javaPath + File.separator + "ui" + File.separator + "adapter", widgetEntity.getResId().substring(0, 1).toUpperCase() + widgetEntity.getResId().substring(1) + "ListAdapter.java");
+                        /*list_item*/
+                        FileUtils.saveFileToServer("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
+                                "<com.zhy.autolayout.AutoLinearLayout xmlns:android=\"http://schemas.android.com/apk/res/android\"\n" +
+                                "    android:layout_width=\"match_parent\"\n" +
+                                "    android:layout_height=\"match_parent\"\n" +
+                                "    android:orientation=\"vertical\">\n" +
+                                "\n" +
+                                "</com.zhy.autolayout.AutoLinearLayout>", layoutPath, "list_item_" + widgetEntity.getResId() + ".xml");
+
+                        sbImp.append("import " + app.getPackageName() + ".ui.widget.sidebar.CharacterParser;\n" +
+                                "import " + app.getPackageName() + ".ui.widget.sidebar.PinyinComparator;\n" +
+                                "import " + app.getPackageName() + ".ui.widget.sidebar.SideBar;\n" +
+                                "import android.Manifest;\n" +
+                                "import android.graphics.Color;\n" +
+                                "import android.text.Editable;\n" +
+                                "import android.text.TextWatcher;\n" +
+                                "import android.view.LayoutInflater;\n" +
+                                "import com.tbruyelle.rxpermissions.RxPermissions;\n" +
+                                "import android.support.v4.widget.SwipeRefreshLayout;\n" +
+                                "import android.support.v7.widget.LinearLayoutManager;\n" +
+                                "import com.yanzhenjie.recyclerview.swipe.SwipeMenu;\n" +
+                                "import com.yanzhenjie.recyclerview.swipe.SwipeMenuCreator;\n" +
+                                "import com.yanzhenjie.recyclerview.swipe.SwipeItemClickListener;\n" +
+                                "import com.yanzhenjie.recyclerview.swipe.SwipeMenuBridge;\n" +
+                                "import com.yanzhenjie.recyclerview.swipe.SwipeMenuItem;\n" +
+                                "import com.yanzhenjie.recyclerview.swipe.SwipeMenuItemClickListener;\n" +
+                                "import com.yanzhenjie.recyclerview.swipe.SwipeMenuRecyclerView;\n" +
+                                "import com.zhy.autolayout.utils.AutoUtils;\n" +
+                                "\n" +
+                                "import java.util.ArrayList;\n" +
+                                "import java.util.Collections;\n" +
+                                "import java.util.List;\n" +
+                                "import rx.functions.Action1;\n");
+                        sbDef.append("    private View header;\n" +
+                                "    private SwipeRefreshLayout refreshLayout;\n" +
+                                "    private SwipeMenuRecyclerView lv;\n" +
+                                "    private List<" + clazz + ".DataEntity> list;\n" +
+                                "    private SideBar sideBar;\n" +
+                                "    private TextView tv_toast;\n" +
+                                "\n" +
+                                "    /**\n" +
+                                "     * 汉字转换成拼音的类\n" +
+                                "     */\n" +
+                                "    private CharacterParser characterParser;\n" +
+                                "\n" +
+                                "    /**\n" +
+                                "     * 根据拼音来排列ListView里面的数据类\n" +
+                                "     */\n" +
+                                "    private PinyinComparator pinyinComparator;\n" +
+                                "    private " + widgetEntity.getResId().substring(0, 1).toUpperCase() + widgetEntity.getResId().substring(1) + "ListAdapter adapter;\n" +
+                                "    private RxPermissions rxPermissions;\n" +
+                                "    private EditText et_search;\n" +
+                                "    private TextView tv_footer;");
+                        sbInit.append("\n        rxPermissions = new RxPermissions(this);\n" +
+                                "        refreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.refresh);\n" +
+                                "        lv = (SwipeMenuRecyclerView) rootView.findViewById(R.id.lv);\n" +
+                                "\n" +
+                                "        lv.setLayoutManager(new LinearLayoutManager(this));\n" +
+                                "\n" +
+                                "        sideBar = (SideBar) rootView.findViewById(R.id.side_bar);\n" +
+                                "        tv_toast = (TextView) rootView.findViewById(R.id.tv_toast);\n" +
+                                "\n" +
+                                "        header = LayoutInflater.from(" + activityEntity.getName() + ".this).inflate(R.layout.item_header_search, lv, false);\n" +
+                                "        AutoUtils.auto(header);\n" +
+                                "        et_search = (EditText) header.findViewById(R.id.et_search);\n" +
+                                "        lv.addHeaderView(header);\n" +
+                                "\n" +
+                                "        View footer = LayoutInflater.from(" + activityEntity.getName() + ".this).inflate(R.layout.item_footer, lv, false);\n" +
+                                "        AutoUtils.auto(footer);\n" +
+                                "        tv_footer = (TextView) footer.findViewById(R.id.tv_footer);\n" +
+                                "        lv.addFooterView(footer);\n" +
+                                "\n" +
+                                "        list = new ArrayList<>();\n" +
+                                "        //实例化汉字转拼音类\n" +
+                                "        characterParser = CharacterParser.getInstance();\n" +
+                                "\n" +
+                                "        pinyinComparator = new PinyinComparator();\n" +
+                                "\n" +
+                                "        adapter = new " + widgetEntity.getResId().substring(0, 1).toUpperCase() + widgetEntity.getResId().substring(1) + "ListAdapter(this, list);\n" +
+                                "        lv.setAdapter(adapter);\n" +
+                                "\n" +
+                                "        lv.setSwipeMenuCreator(new SwipeMenuCreator() {\n" +
+                                "            @Override\n" +
+                                "            public void onCreateMenu(SwipeMenu swipeLeftMenu, SwipeMenu swipeRightMenu, int viewType) {\n" +
+                                "                SwipeMenuItem callItem = new SwipeMenuItem(" + activityEntity.getName() + ".this);\n" +
+                                "                callItem.setImage(R.drawable.delete)\n" +
+                                "                        .setWidth(AutoUtils.getPercentWidthSize(250))\n" +
+                                "                        .setHeight(ViewGroup.LayoutParams.MATCH_PARENT)\n" +
+                                "                        .setBackgroundColor(Color.rgb(224, 232, 238));\n" +
+                                "                swipeRightMenu.addMenuItem(callItem);\n" +
+                                "\n" +
+                                "            }\n" +
+                                "        });");
+                        sbEvent.append("\n       refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {\n" +
+                                "            @Override\n" +
+                                "            public void onRefresh() {\n" +
+                                "                //getContacts();\n" +
+                                "            }\n" +
+                                "        });\n" +
+                                "\n" +
+                                "        //设置右侧触摸监听\n" +
+                                "        sideBar.setLetterTouchListener(new SideBar.OnLetterTouchListener() {\n" +
+                                "            @Override\n" +
+                                "            public void onLetterTouch(String letter, int position) {\n" +
+                                "                tv_toast.setVisibility(View.VISIBLE);\n" +
+                                "                tv_toast.setText(letter);\n" +
+                                "                //该字母首次出现的位置\n" +
+                                "                if (position != -1 && adapter.getPositionForSection(letter.charAt(0)) != -1) {\n" +
+                                "                    ((LinearLayoutManager) lv.getLayoutManager()).scrollToPositionWithOffset(adapter.getPositionForSection(letter.charAt(0)) + 1, 0);\n" +
+                                "                }\n" +
+                                "            }\n" +
+                                "\n" +
+                                "            @Override\n" +
+                                "            public void onActionUp() {\n" +
+                                "                tv_toast.setVisibility(View.INVISIBLE);\n" +
+                                "            }\n" +
+                                "        });\n" +
+                                "\n" +
+                                "\n" +
+                                "        lv.setSwipeItemClickListener(new SwipeItemClickListener() {\n" +
+                                "            @Override\n" +
+                                "            public void onItemClick(View itemView, int position) {\n" +
+                                "            }\n" +
+                                "        });\n" +
+                                "\n" +
+                                "        lv.setSwipeMenuItemClickListener(new SwipeMenuItemClickListener() {\n" +
+                                "            @Override\n" +
+                                "            public void onItemClick(SwipeMenuBridge menuBridge) {\n" +
+                                "                switch (menuBridge.getPosition()) {\n" +
+                                "                    case 0:\n" +
+                                "                        //String id = list.get(menuBridge.getAdapterPosition()).getId();\n" +
+                                "                        //delete(id);\n" +
+                                "                        break;\n" +
+                                "                }\n" +
+                                "            }\n" +
+                                "        });\n" +
+                                "\n" +
+                                "        et_search.addTextChangedListener(new TextWatcher() {\n" +
+                                "            @Override\n" +
+                                "            public void beforeTextChanged(CharSequence s, int start, int count, int after) {\n" +
+                                "\n" +
+                                "            }\n" +
+                                "\n" +
+                                "            @Override\n" +
+                                "            public void onTextChanged(CharSequence s, int start, int before, int count) {\n" +
+                                "\n" +
+                                "            }\n" +
+                                "\n" +
+                                "            @Override\n" +
+                                "            public void afterTextChanged(Editable s) {\n" +
+                                "                if (s.length() == 0) {\n" +
+                                "                    adapter.cancelSearch(list);\n" +
+                                "                } else {\n" +
+                                "                    adapter.startSearch(s.toString());\n" +
+                                "                }\n" +
+                                "                //tv_footer.setText(adapter.getItemCount() + getString(R.string.unit_contact));\n" +
+                                "            }\n" +
+                                "        });");
+                        sbLayout.append("\n" +
+                                "    <FrameLayout\n" +
+                                "        android:layout_width=\"match_parent\"\n" +
+                                "        android:layout_height=\"match_parent\">\n" +
+                                "\n" +
+                                "        <android.support.v4.widget.SwipeRefreshLayout\n" +
+                                "            android:id=\"@+id/refresh\"\n" +
+                                "            android:layout_width=\"match_parent\"\n" +
+                                "            android:layout_height=\"match_parent\">\n" +
+                                "\n" +
+                                "            <com.yanzhenjie.recyclerview.swipe.SwipeMenuRecyclerView\n" +
+                                "                android:id=\"@+id/lv\"\n" +
+                                "                android:layout_width=\"match_parent\"\n" +
+                                "                android:layout_height=\"match_parent\"\n" +
+                                "                android:divider=\"@null\"\n" +
+                                "                android:dividerHeight=\"0dp\"\n" +
+                                "                android:listSelector=\"@color/colorTransparent\" />\n" +
+                                "\n" +
+                                "        </android.support.v4.widget.SwipeRefreshLayout>\n" +
+                                "\n" +
+                                "        <TextView\n" +
+                                "            android:id=\"@+id/tv_toast\"\n" +
+                                "            android:layout_width=\"260px\"\n" +
+                                "            android:layout_height=\"200px\"\n" +
+                                "            android:layout_gravity=\"center\"\n" +
+                                "            android:background=\"@drawable/sort_lv_bg\"\n" +
+                                "            android:gravity=\"center\"\n" +
+                                "            android:textColor=\"@android:color/white\"\n" +
+                                "            android:textSize=\"56px\"\n" +
+                                "            android:visibility=\"invisible\" />\n" +
+                                "\n" +
+                                "        <" + app.getPackageName() + ".ui.widget.sidebar.SideBar\n" +
+                                "            android:id=\"@+id/side_bar\"\n" +
+                                "            android:layout_width=\"70px\"\n" +
+                                "            android:layout_height=\"match_parent\"\n" +
+                                "            android:layout_gravity=\"right|center_vertical\"\n" +
+                                "            android:layout_marginBottom=\"90px\"\n" +
+                                "            android:layout_marginTop=\"90px\" />\n" +
+                                "    </FrameLayout>\n" +
+                                "\n");
+                        break;
+                    case WidgetEntity.TYPE_SCROLL_VIEW:
+                        sbLayout.append("\n    <ScrollView\n" +
+                                (widgetEntity.getWeight() > 0 ? "        android:layout_weight=\"" + widgetEntity.getWeight() + "\"\n" : "") +
+                                "        android:layout_width=\"match_parent\"\n" +
+                                "        android:layout_height=\""+heightString+"\">\n" +
+                                "        <LinearLayout\n" +
+                                "            android:layout_width=\"match_parent\"\n" +
+                                "            android:layout_height=\"wrap_content\"\n" +
+                                "            android:orientation=\"vertical\">");
+                        fillFgmWidget(app, activityEntity, fragmentEntity, layoutName,  layoutPath, javaPath, widgetEntity.getId(), sbStrings, sbLayout, sbImp, sbJava, sbDef, sbInit, sbEvent, sbEditInfo, sbMethods);
+                        sbLayout.append("        </LinearLayout>\n" +
+                                "    </ScrollView>");
+                        break;
+                    case WidgetEntity.TYPE_LINEAR_LAYOUT:
+                        sbLayout.append("\n    <LinearLayout\n" +
+                                "        android:layout_width=\"" + widthString + "\"\n" +
+                                "        android:layout_height=\"" + heightString + "\"\n" +
+                                (widgetEntity.getWeight() > 0 ? "        android:layout_weight=\"" + widgetEntity.getWeight() + "\"\n" : "") +
+                                "        android:gravity=\"" + (widgetEntity.getGravity() == null ? "center_vertical" : widgetEntity.getGravity()) + "\"\n" +
+                                "        android:orientation=\"" + (widgetEntity.getOrientation() == null ? "horizontal" : widgetEntity.getOrientation()) + "\">");
+                        fillFgmWidget(app, activityEntity, fragmentEntity, layoutName, layoutPath, javaPath, widgetEntity.getId(), sbStrings, sbLayout, sbImp, sbJava, sbDef, sbInit, sbEvent, sbEditInfo, sbMethods);
+                        sbLayout.append("\n   </LinearLayout>");
+                        break;
+                    case WidgetEntity.TYPE_RELATIVE_LAYOUT:
+                        sbLayout.append("\n    <RelativeLayout\n" +
+                                "        android:layout_width=\"" + widthString + "\"\n" +
+                                "        android:layout_height=\"" + heightString + "\">");
+                        fillFgmWidget(app, activityEntity, fragmentEntity, layoutName, layoutPath, javaPath, widgetEntity.getId(), sbStrings, sbLayout, sbImp, sbJava, sbDef, sbInit, sbEvent, sbEditInfo, sbMethods);
+                        sbLayout.append("    </RelativeLayout>\n");
+                        break;
+                    case WidgetEntity.TYPE_IMAGE_VIEW:
+                        sbLayout.append("\n    <ImageView\n" +
+                                "        android:id=\"@+id/iv_" + widgetEntity.getResId() + "\"\n" +
+                                "        android:layout_width=\"" + widthString + "\"\n" +
+                                "        android:layout_height=\"" + heightString + "\"\n" +
+                                "        android:layout_marginTop=\"" + widgetEntity.getMarginTop() + "px\"\n" +
+                                "        android:layout_marginBottom=\"" + widgetEntity.getMarginBottom() + "px\"\n" +
+                                "        android:layout_marginRight=\"" + widgetEntity.getMarginRight() + "px\"\n" +
+                                "        android:layout_marginLeft=\"" + widgetEntity.getMarginLeft() + "px\"\n" +
+                                "        android:src=\"@drawable/more\" />");
+                        break;
+                    case WidgetEntity.TYPE_TEXT_VIEW:
+                        sbDef.append("\n    private TextView tv_" + widgetEntity.getResId() + ";");
+                        sbInit.append("\n        tv_" + widgetEntity.getResId() + " = (TextView) rootView.findViewById(R.id.tv_" + widgetEntity.getResId() + ");");
+                        sbStrings.append("    <string name=\"" + widgetEntity.getResId() + "_text\">" + widgetEntity.getTitle() + "</string>\n");
+                        sbStrings.append("    <string name=\"" + widgetEntity.getResId() + "_hint_text\">" + widgetEntity.getHint() + "</string>\n");
+                        sbLayout.append("\n    <TextView\n" +
+                                "        android:id=\"@+id/tv_" + widgetEntity.getResId() + "\"\n" +
+                                "        android:layout_width=\"wrap_content\"\n" +
+                                "        android:layout_height=\"wrap_content\"\n" +
+                                "        android:hint=\"@string/" + widgetEntity.getResId() + "_text\"\n" +
+                                "        android:text=\"@string/" + widgetEntity.getResId() + "_hint_text\"\n" +
+                                "        android:textColor=\"@color/colorBlack\"\n" +
+                                "        android:textSize=\"40px\" />");
+                        break;
+                    case WidgetEntity.TYPE_CHECK_BOX:
+                        sbDef.append("\n    private CheckBox cb_" + widgetEntity.getResId() + ";");
+                        sbInit.append("\n        cb_" + widgetEntity.getResId() + " = (CheckBox) rootView.findViewById(R.id.cb_" + widgetEntity.getResId() + ");");
+                        sbLayout.append("\n    <CheckBox\n" +
+                                "        android:id=\"@+id/cb_" + widgetEntity.getResId() + "\"\n" +
+                                "        android:layout_width=\"99px\"\n" +
+                                "        android:layout_height=\"75px\"\n" +
+                                "        android:background=\"@drawable/cb_selector\"\n" +
+                                "        android:button=\"@null\"\n" +
+                                "        app:layout_auto_baseheight=\"width\" />");
+                        break;
+                }
+            }
+        }
+    }
+
+
     private void fillWidget(ApplicationEntity app, ActivityEntity activityEntity, String layoutName, String layoutPath, String javaPath,
                             String pid, StringBuilder sbStrings, StringBuilder sbLayout, StringBuilder sbImp, StringBuilder sbJava,
-                            StringBuilder sbDef, StringBuilder sbInit, StringBuilder sbEvent, StringBuilder sbSubmit) throws IOException {
+                            StringBuilder sbDef, StringBuilder sbInit, StringBuilder sbEvent, StringBuilder sbEditInfo, StringBuilder sbMethods) throws IOException {
 
         List<WidgetEntity> widgetEntities = mWidgetService.executeCriteria(
                 new Criterion[]{
@@ -1642,7 +2543,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         sbEvent.append("\n        setEditListener(et_" + widgetEntity.getResId() + ", iv_clear_" + widgetEntity.getResId() + ");");
                         sbStrings.append("    <string name=\"" + widgetEntity.getResId() + "_text\">" + widgetEntity.getTitle() + "</string>\n");
                         sbStrings.append("    <string name=\"" + widgetEntity.getResId() + "_hint_text\">请输入" + widgetEntity.getTitle() + "</string>\n");
-                        sbSubmit.append("\n        String " + widgetEntity.getResId() + " = et_" + widgetEntity.getResId() + ".getText().toString().trim();");
+                        sbEditInfo.append("\n        String " + widgetEntity.getResId() + " = et_" + widgetEntity.getResId() + ".getText().toString().trim();");
                         sbLayout.append("\n    <LinearLayout\n" +
                                 "        android:layout_width=\"match_parent\"\n" +
                                 "        android:layout_height=\"wrap_content\"\n" +
@@ -1722,17 +2623,19 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 String m = url.substring(url.lastIndexOf("/") + 1, url.length());
                                 String beanClazz = m.substring(0, 1).toUpperCase() + m.substring(1, m.length()) + "Result";
                                 sbStrings.append("    <string name=\"" + widgetEntity.getResId() + "ing_text\">" + activityEntity.getTitle() + "中...</string>\n");
-                                sbSubmit.append("\n        showPd(getString(R.string." + widgetEntity.getResId() + "ing_text), false);\n" +
+                                sbMethods.append("    public void do_" + widgetEntity.getResId() + "() {\n");
+                                sbMethods.append(sbEditInfo.toString());
+                                sbMethods.append("\n        showPd(getString(R.string." + widgetEntity.getResId() + "ing_text), false);\n" +
                                         "        Api.getApi0()\n" +
                                         "                .userLogin(");
                                 if (requestParamsNo > 0) {
                                     for (int i1 = 0; i1 < requestParamsNo; i1++) {
-                                        sbSubmit.append("\"\", ");
+                                        sbMethods.append("\"\", ");
                                     }
-                                    sbSubmit.deleteCharAt(sbSubmit.length() - 1);
-                                    sbSubmit.deleteCharAt(sbSubmit.length() - 1);
+                                    sbMethods.deleteCharAt(sbMethods.length() - 1);
+                                    sbMethods.deleteCharAt(sbMethods.length() - 1);
                                 }
-                                sbSubmit.append(
+                                sbMethods.append(
                                         ")\n" +
                                                 "                .compose(RxHelper.<" + beanClazz + ">io_main())\n" +
                                                 "                .subscribe(new Subscriber<" + beanClazz + ">() {\n" +
@@ -1758,7 +2661,21 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                                 "                        }\n" +
                                                 "                    }\n" +
                                                 "                });");
+                                sbMethods.append("    }\n");
                             }
+                        } else {
+                            ActivityEntity targetAct = null;
+                            if (widgetEntity.getTargetActivityId() != null && widgetEntity.getTargetActivityId().length() > 0) {
+                                targetAct = mActivityService.get(widgetEntity.getTargetActivityId());
+                            }
+                            sbEvent.append("        btn_" + widgetEntity.getResId() + ".setOnClickListener(new View.OnClickListener() {\n" +
+                                    "            @Override\n" +
+                                    "            public void onClick(View v) {\n" +
+                                    "                Intent intent = new Intent(" + activityEntity.getName() + ".this, " + (targetAct == null ? activityEntity.getName() : targetAct.getName()) + ".class);\n" +
+                                    "                startActWithIntent(intent);\n" +
+                                    "                closeAct();\n" +
+                                    "            }\n" +
+                                    "        });");
                         }
                         break;
                     case WidgetEntity.TYPE_EXIT_BTN_ITEM:
@@ -1767,7 +2684,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         sbEvent.append("\n        btn_" + widgetEntity.getResId() + ".setOnClickListener(new View.OnClickListener() {\n" +
                                 "            @Override\n" +
                                 "            public void onClick(View v) {\n" +
-                                "                doSubmit();\n" +
+                                "                do_" + widgetEntity.getResId() + "();\n" +
                                 "            }\n" +
                                 "        });");
                         sbStrings.append("    <string name=\"" + widgetEntity.getResId() + "_text\">" + activityEntity.getTitle() + "</string>\n");
@@ -1783,22 +2700,6 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "        android:text=\"@string/" + widgetEntity.getResId() + "_text\"\n" +
                                 "        android:textColor=\"#fff\"\n" +
                                 "        android:textSize=\"@dimen/submit_btn_text_size\" />");
-                        sbSubmit.append("        btn_" + widgetEntity.getResId() + ".setOnClickListener(new View.OnClickListener() {\n" +
-                                "            @Override\n" +
-                                "            public void onClick(View v) {\n" +
-                                "                showTwoBtnDialog(getString(R.string." + widgetEntity.getResId() + "_text), \"确定\" + getString(R.string." + widgetEntity.getResId() + "_text) + \"吗？\", true, new OnTwoBtnClick() {\n" +
-                                "                    @Override\n" +
-                                "                    public void onOk() {\n" +
-                                "                        //TODO something\n" +
-                                "                    }\n" +
-                                "\n" +
-                                "                    @Override\n" +
-                                "                    public void onCancel() {\n" +
-                                "\n" +
-                                "                    }\n" +
-                                "                });\n" +
-                                "            }\n" +
-                                "        });");
                         break;
                     case WidgetEntity.TYPE_LETTER_RV:
                         String clazz = "TestResult";
@@ -2101,7 +3002,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "            android:layout_width=\"match_parent\"\n" +
                                 "            android:layout_height=\"wrap_content\"\n" +
                                 "            android:orientation=\"vertical\">");
-                        fillWidget(app, activityEntity, layoutName, layoutPath, javaPath, widgetEntity.getId(), sbStrings, sbLayout, sbImp, sbJava, sbDef, sbInit, sbEvent, sbSubmit);
+                        fillWidget(app, activityEntity, layoutName, layoutPath, javaPath, widgetEntity.getId(), sbStrings, sbLayout, sbImp, sbJava, sbDef, sbInit, sbEvent, sbEditInfo, sbMethods);
                         sbLayout.append("        </LinearLayout>\n" +
                                 "    </ScrollView>");
                         break;
@@ -2112,14 +3013,14 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 (widgetEntity.getWeight() > 0 ? "        android:layout_weight=\"" + widgetEntity.getWeight() + "\"\n" : "") +
                                 "        android:gravity=\"" + (widgetEntity.getGravity() == null ? "center_vertical" : widgetEntity.getGravity()) + "\"\n" +
                                 "        android:orientation=\"" + (widgetEntity.getOrientation() == null ? "horizontal" : widgetEntity.getOrientation()) + "\">");
-                        fillWidget(app, activityEntity, layoutName, layoutPath, javaPath, widgetEntity.getId(), sbStrings, sbLayout, sbImp, sbJava, sbDef, sbInit, sbEvent, sbSubmit);
+                        fillWidget(app, activityEntity, layoutName, layoutPath, javaPath, widgetEntity.getId(), sbStrings, sbLayout, sbImp, sbJava, sbDef, sbInit, sbEvent, sbEditInfo, sbMethods);
                         sbLayout.append("\n   </LinearLayout>");
                         break;
                     case WidgetEntity.TYPE_RELATIVE_LAYOUT:
                         sbLayout.append("\n    <RelativeLayout\n" +
                                 "        android:layout_width=\"" + widthString + "\"\n" +
                                 "        android:layout_height=\"" + heightString + "\">");
-                        fillWidget(app, activityEntity, layoutName, layoutPath, javaPath, widgetEntity.getId(), sbStrings, sbLayout, sbImp, sbJava, sbDef, sbInit, sbEvent, sbSubmit);
+                        fillWidget(app, activityEntity, layoutName, layoutPath, javaPath, widgetEntity.getId(), sbStrings, sbLayout, sbImp, sbJava, sbDef, sbInit, sbEvent, sbEditInfo, sbMethods);
                         sbLayout.append("    </RelativeLayout>\n");
                         break;
                     case WidgetEntity.TYPE_IMAGE_VIEW:
@@ -2134,6 +3035,8 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "        android:src=\"@drawable/more\" />");
                         break;
                     case WidgetEntity.TYPE_TEXT_VIEW:
+                        sbDef.append("\n    private TextView tv_" + widgetEntity.getResId() + ";");
+                        sbInit.append("\n        tv_" + widgetEntity.getResId() + " = (TextView) findViewById(R.id.tv_" + widgetEntity.getResId() + ");");
                         sbStrings.append("    <string name=\"" + widgetEntity.getResId() + "_text\">" + widgetEntity.getTitle() + "</string>\n");
                         sbStrings.append("    <string name=\"" + widgetEntity.getResId() + "_hint_text\">" + widgetEntity.getHint() + "</string>\n");
                         sbLayout.append("\n    <TextView\n" +
@@ -2146,7 +3049,10 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "        android:textSize=\"40px\" />");
                         break;
                     case WidgetEntity.TYPE_CHECK_BOX:
+                        sbDef.append("\n    private CheckBox cb_" + widgetEntity.getResId() + ";");
+                        sbInit.append("\n        cb_" + widgetEntity.getResId() + " = (CheckBox) findViewById(R.id.cb_" + widgetEntity.getResId() + ");");
                         sbLayout.append("\n    <CheckBox\n" +
+                                "        android:id=\"@+id/cb_" + widgetEntity.getResId() + "\"\n" +
                                 "        android:layout_width=\"99px\"\n" +
                                 "        android:layout_height=\"75px\"\n" +
                                 "        android:background=\"@drawable/cb_selector\"\n" +

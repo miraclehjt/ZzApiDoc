@@ -12,7 +12,7 @@ public interface FragmentService extends BaseService<FragmentEntity> {
 
     BaseResult addFragment(String name, String title, boolean showTitle, int type, int position, String appId, String activityId, String userId);
 
-    BaseResult getAllMyFragment(String userId);
+    BaseResult getAllMyFragment( String activityId, String userId);
 
     BaseResult deleteFragment(String id, String userId);
 }

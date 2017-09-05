@@ -87,13 +87,14 @@ public class FragmentServiceImpl extends BaseServiceImpl<FragmentEntity> impleme
     }
 
     @Override
-    public BaseResult getAllMyFragment(String userId) {
+    public BaseResult getAllMyFragment( String activityId, String userId) {
         UserEntity user = mUserService.get(userId);
         if (user == null) {
             return new BaseResult(0, "用户不合法");
         }
         List<FragmentEntity> applicationEntities = getBaseDao().executeCriteria(new Criterion[]{
                 Restrictions.eq("deleteFlag", BaseEntity.DELETE_FLAG_NO),
+                Restrictions.eq("activityId", activityId),
                 Restrictions.eq("createUserID", user.getId())
         });
         if (applicationEntities == null) {

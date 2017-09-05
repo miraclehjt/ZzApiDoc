@@ -30,6 +30,8 @@ public class ActivityEntity extends BaseEntity {
     private String splashImg;
     @Column(name = "ShowTitleBar")
     private Boolean showTitleBar;
+    @Column(name = "IsFirst")
+    private Boolean isFirst = false;
     @Column(name = "ApplicationId")
     private String applicationId;
     @Column(name = "TargetActId")
@@ -38,6 +40,14 @@ public class ActivityEntity extends BaseEntity {
     private String targetActName;
     @Column(name = "SplashSecond")
     private Integer splashSecond = 5;
+
+    public Boolean getFirst() {
+        return isFirst;
+    }
+
+    public void setFirst(Boolean first) {
+        isFirst = first;
+    }
 
     public String getTargetActName() {
         return targetActName;
