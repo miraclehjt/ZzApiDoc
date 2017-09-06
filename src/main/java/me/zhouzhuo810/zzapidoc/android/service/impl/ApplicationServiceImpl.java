@@ -566,7 +566,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 "    //bugly\n" +
                 "    compile 'com.tencent.bugly:crashreport:latest.release'\n" +
                 "    //zzandframe\n" +
-                "    compile 'com.github.zhouzhuo810:ZzAndFrame:1.0.8'\n" +
+                "    compile 'com.github.zhouzhuo810:ZzAndFrame:1.0.9'\n" +
                 "    //xutils\n" +
                 "    compile 'org.xutils:xutils:3.1.26'\n" +
                 "    //Glide\n" +
@@ -699,6 +699,11 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
         if (app.getLogo() != null && app.getLogo().length() > 0) {
             String name = new File(app.getLogo()).getName();
             logoName = name.substring(0, name.indexOf("."));
+        } else {
+            FileUtil.copyFile(new File(rootPath
+            +File.separator+"res"
+            +File.separator+"drawable"
+            +File.separator+"ic_launcher.png"), new File(filePath+File.separator+"res"+File.separator+"mipmap-hdpi"+File.separator+"ic_launcher.png"));
         }
         StringBuilder sbManifest = new StringBuilder();
         sbManifest.append("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
@@ -974,16 +979,16 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 }
                 switch (activityEntity.getType()) {
                     case ActivityEntity.TYPE_EMPTY_ACT:
-                        generateEmptyActJavaAndLayout(layoutPath, javaPath, activityEntity, app, sbStrings);
+                        generateEmptyActJavaAndLayout(logoName, layoutPath, javaPath, activityEntity, app, sbStrings);
                         break;
                     case ActivityEntity.TYPE_GUIDE:
 
                         break;
                     case ActivityEntity.TYPE_BOTTOM_FRAGMENT:
-                        generateFgmActJavaAndLayout(layoutPath, javaPath, activityEntity, app, sbStrings, sbArrays);
+                        generateBottomFgmActJavaAndLayout(logoName, layoutPath, javaPath, activityEntity, app, sbStrings, sbArrays);
                         break;
                     case ActivityEntity.TYPE_TOP_FRAGMENT:
-
+                        generateTopFgmActJavaAndLayout(logoName, layoutPath, javaPath, activityEntity, app, sbStrings, sbArrays);
                         break;
                 }
             }
@@ -1004,7 +1009,350 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
         FileUtils.saveFileToServer(sbManifest.toString(), filePath, "AndroidManifest.xml");
     }
 
-    private void generateFgmActJavaAndLayout(String layoutPath, String javaPath, ActivityEntity activityEntity, ApplicationEntity app, StringBuilder sbStrings, StringBuilder sbArrays) throws IOException {
+    private void generateTopFgmActJavaAndLayout(String logoName, String layoutPath, String javaPath, ActivityEntity activityEntity, ApplicationEntity app, StringBuilder sbStrings, StringBuilder sbArrays) throws IOException {
+        String layoutName = "";
+        boolean isNotFirst = false;
+        for (int i = 0; i < activityEntity.getName().length(); i++) {
+            char c = activityEntity.getName().charAt(i);
+            if (c >= 'A' && c <= 'Z') {
+                if (isNotFirst) {
+                    layoutName += "_";
+                }
+                isNotFirst = true;
+            }
+            layoutName += c;
+        }
+        final String realLayoutName = layoutName.toLowerCase();
+        layoutName = layoutName.replace("activity_", "").replace("__", "_").toLowerCase();
+
+        /*layout*/
+        StringBuilder sbLayout = new StringBuilder();
+        sbStrings.append("    <string name=\"" + layoutName + "_title_text\">" + activityEntity.getTitle() + "</string>\n");
+        sbLayout.append("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
+                "<LinearLayout xmlns:android=\"http://schemas.android.com/apk/res/android\"\n" +
+                "    xmlns:app=\"http://schemas.android.com/apk/res-auto\"\n" +
+                "    android:layout_width=\"match_parent\"\n" +
+                "    android:layout_height=\"match_parent\"\n" +
+                "    android:orientation=\"vertical\">\n" +
+                "\n" +
+                "    <zhouzhuo810.me.zzandframe.ui.widget.TitleBar\n" +
+                "        android:id=\"@+id/title_bar\"\n" +
+                "        android:layout_width=\"match_parent\"\n" +
+                "        android:layout_height=\"@dimen/title_height\"\n" +
+                "        android:background=\"@color/colorPrimary\"\n" +
+                "        app:leftImg=\"@drawable/back\"\n" +
+                "        app:showLeftImg=\"true\"\n" +
+                "        app:showLeftLayout=\"false\"\n" +
+                "        app:showLeftText=\"false\"\n" +
+                "        app:textColorAll=\"@color/colorWhite\"\n" +
+                "        app:textSizeTitle=\"@dimen/title_text_size\"\n" +
+                "        app:titleText=\"@string/"+layoutName+"_title_text\" />\n" +
+                "\n" +
+                "    <zhouzhuo810.me.zzandframe.ui.widget.zzpagerindicator.ZzPagerIndicator\n" +
+                "        android:id=\"@+id/indicator\"\n" +
+                "        android:layout_width=\"match_parent\"\n" +
+                "        android:layout_height=\"wrap_content\"\n" +
+                "        android:paddingBottom=\"10px\"\n" +
+                "        android:paddingTop=\"10px\"\n" +
+                "        app:zz_indicator_type=\"tab_with_icon_and_text\"\n" +
+                "        app:zz_is_need_scale_in_px=\"true\"\n" +
+                "        app:zz_select_tab_text_color=\"@color/colorPrimary\"\n" +
+                "        app:zz_select_tab_text_size=\"@dimen/tab_text_size\"\n" +
+                "        app:zz_should_tab_expand=\"true\"\n" +
+                "        app:zz_tab_icon_size=\"@dimen/tab_img_size\"\n" +
+                "        app:zz_underline_color=\"@color/colorPrimary\"\n" +
+                "        app:zz_underline_height=\"4px\"\n" +
+                "        app:zz_unselect_tab_text_color=\"@color/colorBlack\"\n" +
+                "        app:zz_unselect_tab_text_size=\"@dimen/tab_text_size\" />\n" +
+                "\n" +
+                "    <android.support.v4.view.ViewPager\n" +
+                "        android:id=\"@+id/view_pager\"\n" +
+                "        android:layout_width=\"match_parent\"\n" +
+                "        android:layout_height=\"0dp\"\n" +
+                "        android:layout_weight=\"1\">\n" +
+                "\n" +
+                "    </android.support.v4.view.ViewPager>\n" +
+                "\n" +
+                "</LinearLayout>");
+
+        /*java*/
+        StringBuilder sbJava = new StringBuilder();
+        StringBuilder sbImp = new StringBuilder();
+        sbImp.append(
+                "\nimport android.os.Bundle;\n" +
+                        "import android.support.annotation.Nullable;\n" +
+                        "import android.content.Intent;\n" +
+                        "import android.view.View;\n" +
+                        "import android.view.ViewGroup;\n" +
+                        "import android.widget.Button;\n" +
+                        "import android.widget.CheckBox;\n" +
+                        "import android.widget.EditText;\n" +
+                        "import android.widget.ImageView;\n" +
+                        "import android.widget.TextView;\n" +
+                        "import android.widget.LinearLayout;\n" +
+                        "\n" +
+                        "import " + app.getPackageName() + ".R;\n" +
+                        "import zhouzhuo810.me.zzandframe.ui.act.BaseActivity;\n" +
+                        "import " + app.getPackageName() + ".common.api.Api;\n" +
+                        "import " + app.getPackageName() + ".common.api.entity.*;\n" +
+                        "import rx.Subscriber;\n" +
+                        "import zhouzhuo810.me.zzandframe.common.rx.RxHelper;\n" +
+                        "import zhouzhuo810.me.zzandframe.common.utils.ToastUtils;\n" +
+                        "import zhouzhuo810.me.zzandframe.ui.widget.TitleBar;\n");
+
+        StringBuilder sbDef = new StringBuilder();
+        StringBuilder sbInit = new StringBuilder();
+        StringBuilder sbData = new StringBuilder();
+        StringBuilder sbEvent = new StringBuilder();
+        StringBuilder sbEditInfo = new StringBuilder();
+        StringBuilder sbMethods = new StringBuilder();
+
+        sbInit.append("        titleBar = (TitleBar) findViewById(R.id.title_bar);\n" +
+                "        indicator = (ZzPagerIndicator) findViewById(R.id.indicator);\n" +
+                "        viewPager = (ViewPager) findViewById(R.id.view_pager);\n");
+
+        String arrayName = "tan_names_"+layoutName;
+        sbArrays.append("\n    <string-array name=\""+arrayName+"\">");
+        fillTopFragment(arrayName, logoName, app, activityEntity, layoutPath, javaPath,sbData, sbStrings, sbImp, sbJava, sbDef, sbInit, sbEvent, sbMethods, sbArrays);
+        sbArrays.append("\n    </string-array>");
+
+        sbJava.append("package " + app.getPackageName() + ".ui.act;\n" +
+                "\n")
+                .append(sbImp.toString())
+                .append("\n" +
+                        "/**\n" +
+                        " *\n" +
+                        " * Created by admin on 2017/8/27.\n" +
+                        " */\n" +
+                        "public class " + activityEntity.getName() + " extends BaseActivity {\n")
+                .append(sbDef.toString())
+                .append("\n\n    @Override\n" +
+                        "    public int getLayoutId() {\n" +
+                        "        return R.layout." + realLayoutName + ";\n" +
+                        "    }\n")
+                .append("    @Override\n" +
+                        "    public void initView() {\n")
+                .append(sbInit.toString())
+                .append("\n    }\n" +
+                        "\n" +
+                        "    @Override\n" +
+                        "    public void initData() {\n" )
+                .append(sbData.toString())
+                .append("\n    }\n")
+                .append("\n\n" +
+                        "    @Override\n" +
+                        "    public void initEvent() {\n")
+                .append(sbEvent.toString())
+                .append("\n    }\n");
+
+        sbJava.append(sbMethods.toString());
+
+        sbJava.append("\n" +
+                "    @Override\n" +
+                "    public void resume() {\n" +
+                "\n" +
+                "    }\n" +
+                "\n" +
+                "    @Override\n" +
+                "       public void pause() {\n" +
+                "\n" +
+                "    }\n" +
+                "\n" +
+                "    @Override\n" +
+                "    public void destroy() {\n" +
+                "\n" +
+                "    }\n" +
+                "\n" +
+                "    @Override\n" +
+                "    public void saveState(Bundle bundle) {\n" +
+                "\n" +
+                "    }\n" +
+                "\n" +
+                "    @Override\n" +
+                "    public void restoreState(@Nullable Bundle bundle) {\n" +
+                "\n" +
+                "    }\n" +
+                "\n" +
+                "    @Override\n" +
+                "    public boolean defaultBack() {\n" +
+                "        return false;\n" +
+                "    }\n" +
+                "\n" +
+                "}\n");
+
+        FileUtils.saveFileToServer(sbLayout.toString(), layoutPath, realLayoutName + ".xml");
+        FileUtils.saveFileToServer(sbJava.toString(), javaPath + File.separator + "ui" + File.separator + "act", activityEntity.getName() + ".java");
+
+    }
+
+
+    private void fillTopFragment(String arrayName, String logoName, ApplicationEntity app, ActivityEntity activityEntity, String layoutPath, String javaPath, StringBuilder sbData, StringBuilder sbStrings,
+                                 StringBuilder sbImp, StringBuilder sbJava, StringBuilder sbDef, StringBuilder sbInit, StringBuilder sbEvent,
+                                 StringBuilder sbMethods, StringBuilder sbArrays) throws IOException {
+        sbDef.append("\n" +
+                "    private TitleBar titleBar;\n" +
+                "    private ZzPagerIndicator indicator;\n" +
+                "    private ViewPager viewPager;\n" +
+                "    List<Fragment> fragments;\n");
+        sbImp.append("import android.support.v4.app.Fragment;\n" +
+                "import android.support.v4.view.ViewPager;\n"+
+                "import java.util.ArrayList;\n" +
+                "import java.util.List;\n\n"+
+                "import zhouzhuo810.me.zzandframe.ui.widget.zzpagerindicator.ZzPagerIndicator;\n"+
+                "import zhouzhuo810.me.zzandframe.ui.widget.zzpagerindicator.adapter.ZzFragmentPagerAdapter;\n")
+                .append("import zhouzhuo810.me.zzandframe.ui.widget.TabBar;\n");
+        sbData.append("\n        fragments = new ArrayList<>();");
+        List<FragmentEntity> fragments = mFragmentService.executeCriteria(new Criterion[]{
+                Restrictions.eq("deleteFlag", BaseEntity.DELETE_FLAG_NO),
+                Restrictions.eq("activityId", activityEntity.getId())
+        }, Order.asc("position"));
+        if (fragments != null && fragments.size() > 0) {
+            StringBuilder sbPic = new StringBuilder();
+            for (int i = 0; i < fragments.size(); i++) {
+                sbPic.append("\n            R.mipmap." + logoName + ",");
+            }
+            sbPic.deleteCharAt(sbPic.length() - 1);
+            sbDef.append("\n    private int[] pressIcons = {")
+                    .append(sbPic.toString())
+                    .append("\n    };\n")
+                    .append("\n    private int[] normalIcons = {")
+                    .append(sbPic.toString())
+                    .append("\n    };\n");
+
+            for (int i1 = 0; i1 < fragments.size(); i1++) {
+                FragmentEntity fragment = fragments.get(i1);
+                sbImp.append("\nimport "+app.getPackageName()+".ui.fgm." + fragment.getName() + ";");
+                sbArrays.append("\n        <item>" + fragment.getTitle() + "</item>");
+
+                String layoutName = "";
+                boolean isNotFirst = false;
+                for (int i = 0; i < fragment.getName().length(); i++) {
+                    char c = fragment.getName().charAt(i);
+                    if (c >= 'A' && c <= 'Z') {
+                        if (isNotFirst) {
+                            layoutName += "_";
+                        }
+                        isNotFirst = true;
+                    }
+                    layoutName += c;
+                }
+                final String realLayoutName = layoutName.toLowerCase();
+                layoutName = layoutName.replace("fragment_", "").replace("__", "_").toLowerCase();
+
+                sbData.append("\n        fragments.add(new "+fragment.getName()+"());");
+
+                StringBuilder sbLayout1 = new StringBuilder();
+                StringBuilder sbImp1 = new StringBuilder();
+                StringBuilder sbJava1 = new StringBuilder();
+                StringBuilder sbDef1 = new StringBuilder();
+                StringBuilder sbInit1 = new StringBuilder();
+                StringBuilder sbEvent1 = new StringBuilder();
+                StringBuilder sbEditInfo1 = new StringBuilder();
+                StringBuilder sbMethods1 = new StringBuilder();
+
+                sbLayout1.append("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
+                        "<LinearLayout xmlns:android=\"http://schemas.android.com/apk/res/android\"\n" +
+                        "    xmlns:app=\"http://schemas.android.com/apk/res-auto\"\n" +
+                        "    android:layout_width=\"match_parent\"\n" +
+                        "    android:layout_height=\"match_parent\"\n" +
+                        "    android:background=\"@color/colorGrayBg\"\n" +
+                        "    android:orientation=\"vertical\">\n");
+
+                sbImp1.append(
+                        "\nimport android.os.Bundle;\n" +
+                                "import android.support.annotation.Nullable;\n" +
+                                "import android.content.Intent;\n" +
+                                "import android.view.View;\n" +
+                                "import android.view.ViewGroup;\n" +
+                                "import android.widget.Button;\n" +
+                                "import android.widget.CheckBox;\n" +
+                                "import android.widget.EditText;\n" +
+                                "import android.widget.ImageView;\n" +
+                                "import android.widget.TextView;\n" +
+                                "import android.widget.LinearLayout;\n" +
+                                "\n" +
+                                "import " + app.getPackageName() + ".R;\n" +
+                                "import zhouzhuo810.me.zzandframe.ui.fgm.BaseFragment;\n" +
+                                "import " + app.getPackageName() + ".common.api.Api;\n" +
+                                "import " + app.getPackageName() + ".common.api.entity.*;\n" +
+                                "import rx.Subscriber;\n" +
+                                "import zhouzhuo810.me.zzandframe.common.rx.RxHelper;\n" +
+                                "import zhouzhuo810.me.zzandframe.common.utils.ToastUtils;\n" +
+                                "import zhouzhuo810.me.zzandframe.ui.widget.TitleBar;\n");
+
+                fillFgmWidget(app, activityEntity, fragment, layoutName, layoutPath, javaPath, "0", sbStrings, sbLayout1, sbImp1, sbJava1, sbDef1, sbInit1, sbEvent1, sbEditInfo1, sbMethods1);
+
+                sbJava1.append("package " + app.getPackageName() + ".ui.fgm;\n" +
+                        "\n")
+                        .append(sbImp1.toString())
+                        .append("\n" +
+                                "/**\n" +
+                                " *\n" +
+                                " * Created by admin on 2017/8/27.\n" +
+                                " */\n" +
+                                "public class " + fragment.getName() + " extends BaseFragment {\n")
+                        .append(sbDef1.toString())
+                        .append("\n\n    @Override\n" +
+                                "    public int getLayoutId() {\n" +
+                                "        return R.layout." + realLayoutName + ";\n" +
+                                "    }\n")
+                        .append("    @Override\n" +
+                                "    public void initView() {\n")
+                        .append(sbInit1.toString())
+                        .append("\n    }\n" +
+                                "\n" +
+                                "    @Override\n" +
+                                "    public void initData() {\n" +
+                                "\n" +
+                                "    }\n")
+                        .append("\n" +
+                                "    @Override\n" +
+                                "    public void initEvent() {\n")
+                        .append(sbEvent1.toString())
+                        .append("\n    }\n");
+
+                sbJava1.append(sbMethods1.toString());
+
+                sbJava1.append("\n" +
+                        "    @Override\n" +
+                        "    public void resume() {\n" +
+                        "\n" +
+                        "    }\n" +
+                        "\n" +
+                        "    @Override\n" +
+                        "       public void destroyView() {\n" +
+                        "\n" +
+                        "    }\n" +
+                        "\n" +
+                        "    @Override\n" +
+                        "    public void saveState(Bundle bundle) {\n" +
+                        "\n" +
+                        "    }\n" +
+                        "\n" +
+                        "    @Override\n" +
+                        "    public void restoreState(@Nullable Bundle bundle) {\n" +
+                        "\n" +
+                        "    }\n" +
+                        "\n" +
+                        "}\n");
+                sbLayout1.append("\n" +
+                        "</LinearLayout>");
+
+
+                FileUtils.saveFileToServer(sbLayout1.toString(), layoutPath, realLayoutName + ".xml");
+                FileUtils.saveFileToServer(sbJava1.toString(), javaPath + File.separator + "ui" + File.separator + "fgm", fragment.getName() + ".java");
+
+            }
+
+            sbData.append("\n        String[] titles = getResources().getStringArray(R.array."+arrayName+");\n" +
+                    "        viewPager.setAdapter(new ZzFragmentPagerAdapter(getSupportFragmentManager(), fragments, titles,\n" +
+                    "                pressIcons, normalIcons));\n" +
+                    "\n" +
+                    "        indicator.setViewPager(viewPager);\n");
+        }
+    }
+
+    private void generateBottomFgmActJavaAndLayout(String logoName, String layoutPath, String javaPath, ActivityEntity activityEntity, ApplicationEntity app, StringBuilder sbStrings, StringBuilder sbArrays) throws IOException {
         String layoutName = "";
         boolean isNotFirst = false;
         for (int i = 0; i < activityEntity.getName().length(); i++) {
@@ -1036,18 +1384,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 "        android:layout_weight=\"1\">\n" +
                 "\n" +
                 "    </FrameLayout>\n" +
-                "\n" +
-                "    <zhouzhuo810.me.zzandframe.ui.widget.TabBar\n" +
-                "        android:id=\"@+id/tab_bar\"\n" +
-                "        android:layout_width=\"match_parent\"\n" +
-                "        android:layout_height=\"wrap_content\"\n" +
-                "        app:tb_tabNames=\"@array/tab_names_" + layoutName + "\"\n" +
-                "        app:tb_textColorNormal=\"@color/colorGrayB\"\n" +
-                "        app:tb_textColorPress=\"@color/colorPrimary\"\n" +
-                "        app:tb_tabCount=\"FOUR\"\n" +
-                "        app:tb_textSize=\"@dimen/tab_text_size\" />\n" +
-                "\n" +
-                "</LinearLayout>\n");
+                "\n");
 
         /*java*/
         StringBuilder sbJava = new StringBuilder();
@@ -1081,12 +1418,25 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
         StringBuilder sbMethods = new StringBuilder();
         StringBuilder sbAttach = new StringBuilder();
 
+        sbInit.append("        tabBar = (TabBar) findViewById(R.id.tab_bar);\n" +
+                "        tabBar.setPressIconRes(pressIcons)\n" +
+                "                .setNormalIconRes(normalIcons)\n" +
+                "                .update();\n");
+        sbEvent.append("        tabBar.setOnTabBarClickListener(new TabBar.OnTabBarClick() {\n" +
+                "            @Override\n" +
+                "            public void onTabClick(ImageView imageView, TextView textView, int position, boolean changed) {\n" +
+                "                if (changed) {\n" +
+                "                    select(position);\n" +
+                "                }\n" +
+                "            }\n" +
+                "        });\n");
         sbAttach.append("\n" +
                 "    @Override\n" +
                 "    public void onAttachFragment(Fragment fragment) {\n" +
                 "        super.onAttachFragment(fragment);");
-        sbArrays.append("\n    <string-array name=\"tab_names_main\">");
-        fillFragment(app, activityEntity, layoutPath, javaPath, sbAttach, sbStrings, sbImp, sbJava, sbDef, sbInit, sbEvent, sbMethods, sbArrays);
+        String arrayName = "tan_names_"+layoutName;
+        sbArrays.append("\n    <string-array name=\""+arrayName+"\">");
+        fillBottomFragment(arrayName, logoName, app, activityEntity, layoutPath, javaPath, sbAttach, sbStrings, sbLayout, sbImp, sbJava, sbDef, sbInit, sbEvent, sbMethods, sbArrays);
         sbArrays.append("\n    </string-array>");
         sbAttach.append("\n    }\n");
 
@@ -1111,7 +1461,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         "\n" +
                         "    @Override\n" +
                         "    public void initData() {\n" +
-                        "\n" +
+                        "        select(0);\n" +
                         "    }\n")
                 .append("\n" +
                         "    @Override\n" +
@@ -1119,7 +1469,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 .append(sbEvent.toString())
                 .append("\n    }\n");
 
-        sbMethods.append(sbMethods.toString());
+        sbJava.append(sbMethods.toString());
 
         sbJava.append("\n" +
                 "    @Override\n" +
@@ -1162,20 +1512,67 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
 
     }
 
-    private void fillFragment(ApplicationEntity app, ActivityEntity activityEntity, String layoutPath, String javaPath, StringBuilder sbAttach, StringBuilder sbStrings,
-                              StringBuilder sbImp, StringBuilder sbJava, StringBuilder sbDef, StringBuilder sbInit, StringBuilder sbEvent,
+    private void fillBottomFragment(String arrayName, String logoName, ApplicationEntity app, ActivityEntity activityEntity, String layoutPath, String javaPath, StringBuilder sbAttach, StringBuilder sbStrings,
+                              StringBuilder sbLayout, StringBuilder sbImp, StringBuilder sbJava, StringBuilder sbDef, StringBuilder sbInit, StringBuilder sbEvent,
                               StringBuilder sbMethods, StringBuilder sbArrays) throws IOException {
-        sbDef.append("    private FrameLayout fgmContainer;\n" +
-                "    private TabBar tabBar;\n");
-        sbImp.append("import android.widget.FrameLayout;\n")
+        sbDef.append("\n    private TabBar tabBar;\n\n");
+        sbImp.append("import android.support.v4.app.Fragment;\n" +
+                "import android.support.v4.app.FragmentManager;\n" +
+                "import android.support.v4.app.FragmentTransaction;\n")
                 .append("import zhouzhuo810.me.zzandframe.ui.widget.TabBar;\n");
         List<FragmentEntity> fragments = mFragmentService.executeCriteria(new Criterion[]{
                 Restrictions.eq("deleteFlag", BaseEntity.DELETE_FLAG_NO),
                 Restrictions.eq("activityId", activityEntity.getId())
         }, Order.asc("position"));
         if (fragments != null && fragments.size() > 0) {
-            for (FragmentEntity fragment : fragments) {
-                sbImp.append("\nimport me.zhouzhuo810.logintest.ui.fgm." + fragment.getName() + ";");
+            String tabCount = "FIVE";
+            switch (fragments.size()) {
+                case 1:
+                    tabCount = "ONE";
+                    break;
+                case 2:
+                    tabCount = "TWO";
+                    break;
+                case 3:
+                    tabCount = "THREE";
+                    break;
+                case 4:
+                    tabCount = "FOUR";
+                    break;
+                case 5:
+                    tabCount = "FIVE";
+                    break;
+                default:
+                    tabCount = "FIVE";
+                    break;
+            }
+            sbLayout.append("    <zhouzhuo810.me.zzandframe.ui.widget.TabBar\n" +
+                    "        android:id=\"@+id/tab_bar\"\n" +
+                    "        android:layout_width=\"match_parent\"\n" +
+                    "        android:layout_height=\"wrap_content\"\n" +
+                    "        android:background=\"@color/colorWhite\"\n"+
+                    "        app:tb_tabNames=\"@array/"+arrayName+"\"\n" +
+                    "        app:tb_textColorNormal=\"@color/colorGrayB\"\n" +
+                    "        app:tb_textColorPress=\"@color/colorPrimary\"\n" +
+                    "        app:tb_tabCount=\"" + tabCount + "\"\n" +
+                    "        app:tb_textSize=\"@dimen/tab_text_size\" />\n");
+            StringBuilder sbPic = new StringBuilder();
+            for (int i = 0; i < fragments.size(); i++) {
+                sbPic.append("\n            R.mipmap." + logoName + ",");
+            }
+            sbPic.deleteCharAt(sbPic.length() - 1);
+            sbDef.append("\n    private int[] pressIcons = {")
+                    .append(sbPic.toString())
+                    .append("\n    };\n")
+                    .append("\n    private int[] normalIcons = {")
+                    .append(sbPic.toString())
+                    .append("\n    };\n");
+
+            StringBuilder sbSelect = new StringBuilder();
+            StringBuilder sbHide = new StringBuilder();
+            for (int i1 = 0; i1 < fragments.size(); i1++) {
+                FragmentEntity fragment = fragments.get(i1);
+                sbImp.append("\nimport "+app.getPackageName()+".ui.fgm." + fragment.getName() + ";");
                 sbArrays.append("\n        <item>" + fragment.getTitle() + "</item>");
 
                 String layoutName = "";
@@ -1196,6 +1593,17 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 sbAttach.append("\n        if (" + realLayoutName + " == null && fragment instanceof " + fragment.getName() + ") {\n" +
                         "            " + realLayoutName + " = (" + fragment.getName() + ") fragment;\n" +
                         "        }");
+                sbSelect.append("            case " + i1 + ":\n" +
+                        "                if (" + realLayoutName + " == null) {\n" +
+                        "                    " + realLayoutName + " = new " + fragment.getName() + "();\n" +
+                        "                    ft.add(R.id.fgm_container, " + realLayoutName + ");\n" +
+                        "                } else {\n" +
+                        "                    ft.attach(" + realLayoutName + ");\n" +
+                        "                }\n" +
+                        "                break;\n");
+                sbHide.append("        if (" + realLayoutName + " != null) {\n" +
+                        "            ft.detach(" + realLayoutName + ");\n" +
+                        "        }\n");
 
                 StringBuilder sbLayout1 = new StringBuilder();
                 StringBuilder sbImp1 = new StringBuilder();
@@ -1205,6 +1613,14 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 StringBuilder sbEvent1 = new StringBuilder();
                 StringBuilder sbEditInfo1 = new StringBuilder();
                 StringBuilder sbMethods1 = new StringBuilder();
+
+                sbLayout1.append("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
+                        "<LinearLayout xmlns:android=\"http://schemas.android.com/apk/res/android\"\n" +
+                        "    xmlns:app=\"http://schemas.android.com/apk/res-auto\"\n" +
+                        "    android:layout_width=\"match_parent\"\n" +
+                        "    android:layout_height=\"match_parent\"\n" +
+                        "    android:background=\"@color/colorGrayBg\"\n" +
+                        "    android:orientation=\"vertical\">\n");
 
                 sbImp1.append(
                         "\nimport android.os.Bundle;\n" +
@@ -1228,9 +1644,9 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "import zhouzhuo810.me.zzandframe.common.utils.ToastUtils;\n" +
                                 "import zhouzhuo810.me.zzandframe.ui.widget.TitleBar;\n");
 
-                fillFgmWidget(app, activityEntity, fragment, layoutName, layoutPath, javaPath, "0", sbStrings, sbLayout1, sbImp, sbJava, sbDef, sbInit, sbEvent, sbEditInfo1, sbMethods1);
+                fillFgmWidget(app, activityEntity, fragment, layoutName, layoutPath, javaPath, "0", sbStrings, sbLayout1, sbImp1, sbJava1, sbDef1, sbInit1, sbEvent1, sbEditInfo1, sbMethods1);
 
-                sbJava1.append("package " + app.getPackageName() + ".ui.act;\n" +
+                sbJava1.append("package " + app.getPackageName() + ".ui.fgm;\n" +
                         "\n")
                         .append(sbImp1.toString())
                         .append("\n" +
@@ -1238,7 +1654,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 " *\n" +
                                 " * Created by admin on 2017/8/27.\n" +
                                 " */\n" +
-                                "public class " + activityEntity.getName() + " extends BaseFragment {\n")
+                                "public class " + fragment.getName() + " extends BaseFragment {\n")
                         .append(sbDef1.toString())
                         .append("\n\n    @Override\n" +
                                 "    public int getLayoutId() {\n" +
@@ -1259,7 +1675,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         .append(sbEvent1.toString())
                         .append("\n    }\n");
 
-                sbMethods.append(sbMethods.toString());
+                sbJava1.append(sbMethods1.toString());
 
                 sbJava1.append("\n" +
                         "    @Override\n" +
@@ -1291,6 +1707,22 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 FileUtils.saveFileToServer(sbJava1.toString(), javaPath + File.separator + "ui" + File.separator + "fgm", fragment.getName() + ".java");
 
             }
+
+            sbMethods
+                    .append("\n" +
+                            "    private void select(int position) {\n" +
+                            "        FragmentManager fm = getSupportFragmentManager();\n" +
+                            "        FragmentTransaction ft = fm.beginTransaction();\n" +
+                            "        hideFragment(ft);\n" +
+                            "        switch (position) {\n")
+                    .append(sbSelect.toString())
+                    .append("        }\n" +
+                            "        ft.commit();\n" +
+                            "    }\n")
+                    .append("\n" +
+                            "    private void hideFragment(FragmentTransaction ft) {\n")
+                    .append(sbHide.toString())
+                    .append("    }\n");
         }
     }
 
@@ -1740,7 +2172,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
 
     }
 
-    private void generateEmptyActJavaAndLayout(String layoutPath, String javaPath, ActivityEntity activityEntity, ApplicationEntity app, StringBuilder sbStrings) throws IOException {
+    private void generateEmptyActJavaAndLayout(String logoName, String layoutPath, String javaPath, ActivityEntity activityEntity, ApplicationEntity app, StringBuilder sbStrings) throws IOException {
         String layoutName = "";
         boolean isNotFirst = false;
         for (int i = 0; i < activityEntity.getName().length(); i++) {
@@ -1827,7 +2259,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 .append(sbEvent.toString())
                 .append("\n    }\n");
 
-        sbMethods.append(sbMethods.toString());
+        sbJava.append(sbMethods.toString());
 
         sbJava.append("\n" +
                 "    @Override\n" +
@@ -1927,7 +2359,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "        app:showRightLayout=\"false\"\n" +
                                 "        app:textColorAll=\"@color/colorWhite\"\n" +
                                 "        app:textSizeTitle=\"@dimen/title_text_size\"\n" +
-                                "        app:titleText=\"@string/"+layoutName+"_text\" />");
+                                "        app:titleText=\"@string/" + layoutName + "_text\" />");
                         break;
                     case WidgetEntity.TYPE_EDIT_ITEM:
                         sbDef.append("\n    private EditText et_" + widgetEntity.getResId() + ";");
@@ -2392,12 +2824,12 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         sbLayout.append("\n    <ScrollView\n" +
                                 (widgetEntity.getWeight() > 0 ? "        android:layout_weight=\"" + widgetEntity.getWeight() + "\"\n" : "") +
                                 "        android:layout_width=\"match_parent\"\n" +
-                                "        android:layout_height=\""+heightString+"\">\n" +
+                                "        android:layout_height=\"" + heightString + "\">\n" +
                                 "        <LinearLayout\n" +
                                 "            android:layout_width=\"match_parent\"\n" +
                                 "            android:layout_height=\"wrap_content\"\n" +
                                 "            android:orientation=\"vertical\">");
-                        fillFgmWidget(app, activityEntity, fragmentEntity, layoutName,  layoutPath, javaPath, widgetEntity.getId(), sbStrings, sbLayout, sbImp, sbJava, sbDef, sbInit, sbEvent, sbEditInfo, sbMethods);
+                        fillFgmWidget(app, activityEntity, fragmentEntity, layoutName, layoutPath, javaPath, widgetEntity.getId(), sbStrings, sbLayout, sbImp, sbJava, sbDef, sbInit, sbEvent, sbEditInfo, sbMethods);
                         sbLayout.append("        </LinearLayout>\n" +
                                 "    </ScrollView>");
                         break;
@@ -2436,11 +2868,12 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         sbStrings.append("    <string name=\"" + widgetEntity.getResId() + "_hint_text\">" + widgetEntity.getHint() + "</string>\n");
                         sbLayout.append("\n    <TextView\n" +
                                 "        android:id=\"@+id/tv_" + widgetEntity.getResId() + "\"\n" +
-                                "        android:layout_width=\"wrap_content\"\n" +
-                                "        android:layout_height=\"wrap_content\"\n" +
+                                "        android:layout_width=\""+widthString+"\"\n" +
+                                "        android:layout_height=\""+heightString+"\"\n" +
                                 "        android:hint=\"@string/" + widgetEntity.getResId() + "_text\"\n" +
                                 "        android:text=\"@string/" + widgetEntity.getResId() + "_hint_text\"\n" +
                                 "        android:textColor=\"@color/colorBlack\"\n" +
+                                "        android:gravity=\""+(widgetEntity.getGravity()==null?"center":widgetEntity.getGravity())+"\"\n"+
                                 "        android:textSize=\"40px\" />");
                         break;
                     case WidgetEntity.TYPE_CHECK_BOX:
