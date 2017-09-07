@@ -2,10 +2,12 @@ package me.zhouzhuo810.zzapidoc.common.utils;
 
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.charset.Charset;
 
 /**
@@ -13,7 +15,7 @@ import java.nio.charset.Charset;
  */
 public class FileUtils {
 
-    public static String saveFileToServer(String content, String path)
+    public static String saveFileToPathWithRandomName(String content, String path)
             throws IOException {
         // 创建目录
         File dir = new File(path);
@@ -33,7 +35,7 @@ public class FileUtils {
         return filename;
     }
 
-    public static String saveFileToServer(String content, String path, String filename)
+    public static String saveFileToPathWithName(String content, String path, String filename)
             throws IOException {
         // 创建目录
         File dir = new File(path);

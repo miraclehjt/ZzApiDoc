@@ -803,7 +803,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    String fileName = me.zhouzhuo810.zzapidoc.common.utils.FileUtils.saveFileToServer(json, mPath);
+                    String fileName = me.zhouzhuo810.zzapidoc.common.utils.FileUtils.saveFileToPathWithRandomName(json, mPath);
                     HttpHeaders headers = new HttpHeaders();
                     headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
                     headers.setContentDispositionFormData("attachment", fileName);

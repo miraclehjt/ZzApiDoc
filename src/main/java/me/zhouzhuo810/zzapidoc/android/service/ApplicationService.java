@@ -11,7 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
  */
 public interface ApplicationService extends BaseService<ApplicationEntity> {
 
-    BaseResult addApplication(String appName, String versionName,
+    BaseResult addApplication(String chName, String appName, String versionName,
                               String packageName, MultipartFile logo,
                               String colorMain, int minSDK,
                               int compileSDK, int targetSDK,

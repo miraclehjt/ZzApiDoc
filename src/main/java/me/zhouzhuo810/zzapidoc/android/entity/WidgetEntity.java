@@ -14,17 +14,18 @@ import javax.persistence.Table;
 public class WidgetEntity extends BaseEntity {
     public static final int TYPE_TITLE_BAR = 0;
     public static final int TYPE_SETTING_ITEM = 1;
-    public static final int TYPE_EDIT_ITEM = 2;
-    public static final int TYPE_INFO_ITEM = 3;
-    public static final int TYPE_SUBMIT_BTN_ITEM = 4;
-    public static final int TYPE_EXIT_BTN_ITEM = 5;
-    public static final int TYPE_LETTER_RV = 6;
-    public static final int TYPE_SCROLL_VIEW = 7;
-    public static final int TYPE_LINEAR_LAYOUT = 8;
-    public static final int TYPE_RELATIVE_LAYOUT = 9;
-    public static final int TYPE_IMAGE_VIEW = 10;
-    public static final int TYPE_TEXT_VIEW = 11;
-    public static final int TYPE_CHECK_BOX = 12;
+    public static final int TYPE_TITLE_EDIT_ITEM = 2;
+    public static final int TYPE_UNDERLINE_EDIT_ITEM = 3;
+    public static final int TYPE_INFO_ITEM = 4;
+    public static final int TYPE_SUBMIT_BTN_ITEM = 5;
+    public static final int TYPE_EXIT_BTN_ITEM = 6;
+    public static final int TYPE_LETTER_RV = 7;
+    public static final int TYPE_SCROLL_VIEW = 8;
+    public static final int TYPE_LINEAR_LAYOUT = 9;
+    public static final int TYPE_RELATIVE_LAYOUT = 10;
+    public static final int TYPE_IMAGE_VIEW = 11;
+    public static final int TYPE_TEXT_VIEW = 12;
+    public static final int TYPE_CHECK_BOX = 13;
 
     @Column(name = "Type")
     private Integer type = TYPE_TITLE_BAR;
@@ -98,6 +99,16 @@ public class WidgetEntity extends BaseEntity {
     private String gravity;
     @Column(name = "Orientation")
     private String orientation;
+    @Column(name = "ClickToClose")
+    private Boolean clickToClose = false;
+
+    public Boolean getClickToClose() {
+        return clickToClose;
+    }
+
+    public void setClickToClose(Boolean clickToClose) {
+        this.clickToClose = clickToClose;
+    }
 
     public String getOrientation() {
         return orientation;

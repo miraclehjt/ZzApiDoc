@@ -172,7 +172,7 @@ public class ApiTool {
                                                         generateJavaBean2(root, sbEntity);
                                                         sbEntity.append("\n}");
                                                         System.out.println(sbEntity.toString());
-                                                        FileUtils.saveFileToServer(sbEntity.toString(), path+File.separator+"entity", beanClazz + ".java");
+                                                        FileUtils.saveFileToPathWithName(sbEntity.toString(), path+File.separator+"entity", beanClazz + ".java");
                                                     } catch (Exception e) {
                                                         e.printStackTrace();
                                                         System.out.println(url + "接口的返回json实例解析异常");
@@ -245,7 +245,7 @@ public class ApiTool {
                                             }
                                             sb.append("\n}");
                                             //TODO 创建Api
-                                            FileUtils.saveFileToServer(sb.toString(),path, "Api" + i1 + ".java");
+                                            FileUtils.saveFileToPathWithName(sb.toString(),path, "Api" + i1 + ".java");
                                         }
                                         sbApi.append("\n    private static CookieManager getCookieManager() {");
                                         sbApi.append("\n        CookieManager cookieManager = new CookieManager();");
@@ -254,7 +254,7 @@ public class ApiTool {
                                         sbApi.append("\n    }");
                                         sbApi.append("\n}");
                                         //TODO 创建Api调用
-                                        FileUtils.saveFileToServer(sbApi.toString(),path, "Api.java");
+                                        FileUtils.saveFileToPathWithName(sbApi.toString(),path, "Api.java");
                                     }
                                 }
                             } else {
@@ -389,7 +389,7 @@ public class ApiTool {
                                                 generateJavaBean2(root, sbEntity);
                                                 sbEntity.append("\n}");
                                                 System.out.println(sbEntity.toString());
-                                                FileUtils.saveFileToServer(sbEntity.toString(),path + File.separator + "entity", beanClazz + ".java");
+                                                FileUtils.saveFileToPathWithName(sbEntity.toString(),path + File.separator + "entity", beanClazz + ".java");
                                             } catch (Exception e) {
                                                 e.printStackTrace();
                                                 System.out.println(url + "接口的返回json实例解析异常");
@@ -434,7 +434,7 @@ public class ApiTool {
                                     }
                                     sb.append("\n}");
                                     //TODO 创建Api
-                                    FileUtils.saveFileToServer(sb.toString(), path, "Api" + i1 + ".java");
+                                    FileUtils.saveFileToPathWithName(sb.toString(), path, "Api" + i1 + ".java");
                                 }
                                 sbApi.append("\n    private static CookieManager getCookieManager() {");
                                 sbApi.append("\n        CookieManager cookieManager = new CookieManager();");
@@ -443,7 +443,7 @@ public class ApiTool {
                                 sbApi.append("\n    }");
                                 sbApi.append("\n}");
                                 //TODO 创建Api调用
-                                FileUtils.saveFileToServer(sbApi.toString(), path, "Api.java");
+                                FileUtils.saveFileToPathWithName(sbApi.toString(), path, "Api.java");
                             }
 
                         }

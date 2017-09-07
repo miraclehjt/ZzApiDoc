@@ -1,6 +1,7 @@
 package me.zhouzhuo810.zzapidoc.android.entity;
 
 import me.zhouzhuo810.zzapidoc.common.entity.BaseEntity;
+import org.hibernate.annotations.Formula;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,6 +13,8 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "application")
 public class ApplicationEntity extends BaseEntity{
+    @Column(name = "chName")
+    private String chName;
     @Column(name = "AppName")
     private String appName;
     @Column(name = "MinSDK")
@@ -36,6 +39,34 @@ public class ApplicationEntity extends BaseEntity{
     private Boolean minifyEnabled;
     @Column(name = "ApiId")
     private String apiId;
+    @Formula("(SELECT count(*) FROM fragment f WHERE f.ApplicationId = ID AND f.DelFlag = 0)")
+    private Integer fgmCount = 0;
+    @Formula("(SELECT count(*) FROM activity a WHERE a.ApplicationId = ID AND a.DelFlag = 0)")
+    private Integer actCount = 0;
+
+    public Integer getFgmCount() {
+        return fgmCount;
+    }
+
+    public void setFgmCount(Integer fgmCount) {
+        this.fgmCount = fgmCount;
+    }
+
+    public Integer getActCount() {
+        return actCount;
+    }
+
+    public void setActCount(Integer actCount) {
+        this.actCount = actCount;
+    }
+
+    public String getChName() {
+        return chName;
+    }
+
+    public void setChName(String chName) {
+        this.chName = chName;
+    }
 
     public String getApiId() {
         return apiId;

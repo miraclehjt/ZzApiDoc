@@ -52,7 +52,7 @@ public class WidgetServiceImpl extends BaseServiceImpl<WidgetEntity> implements 
                                 String leftTitleText, String rightTitleText, MultipartFile leftTitleImg,
                                 MultipartFile rightTitleImg, boolean showLeftTitleImg, boolean showRightTitleImg,
                                 boolean showLeftTitleText, boolean showRightTitleText, boolean showLeftTitleLayout,
-                                boolean showRightTitleLayout,String pid, String background, int width, int height,
+                                boolean showRightTitleLayout, boolean clickToClose, String pid, String background, int width, int height,
                                 double weight, int marginLeft, int marginRight, int marginTop, int marginBottom,
                                 int paddingLeft, int paddingRight, int paddingTop, int paddingBottom, String gravity,
                                 String targetActId, String orientation, String relativeId, String targetApiId, String appId, String userId) {
@@ -72,6 +72,7 @@ public class WidgetServiceImpl extends BaseServiceImpl<WidgetEntity> implements 
         entity.setBackground(background==null?"@android:color/transparent":background);
         entity.setWidth(width);
         entity.setHeight(height);
+        entity.setClickToClose(clickToClose);
         entity.setGravity(gravity);
         entity.setOrientation(orientation);
         entity.setWeight(weight);
@@ -158,29 +159,30 @@ public class WidgetServiceImpl extends BaseServiceImpl<WidgetEntity> implements 
         }
 
         List<Map<String, Object>> result = new ArrayList<>();
-        for (WidgetEntity applicationEntity : applicationEntities) {
+        for (WidgetEntity widgetEntity : applicationEntities) {
             MapUtils map = new MapUtils();
-            map.put("id", applicationEntity.getId());
-            map.put("name", applicationEntity.getName());
-            map.put("type", applicationEntity.getType());
-            map.put("title", applicationEntity.getTitle());
-            map.put("resId", applicationEntity.getResId());
-            map.put("defValue", applicationEntity.getDefValue());
-            map.put("hint", applicationEntity.getHint());
-            map.put("leftTitleImg", applicationEntity.getLeftTitleImg());
-            map.put("rightTitleImg", applicationEntity.getRightTitleImg());
-            map.put("leftTitleText", applicationEntity.getLeftTitleText());
-            map.put("rightTitleText", applicationEntity.getRightTitleText());
-            map.put("showLeftTitleImg", applicationEntity.getShowLeftTitleImg());
-            map.put("showLeftTitleText", applicationEntity.getShowLeftTitleText());
-            map.put("showRightTitleImg", applicationEntity.getShowRightTitleImg());
-            map.put("showRightTitleText", applicationEntity.getShowRightTitleText());
-            map.put("showLeftTitleLayout", applicationEntity.getShowLeftTitleLayout());
-            map.put("showRightTitleLayout", applicationEntity.getShowRightTitleLayout());
-            map.put("appId", applicationEntity.getApplicationId());
-            map.put("targetActivityId", applicationEntity.getTargetActivityId());
-            map.put("createTime", DataUtils.formatDate(applicationEntity.getCreateTime()));
-            map.put("createUserName", applicationEntity.getCreateUserName());
+            map.put("id", widgetEntity.getId());
+            map.put("name", widgetEntity.getName());
+            map.put("type", widgetEntity.getType());
+            map.put("title", widgetEntity.getTitle());
+            map.put("resId", widgetEntity.getResId());
+            map.put("defValue", widgetEntity.getDefValue());
+            map.put("hint", widgetEntity.getHint());
+            map.put("clickToClose", widgetEntity.getClickToClose());
+            map.put("leftTitleImg", widgetEntity.getLeftTitleImg());
+            map.put("rightTitleImg", widgetEntity.getRightTitleImg());
+            map.put("leftTitleText", widgetEntity.getLeftTitleText());
+            map.put("rightTitleText", widgetEntity.getRightTitleText());
+            map.put("showLeftTitleImg", widgetEntity.getShowLeftTitleImg());
+            map.put("showLeftTitleText", widgetEntity.getShowLeftTitleText());
+            map.put("showRightTitleImg", widgetEntity.getShowRightTitleImg());
+            map.put("showRightTitleText", widgetEntity.getShowRightTitleText());
+            map.put("showLeftTitleLayout", widgetEntity.getShowLeftTitleLayout());
+            map.put("showRightTitleLayout", widgetEntity.getShowRightTitleLayout());
+            map.put("appId", widgetEntity.getApplicationId());
+            map.put("targetActivityId", widgetEntity.getTargetActivityId());
+            map.put("createTime", DataUtils.formatDate(widgetEntity.getCreateTime()));
+            map.put("createUserName", widgetEntity.getCreateUserName());
             result.add(map.build());
         }
         return new BaseResult(1, "ok", result);

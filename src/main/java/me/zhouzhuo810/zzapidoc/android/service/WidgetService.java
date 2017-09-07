@@ -15,7 +15,7 @@ public interface WidgetService extends BaseService<WidgetEntity> {
                          String hint, String leftTitleText, String rightTitleText,
                          MultipartFile leftTitleImg, MultipartFile rightTitleImg, boolean showLeftTitleImg,
                          boolean showRightTitleImg, boolean showLeftTitleText, boolean showRightTitleText,
-                         boolean showLeftTitleLayout, boolean showRightTitleLayout,
+                         boolean showLeftTitleLayout, boolean showRightTitleLayout,boolean clickToClose,
                          String pid, String background, int width, int height, double weight, int marginLeft,
                          int marginRight, int marginTop, int marginBottom, int paddingLeft, int paddingRight,
                          int paddingTop, int paddingBottom, String gravity,

@@ -35,6 +35,7 @@ public class ApplicationAction extends BaseController<ApplicationEntity> {
     @ResponseBody
     @RequestMapping(value = "/addApplication", method = RequestMethod.POST)
     public BaseResult addApplication(
+            @RequestParam(value = "chName") String chName,
             @RequestParam(value = "appName") String appName,
             @RequestParam(value = "versionName") String versionName,
             @RequestParam(value = "packageName") String packageName,
@@ -49,7 +50,7 @@ public class ApplicationAction extends BaseController<ApplicationEntity> {
             @RequestBody(required = false) MultipartFile logo,
             @RequestParam(value = "userId") String userId
     ) {
-        return getBaseService().addApplication(appName, versionName, packageName, logo,
+        return getBaseService().addApplication(chName, appName, versionName, packageName, logo,
                 colorMain, minSDK, compileSDK, targetSDK, versionCode, multiDex, minifyEnabled, apiId, userId);
     }
 

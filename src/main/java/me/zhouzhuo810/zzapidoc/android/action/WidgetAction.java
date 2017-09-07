@@ -50,6 +50,7 @@ public class WidgetAction extends BaseController<WidgetEntity> {
             @RequestParam(value = "showRightTitleText", required = false) boolean showRightTitleText,
             @RequestParam(value = "showLeftTitleLayout", required = false) boolean showLeftTitleLayout,
             @RequestParam(value = "showRightTitleLayout", required = false) boolean showRightTitleLayout,
+            @RequestParam(value = "clickToClose", required = false) boolean clickToClose,
             @RequestParam(value = "pid", required = false) String pid,
             @RequestParam(value = "background", required = false) String background,
             @RequestParam(value = "width", required = false) int width,
@@ -73,7 +74,7 @@ public class WidgetAction extends BaseController<WidgetEntity> {
     ) {
         return getBaseService().addWidget(name, title, resId, type, defValue, hint,
                 leftTitleText, rightTitleText, leftTitleImg, rightTitleImg, showLeftTitleImg,
-                showRightTitleImg, showLeftTitleText, showRightTitleText, showLeftTitleLayout, showRightTitleLayout,
+                showRightTitleImg, showLeftTitleText, showRightTitleText, showLeftTitleLayout, showRightTitleLayout,clickToClose,
                 pid, background, width, height, weight, marginLeft, marginRight, marginTop, marginBottom, paddingLeft,
                 paddingRight, paddingTop, paddingBottom, gravity, targetActId, orientation, relativeId, targetApiId, appId, userId);
     }
