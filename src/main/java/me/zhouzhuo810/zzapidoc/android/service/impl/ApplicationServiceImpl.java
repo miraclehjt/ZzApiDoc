@@ -189,11 +189,11 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
             map.put("createTime", DataUtils.formatDate(applicationEntity.getCreateTime()));
             map.put("colorMain", applicationEntity.getColorMain());
             map.put("packageName", applicationEntity.getPackageName());
-            map.put("multiDex", applicationEntity.getMultiDex()==null?false:applicationEntity.getMultiDex());
-            map.put("minifyEnabled", applicationEntity.getMinifyEnabled()==null?false:applicationEntity.getMinifyEnabled());
+            map.put("multiDex", applicationEntity.getMultiDex() == null ? false : applicationEntity.getMultiDex());
+            map.put("minifyEnabled", applicationEntity.getMinifyEnabled() == null ? false : applicationEntity.getMinifyEnabled());
             map.put("apiId", applicationEntity.getApiId());
-            map.put("actCount", applicationEntity.getActCount()==null?0:applicationEntity.getActCount());
-            map.put("fgmCount", applicationEntity.getFgmCount()==null?0:applicationEntity.getFgmCount());
+            map.put("actCount", applicationEntity.getActCount() == null ? 0 : applicationEntity.getActCount());
+            map.put("fgmCount", applicationEntity.getFgmCount() == null ? 0 : applicationEntity.getFgmCount());
             result.add(map.build());
         }
         return new BaseResult(1, "ok", result);
@@ -269,7 +269,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 copyGradleWrapper(realPath, appDirPath);
                 generateApp(realPath, appDirPath, app);
 
-                String apkName = app.getAppName() + "_" + app.getVersionName() + "_debug.apk";
+                String apkName = app.getAppName() + "_" + app.getVersionName() + ".apk";
 
                 final String apkPath = appDirPath
                         + File.separator + "app"
@@ -392,7 +392,8 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
         String buildResult = "";
         try {
             BuildLauncher build = connection.newBuild();
-            build.forTasks("assembleDebug");
+//            build.forTasks("assembleDebug");
+            build.forTasks("assembleRelease");
             ByteArrayOutputStream baoStream = new ByteArrayOutputStream(1024);
             PrintStream cacheStream = new PrintStream(baoStream);
             //PrintStream oldStream = System.out;
@@ -417,6 +418,10 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 @Override
                 public void onFailure(GradleConnectionException e) {
                     e.printStackTrace();
+                    File targetFile = new File(realPath + File.separator + "apk" + File.separator + fileName);
+                    if (targetFile.exists()) {
+                        targetFile.delete();
+                    }
                 }
             });
         } catch (Exception e) {
@@ -603,7 +608,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 "    compileSdkVersion 25\n" +
                 "    buildToolsVersion \"25.0.3\"\n" +
                 "    defaultConfig {\n" +
-                "        multiDexEnabled " + (app.getMultiDex()==null?false:app.getMultiDex()) + "\n" +
+                "        multiDexEnabled " + (app.getMultiDex() == null ? false : app.getMultiDex()) + "\n" +
                 "        applicationId \"" + app.getPackageName() + "\"\n" +
                 "        minSdkVersion " + app.getMinSDK() + "\n" +
                 "        targetSdkVersion " + app.getTargetSDK() + "\n" +
@@ -649,7 +654,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 "            signingConfig signingConfigs.debugConfig\n" +
                 "        }\n" +
                 "        release {\n" +
-                "            minifyEnabled " + (app.getMinifyEnabled()?false:app.getMinifyEnabled()) + "\n" +
+                "            minifyEnabled " + (app.getMinifyEnabled() ? false : app.getMinifyEnabled()) + "\n" +
                 "            signingConfig signingConfigs.releaseConfig\n" +
                 "            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'\n" +
                 "        }\n" +
@@ -680,7 +685,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 "    compile 'com.github.yalantis:ucrop:2.2.1'\n" +
                 "    //SwipeRecyclerView\n" +
                 "    compile 'com.yanzhenjie:recyclerview-swipe:1.1.2'\n" +
-                ((app.getMultiDex()==null?false:app.getMultiDex()) ? "    //multidex\n" +
+                ((app.getMultiDex() == null ? false : app.getMultiDex()) ? "    //multidex\n" +
                         "    compile 'com.android.support:multidex:1.0.1'\n" : "") +
                 "\n" +
                 "}\n", appDirPath + File.separator + "app", "build.gradle");
@@ -860,7 +865,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 "import android.content.Context;\n" +
                 "\n" +
                 "import zhouzhuo810.me.zzandframe.ui.app.BaseApplication;\n" +
-                        ((app.getMultiDex()==null?false:app.getMultiDex())?"import android.support.multidex.MultiDex;\n":"")+
+                ((app.getMultiDex() == null ? false : app.getMultiDex()) ? "import android.support.multidex.MultiDex;\n" : "") +
                 "\n" +
                 "/**\n" +
                 " * Created by admin on 2017/8/27.\n" +
@@ -882,7 +887,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 "    @Override\n" +
                 "    protected void attachBaseContext(Context base) {\n" +
                 "        super.attachBaseContext(base);\n" +
-                ((app.getMultiDex()==null?false:app.getMultiDex()) ? "        MultiDex.install(this);\n" : "") +
+                ((app.getMultiDex() == null ? false : app.getMultiDex()) ? "        MultiDex.install(this);\n" : "") +
                 "        \n" +
                 "    }\n" +
                 "}\n", javaPath, "MyApplication.java");
@@ -1126,7 +1131,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
 
         /*layout*/
         StringBuilder sbLayout = new StringBuilder();
-        if (!sbStrings.toString().contains("\""+layoutName + "_title_text\"")) {
+        if (!sbStrings.toString().contains("\"" + layoutName + "_title_text\"")) {
             sbStrings.append("    <string name=\"" + layoutName + "_title_text\">" + activityEntity.getTitle() + "</string>\n");
         }
         sbLayout.append("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
@@ -2545,16 +2550,16 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "        <RelativeLayout\n" +
                                 "            android:layout_width=\"match_parent\"\n" +
                                 "            android:layout_height=\"120px\"\n" +
-                                "            android:layout_marginLeft=\""+widgetEntity.getMarginLeft()+"px\"\n" +
-                                "            android:layout_marginRight=\""+widgetEntity.getMarginRight()+"px\"\n" +
-                                "            android:layout_marginTop=\""+widgetEntity.getMarginTop()+"px\">\n" +
+                                "            android:layout_marginLeft=\"" + widgetEntity.getMarginLeft() + "px\"\n" +
+                                "            android:layout_marginRight=\"" + widgetEntity.getMarginRight() + "px\"\n" +
+                                "            android:layout_marginTop=\"" + widgetEntity.getMarginTop() + "px\">\n" +
                                 "\n" +
                                 "            <EditText\n" +
-                                "                android:id=\"@+id/et_"+widgetEntity.getResId()+"\"\n" +
+                                "                android:id=\"@+id/et_" + widgetEntity.getResId() + "\"\n" +
                                 "                android:layout_width=\"match_parent\"\n" +
                                 "                android:layout_height=\"match_parent\"\n" +
                                 "                android:background=\"@drawable/et_bg_line\"\n" +
-                                "                android:hint=\"@string/"+widgetEntity.getResId()+"_hint_text\"\n" +
+                                "                android:hint=\"@string/" + widgetEntity.getResId() + "_hint_text\"\n" +
                                 "                android:paddingLeft=\"20px\"\n" +
                                 "                android:paddingRight=\"120px\"\n" +
                                 "                android:textColor=\"@color/colorBlack\"\n" +
@@ -2562,7 +2567,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "                android:textSize=\"40px\" />\n" +
                                 "\n" +
                                 "            <ImageView\n" +
-                                "                android:id=\"@+id/iv_clear_"+widgetEntity.getResId()+"\"\n" +
+                                "                android:id=\"@+id/iv_clear_" + widgetEntity.getResId() + "\"\n" +
                                 "                android:layout_width=\"60px\"\n" +
                                 "                android:layout_height=\"60px\"\n" +
                                 "                android:layout_alignParentRight=\"true\"\n" +
@@ -2582,10 +2587,10 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "        android:id=\"@+id/btn_" + widgetEntity.getResId() + "\"\n" +
                                 "        android:layout_width=\"match_parent\"\n" +
                                 "        android:layout_height=\"120px\"\n" +
-                                "        android:layout_marginBottom=\"50px\"\n" +
-                                "        android:layout_marginLeft=\"40px\"\n" +
-                                "        android:layout_marginRight=\"40px\"\n" +
-                                "        android:layout_marginTop=\"40px\"\n" +
+                                "        android:layout_marginBottom=\"" + widgetEntity.getMarginBottom() + "px\"\n" +
+                                "        android:layout_marginLeft=\"" + widgetEntity.getMarginLeft() + "px\"\n" +
+                                "        android:layout_marginRight=\"" + widgetEntity.getMarginRight() + "px\"\n" +
+                                "        android:layout_marginTop=\"" + widgetEntity.getMarginTop() + "px\"\n" +
                                 "        android:background=\"@drawable/btn_save_selector\"\n" +
                                 "        android:text=\"@string/" + widgetEntity.getResId() + "_btn_text\"\n" +
                                 "        android:textColor=\"#fff\"\n" +
@@ -2601,6 +2606,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 String url = interfaceEntity.getPath();
                                 String m = url.substring(url.lastIndexOf("/") + 1, url.length());
                                 String beanClazz = m.substring(0, 1).toUpperCase() + m.substring(1, m.length()) + "Result";
+                                String apiMethod = url.substring(url.lastIndexOf("/") + 1, url.length());
                                 if (!sbStrings.toString().contains("\"" + widgetEntity.getResId() + "ing_text\"")) {
                                     sbStrings.append("    <string name=\"" + widgetEntity.getResId() + "ing_text\">" + widgetEntity.getTitle() + "中...</string>\n");
                                 }
@@ -2608,7 +2614,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 sbMethods.append(sbEditInfo.toString());
                                 sbMethods.append("\n        showPd(getString(R.string." + widgetEntity.getResId() + "ing_text), false);\n" +
                                         "        Api.getApi0()\n" +
-                                        "                .userLogin(");
+                                        "                ."+apiMethod+"(");
                                 if (requestParamsNo > 0) {
                                     for (int i1 = 0; i1 < requestParamsNo; i1++) {
                                         sbMethods.append("\"\", ");
@@ -2636,19 +2642,23 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                                 "                    @Override\n" +
                                                 "                    public void onNext(" + beanClazz + " result) {\n" +
                                                 "                        hidePd();\n" +
-                                                "                        ToastUtils.showCustomBgToast(result.getMsg());\n" +
+                                                "                    /*    ToastUtils.showCustomBgToast(result.getMsg());\n" +
                                                 "                        if (result.getCode() == 1) {\n" +
                                                 "                            Intent intent = new Intent(getActivity(), " + (targetAct == null ? activityEntity.getName() : targetAct.getName()) + ".class);\n" +
                                                 "                            startActWithIntent(intent);\n" +
-                                                "                            closeAct();\n" +
-                                                "                        }\n" +
-                                                "                    }\n" +
-                                                "                });");
+                                                "                        }\n*/")
+                                        .append("                            Intent intent = new Intent(getActivity(), " + (targetAct == null ? activityEntity.getName() : targetAct.getName()) + ".class);\n" +
+                                                "                            startActWithIntent(intent);\n");
+                                if (widgetEntity.getClickToClose()) {
+                                    sbMethods.append("                            closeAct();\n");
+                                }
+                                sbMethods.append("                    }\n" +
+                                        "                });");
                                 sbMethods.append("    }\n");
                                 sbEvent.append("\n        btn_" + widgetEntity.getResId() + ".setOnClickListener(new View.OnClickListener() {\n" +
                                         "            @Override\n" +
                                         "            public void onClick(View v) {\n" +
-                                        "                do_"+widgetEntity.getResId()+"();\n" +
+                                        "                do_" + widgetEntity.getResId() + "();\n" +
                                         "            }\n" +
                                         "        });");
                             }
@@ -2661,9 +2671,11 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                     "            @Override\n" +
                                     "            public void onClick(View v) {\n" +
                                     "                Intent intent = new Intent(getActivity(), " + (targetAct == null ? activityEntity.getName() : targetAct.getName()) + ".class);\n" +
-                                    "                startActWithIntent(intent);\n" +
-                                    "                closeAct();\n" +
-                                    "            }\n" +
+                                    "                startActWithIntent(intent);\n");
+                            if (widgetEntity.getClickToClose()) {
+                                sbEvent.append("                closeAct();\n");
+                            }
+                            sbEvent.append("            }\n" +
                                     "        });");
                         }
                         break;
@@ -2677,10 +2689,10 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "        android:id=\"@+id/btn_" + widgetEntity.getResId() + "\"\n" +
                                 "        android:layout_width=\"match_parent\"\n" +
                                 "        android:layout_height=\"120px\"\n" +
-                                "        android:layout_marginBottom=\"50px\"\n" +
-                                "        android:layout_marginLeft=\"40px\"\n" +
-                                "        android:layout_marginRight=\"40px\"\n" +
-                                "        android:layout_marginTop=\"40px\"\n" +
+                                "        android:layout_marginBottom=\"" + widgetEntity.getMarginBottom() + "px\"\n" +
+                                "        android:layout_marginLeft=\"" + widgetEntity.getMarginLeft() + "px\"\n" +
+                                "        android:layout_marginRight=\"" + widgetEntity.getMarginRight() + "px\"\n" +
+                                "        android:layout_marginTop=\"" + widgetEntity.getMarginTop() + "px\"\n" +
                                 "        android:background=\"@drawable/btn_exit_selector\"\n" +
                                 "        android:text=\"@string/" + widgetEntity.getResId() + "_text\"\n" +
                                 "        android:textColor=\"#fff\"\n" +
@@ -2696,6 +2708,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 String url = interfaceEntity.getPath();
                                 String m = url.substring(url.lastIndexOf("/") + 1, url.length());
                                 String beanClazz = m.substring(0, 1).toUpperCase() + m.substring(1, m.length()) + "Result";
+                                String apiMethod = url.substring(url.lastIndexOf("/") + 1, url.length());
                                 if (!sbStrings.toString().contains("\"" + widgetEntity.getResId() + "ing_text\"")) {
                                     sbStrings.append("    <string name=\"" + widgetEntity.getResId() + "ing_text\">" + widgetEntity.getTitle() + "中...</string>\n");
                                 }
@@ -2703,7 +2716,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 sbMethods.append(sbEditInfo.toString());
                                 sbMethods.append("\n        showPd(getString(R.string." + widgetEntity.getResId() + "ing_text), false);\n" +
                                         "        Api.getApi0()\n" +
-                                        "                .userLogin(");
+                                        "                ."+apiMethod+"(");
                                 if (requestParamsNo > 0) {
                                     for (int i1 = 0; i1 < requestParamsNo; i1++) {
                                         sbMethods.append("\"\", ");
@@ -2731,19 +2744,23 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                                 "                    @Override\n" +
                                                 "                    public void onNext(" + beanClazz + " result) {\n" +
                                                 "                        hidePd();\n" +
-                                                "                        ToastUtils.showCustomBgToast(result.getMsg());\n" +
+                                                "                     /*   ToastUtils.showCustomBgToast(result.getMsg());\n" +
                                                 "                        if (result.getCode() == 1) {\n" +
                                                 "                            Intent intent = new Intent(getActivity(), " + (targetAct == null ? activityEntity.getName() : targetAct.getName()) + ".class);\n" +
                                                 "                            startActWithIntent(intent);\n" +
-                                                "                            closeAct();\n" +
-                                                "                        }\n" +
-                                                "                    }\n" +
-                                                "                });");
+                                                "                        }\n*/")
+                                        .append("                            Intent intent = new Intent(getActivity(), " + (targetAct == null ? activityEntity.getName() : targetAct.getName()) + ".class);\n" +
+                                                "                            startActWithIntent(intent);\n");
+                                if (widgetEntity.getClickToClose()) {
+                                    sbMethods.append("                            closeAct();\n");
+                                }
+                                sbMethods.append("                    }\n" +
+                                        "                });");
                                 sbMethods.append("    }\n");
                                 sbEvent.append("\n        btn_" + widgetEntity.getResId() + ".setOnClickListener(new View.OnClickListener() {\n" +
                                         "            @Override\n" +
                                         "            public void onClick(View v) {\n" +
-                                        "                do_"+widgetEntity.getResId()+"();\n" +
+                                        "                do_" + widgetEntity.getResId() + "();\n" +
                                         "            }\n" +
                                         "        });");
                             }
@@ -2756,9 +2773,11 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                     "            @Override\n" +
                                     "            public void onClick(View v) {\n" +
                                     "                Intent intent = new Intent(getActivity(), " + (targetAct == null ? activityEntity.getName() : targetAct.getName()) + ".class);\n" +
-                                    "                startActWithIntent(intent);\n" +
-                                    "                closeAct();\n" +
-                                    "            }\n" +
+                                    "                startActWithIntent(intent);\n");
+                            if (widgetEntity.getClickToClose()) {
+                                sbEvent.append("                closeAct();\n");
+                            }
+                            sbEvent.append("            }\n" +
                                     "        });");
                         }
                         break;
@@ -3003,12 +3022,12 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "        sideBar = (SideBar) rootView.findViewById(R.id.side_bar);\n" +
                                 "        tv_toast = (TextView) rootView.findViewById(R.id.tv_toast);\n" +
                                 "\n" +
-                                "        header = LayoutInflater.from(" + activityEntity.getName() + ".this).inflate(R.layout.item_header_search, lv, false);\n" +
+                                "        header = LayoutInflater.from(getActivity()).inflate(R.layout.item_header_search, lv, false);\n" +
                                 "        AutoUtils.auto(header);\n" +
                                 "        et_search = (EditText) header.findViewById(R.id.et_search);\n" +
                                 "        lv.addHeaderView(header);\n" +
                                 "\n" +
-                                "        View footer = LayoutInflater.from(" + activityEntity.getName() + ".this).inflate(R.layout.item_footer, lv, false);\n" +
+                                "        View footer = LayoutInflater.from(getActivity()).inflate(R.layout.item_footer, lv, false);\n" +
                                 "        AutoUtils.auto(footer);\n" +
                                 "        tv_footer = (TextView) footer.findViewById(R.id.tv_footer);\n" +
                                 "        tv_footer.setText(0 + getString(R.string." + layoutName + "_unit_text));\n" +
@@ -3026,7 +3045,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "        lv.setSwipeMenuCreator(new SwipeMenuCreator() {\n" +
                                 "            @Override\n" +
                                 "            public void onCreateMenu(SwipeMenu swipeLeftMenu, SwipeMenu swipeRightMenu, int viewType) {\n" +
-                                "                SwipeMenuItem callItem = new SwipeMenuItem(" + activityEntity.getName() + ".this);\n" +
+                                "                SwipeMenuItem callItem = new SwipeMenuItem(getActivity());\n" +
                                 "                callItem.setImage(R.drawable.delete)\n" +
                                 "                        .setWidth(AutoUtils.getPercentWidthSize(250))\n" +
                                 "                        .setHeight(ViewGroup.LayoutParams.MATCH_PARENT)\n" +
@@ -3162,11 +3181,11 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         sbLayout.append("\n    <LinearLayout\n" +
                                 "        android:layout_width=\"" + widthString + "\"\n" +
                                 "        android:layout_height=\"" + heightString + "\"\n" +
-                                "        android:layout_marginLeft=\""+widgetEntity.getMarginLeft()+"px\"\n" +
-                                "        android:layout_marginRight=\""+widgetEntity.getMarginRight()+"px\"\n" +
-                                "        android:layout_marginTop=\""+widgetEntity.getMarginTop()+"px\"\n" +
-                                "        android:layout_marginBottom=\""+widgetEntity.getMarginBottom()+"px\"\n"+
-                                "        android:background=\"" +(widgetEntity.getBackground()==null?"@color/colorTransparent":widgetEntity.getBackground())+"\"\n"+
+                                "        android:layout_marginLeft=\"" + widgetEntity.getMarginLeft() + "px\"\n" +
+                                "        android:layout_marginRight=\"" + widgetEntity.getMarginRight() + "px\"\n" +
+                                "        android:layout_marginTop=\"" + widgetEntity.getMarginTop() + "px\"\n" +
+                                "        android:layout_marginBottom=\"" + widgetEntity.getMarginBottom() + "px\"\n" +
+                                "        android:background=\"" + (widgetEntity.getBackground().length() == 0 ? "@color/colorTransparent" : widgetEntity.getBackground()) + "\"\n" +
                                 (widgetEntity.getWeight() > 0 ? "        android:layout_weight=\"" + widgetEntity.getWeight() + "\"\n" : "") +
                                 "        android:gravity=\"" + (widgetEntity.getGravity() == null ? "center" : widgetEntity.getGravity()) + "\"\n" +
                                 "        android:orientation=\"" + (widgetEntity.getOrientation() == null ? "horizontal" : widgetEntity.getOrientation()) + "\">");
@@ -3175,17 +3194,19 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         break;
                     case WidgetEntity.TYPE_RELATIVE_LAYOUT:
                         sbLayout.append("\n    <RelativeLayout\n" +
-                                "        android:layout_marginLeft=\""+widgetEntity.getMarginLeft()+"px\"\n" +
-                                "        android:layout_marginRight=\""+widgetEntity.getMarginRight()+"px\"\n" +
-                                "        android:layout_marginTop=\""+widgetEntity.getMarginTop()+"px\"\n" +
-                                "        android:layout_marginBottom=\""+widgetEntity.getMarginBottom()+"px\"\n"+
-                                "        android:background=\"" +(widgetEntity.getBackground()==null?"@color/colorTransparent":widgetEntity.getBackground())+"\"\n"+
+                                "        android:layout_marginLeft=\"" + widgetEntity.getMarginLeft() + "px\"\n" +
+                                "        android:layout_marginRight=\"" + widgetEntity.getMarginRight() + "px\"\n" +
+                                "        android:layout_marginTop=\"" + widgetEntity.getMarginTop() + "px\"\n" +
+                                "        android:layout_marginBottom=\"" + widgetEntity.getMarginBottom() + "px\"\n" +
+                                "        android:background=\"" + (widgetEntity.getBackground().length() == 0 ? "@color/colorTransparent" : widgetEntity.getBackground()) + "\"\n" +
                                 "        android:layout_width=\"" + widthString + "\"\n" +
                                 "        android:layout_height=\"" + heightString + "\">");
                         fillFgmWidget(logoName, app, activityEntity, fragmentEntity, layoutName, layoutPath, javaPath, widgetEntity.getId(), sbStrings, sbLayout, sbImp, sbJava, sbDef, sbInit, sbData, sbEvent, sbEditInfo, sbMethods);
                         sbLayout.append("    </RelativeLayout>\n");
                         break;
                     case WidgetEntity.TYPE_IMAGE_VIEW:
+                        sbDef.append("\n    private ImageView iv_" + widgetEntity.getResId() + ";");
+                        sbInit.append("\n        iv_" + widgetEntity.getResId() + " = (ImageView) rootView.findViewById(R.id.iv_" + widgetEntity.getResId() + ");");
                         sbLayout.append("\n    <ImageView\n" +
                                 "        android:id=\"@+id/iv_" + widgetEntity.getResId() + "\"\n" +
                                 "        android:layout_width=\"" + widthString + "\"\n" +
@@ -3194,7 +3215,20 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "        android:layout_marginBottom=\"" + widgetEntity.getMarginBottom() + "px\"\n" +
                                 "        android:layout_marginRight=\"" + widgetEntity.getMarginRight() + "px\"\n" +
                                 "        android:layout_marginLeft=\"" + widgetEntity.getMarginLeft() + "px\"\n" +
-                                "        android:src=\"@mipmap/"+logoName+"\" />");
+                                "        android:src=\"@mipmap/" + logoName + "\" />");
+                        ActivityEntity targetAct = null;
+                        if (widgetEntity.getTargetActivityId() != null && widgetEntity.getTargetActivityId().length() > 0) {
+                            targetAct = mActivityService.get(widgetEntity.getTargetActivityId());
+                            if (targetAct != null) {
+                                sbEvent.append("\n        iv_" + widgetEntity.getResId() + ".setOnClickListener(new View.OnClickListener() {\n" +
+                                        "            @Override\n" +
+                                        "            public void onClick(View v) {\n" +
+                                        "                Intent intent = new Intent(getActivity(), " + targetAct.getName() + ".class);\n" +
+                                        "                startActWithIntent(intent);\n");
+                                sbEvent.append("            }\n" +
+                                        "        });");
+                            }
+                        }
                         break;
                     case WidgetEntity.TYPE_TEXT_VIEW:
                         sbDef.append("\n    private TextView tv_" + widgetEntity.getResId() + ";");
@@ -3211,13 +3245,13 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "        android:layout_height=\"" + heightString + "\"\n" +
                                 "        android:hint=\"@string/" + widgetEntity.getResId() + "_tv_hint_text\"\n" +
                                 "        android:text=\"@string/" + widgetEntity.getResId() + "_tv_text\"\n" +
-                                "        android:textColor=\"@color/colorBlack\"\n" +
-                                "        android:layout_marginLeft=\""+widgetEntity.getMarginLeft()+"px\"\n" +
-                                "        android:layout_marginRight=\""+widgetEntity.getMarginRight()+"px\"\n" +
-                                "        android:layout_marginTop=\""+widgetEntity.getMarginTop()+"px\"\n" +
-                                "        android:layout_marginBottom=\""+widgetEntity.getMarginBottom()+"px\"\n"+
+                                "        android:textColor=\""+widgetEntity.getTextColor()+"\"\n" +
+                                "        android:layout_marginLeft=\"" + widgetEntity.getMarginLeft() + "px\"\n" +
+                                "        android:layout_marginRight=\"" + widgetEntity.getMarginRight() + "px\"\n" +
+                                "        android:layout_marginTop=\"" + widgetEntity.getMarginTop() + "px\"\n" +
+                                "        android:layout_marginBottom=\"" + widgetEntity.getMarginBottom() + "px\"\n" +
                                 "        android:gravity=\"" + (widgetEntity.getGravity() == null ? "center" : widgetEntity.getGravity()) + "\"\n" +
-                                "        android:textSize=\"40px\" />");
+                                "        android:textSize=\""+widgetEntity.getTextSize()+"px\" />");
                         break;
                     case WidgetEntity.TYPE_CHECK_BOX:
                         sbDef.append("\n    private CheckBox cb_" + widgetEntity.getResId() + ";");
@@ -3385,16 +3419,16 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "        <RelativeLayout\n" +
                                 "            android:layout_width=\"match_parent\"\n" +
                                 "            android:layout_height=\"120px\"\n" +
-                                "            android:layout_marginLeft=\""+widgetEntity.getMarginLeft()+"px\"\n" +
-                                "            android:layout_marginRight=\""+widgetEntity.getMarginRight()+"px\"\n" +
-                                "            android:layout_marginTop=\""+widgetEntity.getMarginTop()+"px\">\n" +
+                                "            android:layout_marginLeft=\"" + widgetEntity.getMarginLeft() + "px\"\n" +
+                                "            android:layout_marginRight=\"" + widgetEntity.getMarginRight() + "px\"\n" +
+                                "            android:layout_marginTop=\"" + widgetEntity.getMarginTop() + "px\">\n" +
                                 "\n" +
                                 "            <EditText\n" +
-                                "                android:id=\"@+id/et_"+widgetEntity.getResId()+"\"\n" +
+                                "                android:id=\"@+id/et_" + widgetEntity.getResId() + "\"\n" +
                                 "                android:layout_width=\"match_parent\"\n" +
                                 "                android:layout_height=\"match_parent\"\n" +
                                 "                android:background=\"@drawable/et_bg_line\"\n" +
-                                "                android:hint=\"@string/"+widgetEntity.getResId()+"_et_hint_text\"\n" +
+                                "                android:hint=\"@string/" + widgetEntity.getResId() + "_et_hint_text\"\n" +
                                 "                android:paddingLeft=\"20px\"\n" +
                                 "                android:paddingRight=\"120px\"\n" +
                                 "                android:textColor=\"@color/colorBlack\"\n" +
@@ -3402,7 +3436,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "                android:textSize=\"40px\" />\n" +
                                 "\n" +
                                 "            <ImageView\n" +
-                                "                android:id=\"@+id/iv_clear_"+widgetEntity.getResId()+"\"\n" +
+                                "                android:id=\"@+id/iv_clear_" + widgetEntity.getResId() + "\"\n" +
                                 "                android:layout_width=\"60px\"\n" +
                                 "                android:layout_height=\"60px\"\n" +
                                 "                android:layout_alignParentRight=\"true\"\n" +
@@ -3422,10 +3456,10 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "        android:id=\"@+id/btn_" + widgetEntity.getResId() + "\"\n" +
                                 "        android:layout_width=\"match_parent\"\n" +
                                 "        android:layout_height=\"120px\"\n" +
-                                "        android:layout_marginBottom=\"50px\"\n" +
-                                "        android:layout_marginLeft=\"40px\"\n" +
-                                "        android:layout_marginRight=\"40px\"\n" +
-                                "        android:layout_marginTop=\"40px\"\n" +
+                                "        android:layout_marginBottom=\"" + widgetEntity.getMarginBottom() + "px\"\n" +
+                                "        android:layout_marginLeft=\"" + widgetEntity.getMarginLeft() + "px\"\n" +
+                                "        android:layout_marginRight=\"" + widgetEntity.getMarginRight() + "px\"\n" +
+                                "        android:layout_marginTop=\"" + widgetEntity.getMarginTop() + "px\"\n" +
                                 "        android:background=\"@drawable/btn_save_selector\"\n" +
                                 "        android:text=\"@string/" + widgetEntity.getResId() + "_btn_text\"\n" +
                                 "        android:textColor=\"#fff\"\n" +
@@ -3441,6 +3475,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 String url = interfaceEntity.getPath();
                                 String m = url.substring(url.lastIndexOf("/") + 1, url.length());
                                 String beanClazz = m.substring(0, 1).toUpperCase() + m.substring(1, m.length()) + "Result";
+                                String apiMethod = url.substring(url.lastIndexOf("/") + 1, url.length());
                                 if (!sbStrings.toString().contains("\"" + widgetEntity.getResId() + "ing_text\"")) {
                                     sbStrings.append("    <string name=\"" + widgetEntity.getResId() + "ing_text\">" + widgetEntity.getTitle() + "中...</string>\n");
                                 }
@@ -3448,7 +3483,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 sbMethods.append(sbEditInfo.toString());
                                 sbMethods.append("\n        showPd(getString(R.string." + widgetEntity.getResId() + "ing_text), false);\n" +
                                         "        Api.getApi0()\n" +
-                                        "                .userLogin(");
+                                        "                ."+apiMethod+"(");
                                 if (requestParamsNo > 0) {
                                     for (int i1 = 0; i1 < requestParamsNo; i1++) {
                                         sbMethods.append("\"\", ");
@@ -3474,19 +3509,23 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                                 "                    @Override\n" +
                                                 "                    public void onNext(" + beanClazz + " result) {\n" +
                                                 "                        hidePd();\n" +
-                                                "                        ToastUtils.showCustomBgToast(result.getMsg());\n" +
+                                                "                      /*  ToastUtils.showCustomBgToast(result.getMsg());\n" +
                                                 "                        if (result.getCode() == 1) {\n" +
                                                 "                            Intent intent = new Intent(" + activityEntity.getName() + ".this, " + (targetAct == null ? activityEntity.getName() : targetAct.getName()) + ".class);\n" +
                                                 "                            startActWithIntent(intent);\n" +
-                                                "                            closeAct();\n" +
-                                                "                        }\n" +
-                                                "                    }\n" +
-                                                "                });");
+                                                "                        }\n*/")
+                                        .append("                            Intent intent = new Intent(" + activityEntity.getName() + ".this, " + (targetAct == null ? activityEntity.getName() : targetAct.getName()) + ".class);\n" +
+                                                "                            startActWithIntent(intent);\n");
+                                if (widgetEntity.getClickToClose()) {
+                                    sbMethods.append("                            closeAct();\n");
+                                }
+                                sbMethods.append("                    }\n" +
+                                        "                });");
                                 sbMethods.append("    }\n");
                                 sbEvent.append("\n        btn_" + widgetEntity.getResId() + ".setOnClickListener(new View.OnClickListener() {\n" +
                                         "            @Override\n" +
                                         "            public void onClick(View v) {\n" +
-                                        "                do_" + widgetEntity.getResId()+"();\n" +
+                                        "                do_" + widgetEntity.getResId() + "();\n" +
                                         "            }\n" +
                                         "        });");
                             }
@@ -3499,9 +3538,11 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                     "            @Override\n" +
                                     "            public void onClick(View v) {\n" +
                                     "                Intent intent = new Intent(" + activityEntity.getName() + ".this, " + (targetAct == null ? activityEntity.getName() : targetAct.getName()) + ".class);\n" +
-                                    "                startActWithIntent(intent);\n" +
-                                    "                closeAct();\n" +
-                                    "            }\n" +
+                                    "                startActWithIntent(intent);\n");
+                            if (widgetEntity.getClickToClose()) {
+                                sbEvent.append("                closeAct();\n");
+                            }
+                            sbEvent.append("            }\n" +
                                     "        });");
                         }
                         break;
@@ -3515,10 +3556,10 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "        android:id=\"@+id/btn_" + widgetEntity.getResId() + "\"\n" +
                                 "        android:layout_width=\"match_parent\"\n" +
                                 "        android:layout_height=\"120px\"\n" +
-                                "        android:layout_marginBottom=\"50px\"\n" +
-                                "        android:layout_marginLeft=\"40px\"\n" +
-                                "        android:layout_marginRight=\"40px\"\n" +
-                                "        android:layout_marginTop=\"40px\"\n" +
+                                "        android:layout_marginBottom=\"" + widgetEntity.getMarginBottom() + "px\"\n" +
+                                "        android:layout_marginLeft=\"" + widgetEntity.getMarginLeft() + "px\"\n" +
+                                "        android:layout_marginRight=\"" + widgetEntity.getMarginRight() + "px\"\n" +
+                                "        android:layout_marginTop=\"" + widgetEntity.getMarginTop() + "px\"\n" +
                                 "        android:background=\"@drawable/btn_exit_selector\"\n" +
                                 "        android:text=\"@string/" + widgetEntity.getResId() + "_btn_text\"\n" +
                                 "        android:textColor=\"#fff\"\n" +
@@ -3534,6 +3575,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 String url = interfaceEntity.getPath();
                                 String m = url.substring(url.lastIndexOf("/") + 1, url.length());
                                 String beanClazz = m.substring(0, 1).toUpperCase() + m.substring(1, m.length()) + "Result";
+                                String apiMethod = url.substring(url.lastIndexOf("/") + 1, url.length());
                                 if (!sbStrings.toString().contains("\"" + widgetEntity.getResId() + "ing_text\"")) {
                                     sbStrings.append("    <string name=\"" + widgetEntity.getResId() + "ing_text\">" + widgetEntity.getTitle() + "中...</string>\n");
                                 }
@@ -3541,7 +3583,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 sbMethods.append(sbEditInfo.toString());
                                 sbMethods.append("\n        showPd(getString(R.string." + widgetEntity.getResId() + "ing_text), false);\n" +
                                         "        Api.getApi0()\n" +
-                                        "                .userLogin(");
+                                        "                ."+apiMethod+"(");
                                 if (requestParamsNo > 0) {
                                     for (int i1 = 0; i1 < requestParamsNo; i1++) {
                                         sbMethods.append("\"\", ");
@@ -3571,15 +3613,19 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                                 "                        if (result.getCode() == 1) {\n" +
                                                 "                            Intent intent = new Intent(" + activityEntity.getName() + ".this, " + (targetAct == null ? activityEntity.getName() : targetAct.getName()) + ".class);\n" +
                                                 "                            startActWithIntent(intent);\n" +
-                                                "                            closeAct();\n" +
-                                                "                        }\n" +
-                                                "                    }\n" +
-                                                "                });");
+                                                "                        }\n*/")
+                                        .append("                            Intent intent = new Intent(" + activityEntity.getName() + ".this, " + (targetAct == null ? activityEntity.getName() : targetAct.getName()) + ".class);\n" +
+                                                "                            startActWithIntent(intent);\n");
+                                if (widgetEntity.getClickToClose()) {
+                                    sbMethods.append("                            closeAct();\n");
+                                }
+                                sbMethods.append("                    }\n" +
+                                        "                });");
                                 sbMethods.append("    }\n");
                                 sbEvent.append("\n        btn_" + widgetEntity.getResId() + ".setOnClickListener(new View.OnClickListener() {\n" +
                                         "            @Override\n" +
                                         "            public void onClick(View v) {\n" +
-                                        "                do_" + widgetEntity.getResId()+"();\n" +
+                                        "                do_" + widgetEntity.getResId() + "();\n" +
                                         "            }\n" +
                                         "        });");
                             }
@@ -3592,9 +3638,11 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                     "            @Override\n" +
                                     "            public void onClick(View v) {\n" +
                                     "                Intent intent = new Intent(" + activityEntity.getName() + ".this, " + (targetAct == null ? activityEntity.getName() : targetAct.getName()) + ".class);\n" +
-                                    "                startActWithIntent(intent);\n" +
-                                    "                closeAct();\n" +
-                                    "            }\n" +
+                                    "                startActWithIntent(intent);\n");
+                            if (widgetEntity.getClickToClose()) {
+                                sbEvent.append("                closeAct();\n");
+                            }
+                            sbEvent.append("            }\n" +
                                     "        });");
                         }
                         break;
@@ -3999,7 +4047,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         sbLayout.append("\n    <LinearLayout\n" +
                                 "        android:layout_width=\"" + widthString + "\"\n" +
                                 "        android:layout_height=\"" + heightString + "\"\n" +
-                                "        android:background=\"" +(widgetEntity.getBackground()==null?"@color/colorTransparent":widgetEntity.getBackground())+"\"\n"+
+                                "        android:background=\"" + (widgetEntity.getBackground().length() == 0 ? "@color/colorTransparent" : widgetEntity.getBackground()) + "\"\n" +
                                 (widgetEntity.getWeight() > 0 ? "        android:layout_weight=\"" + widgetEntity.getWeight() + "\"\n" : "") +
                                 "        android:gravity=\"" + (widgetEntity.getGravity() == null ? "center" : widgetEntity.getGravity()) + "\"\n" +
                                 "        android:orientation=\"" + (widgetEntity.getOrientation() == null ? "horizontal" : widgetEntity.getOrientation()) + "\">");
@@ -4008,22 +4056,37 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         break;
                     case WidgetEntity.TYPE_RELATIVE_LAYOUT:
                         sbLayout.append("\n    <RelativeLayout\n" +
-                                "        android:background=\"" +(widgetEntity.getBackground()==null?"@color/colorTransparent":widgetEntity.getBackground())+"\"\n"+
+                                "        android:background=\"" + (widgetEntity.getBackground().length() == 0 ? "@color/colorTransparent" : widgetEntity.getBackground()) + "\"\n" +
                                 "        android:layout_width=\"" + widthString + "\"\n" +
                                 "        android:layout_height=\"" + heightString + "\">");
                         fillWidget(logoName, app, activityEntity, layoutName, layoutPath, javaPath, widgetEntity.getId(), sbStrings, sbLayout, sbImp, sbJava, sbDef, sbInit, sbData, sbEvent, sbEditInfo, sbMethods);
                         sbLayout.append("    </RelativeLayout>\n");
                         break;
                     case WidgetEntity.TYPE_IMAGE_VIEW:
+                        sbDef.append("\n    private ImageView iv_" + widgetEntity.getResId() + ";");
+                        sbInit.append("\n        iv_" + widgetEntity.getResId() + " = (ImageView) findViewById(R.id.iv_" + widgetEntity.getResId() + ");");
                         sbLayout.append("\n    <ImageView\n" +
-                                "        android:id=\"@+id/iv_" + widgetEntity.getResId() + "\"\n" +
+                                "        android:id=\"@+id/iv_" + widgetEntity .getResId() + "\"\n" +
                                 "        android:layout_width=\"" + widthString + "\"\n" +
                                 "        android:layout_height=\"" + heightString + "\"\n" +
                                 "        android:layout_marginTop=\"" + widgetEntity.getMarginTop() + "px\"\n" +
                                 "        android:layout_marginBottom=\"" + widgetEntity.getMarginBottom() + "px\"\n" +
                                 "        android:layout_marginRight=\"" + widgetEntity.getMarginRight() + "px\"\n" +
                                 "        android:layout_marginLeft=\"" + widgetEntity.getMarginLeft() + "px\"\n" +
-                                "        android:src=\"@mipmap/"+logoName+"\" />");
+                                "        android:src=\"@mipmap/" + logoName + "\" />");
+                        ActivityEntity targetAct = null;
+                        if (widgetEntity.getTargetActivityId() != null && widgetEntity.getTargetActivityId().length() > 0) {
+                            targetAct = mActivityService.get(widgetEntity.getTargetActivityId());
+                            if (targetAct != null) {
+                                sbEvent.append("\n        iv_" + widgetEntity.getResId() + ".setOnClickListener(new View.OnClickListener() {\n" +
+                                        "            @Override\n" +
+                                        "            public void onClick(View v) {\n" +
+                                        "                Intent intent = new Intent(" + activityEntity.getName() + ".this, " + targetAct.getName() + ".class);\n" +
+                                        "                startActWithIntent(intent);\n");
+                                sbEvent.append("            }\n" +
+                                        "        });");
+                            }
+                        }
                         break;
                     case WidgetEntity.TYPE_TEXT_VIEW:
                         sbDef.append("\n    private TextView tv_" + widgetEntity.getResId() + ";");
@@ -4036,12 +4099,16 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         }
                         sbLayout.append("\n    <TextView\n" +
                                 "        android:id=\"@+id/tv_" + widgetEntity.getResId() + "\"\n" +
-                                "        android:layout_width=\"wrap_content\"\n" +
-                                "        android:layout_height=\"wrap_content\"\n" +
-                                "        android:hint=\"@string/" + widgetEntity.getResId() + "_tv_text\"\n" +
-                                "        android:text=\"@string/" + widgetEntity.getResId() + "_tv_hint_text\"\n" +
-                                "        android:textColor=\"@color/colorBlack\"\n" +
-                                "        android:textSize=\"40px\" />");
+                                "        android:layout_width=\""+widthString+"\"\n" +
+                                "        android:layout_height=\""+heightString+"\"\n" +
+                                "        android:hint=\"@string/" + widgetEntity.getResId() + "_tv_hint_text\"\n" +
+                                "        android:text=\"@string/" + widgetEntity.getResId() + "_tv_text\"\n" +
+                                "        android:layout_marginLeft=\"" + widgetEntity.getMarginLeft() + "px\"\n" +
+                                "        android:layout_marginRight=\"" + widgetEntity.getMarginRight() + "px\"\n" +
+                                "        android:layout_marginTop=\"" + widgetEntity.getMarginTop() + "px\"\n" +
+                                "        android:layout_marginBottom=\"" + widgetEntity.getMarginBottom() + "px\"\n" +
+                                "        android:textColor=\""+widgetEntity.getTextColor()+"\"\n" +
+                                "        android:textSize=\""+widgetEntity.getTextSize()+"px\" />");
                         break;
                     case WidgetEntity.TYPE_CHECK_BOX:
                         sbDef.append("\n    private CheckBox cb_" + widgetEntity.getResId() + ";");

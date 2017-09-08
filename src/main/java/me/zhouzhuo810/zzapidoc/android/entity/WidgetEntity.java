@@ -101,6 +101,26 @@ public class WidgetEntity extends BaseEntity {
     private String orientation;
     @Column(name = "ClickToClose")
     private Boolean clickToClose = false;
+    @Column(name = "TextColor")
+    private String textColor;
+    @Column(name = "TextSize")
+    private Integer textSize;
+
+    public String getTextColor() {
+        return textColor;
+    }
+
+    public void setTextColor(String textColor) {
+        this.textColor = textColor;
+    }
+
+    public Integer getTextSize() {
+        return textSize;
+    }
+
+    public void setTextSize(Integer textSize) {
+        this.textSize = textSize;
+    }
 
     public Boolean getClickToClose() {
         return clickToClose;

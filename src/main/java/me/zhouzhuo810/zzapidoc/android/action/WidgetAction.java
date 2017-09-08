@@ -70,13 +70,15 @@ public class WidgetAction extends BaseController<WidgetEntity> {
             @RequestParam(value = "relativeId") String relativeId,
             @RequestParam(value = "targetApiId", required = false) String targetApiId,
             @RequestParam(value = "appId", required = false) String appId,
+            @RequestParam(value = "textColor", required = false) String textColor,
+            @RequestParam(value = "textSize", required = false) int textSize,
             @RequestParam(value = "userId") String userId
     ) {
         return getBaseService().addWidget(name, title, resId, type, defValue, hint,
                 leftTitleText, rightTitleText, leftTitleImg, rightTitleImg, showLeftTitleImg,
                 showRightTitleImg, showLeftTitleText, showRightTitleText, showLeftTitleLayout, showRightTitleLayout,clickToClose,
                 pid, background, width, height, weight, marginLeft, marginRight, marginTop, marginBottom, paddingLeft,
-                paddingRight, paddingTop, paddingBottom, gravity, targetActId, orientation, relativeId, targetApiId, appId, userId);
+                paddingRight, paddingTop, paddingBottom, gravity, targetActId, orientation, relativeId, targetApiId, appId, textColor, textSize, userId);
     }
 
     @ResponseBody
