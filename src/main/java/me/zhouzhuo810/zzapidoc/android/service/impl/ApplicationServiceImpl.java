@@ -3264,6 +3264,10 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "        android:hint=\"@string/" + widgetEntity.getResId() + "_tv_hint_text\"\n" +
                                 "        android:text=\"@string/" + widgetEntity.getResId() + "_tv_text\"\n" +
                                 "        android:textColor=\""+widgetEntity.getTextColor()+"\"\n" +
+                                "        android:paddingLeft=\""+widgetEntity.getPaddingLeft()+"px\"\n" +
+                                "        android:paddingRight=\""+widgetEntity.getPaddingRight()+"px\"\n" +
+                                "        android:paddingTop=\""+widgetEntity.getPaddingTop()+"px\"\n" +
+                                "        android:paddingBottom=\""+widgetEntity.getPaddingBottom()+"px\"\n"+
                                 "        android:layout_marginLeft=\"" + widgetEntity.getMarginLeft() + "px\"\n" +
                                 "        android:layout_marginRight=\"" + widgetEntity.getMarginRight() + "px\"\n" +
                                 "        android:layout_marginTop=\"" + widgetEntity.getMarginTop() + "px\"\n" +
@@ -4137,6 +4141,10 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "        android:layout_height=\""+heightString+"\"\n" +
                                 "        android:hint=\"@string/" + widgetEntity.getResId() + "_tv_hint_text\"\n" +
                                 "        android:text=\"@string/" + widgetEntity.getResId() + "_tv_text\"\n" +
+                                "        android:paddingLeft=\""+widgetEntity.getPaddingLeft()+"px\"\n" +
+                                "        android:paddingRight=\""+widgetEntity.getPaddingRight()+"px\"\n" +
+                                "        android:paddingTop=\""+widgetEntity.getPaddingTop()+"px\"\n" +
+                                "        android:paddingBottom=\""+widgetEntity.getPaddingBottom()+"px\"\n"+
                                 "        android:layout_marginLeft=\"" + widgetEntity.getMarginLeft() + "px\"\n" +
                                 "        android:layout_marginRight=\"" + widgetEntity.getMarginRight() + "px\"\n" +
                                 "        android:layout_marginTop=\"" + widgetEntity.getMarginTop() + "px\"\n" +
