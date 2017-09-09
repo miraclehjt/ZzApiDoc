@@ -800,13 +800,9 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
         String logoName = "ic_launcher";
         if (app.getLogo() != null && app.getLogo().length() > 0) {
             String name = new File(app.getLogo()).getName();
-            logoName = name.substring(0, name.indexOf("."));
-        } else {
-            FileUtil.copyFile(new File(rootPath
-                    + File.separator + "res"
-                    + File.separator + "drawable"
-                    + File.separator + "ic_launcher.png"), new File(filePath + File.separator + "res" + File.separator + "mipmap-hdpi" + File.separator + "ic_launcher.png"));
+            logoName = name.substring(0, name.lastIndexOf("."));
         }
+
         StringBuilder sbManifest = new StringBuilder();
         sbManifest.append("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
                 "<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\"\n" +
@@ -851,6 +847,10 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
         String layoutPath = filePath
                 + File.separator + "res"
                 + File.separator + "layout";
+
+        String drawablePath = filePath
+                +File.separator+"res"
+                +File.separator+"drawable-hdpi";
 
         String packagePath = packageName.replace(".", File.separator);
         String javaPath = appDirPath
@@ -897,6 +897,16 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
 
         if (activityEntities != null && activityEntities.size() > 0) {
             ActivityEntity activityEntity = activityEntities.get(0);
+            String splashImgName = null;
+            if (activityEntity.getSplashImg() != null && activityEntity.getSplashImg().length() > 0) {
+                File img = new File(activityEntity.getSplashImg());
+                if (img.exists()) {
+                    String name = img.getName();
+                    String suffix = name.substring(name.lastIndexOf("."));
+                    splashImgName = "splash_img";
+                    FileUtil.copyFile(img, new File(drawablePath+File.separator+splashImgName+suffix));
+                }
+            }
             sbManifest.append("        <activity\n" +
                     "            android:name=\".ui.act." + activityEntity.getName() + "\"\n" +
                     "            android:configChanges=\"orientation|keyboardHidden|layoutDirection|screenSize|screenLayout\"\n" +
@@ -919,7 +929,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                     "        android:id=\"@+id/iv_pic\"\n" +
                     "        android:layout_width=\"match_parent\"\n" +
                     "        android:layout_height=\"match_parent\"\n" +
-                    "        android:src=\"@mipmap/" + logoName + "\" />\n" +
+                    "        android:src=\"" + (splashImgName==null?"@mipmap/ic_launcher":"@drawable/"+splashImgName) + "\" />\n" +
                     "\n" +
                     "    <TextView\n" +
                     "        android:id=\"@+id/tv_jump\"\n" +
@@ -3185,6 +3195,10 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "        android:layout_marginRight=\"" + widgetEntity.getMarginRight() + "px\"\n" +
                                 "        android:layout_marginTop=\"" + widgetEntity.getMarginTop() + "px\"\n" +
                                 "        android:layout_marginBottom=\"" + widgetEntity.getMarginBottom() + "px\"\n" +
+                                "        android:paddingLeft=\""+widgetEntity.getPaddingLeft()+"px\"\n" +
+                                "        android:paddingRight=\""+widgetEntity.getPaddingRight()+"px\"\n" +
+                                "        android:paddingTop=\""+widgetEntity.getPaddingTop()+"px\"\n" +
+                                "        android:paddingBottom=\""+widgetEntity.getPaddingBottom()+"px\"\n"+
                                 "        android:background=\"" + (widgetEntity.getBackground().length() == 0 ? "@color/colorTransparent" : widgetEntity.getBackground()) + "\"\n" +
                                 (widgetEntity.getWeight() > 0 ? "        android:layout_weight=\"" + widgetEntity.getWeight() + "\"\n" : "") +
                                 "        android:gravity=\"" + (widgetEntity.getGravity() == null ? "center" : widgetEntity.getGravity()) + "\"\n" +
@@ -3198,6 +3212,10 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "        android:layout_marginRight=\"" + widgetEntity.getMarginRight() + "px\"\n" +
                                 "        android:layout_marginTop=\"" + widgetEntity.getMarginTop() + "px\"\n" +
                                 "        android:layout_marginBottom=\"" + widgetEntity.getMarginBottom() + "px\"\n" +
+                                "        android:paddingLeft=\""+widgetEntity.getPaddingLeft()+"px\"\n" +
+                                "        android:paddingRight=\""+widgetEntity.getPaddingRight()+"px\"\n" +
+                                "        android:paddingTop=\""+widgetEntity.getPaddingTop()+"px\"\n" +
+                                "        android:paddingBottom=\""+widgetEntity.getPaddingBottom()+"px\"\n"+
                                 "        android:background=\"" + (widgetEntity.getBackground().length() == 0 ? "@color/colorTransparent" : widgetEntity.getBackground()) + "\"\n" +
                                 "        android:layout_width=\"" + widthString + "\"\n" +
                                 "        android:layout_height=\"" + heightString + "\">");
@@ -4047,6 +4065,14 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         sbLayout.append("\n    <LinearLayout\n" +
                                 "        android:layout_width=\"" + widthString + "\"\n" +
                                 "        android:layout_height=\"" + heightString + "\"\n" +
+                                "        android:layout_marginLeft=\"" + widgetEntity.getMarginLeft() + "px\"\n" +
+                                "        android:layout_marginRight=\"" + widgetEntity.getMarginRight() + "px\"\n" +
+                                "        android:layout_marginTop=\"" + widgetEntity.getMarginTop() + "px\"\n" +
+                                "        android:layout_marginBottom=\"" + widgetEntity.getMarginBottom() + "px\"\n" +
+                                "        android:paddingLeft=\""+widgetEntity.getPaddingLeft()+"px\"\n" +
+                                "        android:paddingRight=\""+widgetEntity.getPaddingRight()+"px\"\n" +
+                                "        android:paddingTop=\""+widgetEntity.getPaddingTop()+"px\"\n" +
+                                "        android:paddingBottom=\""+widgetEntity.getPaddingBottom()+"px\"\n"+
                                 "        android:background=\"" + (widgetEntity.getBackground().length() == 0 ? "@color/colorTransparent" : widgetEntity.getBackground()) + "\"\n" +
                                 (widgetEntity.getWeight() > 0 ? "        android:layout_weight=\"" + widgetEntity.getWeight() + "\"\n" : "") +
                                 "        android:gravity=\"" + (widgetEntity.getGravity() == null ? "center" : widgetEntity.getGravity()) + "\"\n" +
@@ -4056,6 +4082,14 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         break;
                     case WidgetEntity.TYPE_RELATIVE_LAYOUT:
                         sbLayout.append("\n    <RelativeLayout\n" +
+                                "        android:paddingLeft=\""+widgetEntity.getPaddingLeft()+"px\"\n" +
+                                "        android:paddingRight=\""+widgetEntity.getPaddingRight()+"px\"\n" +
+                                "        android:paddingTop=\""+widgetEntity.getPaddingTop()+"px\"\n" +
+                                "        android:paddingBottom=\""+widgetEntity.getPaddingBottom()+"px\"\n"+
+                                "        android:layout_marginLeft=\"" + widgetEntity.getMarginLeft() + "px\"\n" +
+                                "        android:layout_marginRight=\"" + widgetEntity.getMarginRight() + "px\"\n" +
+                                "        android:layout_marginTop=\"" + widgetEntity.getMarginTop() + "px\"\n" +
+                                "        android:layout_marginBottom=\"" + widgetEntity.getMarginBottom() + "px\"\n" +
                                 "        android:background=\"" + (widgetEntity.getBackground().length() == 0 ? "@color/colorTransparent" : widgetEntity.getBackground()) + "\"\n" +
                                 "        android:layout_width=\"" + widthString + "\"\n" +
                                 "        android:layout_height=\"" + heightString + "\">");
