@@ -26,6 +26,9 @@ public class WidgetEntity extends BaseEntity {
     public static final int TYPE_IMAGE_VIEW = 11;
     public static final int TYPE_TEXT_VIEW = 12;
     public static final int TYPE_CHECK_BOX = 13;
+    public static final int TYPE_RV = 14;
+    public static final int TYPE_LV = 15;
+    public static final int TYPE_SCROLLABLE_LV = 16;
 
     @Column(name = "Type")
     private Integer type = TYPE_TITLE_BAR;

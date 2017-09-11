@@ -8,4 +8,6 @@
     <dimen name="tab_height">40px</dimen>
     <dimen name="submit_btn_text_size">40px</dimen>
 
+    <dimen name="setting_item_height">110px</dimen>
+
 </resources>

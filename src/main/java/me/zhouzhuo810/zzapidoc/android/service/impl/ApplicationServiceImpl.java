@@ -1845,6 +1845,44 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
     }
 
     private void generateWidgets(String rootPath, String javaPath, ApplicationEntity app) throws IOException {
+        /*scrollableListView*/
+        String scrollLvPath = javaPath+File.separator+"ui"+File.separator+"widget";
+        FileUtils.saveFileToPathWithName("package "+app.getPackageName()+".ui.widget;\n" +
+                "\n" +
+                "import android.content.Context;\n" +
+                "import android.util.AttributeSet;\n" +
+                "import android.widget.ListView;\n" +
+                "\n" +
+                "/**\n" +
+                " * Created by zhouzhuo810 on 2016/6/6.\n" +
+                " */\n" +
+                "public class ScrollableListView extends ListView {\n" +
+                "    public ScrollableListView(Context context) {\n" +
+                "        super(context);\n" +
+                "    }\n" +
+                "\n" +
+                "    public ScrollableListView(Context context, AttributeSet attrs) {\n" +
+                "        super(context, attrs);\n" +
+                "    }\n" +
+                "\n" +
+                "    public ScrollableListView(Context context, AttributeSet attrs, int defStyleAttr) {\n" +
+                "        super(context, attrs, defStyleAttr);\n" +
+                "    }\n" +
+                "\n" +
+                "    @Override\n" +
+                "\n" +
+                "/**   只重写该方法，达到使ListView适应ScrollView的效果   */\n" +
+                "\n" +
+                "    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {\n" +
+                "\n" +
+                "        int expandSpec = MeasureSpec.makeMeasureSpec(Integer.MAX_VALUE >> 2,\n" +
+                "\n" +
+                "                MeasureSpec.AT_MOST);\n" +
+                "\n" +
+                "        super.onMeasure(widthMeasureSpec, expandSpec);\n" +
+                "\n" +
+                "    }\n" +
+                "}\n", scrollLvPath, "ScrollableListView.java");
         /*sidebar*/
         String sideBarPath = javaPath + File.separator + "ui" + File.separator + "widget" + File.separator + "sidebar";
         FileUtils.saveFileToPathWithName("package " + app.getPackageName() + ".ui.widget.sidebar;\n" +
@@ -2485,6 +2523,49 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "        app:textSizeTitle=\"@dimen/title_text_size\"\n" +
                                 "        app:titleText=\"@string/" + layoutName + "_text\" />");
                         break;
+                    case WidgetEntity.TYPE_SETTING_ITEM:
+                        sbDef.append("\n    private LinearLayout ll_"+widgetEntity.getResId()+";");
+                        sbInit.append("\n        ll_"+widgetEntity.getResId()+" = (LinearLayout) rootView.findViewById(R.id.ll_"+widgetEntity.getResId()+");");
+                        sbStrings.append("\n    <string name=\"si_"+widgetEntity.getResId()+"_text\">"+widgetEntity.getTitle()+"</string>");
+                        sbLayout.append("\n            <LinearLayout\n" +
+                                "                android:id=\"@+id/ll_"+widgetEntity.getResId()+"\"\n" +
+                                "                android:layout_width=\"match_parent\"\n" +
+                                "                android:layout_marginTop=\""+widgetEntity.getMarginTop()+"px\"\n" +
+                                "                android:layout_marginBottom=\""+widgetEntity.getMarginBottom()+"px\"\n"+
+                                "                android:layout_height=\"@dimen/setting_item_height\"\n" +
+                                "                android:background=\"@drawable/setting_item_bg_selector\"\n" +
+                                "                android:clickable=\"true\"\n" +
+                                "                android:gravity=\"center_vertical\"\n" +
+                                "                android:orientation=\"horizontal\">\n" +
+                                "\n" +
+                                "                <ImageView\n" +
+                                "                    android:layout_width=\"70px\"\n" +
+                                "                    android:layout_height=\"70px\"\n" +
+                                "                    android:layout_marginLeft=\"40px\"\n" +
+                                "                    android:visibility=\""+(widgetEntity.getShowLeftTitleImg()?"visible":"gone")+"\"\n" +
+                                "                    android:src=\"@mipmap/"+logoName+"\" />\n" +
+                                "\n" +
+                                "                <TextView\n" +
+                                "                    android:layout_width=\"0dp\"\n" +
+                                "                    android:layout_height=\"wrap_content\"\n" +
+                                "                    android:layout_weight=\"1\"\n" +
+                                "                    android:layout_marginLeft=\"40px\"\n"+
+                                "                    android:text=\"@string/si_"+widgetEntity.getResId()+"_text\"\n" +
+                                "                    android:textColor=\"@color/colorText\"\n" +
+                                "                    android:textSize=\"40px\" />\n" +
+                                "\n" +
+                                "                <ImageView\n" +
+                                "                    android:layout_width=\"40px\"\n" +
+                                "                    android:layout_height=\"40px\"\n" +
+                                "                    android:layout_marginRight=\"40px\"\n" +
+                                "                    android:src=\"@drawable/more\" />\n" +
+                                "            </LinearLayout>\n" +
+                                "\n" +
+                                "            <View\n" +
+                                "                android:layout_width=\"match_parent\"\n" +
+                                "                android:layout_height=\"1px\"\n" +
+                                "                android:layout_marginLeft=\"40px\" />\n");
+                        break;
                     case WidgetEntity.TYPE_TITLE_EDIT_ITEM:
                         sbDef.append("\n    private EditText et_" + widgetEntity.getResId() + ";");
                         sbDef.append("\n    private ImageView iv_clear_" + widgetEntity.getResId() + ";");
@@ -2790,6 +2871,154 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                             sbEvent.append("            }\n" +
                                     "        });");
                         }
+                        break;
+                    case WidgetEntity.TYPE_RV:
+                        sbImp.append("\nimport android.support.v4.widget.SwipeRefreshLayout;")
+                            .append("\nimport android.support.v7.widget.RecyclerView;")
+                            .append("\nimport zhouzhuo810.me.zzandframe.ui.widget.ZzRvRefreshLayout;");
+                        sbDef.append("\n    private ZzRvRefreshLayout refresh")
+                                .append("\n    private RecyclerView rv;")
+                                .append("\n    private TextView tvNoData;");
+                        sbInit.append("\n        refresh = (ZzRvRefreshLayout) rootView.findViewById(R.id.refresh);")
+                                .append("\n        rv = (RecyclerView) rootView.findViewById(R.id.rv);")
+                                .append("\n        rv.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager."+widgetEntity.getOrientation().toUpperCase()+", false));")
+                                .append("\n        tvNoData = (TextView) rootView.findViewById(R.id.tv_no_data);");
+                        sbEvent.append("\n        titleBar.setOnTitleClickListener(new TitleBar.OnTitleClick() {\n" +
+                                "            @Override\n" +
+                                "            public void onLeftClick(ImageView imageView, TextView textView) {\n" +
+                                "                closeAct();\n" +
+                                "            }\n" +
+                                "\n" +
+                                "            @Override\n" +
+                                "            public void onTitleClick(TextView textView) {\n" +
+                                "\n" +
+                                "            }\n" +
+                                "\n" +
+                                "            @Override\n" +
+                                "            public void onRightClick(ImageView imageView, TextView textView) {\n" +
+                                "\n" +
+                                "            }\n" +
+                                "        });\n")
+                                .append("        refresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {\n" +
+                                        "            @Override\n" +
+                                        "            public void onRefresh() {\n" +
+                                        "                getData();\n" +
+                                        "            }\n" +
+                                        "        });");
+                        sbMethods.append("\n" +
+                                "    private void getData() {\n" +
+                                "\n" +
+                                "        stopRefresh(refresh);\n" +
+                                "    }\n");
+                        sbData.append("\n        startRefresh(refresh);\n" +
+                                "        getData();\n");
+                        sbLayout.append("\n    <RelativeLayout\n" +
+                                "        android:layout_width=\"match_parent\"\n" +
+                                "        android:layout_height=\"match_parent\">\n" +
+                                "\n" +
+                                "        <zhouzhuo810.me.zzandframe.ui.widget.ZzRvRefreshLayout\n" +
+                                "            android:id=\"@+id/refresh\"\n" +
+                                "            android:layout_width=\"match_parent\"\n" +
+                                "            android:layout_height=\"wrap_content\">\n" +
+                                "\n" +
+                                "            <android.support.v7.widget.RecyclerView\n" +
+                                "                android:id=\"@+id/rv\"\n" +
+                                "                android:layout_width=\"match_parent\"\n" +
+                                "                android:layout_height=\"match_parent\" />\n" +
+                                "        </zhouzhuo810.me.zzandframe.ui.widget.ZzRvRefreshLayout>\n" +
+                                "\n" +
+                                "        <TextView\n" +
+                                "            android:id=\"@+id/tv_no_data\"\n" +
+                                "            android:layout_width=\"wrap_content\"\n" +
+                                "            android:layout_height=\"wrap_content\"\n" +
+                                "            android:layout_centerInParent=\"true\"\n" +
+                                "            android:text=\"@string/no_data_text\"\n" +
+                                "            android:textColor=\"@color/colorGrayB\"\n" +
+                                "            android:textSize=\"40px\"\n" +
+                                "            android:visibility=\"gone\" />\n" +
+                                "    </RelativeLayout>\n");
+
+                        break;
+                    case WidgetEntity.TYPE_LV:
+                        sbImp.append("\nimport android.support.v4.widget.SwipeRefreshLayout;")
+                                .append("\nimport android.widget.ListView;")
+                                .append("\nimport android.support.v7.widget.RecyclerView;")
+                                .append("\nimport zhouzhuo810.me.zzandframe.ui.widget.ZzLvRefreshLayout;");
+                        sbDef.append("\n    private ZzLvRefreshLayout refresh")
+                                .append("\n    private ListView lv;")
+                                .append("\n    private TextView tvNoData;");
+                        sbInit.append("\n        refresh = (ZzLvRefreshLayout) rootView.findViewById(R.id.refresh);")
+                                .append("\n        rv = (RecyclerView) rootView.findViewById(R.id.rv);")
+                                .append("\n        tvNoData = (TextView) rootView.findViewById(R.id.tv_no_data);");
+                        sbEvent.append("\n        titleBar.setOnTitleClickListener(new TitleBar.OnTitleClick() {\n" +
+                                "            @Override\n" +
+                                "            public void onLeftClick(ImageView imageView, TextView textView) {\n" +
+                                "                closeAct();\n" +
+                                "            }\n" +
+                                "\n" +
+                                "            @Override\n" +
+                                "            public void onTitleClick(TextView textView) {\n" +
+                                "\n" +
+                                "            }\n" +
+                                "\n" +
+                                "            @Override\n" +
+                                "            public void onRightClick(ImageView imageView, TextView textView) {\n" +
+                                "\n" +
+                                "            }\n" +
+                                "        });\n")
+                                .append("        refresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {\n" +
+                                        "            @Override\n" +
+                                        "            public void onRefresh() {\n" +
+                                        "                getData();\n" +
+                                        "            }\n" +
+                                        "        });");
+                        sbMethods.append("\n" +
+                                "    private void getData() {\n" +
+                                "\n" +
+                                "        stopRefresh(refresh);\n" +
+                                "    }\n");
+                        sbData.append("\n        startRefresh(refresh);\n" +
+                                "        getData();\n");
+                        sbLayout.append("\n    <RelativeLayout\n" +
+                                "        android:layout_width=\"match_parent\"\n" +
+                                "        android:layout_height=\"match_parent\">\n" +
+                                "\n" +
+                                "        <zhouzhuo810.me.zzandframe.ui.widget.ZzLvRefreshLayout\n" +
+                                "            android:id=\"@+id/refresh\"\n" +
+                                "            android:layout_width=\"match_parent\"\n" +
+                                "            android:layout_height=\"wrap_content\">\n" +
+                                "\n" +
+                                "            <ListView\n" +
+                                "                android:id=\"@+id/lv\"\n" +
+                                "                android:layout_width=\"match_parent\"\n" +
+                                "                android:layout_height=\"match_parent\"\n" +
+                                "                android:divider=\"@null\"\n" +
+                                "                android:dividerHeight=\"0dp\"\n" +
+                                "                android:listSelector=\"@color/colorTransparent\" />\n" +
+                                "        </zhouzhuo810.me.zzandframe.ui.widget.ZzLvRefreshLayout>\n" +
+                                "\n" +
+                                "        <TextView\n" +
+                                "            android:id=\"@+id/tv_no_data\"\n" +
+                                "            android:layout_width=\"wrap_content\"\n" +
+                                "            android:layout_height=\"wrap_content\"\n" +
+                                "            android:layout_centerInParent=\"true\"\n" +
+                                "            android:text=\"@string/no_data_text\"\n" +
+                                "            android:textColor=\"@color/colorGrayB\"\n" +
+                                "            android:textSize=\"40px\"\n" +
+                                "            android:visibility=\"gone\" />\n" +
+                                "    </RelativeLayout>\n");
+                        break;
+                    case WidgetEntity.TYPE_SCROLLABLE_LV:
+                        sbImp.append("\nimport "+app.getPackageName()+".ui.widget.ScrollableListView;");
+                        sbDef.append("\n    private ScrollableListView lv_"+widgetEntity.getResId()+";");
+                        sbInit.append("\n        lv_"+widgetEntity.getResId()+" = (ScrollableListView) rootView.findViewById(R.id.lv_"+widgetEntity.getResId()+");");
+                        sbLayout.append("\n            <"+app.getPackageName()+".ui.widget.ScrollableListView\n" +
+                                "                android:id=\"@+id/lv_"+widgetEntity.getResId()+"\"\n" +
+                                "                android:layout_width=\"match_parent\"\n" +
+                                "                android:layout_height=\"wrap_content\"\n" +
+                                "                android:divider=\"@null\"\n" +
+                                "                android:dividerHeight=\"0dp\"\n" +
+                                "                android:listSelector=\"@color/colorTransparent\" />\n");
                         break;
                     case WidgetEntity.TYPE_LETTER_RV:
                         String testClazz = "RvTestResult";
@@ -3369,6 +3598,49 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "        app:textSizeTitle=\"@dimen/title_text_size\"\n" +
                                 "        app:titleText=\"@string/" + layoutName + "_text\" />");
                         break;
+                    case WidgetEntity.TYPE_SETTING_ITEM:
+                        sbDef.append("\n    private LinearLayout ll_"+widgetEntity.getResId()+";");
+                        sbInit.append("\n        ll_"+widgetEntity.getResId()+" = (LinearLayout) findViewById(R.id.ll_"+widgetEntity.getResId()+");");
+                        sbStrings.append("\n    <string name=\"si_"+widgetEntity.getResId()+"_text\">"+widgetEntity.getTitle()+"</string>");
+                        sbLayout.append("\n            <LinearLayout\n" +
+                                "                android:id=\"@+id/ll_"+widgetEntity.getResId()+"\"\n" +
+                                "                android:layout_width=\"match_parent\"\n" +
+                                "                android:layout_marginTop=\""+widgetEntity.getMarginTop()+"px\"\n" +
+                                "                android:layout_marginBottom=\""+widgetEntity.getMarginBottom()+"px\"\n"+
+                                "                android:layout_height=\"@dimen/setting_item_height\"\n" +
+                                "                android:background=\"@drawable/setting_item_bg_selector\"\n" +
+                                "                android:clickable=\"true\"\n" +
+                                "                android:gravity=\"center_vertical\"\n" +
+                                "                android:orientation=\"horizontal\">\n" +
+                                "\n" +
+                                "                <ImageView\n" +
+                                "                    android:layout_width=\"70px\"\n" +
+                                "                    android:layout_height=\"70px\"\n" +
+                                "                    android:layout_marginLeft=\"40px\"\n" +
+                                "                    android:visibility=\""+(widgetEntity.getShowLeftTitleImg()?"visible":"gone")+"\"\n" +
+                                "                    android:src=\"@mipmap/"+logoName+"\" />\n" +
+                                "\n" +
+                                "                <TextView\n" +
+                                "                    android:layout_width=\"0dp\"\n" +
+                                "                    android:layout_height=\"wrap_content\"\n" +
+                                "                    android:layout_weight=\"1\"\n" +
+                                "                    android:layout_marginLeft=\"40px\"\n"+
+                                "                    android:text=\"@string/si_"+widgetEntity.getResId()+"_text\"\n" +
+                                "                    android:textColor=\"@color/colorText\"\n" +
+                                "                    android:textSize=\"40px\" />\n" +
+                                "\n" +
+                                "                <ImageView\n" +
+                                "                    android:layout_width=\"40px\"\n" +
+                                "                    android:layout_height=\"40px\"\n" +
+                                "                    android:layout_marginRight=\"40px\"\n" +
+                                "                    android:src=\"@drawable/more\" />\n" +
+                                "            </LinearLayout>\n" +
+                                "\n" +
+                                "            <View\n" +
+                                "                android:layout_width=\"match_parent\"\n" +
+                                "                android:layout_height=\"1px\"\n" +
+                                "                android:layout_marginLeft=\"40px\" />\n");
+                        break;
                     case WidgetEntity.TYPE_TITLE_EDIT_ITEM:
                         sbDef.append("\n    private EditText et_" + widgetEntity.getResId() + ";");
                         sbDef.append("\n    private ImageView iv_clear_" + widgetEntity.getResId() + ";");
@@ -3667,6 +3939,154 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                             sbEvent.append("            }\n" +
                                     "        });");
                         }
+                        break;
+                    case WidgetEntity.TYPE_RV:
+                        sbImp.append("\nimport android.support.v4.widget.SwipeRefreshLayout;")
+                                .append("\nimport android.support.v7.widget.RecyclerView;")
+                                .append("\nimport zhouzhuo810.me.zzandframe.ui.widget.ZzRvRefreshLayout;");
+                        sbDef.append("\n    private ZzRvRefreshLayout refresh")
+                                .append("\n    private RecyclerView rv;")
+                                .append("\n    private TextView tvNoData;");
+                        sbInit.append("\n        refresh = (ZzRvRefreshLayout) findViewById(R.id.refresh);")
+                                .append("\n        rv = (RecyclerView) findViewById(R.id.rv);")
+                                .append("\n        rv.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager."+widgetEntity.getOrientation().toUpperCase()+", false));")
+                                .append("\n        tvNoData = (TextView) findViewById(R.id.tv_no_data);");
+                        sbEvent.append("\n        titleBar.setOnTitleClickListener(new TitleBar.OnTitleClick() {\n" +
+                                "            @Override\n" +
+                                "            public void onLeftClick(ImageView imageView, TextView textView) {\n" +
+                                "                closeAct();\n" +
+                                "            }\n" +
+                                "\n" +
+                                "            @Override\n" +
+                                "            public void onTitleClick(TextView textView) {\n" +
+                                "\n" +
+                                "            }\n" +
+                                "\n" +
+                                "            @Override\n" +
+                                "            public void onRightClick(ImageView imageView, TextView textView) {\n" +
+                                "\n" +
+                                "            }\n" +
+                                "        });\n")
+                                .append("        refresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {\n" +
+                                        "            @Override\n" +
+                                        "            public void onRefresh() {\n" +
+                                        "                getData();\n" +
+                                        "            }\n" +
+                                        "        });");
+                        sbMethods.append("\n" +
+                                "    private void getData() {\n" +
+                                "\n" +
+                                "        stopRefresh(refresh);\n" +
+                                "    }\n");
+                        sbData.append("\n        startRefresh(refresh);\n" +
+                                "        getData();\n");
+                        sbLayout.append("\n    <RelativeLayout\n" +
+                                "        android:layout_width=\"match_parent\"\n" +
+                                "        android:layout_height=\"match_parent\">\n" +
+                                "\n" +
+                                "        <zhouzhuo810.me.zzandframe.ui.widget.ZzRvRefreshLayout\n" +
+                                "            android:id=\"@+id/refresh\"\n" +
+                                "            android:layout_width=\"match_parent\"\n" +
+                                "            android:layout_height=\"wrap_content\">\n" +
+                                "\n" +
+                                "            <android.support.v7.widget.RecyclerView\n" +
+                                "                android:id=\"@+id/rv\"\n" +
+                                "                android:layout_width=\"match_parent\"\n" +
+                                "                android:layout_height=\"match_parent\" />\n" +
+                                "        </zhouzhuo810.me.zzandframe.ui.widget.ZzRvRefreshLayout>\n" +
+                                "\n" +
+                                "        <TextView\n" +
+                                "            android:id=\"@+id/tv_no_data\"\n" +
+                                "            android:layout_width=\"wrap_content\"\n" +
+                                "            android:layout_height=\"wrap_content\"\n" +
+                                "            android:layout_centerInParent=\"true\"\n" +
+                                "            android:text=\"@string/no_data_text\"\n" +
+                                "            android:textColor=\"@color/colorGrayB\"\n" +
+                                "            android:textSize=\"40px\"\n" +
+                                "            android:visibility=\"gone\" />\n" +
+                                "    </RelativeLayout>\n");
+
+                        break;
+                    case WidgetEntity.TYPE_LV:
+                        sbImp.append("\nimport android.support.v4.widget.SwipeRefreshLayout;")
+                                .append("\nimport android.widget.ListView;")
+                                .append("\nimport android.support.v7.widget.RecyclerView;")
+                                .append("\nimport zhouzhuo810.me.zzandframe.ui.widget.ZzLvRefreshLayout;");
+                        sbDef.append("\n    private ZzLvRefreshLayout refresh")
+                                .append("\n    private ListView lv;")
+                                .append("\n    private TextView tvNoData;");
+                        sbInit.append("\n        refresh = (ZzLvRefreshLayout) findViewById(R.id.refresh);")
+                                .append("\n        rv = (RecyclerView) findViewById(R.id.rv);")
+                                .append("\n        tvNoData = (TextView) findViewById(R.id.tv_no_data);");
+                        sbEvent.append("\n        titleBar.setOnTitleClickListener(new TitleBar.OnTitleClick() {\n" +
+                                "            @Override\n" +
+                                "            public void onLeftClick(ImageView imageView, TextView textView) {\n" +
+                                "                closeAct();\n" +
+                                "            }\n" +
+                                "\n" +
+                                "            @Override\n" +
+                                "            public void onTitleClick(TextView textView) {\n" +
+                                "\n" +
+                                "            }\n" +
+                                "\n" +
+                                "            @Override\n" +
+                                "            public void onRightClick(ImageView imageView, TextView textView) {\n" +
+                                "\n" +
+                                "            }\n" +
+                                "        });\n")
+                                .append("        refresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {\n" +
+                                        "            @Override\n" +
+                                        "            public void onRefresh() {\n" +
+                                        "                getData();\n" +
+                                        "            }\n" +
+                                        "        });");
+                        sbMethods.append("\n" +
+                                "    private void getData() {\n" +
+                                "\n" +
+                                "        stopRefresh(refresh);\n" +
+                                "    }\n");
+                        sbData.append("\n        startRefresh(refresh);\n" +
+                                "        getData();\n");
+                        sbLayout.append("\n    <RelativeLayout\n" +
+                                "        android:layout_width=\"match_parent\"\n" +
+                                "        android:layout_height=\"match_parent\">\n" +
+                                "\n" +
+                                "        <zhouzhuo810.me.zzandframe.ui.widget.ZzLvRefreshLayout\n" +
+                                "            android:id=\"@+id/refresh\"\n" +
+                                "            android:layout_width=\"match_parent\"\n" +
+                                "            android:layout_height=\"wrap_content\">\n" +
+                                "\n" +
+                                "            <ListView\n" +
+                                "                android:id=\"@+id/lv\"\n" +
+                                "                android:layout_width=\"match_parent\"\n" +
+                                "                android:layout_height=\"match_parent\"\n" +
+                                "                android:divider=\"@null\"\n" +
+                                "                android:dividerHeight=\"0dp\"\n" +
+                                "                android:listSelector=\"@color/colorTransparent\" />\n" +
+                                "        </zhouzhuo810.me.zzandframe.ui.widget.ZzLvRefreshLayout>\n" +
+                                "\n" +
+                                "        <TextView\n" +
+                                "            android:id=\"@+id/tv_no_data\"\n" +
+                                "            android:layout_width=\"wrap_content\"\n" +
+                                "            android:layout_height=\"wrap_content\"\n" +
+                                "            android:layout_centerInParent=\"true\"\n" +
+                                "            android:text=\"@string/no_data_text\"\n" +
+                                "            android:textColor=\"@color/colorGrayB\"\n" +
+                                "            android:textSize=\"40px\"\n" +
+                                "            android:visibility=\"gone\" />\n" +
+                                "    </RelativeLayout>\n");
+                        break;
+                    case WidgetEntity.TYPE_SCROLLABLE_LV:
+                        sbImp.append("\nimport "+app.getPackageName()+".ui.widget.ScrollableListView;");
+                        sbDef.append("\n    private ScrollableListView lv_"+widgetEntity.getResId()+";");
+                        sbInit.append("\n        lv_"+widgetEntity.getResId()+" = (ScrollableListView) findViewById(R.id.lv_"+widgetEntity.getResId()+");");
+                        sbLayout.append("\n            <"+app.getPackageName()+".ui.widget.ScrollableListView\n" +
+                                "                android:id=\"@+id/lv_"+widgetEntity.getResId()+"\"\n" +
+                                "                android:layout_width=\"match_parent\"\n" +
+                                "                android:layout_height=\"wrap_content\"\n" +
+                                "                android:divider=\"@null\"\n" +
+                                "                android:dividerHeight=\"0dp\"\n" +
+                                "                android:listSelector=\"@color/colorTransparent\" />\n");
                         break;
                     case WidgetEntity.TYPE_LETTER_RV:
                         String testClazz = "RvTestResult";
