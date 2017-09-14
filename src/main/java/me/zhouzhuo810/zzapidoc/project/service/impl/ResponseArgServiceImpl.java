@@ -163,6 +163,7 @@ public class ResponseArgServiceImpl extends BaseServiceImpl<ResponseArgEntity> i
                 map.put("createTime", DataUtils.formatDate(arg.getCreateTime()));
                 map.put("createUserName", arg.getCreateUserName());
                 map.put("interfaceId", arg.getInterfaceId());
+                map.put("isGlobal", arg.getGlobal());
                 result.add(map.build());
             }
         }
@@ -178,6 +179,7 @@ public class ResponseArgServiceImpl extends BaseServiceImpl<ResponseArgEntity> i
                 map.put("createTime", DataUtils.formatDate(arg.getCreateTime()));
                 map.put("createUserName", arg.getCreateUserName());
                 map.put("interfaceId", arg.getInterfaceId());
+                map.put("isGlobal", arg.getGlobal());
                 result.add(map.build());
             }
         }
