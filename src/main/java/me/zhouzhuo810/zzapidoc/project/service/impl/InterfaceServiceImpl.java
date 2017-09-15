@@ -1359,7 +1359,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                     e.printStackTrace();
                     LOGGER.error("PDF ERROR", e);
                 }
-                String realFileName = System.currentTimeMillis() + ".pdf";
+                String realFileName = new String(project.getName().getBytes("UTF-8"), "iso-8859-1")+"_"+System.currentTimeMillis()%1000 + ".pdf";
                 String filePath = mPath + File.separator + realFileName;
                 BaseFont bfChinese = BaseFont.createFont(fontPath + "SIMYOU.TTF", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
                 Font fontChinese = new Font(bfChinese, 12, Font.NORMAL);
@@ -1438,7 +1438,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                                 addSmallTitle(document, "返回示例", fontChinese);
                                 addTextLine(document, "\n", null);
                                 fontChinese.setStyle(Font.NORMAL);
-                                addTextLine(document, entity.getExample() == null ? "" : entity.getExample(), null);
+                                addTextLine(document, entity.getExample() == null ? "" : entity.getExample(), fontChinese);
 
                             }
                         }
