@@ -165,6 +165,7 @@ public class RequestArgServiceImpl extends BaseServiceImpl<RequestArgEntity> imp
                 map.put("pid", arg.getPid());
                 map.put("defValue", arg.getDefaultValue() == null ? "" : arg.getDefaultValue());
                 map.put("require", arg.getRequire() == null ? true : arg.getRequire());
+                map.put("global", arg.getGlobal() == null ? false : arg.getGlobal());
                 map.put("type", arg.getTypeId());
                 map.put("createTime", DataUtils.formatDate(arg.getCreateTime()));
                 map.put("createUserName", arg.getCreateUserName());
@@ -181,6 +182,7 @@ public class RequestArgServiceImpl extends BaseServiceImpl<RequestArgEntity> imp
                 map.put("pid", arg.getPid());
                 map.put("defValue", arg.getDefaultValue() == null ? "" : arg.getDefaultValue());
                 map.put("require", arg.getRequire() == null ? true : arg.getRequire());
+                map.put("global", arg.getGlobal() == null ? false : arg.getGlobal());
                 map.put("type", arg.getTypeId());
                 map.put("createTime", DataUtils.formatDate(arg.getCreateTime()));
                 map.put("createUserName", arg.getCreateUserName());
@@ -207,6 +209,7 @@ public class RequestArgServiceImpl extends BaseServiceImpl<RequestArgEntity> imp
         map.put("note", arg.getNote());
         map.put("defValue", arg.getDefaultValue() == null ? "" : arg.getDefaultValue());
         map.put("require", arg.getRequire() == null ? true : arg.getRequire());;
+        map.put("global", arg.getGlobal() == null ? false : arg.getGlobal());
         map.put("pid", arg.getPid());
         map.put("type", arg.getTypeId());
         map.put("createTime", DataUtils.formatDate(arg.getCreateTime()));
