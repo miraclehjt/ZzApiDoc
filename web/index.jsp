@@ -12,11 +12,6 @@
     <link rel="stylesheet" type="text/css" href="themes/icon.css">
     <script type="text/javascript">
 
-        /*关闭对话框*/
-        function closeDialog() {
-            $('#dlg').dialog('close');
-        }
-
         /*提交表单*/
         function submitForm() {
             $('#ff').form('submit', {
@@ -30,16 +25,10 @@
                         localStorage.userId = json.data.id;
                         self.location = 'main.jsp';
                     } else {
-                        showDialog(json.msg);
+                        showErrorMsg(json.msg);
                     }
                 }
             });
-        }
-
-        /*显示对话框*/
-        function showDialog(msg) {
-            $('#dlg').html(msg);
-            $('#dlg').dialog('open');
         }
 
         /*清空表单*/
@@ -47,10 +36,10 @@
             $('#ff').form('clear');
         }
 
-        /*默认关闭对话框*/
-        $(document).ready(function () {
-            closeDialog();
-        });
+        function showErrorMsg(msg) {
+            $.messager.alert("登陆", msg, 'error');
+        }
+
     </script>
 </head>
 
@@ -62,15 +51,13 @@
             <input class="easyui-textbox" name="phone" style="width:100%" data-options="label:'手机号:',required:true">
         </div>
         <div style="margin-bottom:20px">
-            <input class="easyui-passwordbox" name="password" style="width:100%" data-options="label:'密码:',required:true">
+            <input class="easyui-passwordbox" name="password" style="width:100%"
+                   data-options="label:'密码:',required:true">
         </div>
     </form>
     <div style="text-align:center;padding:5px 0">
         <a href="javascript:void(0)" class="easyui-linkbutton" onclick="submitForm()" style="width:80px">登陆</a>
         <a href="javascript:void(0)" class="easyui-linkbutton" onclick="clearForm()" style="width:80px">重置</a>
-    </div>
-
-    <div id="dlg" class="easyui-dialog" title="登陆" style="width:400px;height:200px;padding:10px">
     </div>
 </div>
 </body>
