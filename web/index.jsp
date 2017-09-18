@@ -6,25 +6,72 @@
     <meta charset="utf-8"/>
     <title>登陆页面</title>
     <link rel="stylesheet" type="text/css" href="css/common.css"/>
-    <script src="js/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script type="text/javascript" src="js/jquery.easyui.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="themes/icon.css">
     <script type="text/javascript">
 
+        /*关闭对话框*/
+        function closeDialog() {
+            $('#dlg').dialog('close');
+        }
+
+        /*提交表单*/
+        function submitForm() {
+            $('#ff').form('submit', {
+                url: "v1/user/userLogin",
+                onSubmit: function () {
+                    return $(this).form('enableValidation').form('validate');
+                },
+                success: function (data) {
+                    var json = JSON.parse(data);
+                    if (json.code == 1) {
+                        localStorage.userId = json.data.id;
+                        self.location = 'main.jsp';
+                    } else {
+                        showDialog(json.msg);
+                    }
+                }
+            });
+        }
+
+        /*显示对话框*/
+        function showDialog(msg) {
+            $('#dlg').html(msg);
+            $('#dlg').dialog('open');
+        }
+
+        /*清空表单*/
+        function clearForm() {
+            $('#ff').form('clear');
+        }
+
+        /*默认关闭对话框*/
+        $(document).ready(function () {
+            closeDialog();
+        });
     </script>
 </head>
 
 <body>
-<div class="login_box">
-    <h2>小周接口文档管理</h2>
-    <div class="login_username">
-        手机号：
-        <input type="text" name="username" id="et_username" value=""/>
+
+<div class="easyui-panel" title="小周接口文档管理" style="width:100%;max-width:400px;padding:30px 60px;">
+    <form id="ff" method="post">
+        <div style="margin-bottom:20px">
+            <input class="easyui-textbox" name="phone" style="width:100%" data-options="label:'手机号:',required:true">
+        </div>
+        <div style="margin-bottom:20px">
+            <input class="easyui-passwordbox" name="password" style="width:100%" data-options="label:'密码:',required:true">
+        </div>
+    </form>
+    <div style="text-align:center;padding:5px 0">
+        <a href="javascript:void(0)" class="easyui-linkbutton" onclick="submitForm()" style="width:80px">登陆</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" onclick="clearForm()" style="width:80px">重置</a>
     </div>
-    <div class="login_password">
-        密码：
-        <input type="text" name="password" id="et_password" value=""/>
+
+    <div id="dlg" class="easyui-dialog" title="登陆" style="width:400px;height:200px;padding:10px">
     </div>
-    <%--<input type="button" name="" id="login_btn" value="登陆" class="submit_btn"/>--%>
-    <button id="login_btn">登陆</button>
 </div>
 </body>
 

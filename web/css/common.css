@@ -6,15 +6,6 @@ body {
 	background: #f7f7f7;
 }
 
-.login_box {
-	width: 350px;
-	padding-top: 30px;
-	padding-bottom: 20px;
-	text-align: center;
-	margin-top: 200px;
-	background: #FFFFFF;
-}
-
 .login_username {
 	line-height: 100px;
 }
