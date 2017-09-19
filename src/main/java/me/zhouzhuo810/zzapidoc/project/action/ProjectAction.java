@@ -2,6 +2,7 @@ package me.zhouzhuo810.zzapidoc.project.action;
 
 import me.zhouzhuo810.zzapidoc.common.action.BaseController;
 import me.zhouzhuo810.zzapidoc.common.result.BaseResult;
+import me.zhouzhuo810.zzapidoc.common.result.WebResult;
 import me.zhouzhuo810.zzapidoc.common.service.BaseService;
 import me.zhouzhuo810.zzapidoc.project.entity.ProjectEntity;
 import me.zhouzhuo810.zzapidoc.project.service.ProjectService;
@@ -68,6 +69,14 @@ public class ProjectAction extends BaseController<ProjectEntity> {
             @RequestParam(value = "userId") String userId
     ) {
         return getService().getAllProject(userId);
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/getAllProjectWeb", method = RequestMethod.GET)
+    public WebResult getAllProjectWeb(
+            @RequestParam(value = "userId") String userId
+    ) {
+        return getService().getAllProjectWeb(userId);
     }
 
     @ResponseBody

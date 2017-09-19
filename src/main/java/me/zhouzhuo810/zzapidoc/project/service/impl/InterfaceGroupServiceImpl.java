@@ -2,6 +2,7 @@ package me.zhouzhuo810.zzapidoc.project.service.impl;
 
 import me.zhouzhuo810.zzapidoc.common.dao.BaseDao;
 import me.zhouzhuo810.zzapidoc.common.result.BaseResult;
+import me.zhouzhuo810.zzapidoc.common.result.WebResult;
 import me.zhouzhuo810.zzapidoc.common.service.impl.BaseServiceImpl;
 import me.zhouzhuo810.zzapidoc.common.utils.DataUtils;
 import me.zhouzhuo810.zzapidoc.common.utils.MapUtils;
@@ -134,5 +135,30 @@ public class InterfaceGroupServiceImpl extends BaseServiceImpl<InterfaceGroupEnt
             result.add(map.build());
         }
         return new BaseResult(1, "ok", result);
+    }
+
+    @Override
+    public WebResult getAllInterfaceGroupWeb(String projectId, String userId) {
+        UserEntity user = mUserService.get(userId);
+        if (user == null) {
+            return new WebResult(0);
+        }
+        List<InterfaceGroupEntity> groups = getBaseDao().executeCriteria(InterfaceUtils.getInterfaceByProjectId(projectId));
+        if (groups == null) {
+            return new WebResult(0);
+        }
+        List<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
+        for (InterfaceGroupEntity group : groups) {
+            MapUtils map = new MapUtils();
+            map.put("id", group.getId());
+            map.put("name", group.getName());
+            map.put("ip", group.getIp());
+            map.put("interfaceNo", group.getInterfaceNo());
+            map.put("createTime", DataUtils.formatDate(group.getCreateTime()));
+            map.put("createUserName", group.getCreateUserName());
+            map.put("createUserId", group.getCreateUserID());
+            result.add(map.build());
+        }
+        return new WebResult(groups.size(), result);
     }
 }

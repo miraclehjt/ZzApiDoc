@@ -2,6 +2,7 @@ package me.zhouzhuo810.zzapidoc.project.action;
 
 import me.zhouzhuo810.zzapidoc.common.action.BaseController;
 import me.zhouzhuo810.zzapidoc.common.result.BaseResult;
+import me.zhouzhuo810.zzapidoc.common.result.WebResult;
 import me.zhouzhuo810.zzapidoc.common.service.BaseService;
 import me.zhouzhuo810.zzapidoc.project.entity.InterfaceGroupEntity;
 import me.zhouzhuo810.zzapidoc.project.service.InterfaceGroupService;
@@ -47,6 +48,15 @@ public class InterfaceGroupAction extends BaseController<InterfaceGroupEntity> {
             @RequestParam(value = "userId") String userId
     ) {
         return getService().getAllInterfaceGroup(projectId, userId);
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/getAllInterfaceGroupWeb", method = RequestMethod.GET)
+    public WebResult getAllInterfaceGroupWeb(
+            @RequestParam(value = "projectId") String projectId,
+            @RequestParam(value = "userId") String userId
+    ) {
+        return getService().getAllInterfaceGroupWeb(projectId, userId);
     }
 
     @ResponseBody

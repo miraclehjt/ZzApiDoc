@@ -1,6 +1,7 @@
 package me.zhouzhuo810.zzapidoc.project.service;
 
 import me.zhouzhuo810.zzapidoc.common.result.BaseResult;
+import me.zhouzhuo810.zzapidoc.common.result.WebResult;
 import me.zhouzhuo810.zzapidoc.common.service.BaseService;
 import me.zhouzhuo810.zzapidoc.project.entity.ProjectEntity;
 import me.zhouzhuo810.zzapidoc.project.entity.RequestArgEntity;
@@ -20,6 +21,8 @@ public interface ProjectService extends BaseService<ProjectEntity> {
     BaseResult updateProject(String projectId, String name, String note, String property, String userId);
 
     BaseResult getAllProject(String userId);
+
+    WebResult getAllProjectWeb(String userId);
 
     BaseResult getProjectDetails(String projectId, String userId);
 

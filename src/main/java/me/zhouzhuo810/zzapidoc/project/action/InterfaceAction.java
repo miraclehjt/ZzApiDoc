@@ -2,6 +2,7 @@ package me.zhouzhuo810.zzapidoc.project.action;
 
 import me.zhouzhuo810.zzapidoc.common.action.BaseController;
 import me.zhouzhuo810.zzapidoc.common.result.BaseResult;
+import me.zhouzhuo810.zzapidoc.common.result.WebResult;
 import me.zhouzhuo810.zzapidoc.common.service.BaseService;
 import me.zhouzhuo810.zzapidoc.project.entity.InterfaceEntity;
 import me.zhouzhuo810.zzapidoc.project.entity.ProjectEntity;
@@ -87,6 +88,7 @@ public class InterfaceAction extends BaseController<InterfaceEntity> {
         return getService().addInterface(name, path, projectId, groupId, httpMethodId, note, userId, requestArgs, responseArgs);
     }
 
+
     @ResponseBody
     @RequestMapping(value = "/updateInterface", method = RequestMethod.POST)
     public BaseResult updateInterface(
@@ -131,6 +133,16 @@ public class InterfaceAction extends BaseController<InterfaceEntity> {
             @RequestParam(value = "userId") String userId
     ) {
         return getService().getInterfaceByGroupId(projectId, groupId, userId);
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/getInterfaceByGroupIdWeb", method = RequestMethod.GET)
+    public WebResult getInterfaceByGroupIdWeb(
+            @RequestParam(value = "projectId") String projectId,
+            @RequestParam(value = "groupId") String groupId,
+            @RequestParam(value = "userId") String userId
+    ) {
+        return getService().getInterfaceByGroupIdWeb(projectId, groupId, userId);
     }
 
 

@@ -7,6 +7,7 @@ import me.zhouzhuo810.zzapidoc.cache.service.CacheService;
 import me.zhouzhuo810.zzapidoc.common.dao.BaseDao;
 import me.zhouzhuo810.zzapidoc.common.entity.BaseEntity;
 import me.zhouzhuo810.zzapidoc.common.result.BaseResult;
+import me.zhouzhuo810.zzapidoc.common.result.WebResult;
 import me.zhouzhuo810.zzapidoc.common.service.impl.BaseServiceImpl;
 import me.zhouzhuo810.zzapidoc.common.utils.DataUtils;
 import me.zhouzhuo810.zzapidoc.common.utils.MapUtils;
@@ -335,6 +336,46 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
             result.add(map.build());
         }
         return new BaseResult(1, "ok", result);
+    }
+
+    @Override
+    public WebResult getInterfaceByGroupIdWeb(String projectId, String groupId, String userId) {
+        UserEntity user = mUserService.get(userId);
+        if (user == null) {
+            return new WebResult(0);
+        }
+        InterfaceGroupEntity group = mInterfaceGroupService.get(groupId);
+        if (group == null) {
+            return new WebResult(0);
+        }
+        List<InterfaceEntity> list = getBaseDao().executeCriteria(InterfaceUtils.getInterfaceByGroupId(groupId));
+        List<RequestHeaderEntity> globalRequestHeaders = mRequestHeaderService.getGlobalRequestHeaders(projectId);
+        int globalHeadSize = globalRequestHeaders == null ? 0 : globalRequestHeaders.size();
+        List<RequestArgEntity> globalRequestArgs = mRequestArgService.getGlobalRequestArgs(projectId);
+        int globalReqSize = globalRequestArgs == null ? 0 : globalRequestArgs.size();
+        List<ResponseArgEntity> globalResponseArgs = mResponseArgService.getGlobalResponseArgs(projectId);
+        int globalResSize = globalResponseArgs == null ? 0 : globalResponseArgs.size();
+        if (list == null) {
+            return new WebResult(0);
+        }
+        List<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
+        for (InterfaceEntity entity : list) {
+            MapUtils map = new MapUtils();
+            map.put("id", entity.getId());
+            map.put("name", entity.getName());
+            map.put("method", entity.getHttpMethodName());
+            map.put("group", entity.getGroupName());
+            map.put("ip", group.getIp());
+            map.put("path", entity.getPath());
+            map.put("note", entity.getNote() == null ? "" : entity.getNote());
+            map.put("createTime", DataUtils.formatDate(entity.getCreateTime()));
+            map.put("createUserName", entity.getCreateUserName());
+            map.put("requestHeadersNo", entity.getRequestHeadersNo() + globalHeadSize);
+            map.put("requestParamsNo", entity.getRequestParamsNo() + globalReqSize);
+            map.put("responseParamsNo", entity.getResponseParamsNo() + globalResSize);
+            result.add(map.build());
+        }
+        return new WebResult(list.size(), result);
     }
 
     @Override

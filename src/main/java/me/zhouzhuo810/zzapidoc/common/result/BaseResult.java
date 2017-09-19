@@ -10,6 +10,7 @@ public class BaseResult {
     private int code;
     private String msg;
 
+
     public BaseResult(int code, String msg) {
         this(code,msg, new ArrayList<String>());
     }

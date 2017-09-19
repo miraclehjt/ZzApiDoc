@@ -1,6 +1,7 @@
 package me.zhouzhuo810.zzapidoc.project.service;
 
 import me.zhouzhuo810.zzapidoc.common.result.BaseResult;
+import me.zhouzhuo810.zzapidoc.common.result.WebResult;
 import me.zhouzhuo810.zzapidoc.common.service.BaseService;
 import me.zhouzhuo810.zzapidoc.project.entity.InterfaceGroupEntity;
 
@@ -16,4 +17,6 @@ public interface InterfaceGroupService extends BaseService<InterfaceGroupEntity>
     BaseResult deleteInterfaceGroup(String id, String userId);
 
     BaseResult getAllInterfaceGroup(String projectId, String userId);
+
+    WebResult getAllInterfaceGroupWeb(String projectId, String userId);
 }
