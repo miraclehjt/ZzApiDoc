@@ -66,4 +66,15 @@ public class ActivityAction extends BaseController<ActivityEntity> {
     ) {
         return getBaseService().deleteActivity(id, userId);
     }
+
+
+    @ResponseBody
+    @RequestMapping(value = "/previewUI", method = RequestMethod.POST)
+    public BaseResult previewUI(
+            @RequestParam(value = "userId") String userId,
+            @RequestParam(value = "id") String id
+    ) {
+        return getBaseService().previewUI(id, userId);
+    }
+
 }

@@ -4,8 +4,12 @@ import me.zhouzhuo810.zzapidoc.android.dao.ActivityDao;
 import me.zhouzhuo810.zzapidoc.android.dao.ActivityDao;
 import me.zhouzhuo810.zzapidoc.android.entity.ActivityEntity;
 import me.zhouzhuo810.zzapidoc.android.entity.ActivityEntity;
+import me.zhouzhuo810.zzapidoc.android.entity.ApplicationEntity;
+import me.zhouzhuo810.zzapidoc.android.entity.WidgetEntity;
 import me.zhouzhuo810.zzapidoc.android.service.ActivityService;
 import me.zhouzhuo810.zzapidoc.android.service.ActivityService;
+import me.zhouzhuo810.zzapidoc.android.service.ApplicationService;
+import me.zhouzhuo810.zzapidoc.android.service.WidgetService;
 import me.zhouzhuo810.zzapidoc.common.dao.BaseDao;
 import me.zhouzhuo810.zzapidoc.common.entity.BaseEntity;
 import me.zhouzhuo810.zzapidoc.common.result.BaseResult;
@@ -23,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -34,6 +39,13 @@ public class ActivityServiceImpl extends BaseServiceImpl<ActivityEntity> impleme
 
     @Resource(name = "userServiceImpl")
     private UserService mUserService;
+
+    @Resource(name = "widgetServiceImpl")
+    private WidgetService mWidgetService;
+
+    @Resource(name = "applicationServiceImpl")
+    private ApplicationService mApplicationService;
+
 
     @Override
     @Resource(name = "activityDaoImpl")
@@ -90,7 +102,7 @@ public class ActivityServiceImpl extends BaseServiceImpl<ActivityEntity> impleme
         }
         ActivityEntity entity = getBaseDao().get(id);
         if (entity == null) {
-            return new BaseResult(0, "应用不存在");
+            return new BaseResult(0, "Activity不存在");
         }
         entity.setDeleteFlag(BaseEntity.DELETE_FLAG_YES);
         try {
@@ -101,6 +113,97 @@ public class ActivityServiceImpl extends BaseServiceImpl<ActivityEntity> impleme
             return new BaseResult(0, "删除失败");
         }
     }
+
+    @Override
+    public BaseResult previewUI(String id, String userId) {
+        UserEntity user = mUserService.get(userId);
+        if (user == null) {
+            return new BaseResult(0, "用户不合法", new HashMap<String, String>());
+        }
+        ActivityEntity entity = getBaseDao().get(id);
+        if (entity == null) {
+            return new BaseResult(0, "Activity不存在", new HashMap<String, String>());
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append("<!DOCTYPE html>\n" +
+                "<html lang=\"en\">\n" +
+                "<head>\n" +
+                "\t<meta charset=\"UTF-8\">\n" +
+                "\t<title>预览</title>\n" +
+                "\t<style>\n" +
+                "\t* {\n" +
+                "\t\tmargin: 0 auto;\n" +
+                "\t\ttext-align: center;\n" +
+                "\t}\n" +
+                "\t</style>\n" +
+                "</head>\n" +
+                "\n" +
+                "<body>");
+
+        generateChildUI(entity, sb);
+
+        sb.append("</body>\n" +
+                "</html>");
+
+        MapUtils map = new MapUtils();
+        map.put("content", sb.toString());
+        return new BaseResult(1, "ok", map.build());
+    }
+
+    private void generateChildUI(ActivityEntity entity, StringBuilder sb) {
+        String applicationId = entity.getApplicationId();
+        ApplicationEntity applicationEntity = mApplicationService.get(applicationId);
+        switch (entity.getType()) {
+            case ActivityEntity.TYPE_EMPTY_ACT:
+                generateWidgetUI(entity.getId(), applicationEntity, "0", sb);
+                break;
+        }
+    }
+
+    private void generateWidgetUI(String relativeId, ApplicationEntity app, String pid, StringBuilder sb) {
+        List<WidgetEntity> widgetEntities = mWidgetService.executeCriteria(new Criterion[]{
+                Restrictions.eq("deleteFlag", BaseEntity.DELETE_FLAG_NO),
+                Restrictions.eq("pid", pid),
+                Restrictions.eq("relativeId", relativeId)
+        });
+
+        if (widgetEntities != null && widgetEntities.size() > 0) {
+            for (WidgetEntity widgetEntity : widgetEntities) {
+                switch (widgetEntity.getType()) {
+                    case WidgetEntity.TYPE_TITLE_BAR:
+                        sb.append("<div class=\"title-bar\" style=\"width:100%;height:100px;line-height:100px;background:" + app.getColorMain() + ";font-size:40px;color:#fff;\">\n" +
+                                "\t" + widgetEntity.getTitle() + "\n" +
+                                "</div>");
+                        break;
+                    case WidgetEntity.TYPE_UNDERLINE_EDIT_ITEM:
+                        sb.append("\n<input type=\"text\" style=\"font-size:20px;color:#00f;width:94%;margin-top:20px;margin-bottom:20px;line-height:80px;height:80px;\" >\n");
+                        break;
+                    case WidgetEntity.TYPE_TITLE_EDIT_ITEM:
+                        sb.append("\n<div>\n" +
+                                "\t<label style=\"width:10%;font-size:26px;color:#000;margin-right:30px;\">" + widgetEntity.getTitle() + "</label>\n" +
+                                "\t<input type=\"text\" style=\"font-size:20px;color:#00f;width:84%;margin-top:20px;margin-bottom:20px;line-height:80px;height:80px;\" >\n" +
+                                "</div>\n");
+                        break;
+                    case WidgetEntity.TYPE_SETTING_ITEM:
+                        sb.append("\n<hr>\n" +
+                                "<div style=\"width:100%;height:90px;line-height:90px;text-align:right;\">\n" +
+                                "\t<label style=\"font-size:26px;color:#000;margin-right:1550px;\">用户名</label>\n" +
+                                "\t<img src=\"../../../res/drawable/more.png\" style=\"width:50px;height:50px;margin-right:100px;\" >\n" +
+                                "</div>\n" +
+                                "<hr>\n");
+                        break;
+                    case WidgetEntity.TYPE_SUBMIT_BTN_ITEM:
+                        sb.append("\n<button style=\"width:94%;height:90px;background:" + app.getColorMain() + ";font-size:30px;color:#fff;margin-top:20px;margin-bottom:20px;\">提交</button>\n");
+                        break;
+                    case WidgetEntity.TYPE_EXIT_BTN_ITEM:
+                        sb.append("\n<button style=\"width:94%;height:90px;background:#d44a4a;font-size:30px;color:#fff;margin-top:20px;margin-bottom:20px;\">退出</button>\n");
+                        break;
+                }
+                generateWidgetUI(relativeId, app, widgetEntity.getId(), sb);
+            }
+        }
+    }
+
 
     @Override
     public BaseResult getAllMyActivity(String appId, String userId) {

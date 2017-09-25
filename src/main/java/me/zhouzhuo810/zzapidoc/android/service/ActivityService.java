@@ -19,5 +19,7 @@ public interface ActivityService extends BaseService<ActivityEntity> {
 
     BaseResult deleteActivity(String id, String userId);
 
+    BaseResult previewUI(String id, String userId);
+
     BaseResult getAllMyActivity(String appId, String userId);
 }
