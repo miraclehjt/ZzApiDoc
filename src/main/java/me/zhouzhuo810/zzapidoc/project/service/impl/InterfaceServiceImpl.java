@@ -908,7 +908,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                             .key("requestMethod").value(entity.getHttpMethodName())
                             .key("requestHeaders").value(headersToJson(entity.getId()))
                             .key("url").value(entity.getPath())
-                            .key("description").value(entity.getNote() == null ? "" : entity.getNote());
+                            .key("description").value((entity.getName() == null ? "" : entity.getName())+(entity.getNote() == null ? "" : "("+entity.getNote()+")"));
 
                     /*请求参数*/
                     stringer.key("requestArgs").value(requestToJson(entity.getId(), "0"));
