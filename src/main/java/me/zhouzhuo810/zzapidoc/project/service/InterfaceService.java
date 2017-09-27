@@ -37,4 +37,6 @@ public interface InterfaceService extends BaseService<InterfaceEntity> {
     BaseResult generateEmptyExample(String interfaceId, String userId);
 
     String convertToJson(ProjectEntity project);
+
+    BaseResult setTestFinish(String interfaceId, String userId);
 }

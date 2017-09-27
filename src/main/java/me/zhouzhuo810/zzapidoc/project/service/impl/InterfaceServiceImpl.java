@@ -42,10 +42,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by admin on 2017/7/22.
@@ -207,6 +205,27 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
     }
 
     @Override
+    public BaseResult setTestFinish(String interfaceId, String userId) {
+        UserEntity user = mUserService.get(userId);
+        if (user == null)
+            return new BaseResult(0, "用户不合法！");
+        InterfaceEntity entity = getBaseDao().get(interfaceId);
+        if (entity == null) {
+            return new BaseResult(0, "该接口不存在或已被删除！");
+        }
+        entity.setTest(true);
+        entity.setTestTime(new Date());
+        entity.setTestUserId(userId);
+        try {
+            getBaseDao().update(entity);
+            return new BaseResult(1, "保存成功！");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new BaseResult(0, "保存失败！");
+        }
+    }
+
+    @Override
     public BaseResult updateInterface(String interfaceId, String name, String path, String projectId, String groupId, String httpMethodId,
                                       String note, String userId, String requestArgs, String responseArgs) {
         UserEntity user = mUserService.get(userId);
@@ -327,6 +346,8 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
             map.put("group", entity.getGroupName());
             map.put("ip", group.getIp());
             map.put("path", entity.getPath());
+            map.put("testUserName", entity.getTestUserName());
+            map.put("isTest", entity.getTest() == null ? false : entity.getTest());
             map.put("note", entity.getNote() == null ? "" : entity.getNote());
             map.put("createTime", DataUtils.formatDate(entity.getCreateTime()));
             map.put("createUserName", entity.getCreateUserName());
@@ -367,6 +388,8 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
             map.put("group", entity.getGroupName());
             map.put("ip", group.getIp());
             map.put("path", entity.getPath());
+            map.put("testUserName", entity.getTestUserName());
+            map.put("isTest", entity.getTest() == null ? false : entity.getTest());
             map.put("note", entity.getNote() == null ? "" : entity.getNote());
             map.put("createTime", DataUtils.formatDate(entity.getCreateTime()));
             map.put("createUserName", entity.getCreateUserName());
@@ -394,6 +417,8 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
         map.put("path", entity.getPath());
         map.put("groupName", entity.getGroupName());
         map.put("note", entity.getNote() == null ? "" : entity.getNote());
+        map.put("testUserName", entity.getTestUserName());
+        map.put("isTest", entity.getTest() == null ? false : entity.getTest());
         map.put("httpMethod", entity.getHttpMethodName());
         map.put("projectName", entity.getProjectName());
         map.put("example", entity.getExample());
@@ -935,6 +960,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
         stringer.endObject();
         return stringer.toString();
     }
+
 
     private String headersToJson(String interfaceId) {
         JSONStringer stringer = new JSONStringer();

@@ -3,9 +3,8 @@ package me.zhouzhuo810.zzapidoc.project.entity;
 import me.zhouzhuo810.zzapidoc.common.entity.BaseEntity;
 import org.hibernate.annotations.Formula;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.util.Date;
 
 /**
  * 接口
@@ -41,6 +40,48 @@ public class InterfaceEntity extends BaseEntity {
     private int requestParamsNo;
     @Formula("(SELECT count(*) FROM response_args r WHERE r.InterfaceId = ID AND r.DelFlag = 0)")
     private int responseParamsNo;
+    @Column(name = "IsTest")
+    private Boolean isTest;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "TestTime")
+    private Date testTime;
+    @Column(name = "TestUserId")
+    private String testUserId;
+    @Formula("(SELECT u.Name FROM user u WHERE u.ID = TestUserId)")
+    private String testUserName;
+
+    public String getTestUserId() {
+        return testUserId;
+    }
+
+    public void setTestUserId(String testUserId) {
+        this.testUserId = testUserId;
+    }
+
+    public String getTestUserName() {
+        return testUserName;
+    }
+
+    public void setTestUserName(String testUserName) {
+        this.testUserName = testUserName;
+    }
+
+    public Date getTestTime() {
+        return testTime;
+    }
+
+    public void setTestTime(Date testTime) {
+        this.testTime = testTime;
+    }
+
+    public Boolean getTest() {
+        return isTest;
+    }
+
+    public void setTest(Boolean test) {
+        isTest = test;
+    }
 
     public int getRequestHeadersNo() {
         return requestHeadersNo;
