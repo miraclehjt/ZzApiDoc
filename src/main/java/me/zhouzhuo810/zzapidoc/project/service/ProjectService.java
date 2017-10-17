@@ -14,11 +14,11 @@ import java.util.List;
  */
 public interface ProjectService extends BaseService<ProjectEntity> {
 
-    BaseResult addProject(String name, String note, String property, String userId);
+    BaseResult addProject(String name, String note, String property, String packageName, String userId);
 
     BaseResult deleteProject(String id, String userId);
 
-    BaseResult updateProject(String projectId, String name, String note, String property, String userId);
+    BaseResult updateProject(String projectId, String name, String note, String property,String packageName, String userId);
 
     BaseResult getAllProject(String userId);
 

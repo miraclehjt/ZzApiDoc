@@ -37,9 +37,10 @@ public class ProjectAction extends BaseController<ProjectEntity> {
             @RequestParam(value = "name") String name,
             @RequestParam(value = "property") String property,
             @RequestParam(value = "note", required = false) String note,
+            @RequestParam(value = "packageName", required = false) String packageName,
             @RequestParam(value = "userId") String userId
     ) {
-        return getService().addProject(name, note, property, userId);
+        return getService().addProject(name, note, property, packageName, userId);
     }
 
     @ResponseBody
@@ -49,9 +50,10 @@ public class ProjectAction extends BaseController<ProjectEntity> {
             @RequestParam(value = "name") String name,
             @RequestParam(value = "property") String property,
             @RequestParam(value = "note", required = false) String note,
+            @RequestParam(value = "packageName", required = false) String packageName,
             @RequestParam(value = "userId") String userId
     ) {
-        return getService().updateProject(projectId, name, note, property, userId);
+        return getService().updateProject(projectId, name, note, property, packageName, userId);
     }
 
     @ResponseBody

@@ -27,8 +27,19 @@ public class ProjectEntity extends BaseEntity {
     @Column(name = "Note",columnDefinition = "TEXT")
     private String note;
 
+    @Column(name = "packageName", length = 100)
+    private String packageName;
+
     @Formula("(SELECT count(*) FROM interfaces i WHERE i.ProjectId = ID AND i.DelFlag = 0)")
     private int interfaceNo;
+
+    public String getPackageName() {
+        return packageName;
+    }
+
+    public void setPackageName(String packageName) {
+        this.packageName = packageName;
+    }
 
     public int getInterfaceNo() {
         return interfaceNo;

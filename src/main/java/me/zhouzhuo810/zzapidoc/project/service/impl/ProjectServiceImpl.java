@@ -65,7 +65,7 @@ public class ProjectServiceImpl extends BaseServiceImpl<ProjectEntity> implement
     }
 
     @Override
-    public BaseResult addProject(String name, String note, String property, String userId) {
+    public BaseResult addProject(String name, String note, String property, String packageName, String userId) {
         UserEntity user = mUserService.get(userId);
         if (user == null) {
             return new BaseResult(0, "用户不合法！", new HashMap<String, String>());
@@ -73,6 +73,7 @@ public class ProjectServiceImpl extends BaseServiceImpl<ProjectEntity> implement
         ProjectEntity entity = new ProjectEntity();
         entity.setName(name);
         entity.setNote(note);
+        entity.setPackageName(packageName);
         entity.setProperty(property);
         entity.setCreateUserID(user.getId());
         entity.setCreateUserName(user.getName());
@@ -111,7 +112,7 @@ public class ProjectServiceImpl extends BaseServiceImpl<ProjectEntity> implement
     }
 
     @Override
-    public BaseResult updateProject(String projectId, String name, String note, String property, String userId) {
+    public BaseResult updateProject(String projectId, String name, String note, String property, String packageName, String userId) {
         UserEntity user = mUserService.get(userId);
         if (user == null) {
             return new BaseResult(0, "用户不合法！", new HashMap<String, String>());
@@ -122,6 +123,7 @@ public class ProjectServiceImpl extends BaseServiceImpl<ProjectEntity> implement
         entity.setName(name);
         entity.setNote(note);
         entity.setProperty(property);
+        entity.setPackageName(packageName);
         entity.setModifyUserID(user.getId());
         entity.setModifyUserName(user.getName());
         try {

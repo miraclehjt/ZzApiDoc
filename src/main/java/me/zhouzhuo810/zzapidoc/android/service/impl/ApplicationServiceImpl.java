@@ -200,6 +200,9 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
 
     }
 
+
+    /***********************************下载 APK 开始**************************************/
+
     @Override
     public ResponseEntity<byte[]> downloadApk(String appId, String userId) {
         UserEntity user = mUserService.get(userId);
@@ -297,6 +300,11 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
         }
         return null;
     }
+
+    /***********************************下载 APK 结束**************************************/
+
+
+    /***********************************下载 项目文件 开始**************************************/
 
     @Override
     public ResponseEntity<byte[]> downloadApplication(String appId, String userId) {
@@ -849,8 +857,8 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 + File.separator + "layout";
 
         String drawablePath = filePath
-                +File.separator+"res"
-                +File.separator+"drawable-hdpi";
+                + File.separator + "res"
+                + File.separator + "drawable-hdpi";
 
         String packagePath = packageName.replace(".", File.separator);
         String javaPath = appDirPath
@@ -904,7 +912,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                     String name = img.getName();
                     String suffix = name.substring(name.lastIndexOf("."));
                     splashImgName = "splash_img";
-                    FileUtil.copyFile(img, new File(drawablePath+File.separator+splashImgName+suffix));
+                    FileUtil.copyFile(img, new File(drawablePath + File.separator + splashImgName + suffix));
                 }
             }
             sbManifest.append("        <activity\n" +
@@ -929,7 +937,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                     "        android:id=\"@+id/iv_pic\"\n" +
                     "        android:layout_width=\"match_parent\"\n" +
                     "        android:layout_height=\"match_parent\"\n" +
-                    "        android:src=\"" + (splashImgName==null?"@mipmap/ic_launcher":"@drawable/"+splashImgName) + "\" />\n" +
+                    "        android:src=\"" + (splashImgName == null ? "@mipmap/ic_launcher" : "@drawable/" + splashImgName) + "\" />\n" +
                     "\n" +
                     "    <TextView\n" +
                     "        android:id=\"@+id/tv_jump\"\n" +
@@ -1846,8 +1854,8 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
 
     private void generateWidgets(String rootPath, String javaPath, ApplicationEntity app) throws IOException {
         /*scrollableListView*/
-        String scrollLvPath = javaPath+File.separator+"ui"+File.separator+"widget";
-        FileUtils.saveFileToPathWithName("package "+app.getPackageName()+".ui.widget;\n" +
+        String scrollLvPath = javaPath + File.separator + "ui" + File.separator + "widget";
+        FileUtils.saveFileToPathWithName("package " + app.getPackageName() + ".ui.widget;\n" +
                 "\n" +
                 "import android.content.Context;\n" +
                 "import android.util.AttributeSet;\n" +
@@ -2524,14 +2532,14 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "        app:titleText=\"@string/" + layoutName + "_text\" />");
                         break;
                     case WidgetEntity.TYPE_SETTING_ITEM:
-                        sbDef.append("\n    private LinearLayout ll_"+widgetEntity.getResId()+";");
-                        sbInit.append("\n        ll_"+widgetEntity.getResId()+" = (LinearLayout) rootView.findViewById(R.id.ll_"+widgetEntity.getResId()+");");
-                        sbStrings.append("\n    <string name=\"si_"+widgetEntity.getResId()+"_text\">"+widgetEntity.getTitle()+"</string>");
+                        sbDef.append("\n    private LinearLayout ll_" + widgetEntity.getResId() + ";");
+                        sbInit.append("\n        ll_" + widgetEntity.getResId() + " = (LinearLayout) rootView.findViewById(R.id.ll_" + widgetEntity.getResId() + ");");
+                        sbStrings.append("\n    <string name=\"si_" + widgetEntity.getResId() + "_text\">" + widgetEntity.getTitle() + "</string>");
                         sbLayout.append("\n            <LinearLayout\n" +
-                                "                android:id=\"@+id/ll_"+widgetEntity.getResId()+"\"\n" +
+                                "                android:id=\"@+id/ll_" + widgetEntity.getResId() + "\"\n" +
                                 "                android:layout_width=\"match_parent\"\n" +
-                                "                android:layout_marginTop=\""+widgetEntity.getMarginTop()+"px\"\n" +
-                                "                android:layout_marginBottom=\""+widgetEntity.getMarginBottom()+"px\"\n"+
+                                "                android:layout_marginTop=\"" + widgetEntity.getMarginTop() + "px\"\n" +
+                                "                android:layout_marginBottom=\"" + widgetEntity.getMarginBottom() + "px\"\n" +
                                 "                android:layout_height=\"@dimen/setting_item_height\"\n" +
                                 "                android:background=\"@drawable/setting_item_bg_selector\"\n" +
                                 "                android:clickable=\"true\"\n" +
@@ -2542,15 +2550,15 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "                    android:layout_width=\"70px\"\n" +
                                 "                    android:layout_height=\"70px\"\n" +
                                 "                    android:layout_marginLeft=\"40px\"\n" +
-                                "                    android:visibility=\""+(widgetEntity.getShowLeftTitleImg()?"visible":"gone")+"\"\n" +
-                                "                    android:src=\"@mipmap/"+logoName+"\" />\n" +
+                                "                    android:visibility=\"" + (widgetEntity.getShowLeftTitleImg() ? "visible" : "gone") + "\"\n" +
+                                "                    android:src=\"@mipmap/" + logoName + "\" />\n" +
                                 "\n" +
                                 "                <TextView\n" +
                                 "                    android:layout_width=\"0dp\"\n" +
                                 "                    android:layout_height=\"wrap_content\"\n" +
                                 "                    android:layout_weight=\"1\"\n" +
-                                "                    android:layout_marginLeft=\"40px\"\n"+
-                                "                    android:text=\"@string/si_"+widgetEntity.getResId()+"_text\"\n" +
+                                "                    android:layout_marginLeft=\"40px\"\n" +
+                                "                    android:text=\"@string/si_" + widgetEntity.getResId() + "_text\"\n" +
                                 "                    android:textColor=\"@color/colorText\"\n" +
                                 "                    android:textSize=\"40px\" />\n" +
                                 "\n" +
@@ -2705,7 +2713,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 sbMethods.append(sbEditInfo.toString());
                                 sbMethods.append("\n        showPd(getString(R.string." + widgetEntity.getResId() + "ing_text), false);\n" +
                                         "        Api.getApi0()\n" +
-                                        "                ."+apiMethod+"(");
+                                        "                ." + apiMethod + "(");
                                 if (requestParamsNo > 0) {
                                     for (int i1 = 0; i1 < requestParamsNo; i1++) {
                                         sbMethods.append("\"\", ");
@@ -2807,7 +2815,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 sbMethods.append(sbEditInfo.toString());
                                 sbMethods.append("\n        showPd(getString(R.string." + widgetEntity.getResId() + "ing_text), false);\n" +
                                         "        Api.getApi0()\n" +
-                                        "                ."+apiMethod+"(");
+                                        "                ." + apiMethod + "(");
                                 if (requestParamsNo > 0) {
                                     for (int i1 = 0; i1 < requestParamsNo; i1++) {
                                         sbMethods.append("\"\", ");
@@ -2874,14 +2882,14 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         break;
                     case WidgetEntity.TYPE_RV:
                         sbImp.append("\nimport android.support.v4.widget.SwipeRefreshLayout;")
-                            .append("\nimport android.support.v7.widget.RecyclerView;")
-                            .append("\nimport zhouzhuo810.me.zzandframe.ui.widget.ZzRvRefreshLayout;");
+                                .append("\nimport android.support.v7.widget.RecyclerView;")
+                                .append("\nimport zhouzhuo810.me.zzandframe.ui.widget.ZzRvRefreshLayout;");
                         sbDef.append("\n    private ZzRvRefreshLayout refresh")
                                 .append("\n    private RecyclerView rv;")
                                 .append("\n    private TextView tvNoData;");
                         sbInit.append("\n        refresh = (ZzRvRefreshLayout) rootView.findViewById(R.id.refresh);")
                                 .append("\n        rv = (RecyclerView) rootView.findViewById(R.id.rv);")
-                                .append("\n        rv.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager."+widgetEntity.getOrientation().toUpperCase()+", false));")
+                                .append("\n        rv.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager." + widgetEntity.getOrientation().toUpperCase() + ", false));")
                                 .append("\n        tvNoData = (TextView) rootView.findViewById(R.id.tv_no_data);");
                         sbEvent.append("\n        titleBar.setOnTitleClickListener(new TitleBar.OnTitleClick() {\n" +
                                 "            @Override\n" +
@@ -3009,11 +3017,11 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "    </RelativeLayout>\n");
                         break;
                     case WidgetEntity.TYPE_SCROLLABLE_LV:
-                        sbImp.append("\nimport "+app.getPackageName()+".ui.widget.ScrollableListView;");
-                        sbDef.append("\n    private ScrollableListView lv_"+widgetEntity.getResId()+";");
-                        sbInit.append("\n        lv_"+widgetEntity.getResId()+" = (ScrollableListView) rootView.findViewById(R.id.lv_"+widgetEntity.getResId()+");");
-                        sbLayout.append("\n            <"+app.getPackageName()+".ui.widget.ScrollableListView\n" +
-                                "                android:id=\"@+id/lv_"+widgetEntity.getResId()+"\"\n" +
+                        sbImp.append("\nimport " + app.getPackageName() + ".ui.widget.ScrollableListView;");
+                        sbDef.append("\n    private ScrollableListView lv_" + widgetEntity.getResId() + ";");
+                        sbInit.append("\n        lv_" + widgetEntity.getResId() + " = (ScrollableListView) rootView.findViewById(R.id.lv_" + widgetEntity.getResId() + ");");
+                        sbLayout.append("\n            <" + app.getPackageName() + ".ui.widget.ScrollableListView\n" +
+                                "                android:id=\"@+id/lv_" + widgetEntity.getResId() + "\"\n" +
                                 "                android:layout_width=\"match_parent\"\n" +
                                 "                android:layout_height=\"wrap_content\"\n" +
                                 "                android:divider=\"@null\"\n" +
@@ -3424,10 +3432,10 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "        android:layout_marginRight=\"" + widgetEntity.getMarginRight() + "px\"\n" +
                                 "        android:layout_marginTop=\"" + widgetEntity.getMarginTop() + "px\"\n" +
                                 "        android:layout_marginBottom=\"" + widgetEntity.getMarginBottom() + "px\"\n" +
-                                "        android:paddingLeft=\""+widgetEntity.getPaddingLeft()+"px\"\n" +
-                                "        android:paddingRight=\""+widgetEntity.getPaddingRight()+"px\"\n" +
-                                "        android:paddingTop=\""+widgetEntity.getPaddingTop()+"px\"\n" +
-                                "        android:paddingBottom=\""+widgetEntity.getPaddingBottom()+"px\"\n"+
+                                "        android:paddingLeft=\"" + widgetEntity.getPaddingLeft() + "px\"\n" +
+                                "        android:paddingRight=\"" + widgetEntity.getPaddingRight() + "px\"\n" +
+                                "        android:paddingTop=\"" + widgetEntity.getPaddingTop() + "px\"\n" +
+                                "        android:paddingBottom=\"" + widgetEntity.getPaddingBottom() + "px\"\n" +
                                 "        android:background=\"" + (widgetEntity.getBackground().length() == 0 ? "@color/colorTransparent" : widgetEntity.getBackground()) + "\"\n" +
                                 (widgetEntity.getWeight() > 0 ? "        android:layout_weight=\"" + widgetEntity.getWeight() + "\"\n" : "") +
                                 "        android:gravity=\"" + (widgetEntity.getGravity() == null ? "center" : widgetEntity.getGravity()) + "\"\n" +
@@ -3441,10 +3449,10 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "        android:layout_marginRight=\"" + widgetEntity.getMarginRight() + "px\"\n" +
                                 "        android:layout_marginTop=\"" + widgetEntity.getMarginTop() + "px\"\n" +
                                 "        android:layout_marginBottom=\"" + widgetEntity.getMarginBottom() + "px\"\n" +
-                                "        android:paddingLeft=\""+widgetEntity.getPaddingLeft()+"px\"\n" +
-                                "        android:paddingRight=\""+widgetEntity.getPaddingRight()+"px\"\n" +
-                                "        android:paddingTop=\""+widgetEntity.getPaddingTop()+"px\"\n" +
-                                "        android:paddingBottom=\""+widgetEntity.getPaddingBottom()+"px\"\n"+
+                                "        android:paddingLeft=\"" + widgetEntity.getPaddingLeft() + "px\"\n" +
+                                "        android:paddingRight=\"" + widgetEntity.getPaddingRight() + "px\"\n" +
+                                "        android:paddingTop=\"" + widgetEntity.getPaddingTop() + "px\"\n" +
+                                "        android:paddingBottom=\"" + widgetEntity.getPaddingBottom() + "px\"\n" +
                                 "        android:background=\"" + (widgetEntity.getBackground().length() == 0 ? "@color/colorTransparent" : widgetEntity.getBackground()) + "\"\n" +
                                 "        android:layout_width=\"" + widthString + "\"\n" +
                                 "        android:layout_height=\"" + heightString + "\">");
@@ -3492,17 +3500,17 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "        android:layout_height=\"" + heightString + "\"\n" +
                                 "        android:hint=\"@string/" + widgetEntity.getResId() + "_tv_hint_text\"\n" +
                                 "        android:text=\"@string/" + widgetEntity.getResId() + "_tv_text\"\n" +
-                                "        android:textColor=\""+widgetEntity.getTextColor()+"\"\n" +
-                                "        android:paddingLeft=\""+widgetEntity.getPaddingLeft()+"px\"\n" +
-                                "        android:paddingRight=\""+widgetEntity.getPaddingRight()+"px\"\n" +
-                                "        android:paddingTop=\""+widgetEntity.getPaddingTop()+"px\"\n" +
-                                "        android:paddingBottom=\""+widgetEntity.getPaddingBottom()+"px\"\n"+
+                                "        android:textColor=\"" + widgetEntity.getTextColor() + "\"\n" +
+                                "        android:paddingLeft=\"" + widgetEntity.getPaddingLeft() + "px\"\n" +
+                                "        android:paddingRight=\"" + widgetEntity.getPaddingRight() + "px\"\n" +
+                                "        android:paddingTop=\"" + widgetEntity.getPaddingTop() + "px\"\n" +
+                                "        android:paddingBottom=\"" + widgetEntity.getPaddingBottom() + "px\"\n" +
                                 "        android:layout_marginLeft=\"" + widgetEntity.getMarginLeft() + "px\"\n" +
                                 "        android:layout_marginRight=\"" + widgetEntity.getMarginRight() + "px\"\n" +
                                 "        android:layout_marginTop=\"" + widgetEntity.getMarginTop() + "px\"\n" +
                                 "        android:layout_marginBottom=\"" + widgetEntity.getMarginBottom() + "px\"\n" +
                                 "        android:gravity=\"" + (widgetEntity.getGravity() == null ? "center" : widgetEntity.getGravity()) + "\"\n" +
-                                "        android:textSize=\""+widgetEntity.getTextSize()+"px\" />");
+                                "        android:textSize=\"" + widgetEntity.getTextSize() + "px\" />");
                         break;
                     case WidgetEntity.TYPE_CHECK_BOX:
                         sbDef.append("\n    private CheckBox cb_" + widgetEntity.getResId() + ";");
@@ -3599,14 +3607,14 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "        app:titleText=\"@string/" + layoutName + "_text\" />");
                         break;
                     case WidgetEntity.TYPE_SETTING_ITEM:
-                        sbDef.append("\n    private LinearLayout ll_"+widgetEntity.getResId()+";");
-                        sbInit.append("\n        ll_"+widgetEntity.getResId()+" = (LinearLayout) findViewById(R.id.ll_"+widgetEntity.getResId()+");");
-                        sbStrings.append("\n    <string name=\"si_"+widgetEntity.getResId()+"_text\">"+widgetEntity.getTitle()+"</string>");
+                        sbDef.append("\n    private LinearLayout ll_" + widgetEntity.getResId() + ";");
+                        sbInit.append("\n        ll_" + widgetEntity.getResId() + " = (LinearLayout) findViewById(R.id.ll_" + widgetEntity.getResId() + ");");
+                        sbStrings.append("\n    <string name=\"si_" + widgetEntity.getResId() + "_text\">" + widgetEntity.getTitle() + "</string>");
                         sbLayout.append("\n            <LinearLayout\n" +
-                                "                android:id=\"@+id/ll_"+widgetEntity.getResId()+"\"\n" +
+                                "                android:id=\"@+id/ll_" + widgetEntity.getResId() + "\"\n" +
                                 "                android:layout_width=\"match_parent\"\n" +
-                                "                android:layout_marginTop=\""+widgetEntity.getMarginTop()+"px\"\n" +
-                                "                android:layout_marginBottom=\""+widgetEntity.getMarginBottom()+"px\"\n"+
+                                "                android:layout_marginTop=\"" + widgetEntity.getMarginTop() + "px\"\n" +
+                                "                android:layout_marginBottom=\"" + widgetEntity.getMarginBottom() + "px\"\n" +
                                 "                android:layout_height=\"@dimen/setting_item_height\"\n" +
                                 "                android:background=\"@drawable/setting_item_bg_selector\"\n" +
                                 "                android:clickable=\"true\"\n" +
@@ -3617,15 +3625,15 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "                    android:layout_width=\"70px\"\n" +
                                 "                    android:layout_height=\"70px\"\n" +
                                 "                    android:layout_marginLeft=\"40px\"\n" +
-                                "                    android:visibility=\""+(widgetEntity.getShowLeftTitleImg()?"visible":"gone")+"\"\n" +
-                                "                    android:src=\"@mipmap/"+logoName+"\" />\n" +
+                                "                    android:visibility=\"" + (widgetEntity.getShowLeftTitleImg() ? "visible" : "gone") + "\"\n" +
+                                "                    android:src=\"@mipmap/" + logoName + "\" />\n" +
                                 "\n" +
                                 "                <TextView\n" +
                                 "                    android:layout_width=\"0dp\"\n" +
                                 "                    android:layout_height=\"wrap_content\"\n" +
                                 "                    android:layout_weight=\"1\"\n" +
-                                "                    android:layout_marginLeft=\"40px\"\n"+
-                                "                    android:text=\"@string/si_"+widgetEntity.getResId()+"_text\"\n" +
+                                "                    android:layout_marginLeft=\"40px\"\n" +
+                                "                    android:text=\"@string/si_" + widgetEntity.getResId() + "_text\"\n" +
                                 "                    android:textColor=\"@color/colorText\"\n" +
                                 "                    android:textSize=\"40px\" />\n" +
                                 "\n" +
@@ -3777,7 +3785,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 sbMethods.append(sbEditInfo.toString());
                                 sbMethods.append("\n        showPd(getString(R.string." + widgetEntity.getResId() + "ing_text), false);\n" +
                                         "        Api.getApi0()\n" +
-                                        "                ."+apiMethod+"(");
+                                        "                ." + apiMethod + "(");
                                 if (requestParamsNo > 0) {
                                     for (int i1 = 0; i1 < requestParamsNo; i1++) {
                                         sbMethods.append("\"\", ");
@@ -3877,7 +3885,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 sbMethods.append(sbEditInfo.toString());
                                 sbMethods.append("\n        showPd(getString(R.string." + widgetEntity.getResId() + "ing_text), false);\n" +
                                         "        Api.getApi0()\n" +
-                                        "                ."+apiMethod+"(");
+                                        "                ." + apiMethod + "(");
                                 if (requestParamsNo > 0) {
                                     for (int i1 = 0; i1 < requestParamsNo; i1++) {
                                         sbMethods.append("\"\", ");
@@ -3949,7 +3957,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 .append("\n    private TextView tvNoData;");
                         sbInit.append("\n        refresh = (ZzRvRefreshLayout) findViewById(R.id.refresh);")
                                 .append("\n        rv = (RecyclerView) findViewById(R.id.rv);")
-                                .append("\n        rv.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager."+widgetEntity.getOrientation().toUpperCase()+", false));")
+                                .append("\n        rv.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager." + widgetEntity.getOrientation().toUpperCase() + ", false));")
                                 .append("\n        tvNoData = (TextView) findViewById(R.id.tv_no_data);");
                         sbEvent.append("\n        titleBar.setOnTitleClickListener(new TitleBar.OnTitleClick() {\n" +
                                 "            @Override\n" +
@@ -4077,11 +4085,11 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "    </RelativeLayout>\n");
                         break;
                     case WidgetEntity.TYPE_SCROLLABLE_LV:
-                        sbImp.append("\nimport "+app.getPackageName()+".ui.widget.ScrollableListView;");
-                        sbDef.append("\n    private ScrollableListView lv_"+widgetEntity.getResId()+";");
-                        sbInit.append("\n        lv_"+widgetEntity.getResId()+" = (ScrollableListView) findViewById(R.id.lv_"+widgetEntity.getResId()+");");
-                        sbLayout.append("\n            <"+app.getPackageName()+".ui.widget.ScrollableListView\n" +
-                                "                android:id=\"@+id/lv_"+widgetEntity.getResId()+"\"\n" +
+                        sbImp.append("\nimport " + app.getPackageName() + ".ui.widget.ScrollableListView;");
+                        sbDef.append("\n    private ScrollableListView lv_" + widgetEntity.getResId() + ";");
+                        sbInit.append("\n        lv_" + widgetEntity.getResId() + " = (ScrollableListView) findViewById(R.id.lv_" + widgetEntity.getResId() + ");");
+                        sbLayout.append("\n            <" + app.getPackageName() + ".ui.widget.ScrollableListView\n" +
+                                "                android:id=\"@+id/lv_" + widgetEntity.getResId() + "\"\n" +
                                 "                android:layout_width=\"match_parent\"\n" +
                                 "                android:layout_height=\"wrap_content\"\n" +
                                 "                android:divider=\"@null\"\n" +
@@ -4493,10 +4501,10 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "        android:layout_marginRight=\"" + widgetEntity.getMarginRight() + "px\"\n" +
                                 "        android:layout_marginTop=\"" + widgetEntity.getMarginTop() + "px\"\n" +
                                 "        android:layout_marginBottom=\"" + widgetEntity.getMarginBottom() + "px\"\n" +
-                                "        android:paddingLeft=\""+widgetEntity.getPaddingLeft()+"px\"\n" +
-                                "        android:paddingRight=\""+widgetEntity.getPaddingRight()+"px\"\n" +
-                                "        android:paddingTop=\""+widgetEntity.getPaddingTop()+"px\"\n" +
-                                "        android:paddingBottom=\""+widgetEntity.getPaddingBottom()+"px\"\n"+
+                                "        android:paddingLeft=\"" + widgetEntity.getPaddingLeft() + "px\"\n" +
+                                "        android:paddingRight=\"" + widgetEntity.getPaddingRight() + "px\"\n" +
+                                "        android:paddingTop=\"" + widgetEntity.getPaddingTop() + "px\"\n" +
+                                "        android:paddingBottom=\"" + widgetEntity.getPaddingBottom() + "px\"\n" +
                                 "        android:background=\"" + (widgetEntity.getBackground().length() == 0 ? "@color/colorTransparent" : widgetEntity.getBackground()) + "\"\n" +
                                 (widgetEntity.getWeight() > 0 ? "        android:layout_weight=\"" + widgetEntity.getWeight() + "\"\n" : "") +
                                 "        android:gravity=\"" + (widgetEntity.getGravity() == null ? "center" : widgetEntity.getGravity()) + "\"\n" +
@@ -4506,10 +4514,10 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         break;
                     case WidgetEntity.TYPE_RELATIVE_LAYOUT:
                         sbLayout.append("\n    <RelativeLayout\n" +
-                                "        android:paddingLeft=\""+widgetEntity.getPaddingLeft()+"px\"\n" +
-                                "        android:paddingRight=\""+widgetEntity.getPaddingRight()+"px\"\n" +
-                                "        android:paddingTop=\""+widgetEntity.getPaddingTop()+"px\"\n" +
-                                "        android:paddingBottom=\""+widgetEntity.getPaddingBottom()+"px\"\n"+
+                                "        android:paddingLeft=\"" + widgetEntity.getPaddingLeft() + "px\"\n" +
+                                "        android:paddingRight=\"" + widgetEntity.getPaddingRight() + "px\"\n" +
+                                "        android:paddingTop=\"" + widgetEntity.getPaddingTop() + "px\"\n" +
+                                "        android:paddingBottom=\"" + widgetEntity.getPaddingBottom() + "px\"\n" +
                                 "        android:layout_marginLeft=\"" + widgetEntity.getMarginLeft() + "px\"\n" +
                                 "        android:layout_marginRight=\"" + widgetEntity.getMarginRight() + "px\"\n" +
                                 "        android:layout_marginTop=\"" + widgetEntity.getMarginTop() + "px\"\n" +
@@ -4524,7 +4532,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         sbDef.append("\n    private ImageView iv_" + widgetEntity.getResId() + ";");
                         sbInit.append("\n        iv_" + widgetEntity.getResId() + " = (ImageView) findViewById(R.id.iv_" + widgetEntity.getResId() + ");");
                         sbLayout.append("\n    <ImageView\n" +
-                                "        android:id=\"@+id/iv_" + widgetEntity .getResId() + "\"\n" +
+                                "        android:id=\"@+id/iv_" + widgetEntity.getResId() + "\"\n" +
                                 "        android:layout_width=\"" + widthString + "\"\n" +
                                 "        android:layout_height=\"" + heightString + "\"\n" +
                                 "        android:layout_marginTop=\"" + widgetEntity.getMarginTop() + "px\"\n" +
@@ -4557,20 +4565,20 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         }
                         sbLayout.append("\n    <TextView\n" +
                                 "        android:id=\"@+id/tv_" + widgetEntity.getResId() + "\"\n" +
-                                "        android:layout_width=\""+widthString+"\"\n" +
-                                "        android:layout_height=\""+heightString+"\"\n" +
+                                "        android:layout_width=\"" + widthString + "\"\n" +
+                                "        android:layout_height=\"" + heightString + "\"\n" +
                                 "        android:hint=\"@string/" + widgetEntity.getResId() + "_tv_hint_text\"\n" +
                                 "        android:text=\"@string/" + widgetEntity.getResId() + "_tv_text\"\n" +
-                                "        android:paddingLeft=\""+widgetEntity.getPaddingLeft()+"px\"\n" +
-                                "        android:paddingRight=\""+widgetEntity.getPaddingRight()+"px\"\n" +
-                                "        android:paddingTop=\""+widgetEntity.getPaddingTop()+"px\"\n" +
-                                "        android:paddingBottom=\""+widgetEntity.getPaddingBottom()+"px\"\n"+
+                                "        android:paddingLeft=\"" + widgetEntity.getPaddingLeft() + "px\"\n" +
+                                "        android:paddingRight=\"" + widgetEntity.getPaddingRight() + "px\"\n" +
+                                "        android:paddingTop=\"" + widgetEntity.getPaddingTop() + "px\"\n" +
+                                "        android:paddingBottom=\"" + widgetEntity.getPaddingBottom() + "px\"\n" +
                                 "        android:layout_marginLeft=\"" + widgetEntity.getMarginLeft() + "px\"\n" +
                                 "        android:layout_marginRight=\"" + widgetEntity.getMarginRight() + "px\"\n" +
                                 "        android:layout_marginTop=\"" + widgetEntity.getMarginTop() + "px\"\n" +
                                 "        android:layout_marginBottom=\"" + widgetEntity.getMarginBottom() + "px\"\n" +
-                                "        android:textColor=\""+widgetEntity.getTextColor()+"\"\n" +
-                                "        android:textSize=\""+widgetEntity.getTextSize()+"px\" />");
+                                "        android:textColor=\"" + widgetEntity.getTextColor() + "\"\n" +
+                                "        android:textSize=\"" + widgetEntity.getTextSize() + "px\" />");
                         break;
                     case WidgetEntity.TYPE_CHECK_BOX:
                         sbDef.append("\n    private CheckBox cb_" + widgetEntity.getResId() + ";");
@@ -4644,6 +4652,8 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
     private void createSettingGradleFile(String appDirPath) throws IOException {
         FileUtils.saveFileToPathWithName("include ':app'\n", appDirPath, "settings.gradle");
     }
+
+    /***********************************下载 项目文件 结束**************************************/
 
 
 }

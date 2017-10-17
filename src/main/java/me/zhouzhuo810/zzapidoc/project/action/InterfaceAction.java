@@ -200,6 +200,15 @@ public class InterfaceAction extends BaseController<InterfaceEntity> {
         return getService().downloadPdf(projectId, userId);
     }
 
+    @ResponseBody
+    @RequestMapping(value = "/downloadApi", method = RequestMethod.GET)
+    public ResponseEntity<byte[]> downloadApi(
+            @RequestParam(value = "projectId") String projectId,
+            @RequestParam(value = "userId") String userId
+    ) throws IOException {
+        return getService().downloadApi(projectId, userId);
+    }
+
 
 
 }

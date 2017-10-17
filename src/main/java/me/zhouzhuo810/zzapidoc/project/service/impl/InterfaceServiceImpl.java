@@ -2,6 +2,8 @@ package me.zhouzhuo810.zzapidoc.project.service.impl;
 
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
+import me.zhouzhuo810.zzapidoc.android.utils.ZipUtils;
+import me.zhouzhuo810.zzapidoc.android.widget.apicreator.ApiTool;
 import me.zhouzhuo810.zzapidoc.cache.entity.CacheEntity;
 import me.zhouzhuo810.zzapidoc.cache.service.CacheService;
 import me.zhouzhuo810.zzapidoc.common.dao.BaseDao;
@@ -22,6 +24,7 @@ import me.zhouzhuo810.zzapidoc.user.entity.UserEntity;
 import me.zhouzhuo810.zzapidoc.user.service.UserService;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
+import org.aspectj.util.FileUtil;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 import org.json.JSONArray;
@@ -224,6 +227,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
             return new BaseResult(0, "保存失败！");
         }
     }
+
 
     @Override
     public BaseResult updateInterface(String interfaceId, String name, String path, String projectId, String groupId, String httpMethodId,
@@ -523,7 +527,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                 m.put("pid", requestArgEntity.getPid());
                 m.put("typeId", requestArgEntity.getTypeId());
                 response.add(m.build());
-                addChildResponseArg(response, "    ",interfaceId, requestArgEntity.getId());
+                addChildResponseArg(response, "    ", interfaceId, requestArgEntity.getId());
             }
             map.put("responseArgs", response);
         }
@@ -536,14 +540,14 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
             for (ResponseArgEntity requestArgEntity : responseArgEntities) {
                 MapUtils m = new MapUtils();
                 m.put("id", requestArgEntity.getId());
-                m.put("name", space+requestArgEntity.getName());
+                m.put("name", space + requestArgEntity.getName());
                 m.put("defValue", requestArgEntity.getDefaultValue() == null ? "" : requestArgEntity.getDefaultValue());
                 m.put("global", requestArgEntity.getGlobal() == null ? false : requestArgEntity.getGlobal());
                 m.put("note", requestArgEntity.getNote() == null ? "" : requestArgEntity.getNote());
                 m.put("pid", requestArgEntity.getPid());
                 m.put("typeId", requestArgEntity.getTypeId());
                 response.add(m.build());
-                addChildResponseArg(response, space+"    ", interfaceId, requestArgEntity.getId());
+                addChildResponseArg(response, space + "    ", interfaceId, requestArgEntity.getId());
             }
         }
     }
@@ -590,7 +594,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                 switch (resG.getTypeId()) {
                     case ResponseArgEntity.TYPE_STRING:
                         try {
-                            stringer.key(resG.getName()).value(resG.getNote()==null?"":resG.getNote());
+                            stringer.key(resG.getName()).value(resG.getNote() == null ? "" : resG.getNote());
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -656,7 +660,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
             switch (res.getTypeId()) {
                 case ResponseArgEntity.TYPE_STRING:
                     try {
-                        stringer.key(res.getName()).value(res.getNote()==null?"":res.getNote());
+                        stringer.key(res.getName()).value(res.getNote() == null ? "" : res.getNote());
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -755,7 +759,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
             switch (res.getTypeId()) {
                 case ResponseArgEntity.TYPE_STRING:
                     try {
-                        stringer.key(res.getName()).value(res.getNote()==null?"":res.getNote());
+                        stringer.key(res.getName()).value(res.getNote() == null ? "" : res.getNote());
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -933,7 +937,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                             .key("requestMethod").value(entity.getHttpMethodName())
                             .key("requestHeaders").value(headersToJson(entity.getId()))
                             .key("url").value(entity.getPath())
-                            .key("description").value((entity.getName() == null ? "" : entity.getName())+(entity.getNote() == null ? "" : "("+entity.getNote()+")"));
+                            .key("description").value((entity.getName() == null ? "" : entity.getName()) + (entity.getNote() == null ? "" : "(" + entity.getNote() + ")"));
 
                     /*请求参数*/
                     stringer.key("requestArgs").value(requestToJson(entity.getId(), "0"));
@@ -1048,7 +1052,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                 stringer.object()
                         .key("id").value(responseArgEntity.getId())
                         .key("name").value(responseArgEntity.getName())
-                        .key("defaultValue").value(responseArgEntity.getDefaultValue()==null?"":responseArgEntity.getDefaultValue())
+                        .key("defaultValue").value(responseArgEntity.getDefaultValue() == null ? "" : responseArgEntity.getDefaultValue())
                         .key("pid").value(responseArgEntity.getPid())
                         .key("typeId").value(responseArgEntity.getTypeId())
                         .key("description").value(responseArgEntity.getNote() == null ? "" : responseArgEntity.getNote());
@@ -1426,7 +1430,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                     e.printStackTrace();
                     LOGGER.error("PDF ERROR", e);
                 }
-                String realFileName = new String(project.getName().getBytes("UTF-8"), "iso-8859-1")+"_"+System.currentTimeMillis()%1000 + ".pdf";
+                String realFileName = new String(project.getName().getBytes("UTF-8"), "iso-8859-1") + "_" + System.currentTimeMillis() % 1000 + ".pdf";
                 String filePath = mPath + File.separator + realFileName;
                 BaseFont bfChinese = BaseFont.createFont(fontPath + "SIMYOU.TTF", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
                 Font fontChinese = new Font(bfChinese, 12, Font.NORMAL);
@@ -2142,4 +2146,89 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
     }
 
     /***********************************下载 PDF 结束**************************************/
+
+
+    /***********************************下载 API 开始**************************************/
+    @Override
+    public ResponseEntity<byte[]> downloadApi(String projectId, String userId) {
+        UserEntity user = mUserService.get(userId);
+        if (user == null) {
+            return null;
+        }
+
+        ProjectEntity project = mProjectService.get(projectId);
+        if (project == null) {
+            return null;
+        }
+
+        try {
+            HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+            String realPath = request.getRealPath("");
+            if (realPath != null) {
+                String mPath = realPath + File.separator + "API";
+                File dir = new File(mPath);
+                if (!dir.exists()) {
+                    dir.mkdirs();
+                }
+                CacheEntity cacheEntity = new CacheEntity();
+                cacheEntity.setCachePath(mPath);
+                try {
+                    List<CacheEntity> cacheEntities = mCacheService.executeCriteria(new Criterion[]{
+                            Restrictions.eq("deleteFlag", BaseEntity.DELETE_FLAG_NO),
+                            Restrictions.eq("cachePath", mPath)});
+                    if (cacheEntities == null || cacheEntities.size() == 0) {
+                        mCacheService.save(cacheEntity);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    LOGGER.error("API ERROR", e);
+                }
+                /*Api*/
+                String appName = project.getName();
+                String appDirPath = mPath + File.separator + appName;
+                File appDir = new File(appDirPath);
+                if (!appDir.exists()) {
+                    /*如果不存在，创建app目录*/
+                    appDir.mkdirs();
+                } else {
+                    /*如果存在，删除该目录里的所有文件*/
+                    me.zhouzhuo810.zzapidoc.common.utils.FileUtils.deleteFiles(appDirPath);
+                }
+
+                String packageName = project.getPackageName();
+                if (packageName == null || packageName.length() == 0) {
+                    packageName = "com.example.zzapidoc";
+                }
+                String packagePath = packageName.replace(".", File.separator);
+                String javaDir = appDirPath
+                        + File.separator + "app"
+                        + File.separator + "src"
+                        + File.separator + "main"
+                        + File.separator + "java"
+                        + File.separator + packagePath
+                        + File.separator + "common"
+                        + File.separator + "api";
+                ApiTool.createApi(convertToJson(project), packageName, javaDir);
+
+                /*压缩文件*/
+                String zipName = System.currentTimeMillis() + ".zip";
+                String zipPath = mPath + File.separator + zipName;
+                ZipUtils.doCompress(appDirPath, zipPath);
+
+                //压缩完毕，删除源文件
+                FileUtil.deleteContents(new File(appDirPath));
+
+                HttpHeaders headers = new HttpHeaders();
+                headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+                headers.setContentDispositionFormData("attachment", zipName);
+                return new ResponseEntity<byte[]>(org.apache.commons.io.FileUtils.readFileToByteArray(new File(zipPath)), headers, HttpStatus.CREATED);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
+    /***********************************下载 API 结束**************************************/
 }
