@@ -2,11 +2,20 @@
   <artifact type="exploded-war" name="ZzApiDoc">
     <output-path>$PROJECT_DIR$/classes/artifacts/ZzApiDoc</output-path>
     <root id="root">
+      <element id="javaee-facet-resources" facet="zzapidoc-maven/web/Web" />
       <element id="directory" name="WEB-INF">
         <element id="directory" name="classes">
           <element id="module-output" name="zzapidoc-maven" />
         </element>
         <element id="directory" name="lib">
+          <element id="library" level="project" name="gradle-tooling-api-4.1" />
+          <element id="library" level="project" name="Maven: com.google.zxing:core:3.3.0" />
+          <element id="library" level="project" name="Maven: com.google.zxing:javase:3.3.0" />
+          <element id="library" level="project" name="Maven: com.beust:jcommander:1.48" />
+          <element id="library" level="project" name="Maven: com.github.jai-imageio:jai-imageio-core:1.3.1" />
+          <element id="library" level="project" name="Maven: com.google.code.gson:gson:2.3.1" />
+          <element id="library" level="project" name="Maven: com.itextpdf:itextpdf:5.5.11" />
+          <element id="library" level="project" name="Maven: com.itextpdf:itext-asian:5.2.0" />
           <element id="library" level="project" name="Maven: org.springframework:spring-webmvc:4.0.2.RELEASE" />
           <element id="library" level="project" name="Maven: org.springframework:spring-beans:4.0.2.RELEASE" />
           <element id="library" level="project" name="Maven: org.springframework:spring-context:4.0.2.RELEASE" />
@@ -80,64 +89,8 @@
           <element id="library" level="project" name="Maven: commons-codec:commons-codec:1.9" />
           <element id="library" level="project" name="Maven: commons-fileupload:commons-fileupload:1.3" />
           <element id="library" level="project" name="Maven: commons-io:commons-io:2.4" />
-          <element id="library" level="project" name="Maven: com.itextpdf:itextpdf:5.5.11" />
-          <element id="library" level="project" name="Maven: com.itextpdf:itext-asian:5.2.0" />
-          <element id="library" level="project" name="Maven: com.google.code.gson:gson:2.3.1" />
-          <element id="library" level="project" name="Maven: com.android.tools.build:gradle:2.1.0" />
-          <element id="library" level="project" name="Maven: com.android.tools.build:gradle-core:2.1.0" />
-          <element id="library" level="project" name="Maven: com.android.tools.build:builder:2.1.0" />
-          <element id="library" level="project" name="Maven: com.android.tools.build:builder-model:2.1.0" />
-          <element id="library" level="project" name="Maven: com.android.tools.build:builder-test-api:2.1.0" />
-          <element id="library" level="project" name="Maven: com.android.tools:sdklib:25.1.0" />
-          <element id="library" level="project" name="Maven: com.android.tools.layoutlib:layoutlib-api:25.1.0" />
-          <element id="library" level="project" name="Maven: com.intellij:annotations:12.0" />
-          <element id="library" level="project" name="Maven: com.android.tools:dvlib:25.1.0" />
-          <element id="library" level="project" name="Maven: com.android.tools:repository:25.1.0" />
-          <element id="library" level="project" name="Maven: org.apache.commons:commons-compress:1.8.1" />
-          <element id="library" level="project" name="Maven: org.apache.httpcomponents:httpclient:4.1.1" />
-          <element id="library" level="project" name="Maven: org.apache.httpcomponents:httpcore:4.1" />
-          <element id="library" level="project" name="Maven: org.apache.httpcomponents:httpmime:4.1" />
-          <element id="library" level="project" name="Maven: com.android.tools:sdk-common:25.1.0" />
-          <element id="library" level="project" name="Maven: com.android.tools:common:25.1.0" />
-          <element id="library" level="project" name="Maven: com.android.tools.build:manifest-merger:25.1.0" />
-          <element id="library" level="project" name="Maven: net.sf.kxml:kxml2:2.3.0" />
-          <element id="library" level="project" name="Maven: com.android.tools.ddms:ddmlib:25.1.0" />
-          <element id="library" level="project" name="Maven: com.android.tools.jack:jack-api:0.10.0" />
-          <element id="library" level="project" name="Maven: com.android.tools.jill:jill-api:0.10.0" />
-          <element id="library" level="project" name="Maven: com.squareup:javawriter:2.5.0" />
-          <element id="library" level="project" name="Maven: org.bouncycastle:bcpkix-jdk15on:1.48" />
-          <element id="library" level="project" name="Maven: org.bouncycastle:bcprov-jdk15on:1.48" />
-          <element id="library" level="project" name="Maven: org.ow2.asm:asm-tree:5.0.3" />
-          <element id="library" level="project" name="Maven: com.android.tools.lint:lint:25.1.0" />
-          <element id="library" level="project" name="Maven: com.android.tools.lint:lint-checks:25.1.0" />
-          <element id="library" level="project" name="Maven: com.android.tools.lint:lint-api:25.1.0" />
-          <element id="library" level="project" name="Maven: com.android.tools.external.lombok:lombok-ast:0.2.3" />
-          <element id="library" level="project" name="Maven: org.ow2.asm:asm-analysis:5.0.3" />
-          <element id="library" level="project" name="Maven: org.eclipse.jdt.core.compiler:ecj:4.4.2" />
-          <element id="library" level="project" name="Maven: com.android.tools.build:transform-api:2.0.0-deprecated-use-gradle-api" />
-          <element id="library" level="project" name="Maven: com.android.tools.build:gradle-api:2.1.0" />
-          <element id="library" level="project" name="Maven: com.android.tools:annotations:25.1.0" />
-          <element id="library" level="project" name="Maven: com.google.guava:guava:17.0" />
-          <element id="library" level="project" name="Maven: com.android.databinding:compilerCommon:2.1.0" />
-          <element id="library" level="project" name="Maven: com.android.databinding:baseLibrary:2.1.0" />
-          <element id="library" level="project" name="Maven: com.tunnelvisionlabs:antlr4:4.5" />
-          <element id="library" level="project" name="Maven: com.tunnelvisionlabs:antlr4-runtime:4.5" />
-          <element id="library" level="project" name="Maven: org.abego.treelayout:org.abego.treelayout.core:1.0.1" />
-          <element id="library" level="project" name="Maven: com.tunnelvisionlabs:antlr4-annotations:4.5" />
-          <element id="library" level="project" name="Maven: com.googlecode.juniversalchardet:juniversalchardet:1.0.3" />
-          <element id="library" level="project" name="Maven: org.ow2.asm:asm:5.0.3" />
-          <element id="library" level="project" name="Maven: org.ow2.asm:asm-commons:5.0.3" />
-          <element id="library" level="project" name="Maven: net.sf.proguard:proguard-gradle:5.2.1" />
-          <element id="library" level="project" name="Maven: net.sf.proguard:proguard-base:5.2.1" />
-          <element id="library" level="project" name="Maven: org.jacoco:org.jacoco.core:0.7.4.201502262128" />
-          <element id="library" level="project" name="Maven: org.ow2.asm:asm-debug-all:5.0.1" />
-          <element id="library" level="project" name="Maven: org.antlr:antlr:3.5.2" />
-          <element id="library" level="project" name="Maven: org.antlr:antlr-runtime:3.5.2" />
-          <element id="library" level="project" name="Maven: org.antlr:ST4:4.0.8" />
-          <element id="library" level="project" name="gradle-tooling-api-4.1" />
         </element>
       </element>
-      <element id="javaee-facet-resources" facet="zzapidoc-maven/web/Web" />
     </root>
   </artifact>
 </component>

@@ -36,7 +36,7 @@
 			<value>${connection.driver_class}</value>
 		</property>
 		<property name="jdbcUrl">
-			<value>${connection.url}</value>
+			<value>${connection.content}</value>
 		</property>
 		<property name="user">
 			<value>${connection.username}</value>

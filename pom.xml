@@ -16,7 +16,7 @@
         <repository>
             <id>nexus</id>
             <name>Nexus</name>
-            <url>http://localhost:8081/nexus/content/groups/public/</url>
+     contentennt<url>http://localhost:8081/nexus/content/groups/publicontennt/url>
             <releases><enabled>true</enabled></releases>
             <snapshots><enabled>true</enabled></snapshots>
         </repository>
@@ -25,7 +25,7 @@
         <pluginRepository>
             <id>nexus</id>
             <name>Nexus</name>
-            <url>http://localhost:8081/nexus/content/groups/public/</url>
+     contentennt<url>http://localhost:8081/nexus/content/groups/publicontennt/url>
             <releases><enabled>true</enabled></releases>
             <snapshots><enabled>true</enabled></snapshots>
         </pluginRepository>
@@ -45,6 +45,18 @@
             <artifactId>gradle</artifactId>
             <version>2.1.0</version>
         </dependency>-->
+        <!-- https://mvnrepository.com/artifact/com.google.zxing/core -->
+        <dependency>
+            <groupId>com.google.zxing</groupId>
+            <artifactId>core</artifactId>
+            <version>3.3.0</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.google.zxing/javase -->
+        <dependency>
+            <groupId>com.google.zxing</groupId>
+            <artifactId>javase</artifactId>
+            <version>3.3.0</version>
+        </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
@@ -323,7 +335,7 @@
                 <artifactId>tomcat7-maven-plugin</artifactId>
                 <version>2.2</version>
                 <configuration>
-                <url>http://localhost:8080/manager/text</url> tomcat管理路径
+         contentennt<url>http://localhost:8080/manager/tecontennt/url> tomcat管理路径
                 <server>Tomcat7</server> 与settings.xml文件中Server的id相同
                 <path>/web</path> 应用的部署位置
                 </configuration>

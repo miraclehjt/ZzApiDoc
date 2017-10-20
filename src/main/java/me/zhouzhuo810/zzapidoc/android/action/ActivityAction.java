@@ -1,8 +1,6 @@
 package me.zhouzhuo810.zzapidoc.android.action;
 
 import me.zhouzhuo810.zzapidoc.android.entity.ActivityEntity;
-import me.zhouzhuo810.zzapidoc.android.entity.ActivityEntity;
-import me.zhouzhuo810.zzapidoc.android.service.ActivityService;
 import me.zhouzhuo810.zzapidoc.android.service.ActivityService;
 import me.zhouzhuo810.zzapidoc.common.action.BaseController;
 import me.zhouzhuo810.zzapidoc.common.result.BaseResult;
