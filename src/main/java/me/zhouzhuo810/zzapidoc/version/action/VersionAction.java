@@ -40,7 +40,6 @@ public class VersionAction extends BaseController<VersionEntity> {
             @RequestParam(value = "versionDesc") String versionDesc,
             @RequestParam(value = "userId") String userId
     ) {
-
         return getBaseService().addVersion(projectId, versionName, versionCode, versionDesc, userId);
     }
 
@@ -54,7 +53,6 @@ public class VersionAction extends BaseController<VersionEntity> {
             @RequestParam(value = "versionDesc") String versionDesc,
             @RequestParam(value = "userId") String userId
     ) {
-
         return getBaseService().updateVersion(versionId, projectId, versionName, versionCode, versionDesc, userId);
     }
 
@@ -64,7 +62,6 @@ public class VersionAction extends BaseController<VersionEntity> {
         @RequestParam(value = "id") String id,
         @RequestParam(value = "userId") String userId
     ) {
-
         return getBaseService().deleteVersion(id, userId);
     }
 
@@ -74,7 +71,6 @@ public class VersionAction extends BaseController<VersionEntity> {
         @RequestParam(value = "userId") String userId,
         @RequestParam(value = "projectId") String projectId
     ) {
-
         return getBaseService().getAllVersion(userId, projectId);
     }
 
