@@ -2749,7 +2749,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                         .append("                            Intent intent = new Intent(getActivity(), " + (targetAct == null ? activityEntity.getName() : targetAct.getName()) + ".class);\n" +
                                                 "                            startActWithIntent(intent);\n");
                                 if (widgetEntity.getClickToClose()) {
-                                    sbMethods.append("                            closeAct();\n");
+                                    sbMethods.append("                            getBaseAct().closeAct();\n");
                                 }
                                 sbMethods.append("                    }\n" +
                                         "                });");
@@ -2772,7 +2772,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                     "                Intent intent = new Intent(getActivity(), " + (targetAct == null ? activityEntity.getName() : targetAct.getName()) + ".class);\n" +
                                     "                startActWithIntent(intent);\n");
                             if (widgetEntity.getClickToClose()) {
-                                sbEvent.append("                closeAct();\n");
+                                sbEvent.append("                getBaseAct().closeAct();\n");
                             }
                             sbEvent.append("            }\n" +
                                     "        });");
@@ -2851,7 +2851,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                         .append("                            Intent intent = new Intent(getActivity(), " + (targetAct == null ? activityEntity.getName() : targetAct.getName()) + ".class);\n" +
                                                 "                            startActWithIntent(intent);\n");
                                 if (widgetEntity.getClickToClose()) {
-                                    sbMethods.append("                            closeAct();\n");
+                                    sbMethods.append("                            getBaseAct().closeAct();\n");
                                 }
                                 sbMethods.append("                    }\n" +
                                         "                });");
@@ -2874,7 +2874,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                     "                Intent intent = new Intent(getActivity(), " + (targetAct == null ? activityEntity.getName() : targetAct.getName()) + ".class);\n" +
                                     "                startActWithIntent(intent);\n");
                             if (widgetEntity.getClickToClose()) {
-                                sbEvent.append("                closeAct();\n");
+                                sbEvent.append("                getBaseAct().closeAct();\n");
                             }
                             sbEvent.append("            }\n" +
                                     "        });");
@@ -2895,7 +2895,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         sbEvent.append("\n        title_bar.setOnTitleClickListener(new TitleBar.OnTitleClick() {\n" +
                                 "            @Override\n" +
                                 "            public void onLeftClick(ImageView imageView, TextView textView) {\n" +
-                                "                closeAct();\n" +
+                                "                getBaseAct().closeAct();\n" +
                                 "            }\n" +
                                 "\n" +
                                 "            @Override\n" +
@@ -2962,7 +2962,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         sbEvent.append("\n        title_bar.setOnTitleClickListener(new TitleBar.OnTitleClick() {\n" +
                                 "            @Override\n" +
                                 "            public void onLeftClick(ImageView imageView, TextView textView) {\n" +
-                                "                closeAct();\n" +
+                                "                getBaseAct().closeAct();\n" +
                                 "            }\n" +
                                 "\n" +
                                 "            @Override\n" +
