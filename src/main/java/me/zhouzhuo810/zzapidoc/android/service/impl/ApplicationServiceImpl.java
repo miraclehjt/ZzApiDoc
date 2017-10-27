@@ -1231,7 +1231,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
         StringBuilder sbEditInfo = new StringBuilder();
         StringBuilder sbMethods = new StringBuilder();
 
-        sbInit.append("        titleBar = (TitleBar) findViewById(R.id.title_bar);\n" +
+        sbInit.append("        title_bar = (TitleBar) findViewById(R.id.title_bar);\n" +
                 "        indicator = (ZzPagerIndicator) findViewById(R.id.indicator);\n" +
                 "        viewPager = (ViewPager) findViewById(R.id.view_pager);\n");
 
@@ -1314,7 +1314,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                  StringBuilder sbImp, StringBuilder sbJava, StringBuilder sbDef, StringBuilder sbInit, StringBuilder sbEvent,
                                  StringBuilder sbMethods, StringBuilder sbArrays) throws IOException {
         sbDef.append("\n" +
-                "    private TitleBar titleBar;\n" +
+                "    private TitleBar title_bar;\n" +
                 "    private ZzPagerIndicator indicator;\n" +
                 "    private ViewPager viewPager;\n" +
                 "    List<Fragment> fragments;\n");
@@ -2883,15 +2883,16 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                     case WidgetEntity.TYPE_RV:
                         sbImp.append("\nimport android.support.v4.widget.SwipeRefreshLayout;")
                                 .append("\nimport android.support.v7.widget.RecyclerView;")
+                                .append("\nimport android.support.v7.widget.LinearLayoutManager;")
                                 .append("\nimport zhouzhuo810.me.zzandframe.ui.widget.ZzRvRefreshLayout;");
-                        sbDef.append("\n    private ZzRvRefreshLayout refresh")
+                        sbDef.append("\n    private ZzRvRefreshLayout refresh;")
                                 .append("\n    private RecyclerView rv;")
                                 .append("\n    private TextView tvNoData;");
                         sbInit.append("\n        refresh = (ZzRvRefreshLayout) rootView.findViewById(R.id.refresh);")
                                 .append("\n        rv = (RecyclerView) rootView.findViewById(R.id.rv);")
                                 .append("\n        rv.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager." + widgetEntity.getOrientation().toUpperCase() + ", false));")
                                 .append("\n        tvNoData = (TextView) rootView.findViewById(R.id.tv_no_data);");
-                        sbEvent.append("\n        titleBar.setOnTitleClickListener(new TitleBar.OnTitleClick() {\n" +
+                        sbEvent.append("\n        title_bar.setOnTitleClickListener(new TitleBar.OnTitleClick() {\n" +
                                 "            @Override\n" +
                                 "            public void onLeftClick(ImageView imageView, TextView textView) {\n" +
                                 "                closeAct();\n" +
@@ -2958,7 +2959,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         sbInit.append("\n        refresh = (ZzLvRefreshLayout) rootView.findViewById(R.id.refresh);")
                                 .append("\n        rv = (RecyclerView) rootView.findViewById(R.id.rv);")
                                 .append("\n        tvNoData = (TextView) rootView.findViewById(R.id.tv_no_data);");
-                        sbEvent.append("\n        titleBar.setOnTitleClickListener(new TitleBar.OnTitleClick() {\n" +
+                        sbEvent.append("\n        title_bar.setOnTitleClickListener(new TitleBar.OnTitleClick() {\n" +
                                 "            @Override\n" +
                                 "            public void onLeftClick(ImageView imageView, TextView textView) {\n" +
                                 "                closeAct();\n" +
@@ -3950,16 +3951,17 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         break;
                     case WidgetEntity.TYPE_RV:
                         sbImp.append("\nimport android.support.v4.widget.SwipeRefreshLayout;")
+                                .append("\nimport android.support.v7.widget.LinearLayoutManager;")
                                 .append("\nimport android.support.v7.widget.RecyclerView;")
                                 .append("\nimport zhouzhuo810.me.zzandframe.ui.widget.ZzRvRefreshLayout;");
-                        sbDef.append("\n    private ZzRvRefreshLayout refresh")
+                        sbDef.append("\n    private ZzRvRefreshLayout refresh;")
                                 .append("\n    private RecyclerView rv;")
                                 .append("\n    private TextView tvNoData;");
                         sbInit.append("\n        refresh = (ZzRvRefreshLayout) findViewById(R.id.refresh);")
                                 .append("\n        rv = (RecyclerView) findViewById(R.id.rv);")
                                 .append("\n        rv.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager." + widgetEntity.getOrientation().toUpperCase() + ", false));")
                                 .append("\n        tvNoData = (TextView) findViewById(R.id.tv_no_data);");
-                        sbEvent.append("\n        titleBar.setOnTitleClickListener(new TitleBar.OnTitleClick() {\n" +
+                        sbEvent.append("\n        title_bar.setOnTitleClickListener(new TitleBar.OnTitleClick() {\n" +
                                 "            @Override\n" +
                                 "            public void onLeftClick(ImageView imageView, TextView textView) {\n" +
                                 "                closeAct();\n" +
@@ -4026,7 +4028,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         sbInit.append("\n        refresh = (ZzLvRefreshLayout) findViewById(R.id.refresh);")
                                 .append("\n        rv = (RecyclerView) findViewById(R.id.rv);")
                                 .append("\n        tvNoData = (TextView) findViewById(R.id.tv_no_data);");
-                        sbEvent.append("\n        titleBar.setOnTitleClickListener(new TitleBar.OnTitleClick() {\n" +
+                        sbEvent.append("\n        title_bar.setOnTitleClickListener(new TitleBar.OnTitleClick() {\n" +
                                 "            @Override\n" +
                                 "            public void onLeftClick(ImageView imageView, TextView textView) {\n" +
                                 "                closeAct();\n" +
