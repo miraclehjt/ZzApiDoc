@@ -674,7 +674,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 "    //bugly\n" +
                 "    compile 'com.tencent.bugly:crashreport:latest.release'\n" +
                 "    //zzandframe\n" +
-                "    compile 'com.github.zhouzhuo810:ZzAndFrame:1.0.10'\n" +
+                "    compile 'com.github.zhouzhuo810:ZzAndFrame:1.0.12'\n" +
                 "    //xutils\n" +
                 "    compile 'org.xutils:xutils:3.1.26'\n" +
                 "    //Glide\n" +
@@ -692,7 +692,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 "    //Ucrop\n" +
                 "    compile 'com.github.yalantis:ucrop:2.2.1'\n" +
                 "    //SwipeRecyclerView\n" +
-                "    compile 'com.yanzhenjie:recyclerview-swipe:1.1.2'\n" +
+                "    compile 'com.yanzhenjie:recyclerview-swipe:1.1.3'\n" +
                 ((app.getMultiDex() == null ? false : app.getMultiDex()) ? "    //multidex\n" +
                         "    compile 'com.android.support:multidex:1.0.1'\n" : "") +
                 "\n" +

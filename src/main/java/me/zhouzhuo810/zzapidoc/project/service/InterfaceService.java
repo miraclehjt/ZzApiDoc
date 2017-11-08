@@ -38,7 +38,11 @@ public interface InterfaceService extends BaseService<InterfaceEntity> {
 
     String convertToJson(ProjectEntity project);
 
+    String convertToJson(ProjectEntity project, InterfaceEntity entity);
+
     BaseResult setTestFinish(String interfaceId, String userId);
 
     ResponseEntity<byte[]> downloadApi(String projectId, String userId);
+
+    ResponseEntity<byte[]> downloadInterfaceApi(String projectId, String interfaceId, String userId);
 }

@@ -36,39 +36,40 @@ public class InterfaceAction extends BaseController<InterfaceEntity> {
     public InterfaceService getService() {
         return (InterfaceService) baseService;
     }
-/**
- * responseArgs 示例格式
- *
-[
-    {
-        "name": "android",
-        "typeId": 1,
-        "note": ""
-    },
-    {
-        "name": "msg",
-        "typeId": 0,
-        "note": ""
-    },
-    {
-        "name": "data",
-        "typeId": 3,
-        "note": "",
-        "child": [
-            {
-                "name": "phone",
-                "typeId": 0,
-                "note": "手机号"
-            },
-            {
-                "name": "name",
-                "typeId": 0,
-                "note": "名字"
-            }
-        ]
-    }
-]
-*/
+
+    /**
+     * responseArgs 示例格式
+     * <p>
+     * [
+     * {
+     * "name": "android",
+     * "typeId": 1,
+     * "note": ""
+     * },
+     * {
+     * "name": "msg",
+     * "typeId": 0,
+     * "note": ""
+     * },
+     * {
+     * "name": "data",
+     * "typeId": 3,
+     * "note": "",
+     * "child": [
+     * {
+     * "name": "phone",
+     * "typeId": 0,
+     * "note": "手机号"
+     * },
+     * {
+     * "name": "name",
+     * "typeId": 0,
+     * "note": "名字"
+     * }
+     * ]
+     * }
+     * ]
+     */
     @ResponseBody
     @RequestMapping(value = "/addInterface", method = RequestMethod.POST)
     public BaseResult addInterface(
@@ -172,7 +173,6 @@ public class InterfaceAction extends BaseController<InterfaceEntity> {
     }
 
 
-
     @ResponseBody
     @RequestMapping(value = "/generateEmptyExample", method = RequestMethod.GET)
     public BaseResult generateEmptyExample(
@@ -209,6 +209,15 @@ public class InterfaceAction extends BaseController<InterfaceEntity> {
         return getService().downloadApi(projectId, userId);
     }
 
+    @ResponseBody
+    @RequestMapping(value = "/downloadInterfaceApi", method = RequestMethod.GET)
+    public ResponseEntity<byte[]> downloadInterfaceApi(
+            @RequestParam(value = "projectId") String projectId,
+            @RequestParam(value = "interfaceId") String interfaceId,
+            @RequestParam(value = "userId") String userId
+    ) throws IOException {
+        return getService().downloadInterfaceApi(projectId, interfaceId, userId);
+    }
 
 
 }

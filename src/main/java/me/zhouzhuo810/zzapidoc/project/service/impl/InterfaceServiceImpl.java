@@ -966,6 +966,74 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
     }
 
 
+    @Override
+    public String convertToJson(ProjectEntity project, InterfaceEntity entity) {
+
+        JSONStringer stringer = new JSONStringer();
+        /*工程*/
+        stringer.object()
+                .key("project").object()
+                .key("name").value(project.getName())
+                .key("userId").value(project.getCreateUserID())
+                .key("description").value(project.getNote() == null ? "" : project.getNote())
+                .key("permission").value(project.getProperty())
+                .key("createTime").value(DataUtils.formatDate(project.getCreateTime()))
+                .endObject();
+        /*模块数组开始*/
+        stringer
+                .key("modules").array();
+            /*分组数组开始*/
+        stringer.object()
+                .key("name").value("默认模块")
+                   /*请求参数*/
+                .key("requestHeaders").value(globalHeaderToJson(project.getId()))
+                .key("requestArgs").value(globalRequestToJson(project.getId()))
+                    /*返回参数*/
+                .key("responseArgs").value(globalResponseToJson(project.getId()))
+                .key("folders").array();
+                /*分组基本信息*/
+        stringer.object()
+                .key("id").value("")
+                .key("name").value("默认分组")
+                .key("ip").value("http://www.baidu.com/")
+                .key("createTime").value(DataUtils.formatDate(new Date()))
+                .key("createUser").value("System");
+                /*组的接口数组*/
+        stringer.key("children").array();
+                    /*接口基本信息*/
+        stringer.object()
+                .key("id").value(entity.getId())
+                .key("name").value(entity.getName())
+                .key("example").value(entity.getExample() == null ? "" : entity.getExample())
+                .key("requestMethod").value(entity.getHttpMethodName())
+                .key("requestHeaders").value(headersToJson(entity.getId()))
+                .key("url").value(entity.getPath())
+                .key("description").value((entity.getName() == null ? "" : entity.getName()) + (entity.getNote() == null ? "" : "(" + entity.getNote() + ")"));
+
+                    /*请求参数*/
+        stringer.key("requestArgs").value(requestToJson(entity.getId(), "0"));
+
+                    /*返回参数*/
+        stringer.key("responseArgs").value(responseAndGlobalToJson(project.getId(), entity.getId(), "0"));
+
+                    /*接口信息结束*/
+        stringer.endObject();
+                /*接口数组结束*/
+        stringer.endArray();
+                /*接口分组结束*/
+        stringer.endObject();
+            /*接口分组数组结束*/
+        stringer.endArray();
+            /*模块结束*/
+        stringer.endObject();
+        /*模块分组结束*/
+        stringer.endArray();
+        /*工程结束*/
+        stringer.endObject();
+        return stringer.toString();
+    }
+
+
     private String headersToJson(String interfaceId) {
         JSONStringer stringer = new JSONStringer();
         List<RequestHeaderEntity> headers = mRequestHeaderService.executeCriteria(ResponseArgUtils.getArgByInterfaceId(interfaceId));
@@ -2231,4 +2299,96 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
 
 
     /***********************************下载 API 结束**************************************/
+
+
+    /***********************************下载 单个接口API 开始**************************************/
+    @Override
+    public ResponseEntity<byte[]> downloadInterfaceApi(String projectId, String interfaceId, String userId) {
+        UserEntity user = mUserService.get(userId);
+        if (user == null) {
+            return null;
+        }
+
+        ProjectEntity project = mProjectService.get(projectId);
+        if (project == null) {
+            return null;
+        }
+
+        InterfaceEntity interfaceEntity = get(interfaceId);
+        if (interfaceEntity == null) {
+            return null;
+        }
+
+        try {
+            HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+            String realPath = request.getRealPath("");
+            if (realPath != null) {
+                String mPath = realPath + File.separator + "API";
+                File dir = new File(mPath);
+                if (!dir.exists()) {
+                    dir.mkdirs();
+                }
+                CacheEntity cacheEntity = new CacheEntity();
+                cacheEntity.setCachePath(mPath);
+                try {
+                    List<CacheEntity> cacheEntities = mCacheService.executeCriteria(new Criterion[]{
+                            Restrictions.eq("deleteFlag", BaseEntity.DELETE_FLAG_NO),
+                            Restrictions.eq("cachePath", mPath)});
+                    if (cacheEntities == null || cacheEntities.size() == 0) {
+                        mCacheService.save(cacheEntity);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    LOGGER.error("API ERROR", e);
+                }
+                /*Api*/
+                String appName = project.getName() + "_" + interfaceEntity.getName();
+                String appDirPath = mPath + File.separator + appName;
+                File appDir = new File(appDirPath);
+                if (!appDir.exists()) {
+                    /*如果不存在，创建app目录*/
+                    appDir.mkdirs();
+                } else {
+                    /*如果存在，删除该目录里的所有文件*/
+                    me.zhouzhuo810.zzapidoc.common.utils.FileUtils.deleteFiles(appDirPath);
+                }
+
+                String packageName = project.getPackageName();
+                if (packageName == null || packageName.length() == 0) {
+                    packageName = "com.example.zzapidoc";
+                }
+                String packagePath = packageName.replace(".", File.separator);
+                String javaDir = appDirPath
+                        + File.separator + "app"
+                        + File.separator + "src"
+                        + File.separator + "main"
+                        + File.separator + "java"
+                        + File.separator + packagePath
+                        + File.separator + "common"
+                        + File.separator + "api";
+                ApiTool.createApi(convertToJson(project, interfaceEntity), packageName, javaDir);
+
+                /*压缩文件*/
+                String zipName = System.currentTimeMillis() + ".zip";
+                String zipPath = mPath + File.separator + zipName;
+                ZipUtils.doCompress(appDirPath, zipPath);
+
+                //压缩完毕，删除源文件
+                FileUtil.deleteContents(new File(appDirPath));
+
+                HttpHeaders headers = new HttpHeaders();
+                headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+                headers.setContentDispositionFormData("attachment", zipName);
+                return new ResponseEntity<byte[]>(org.apache.commons.io.FileUtils.readFileToByteArray(new File(zipPath)), headers, HttpStatus.CREATED);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
+    /***********************************下载 单个接口API 结束**************************************/
+
+
 }
