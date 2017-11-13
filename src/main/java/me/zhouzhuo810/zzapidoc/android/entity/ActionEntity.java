@@ -12,32 +12,63 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "actions")
 public class ActionEntity extends BaseEntity {
-    public static final int TYPE_DIALOG_TWO_PROGRESS = 0;
+    public static final int TYPE_DIALOG_PROGRESS = 0;
     public static final int TYPE_DIALOG_TWO_BTN = 1;
     public static final int TYPE_DIALOG_EDIT = 2;
     public static final int TYPE_DIALOG_UPDATE = 3;
     public static final int TYPE_DIALOG_LIST = 4;
+    public static final int TYPE_CHOOSE_PIC = 5;
 
     @Column(name = "Type")
-    private int type = TYPE_DIALOG_TWO_PROGRESS;
+    private int type = TYPE_DIALOG_PROGRESS;
     @Column(name = "Name")
     private String name;
     @Column(name = "WidgetId")
     private String widgetId;
-    @Column(name = "title")
+    @Column(name = "Title")
     private String title;
-    @Column(name = "msg")
+    @Column(name = "Msg")
     private String msg;
-    @Column(name = "okText")
+    @Column(name = "OkText")
     private String okText;
-    @Column(name = "cancelText")
+    @Column(name = "CancelText")
     private String cancelText;
-    @Column(name = "defText")
+    @Column(name = "DefText")
     private String defText;
-    @Column(name = "hintText")
+    @Column(name = "HintText")
     private String hintText;
-    @Column(name = "showOrHide")
+    @Column(name = "ShowOrHide")
     private Boolean showOrHide = false;
+    @Column(name = "OkApiId")
+    private String okApiId;
+    @Column(name = "OkActId")
+    private String okActId;
+    @Column(name = "Items")
+    private String items;
+
+    public String getItems() {
+        return items;
+    }
+
+    public void setItems(String items) {
+        this.items = items;
+    }
+
+    public String getOkApiId() {
+        return okApiId;
+    }
+
+    public void setOkApiId(String okApiId) {
+        this.okApiId = okApiId;
+    }
+
+    public String getOkActId() {
+        return okActId;
+    }
+
+    public void setOkActId(String okActId) {
+        this.okActId = okActId;
+    }
 
     public Boolean getShowOrHide() {
         return showOrHide;

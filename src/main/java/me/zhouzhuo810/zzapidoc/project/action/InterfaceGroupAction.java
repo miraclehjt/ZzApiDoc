@@ -6,6 +6,7 @@ import me.zhouzhuo810.zzapidoc.common.result.WebResult;
 import me.zhouzhuo810.zzapidoc.common.service.BaseService;
 import me.zhouzhuo810.zzapidoc.project.entity.InterfaceGroupEntity;
 import me.zhouzhuo810.zzapidoc.project.service.InterfaceGroupService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
+import java.io.IOException;
 
 /**
  * Created by admin on 2017/7/22.
@@ -41,6 +43,7 @@ public class InterfaceGroupAction extends BaseController<InterfaceGroupEntity> {
     ) {
         return getService().addInterfaceGroup(name, projectId, ip, userId);
     }
+
     @ResponseBody
     @RequestMapping(value = "/getAllInterfaceGroup", method = RequestMethod.GET)
     public BaseResult getAllInterfaceGroup(
@@ -79,4 +82,15 @@ public class InterfaceGroupAction extends BaseController<InterfaceGroupEntity> {
     ) {
         return getService().deleteInterfaceGroup(id, userId);
     }
+
+
+    @ResponseBody
+    @RequestMapping(value = "/downloadApi", method = RequestMethod.GET)
+    public ResponseEntity<byte[]> downloadApi(
+            @RequestParam(value = "groupId") String groupId,
+            @RequestParam(value = "userId") String userId
+    ) throws IOException {
+        return getService().downloadApi(groupId, userId);
+    }
+
 }

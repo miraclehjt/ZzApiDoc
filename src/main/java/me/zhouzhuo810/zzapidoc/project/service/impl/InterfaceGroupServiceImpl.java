@@ -1,20 +1,39 @@
 package me.zhouzhuo810.zzapidoc.project.service.impl;
 
+import me.zhouzhuo810.zzapidoc.android.utils.ZipUtils;
+import me.zhouzhuo810.zzapidoc.android.widget.apicreator.ApiTool;
+import me.zhouzhuo810.zzapidoc.cache.entity.CacheEntity;
+import me.zhouzhuo810.zzapidoc.cache.service.CacheService;
 import me.zhouzhuo810.zzapidoc.common.dao.BaseDao;
+import me.zhouzhuo810.zzapidoc.common.entity.BaseEntity;
 import me.zhouzhuo810.zzapidoc.common.result.BaseResult;
 import me.zhouzhuo810.zzapidoc.common.result.WebResult;
 import me.zhouzhuo810.zzapidoc.common.service.impl.BaseServiceImpl;
 import me.zhouzhuo810.zzapidoc.common.utils.DataUtils;
 import me.zhouzhuo810.zzapidoc.common.utils.MapUtils;
 import me.zhouzhuo810.zzapidoc.project.dao.InterfaceGroupDao;
-import me.zhouzhuo810.zzapidoc.project.entity.InterfaceGroupEntity;
-import me.zhouzhuo810.zzapidoc.project.service.InterfaceGroupService;
+import me.zhouzhuo810.zzapidoc.project.entity.*;
+import me.zhouzhuo810.zzapidoc.project.service.*;
 import me.zhouzhuo810.zzapidoc.project.utils.InterfaceUtils;
+import me.zhouzhuo810.zzapidoc.project.utils.ResponseArgUtils;
 import me.zhouzhuo810.zzapidoc.user.entity.UserEntity;
 import me.zhouzhuo810.zzapidoc.user.service.UserService;
+import org.apache.log4j.Logger;
+import org.aspectj.util.FileUtil;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Restrictions;
+import org.json.JSONStringer;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,8 +45,28 @@ import java.util.Map;
 @Service
 public class InterfaceGroupServiceImpl extends BaseServiceImpl<InterfaceGroupEntity> implements InterfaceGroupService {
 
+    private static Logger LOGGER = Logger.getLogger(InterfaceServiceImpl.class.getSimpleName());
+
     @Resource(name = "userServiceImpl")
     UserService mUserService;
+
+    @Resource(name = "projectServiceImpl")
+    ProjectService mProjectService;
+
+    @Resource(name = "interfaceServiceImpl")
+    InterfaceService mInterfaceService;
+
+    @Resource(name = "cacheServiceImpl")
+    CacheService mCacheService;
+
+    @Resource(name = "responseArgServiceImpl")
+    ResponseArgService mResponseArgService;
+
+    @Resource(name = "requestHeaderServiceImpl")
+    RequestHeaderService mRequestHeaderService;
+
+    @Resource(name = "requestArgServiceImpl")
+    RequestArgService mRequestArgService;
 
 
     @Override
@@ -65,7 +104,7 @@ public class InterfaceGroupServiceImpl extends BaseServiceImpl<InterfaceGroupEnt
     }
 
     @Override
-    public BaseResult updateInterfaceGroup(String interfaceGroupId, String name, String projectId,String ip, String userId) {
+    public BaseResult updateInterfaceGroup(String interfaceGroupId, String name, String projectId, String ip, String userId) {
         UserEntity user = mUserService.get(userId);
         InterfaceGroupEntity entity = getBaseDao().get(interfaceGroupId);
         if (entity == null) {
@@ -161,4 +200,503 @@ public class InterfaceGroupServiceImpl extends BaseServiceImpl<InterfaceGroupEnt
         }
         return new WebResult(groups.size(), result);
     }
+
+
+    /***********************************下载 group API 开始**************************************/
+    @Override
+    public ResponseEntity<byte[]> downloadApi(String groupId, String userId) {
+        UserEntity user = mUserService.get(userId);
+        if (user == null) {
+            return null;
+        }
+
+        InterfaceGroupEntity group = get(groupId);
+        if (group == null) {
+            return null;
+        }
+
+        ProjectEntity project = mProjectService.get(group.getProjectId());
+        if (project == null) {
+            return null;
+        }
+
+        try {
+            HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+            String realPath = request.getRealPath("");
+            if (realPath != null) {
+                String mPath = realPath + File.separator + "API";
+                File dir = new File(mPath);
+                if (!dir.exists()) {
+                    dir.mkdirs();
+                }
+                CacheEntity cacheEntity = new CacheEntity();
+                cacheEntity.setCachePath(mPath);
+                try {
+                    List<CacheEntity> cacheEntities = mCacheService.executeCriteria(new Criterion[]{
+                            Restrictions.eq("deleteFlag", BaseEntity.DELETE_FLAG_NO),
+                            Restrictions.eq("cachePath", mPath)});
+                    if (cacheEntities == null || cacheEntities.size() == 0) {
+                        mCacheService.save(cacheEntity);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    LOGGER.error("API ERROR", e);
+                }
+                /*Api*/
+                String appName = project.getName();
+                String appDirPath = mPath + File.separator + appName;
+                File appDir = new File(appDirPath);
+                if (!appDir.exists()) {
+                    /*如果不存在，创建app目录*/
+                    appDir.mkdirs();
+                } else {
+                    /*如果存在，删除该目录里的所有文件*/
+                    me.zhouzhuo810.zzapidoc.common.utils.FileUtils.deleteFiles(appDirPath);
+                }
+
+                String packageName = project.getPackageName();
+                if (packageName == null || packageName.length() == 0) {
+                    packageName = "com.example.zzapidoc";
+                }
+                String packagePath = packageName.replace(".", File.separator);
+                String javaDir = appDirPath
+                        + File.separator + "app"
+                        + File.separator + "src"
+                        + File.separator + "main"
+                        + File.separator + "java"
+                        + File.separator + packagePath
+                        + File.separator + "common"
+                        + File.separator + "api";
+                ApiTool.createApi(convertToJson(project, group), packageName, javaDir);
+
+                /*压缩文件*/
+                String zipName = System.currentTimeMillis() + ".zip";
+                String zipPath = mPath + File.separator + zipName;
+                ZipUtils.doCompress(appDirPath, zipPath);
+
+                //压缩完毕，删除源文件
+                FileUtil.deleteContents(new File(appDirPath));
+
+                HttpHeaders headers = new HttpHeaders();
+                headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+                headers.setContentDispositionFormData("attachment", zipName);
+                return new ResponseEntity<byte[]>(org.apache.commons.io.FileUtils.readFileToByteArray(new File(zipPath)), headers, HttpStatus.CREATED);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
+    @Override
+    public String convertToJson(ProjectEntity project, InterfaceGroupEntity interfaceGroupEntity) {
+
+        JSONStringer stringer = new JSONStringer();
+        /*工程*/
+        stringer.object()
+                .key("project").object()
+                .key("name").value(project.getName())
+                .key("userId").value(project.getCreateUserID())
+                .key("description").value(project.getNote() == null ? "" : project.getNote())
+                .key("permission").value(project.getProperty())
+                .key("createTime").value(DataUtils.formatDate(project.getCreateTime()))
+                .endObject();
+        /*模块数组开始*/
+        stringer
+                .key("modules").array();
+            /*分组数组开始*/
+        stringer.object()
+                .key("name").value("默认模块")
+                   /*请求参数*/
+                .key("requestHeaders").value(globalHeaderToJson(project.getId()))
+                .key("requestArgs").value(globalRequestToJson(project.getId()))
+                    /*返回参数*/
+                .key("responseArgs").value(globalResponseToJson(project.getId()))
+                .key("folders").array();
+                /*分组基本信息*/
+        stringer.object()
+                .key("id").value(interfaceGroupEntity.getId())
+                .key("name").value(interfaceGroupEntity.getName())
+                .key("ip").value(interfaceGroupEntity.getIp())
+                .key("createTime").value(DataUtils.formatDate(interfaceGroupEntity.getCreateTime()))
+                .key("createUser").value(interfaceGroupEntity.getCreateUserName());
+        List<InterfaceEntity> list = mInterfaceService.executeCriteria(InterfaceUtils.getInterfaceByGroupId(interfaceGroupEntity.getId()));
+        stringer.key("children").array();
+        if (list != null) {
+            for (InterfaceEntity entity : list) {
+                    /*接口基本信息*/
+                stringer.object()
+                        .key("id").value(entity.getId())
+                        .key("name").value(entity.getName())
+                        .key("example").value(entity.getExample() == null ? "" : entity.getExample())
+                        .key("requestMethod").value(entity.getHttpMethodName())
+                        .key("requestHeaders").value(headersToJson(entity.getId()))
+                        .key("url").value(entity.getPath())
+                        .key("description").value((entity.getName() == null ? "" : entity.getName()) + (entity.getNote() == null ? "" : "(" + entity.getNote() + ")"));
+
+                    /*请求参数*/
+                stringer.key("requestArgs").value(requestToJson(entity.getId(), "0"));
+
+                    /*返回参数*/
+                stringer.key("responseArgs").value(responseAndGlobalToJson(project.getId(), entity.getId(), "0"));
+
+                    /*接口信息结束*/
+                stringer.endObject();
+            }
+        }
+                /*接口数组结束*/
+        stringer.endArray();
+                /*接口分组结束*/
+        stringer.endObject();
+            /*接口分组数组结束*/
+        stringer.endArray();
+            /*模块结束*/
+        stringer.endObject();
+        /*模块分组结束*/
+        stringer.endArray();
+        /*工程结束*/
+        stringer.endObject();
+        return stringer.toString();
+    }
+
+
+    private String requestToJson(String interfaceId, String pid) {
+        JSONStringer stringer = new JSONStringer();
+        List<RequestArgEntity> requestArgEntities = mRequestArgService.executeCriteria(ResponseArgUtils.getArgByInterfaceIdAndPid(interfaceId, pid));
+        stringer.array();
+        if (requestArgEntities != null) {
+            for (RequestArgEntity requestArgEntity : requestArgEntities) {
+                stringer.object()
+                        .key("id").value(requestArgEntity.getId())
+                        .key("name").value(requestArgEntity.getName())
+                        .key("pid").value(requestArgEntity.getPid())
+                        .key("defaultValue").value(requestArgEntity.getDefaultValue() == null ? "" : requestArgEntity.getDefaultValue())
+                        .key("require").value(requestArgEntity.getRequire() == null ? true : requestArgEntity.getRequire())
+                        .key("typeId").value(requestArgEntity.getTypeId())
+                        .key("description").value(requestArgEntity.getNote() == null ? "" : requestArgEntity.getNote());
+                if (requestArgEntity.getTypeId() == null) {
+                    requestArgEntity.setTypeId(7);
+                }
+                switch (requestArgEntity.getTypeId()) {
+                    case ResponseArgEntity.TYPE_STRING:
+                        stringer.key("type").value("string");
+                        stringer.key("children").array().endArray();
+                        break;
+                    case ResponseArgEntity.TYPE_NUMBER:
+                        stringer.key("type").value("number");
+                        stringer.key("children").array().endArray();
+                        break;
+                    case ResponseArgEntity.TYPE_ARRAY_OBJECT:
+                        stringer.key("type").value("array[object]");
+                        stringer.key("children").array().endArray();
+                        break;
+                    case ResponseArgEntity.TYPE_OBJECT:
+                        stringer.key("type").value("object");
+                        stringer.key("children").array().endArray();
+                        break;
+                    case ResponseArgEntity.TYPE_ARRAY:
+                        stringer.key("type").value("array");
+                        stringer.key("children").array().endArray();
+                        break;
+                    case ResponseArgEntity.TYPE_FILE:
+                        stringer.key("type").value("file");
+                        stringer.key("children").array().endArray();
+                        break;
+                    default:
+                        stringer.key("type").value("未知");
+                        stringer.key("children").array().endArray();
+                        break;
+                }
+                stringer.endObject();
+            }
+        }
+        stringer.endArray();
+        return stringer.toString();
+    }
+
+    private String responseAndGlobalToJson(String projectId, String interfaceId, String pid) {
+        JSONStringer stringer = new JSONStringer();
+        List<ResponseArgEntity> responseArgEntities = mResponseArgService.executeCriteria(ResponseArgUtils.getArgByInterfaceIdAndPid(interfaceId, pid));
+        stringer.array();
+
+        List<ResponseArgEntity> globals = mResponseArgService.executeCriteria(ResponseArgUtils.getGlobal(projectId));
+        if (globals != null) {
+            for (ResponseArgEntity responseArgEntity : globals) {
+                stringer.object()
+                        .key("id").value(responseArgEntity.getId())
+                        .key("name").value(responseArgEntity.getName())
+                        .key("defaultValue").value(responseArgEntity.getDefaultValue() == null ? "" : responseArgEntity.getDefaultValue())
+                        .key("pid").value(responseArgEntity.getPid())
+                        .key("typeId").value(responseArgEntity.getTypeId())
+                        .key("description").value(responseArgEntity.getNote() == null ? "" : responseArgEntity.getNote());
+                switch (responseArgEntity.getTypeId()) {
+                    case ResponseArgEntity.TYPE_STRING:
+                        stringer.key("type").value("string");
+                        stringer.key("children").array().endArray();
+                        break;
+                    case ResponseArgEntity.TYPE_NUMBER:
+                        stringer.key("type").value("number");
+                        stringer.key("children").array().endArray();
+                        break;
+                    case ResponseArgEntity.TYPE_ARRAY_OBJECT:
+                        stringer.key("type").value("array[object]");
+                        responseToChildJson(stringer, interfaceId, responseArgEntity.getId());
+                        break;
+                    case ResponseArgEntity.TYPE_OBJECT:
+                        stringer.key("type").value("object");
+                        stringer.key("children").array().endArray();
+                        break;
+                    default:
+                        stringer.key("type").value("未知");
+                        stringer.key("children").array().endArray();
+                        break;
+                }
+                stringer.endObject();
+            }
+        }
+
+        if (responseArgEntities != null) {
+            for (ResponseArgEntity responseArgEntity : responseArgEntities) {
+                stringer.object()
+                        .key("id").value(responseArgEntity.getId())
+                        .key("name").value(responseArgEntity.getName())
+                        .key("defaultValue").value(responseArgEntity.getDefaultValue() == null ? "" : responseArgEntity.getDefaultValue())
+                        .key("pid").value(responseArgEntity.getPid())
+                        .key("typeId").value(responseArgEntity.getTypeId())
+                        .key("description").value(responseArgEntity.getNote() == null ? "" : responseArgEntity.getNote());
+                if (responseArgEntity.getTypeId() == null) {
+                    responseArgEntity.setTypeId(7);
+                }
+                switch (responseArgEntity.getTypeId()) {
+                    case ResponseArgEntity.TYPE_STRING:
+                        stringer.key("type").value("string");
+                        stringer.key("children").array().endArray();
+                        break;
+                    case ResponseArgEntity.TYPE_NUMBER:
+                        stringer.key("type").value("number");
+                        stringer.key("children").array().endArray();
+                        break;
+                    case ResponseArgEntity.TYPE_ARRAY_OBJECT:
+                        stringer.key("type").value("array[object]");
+                        responseToChildJson(stringer, interfaceId, responseArgEntity.getId());
+                        break;
+                    case ResponseArgEntity.TYPE_OBJECT:
+                        stringer.key("type").value("object");
+                        responseToChildJson(stringer, interfaceId, responseArgEntity.getId());
+                        break;
+                    case ResponseArgEntity.TYPE_ARRAY:
+                        stringer.key("type").value("array");
+                        stringer.key("children").array().endArray();
+                        break;
+                    case ResponseArgEntity.TYPE_FILE:
+                        stringer.key("type").value("file");
+                        stringer.key("children").array().endArray();
+                        break;
+                    default:
+                        stringer.key("type").value("未知");
+                        stringer.key("children").array().endArray();
+                        break;
+                }
+                stringer.endObject();
+            }
+        }
+        stringer.endArray();
+        return stringer.toString();
+    }
+
+
+    private String headersToJson(String interfaceId) {
+        JSONStringer stringer = new JSONStringer();
+        List<RequestHeaderEntity> headers = mRequestHeaderService.executeCriteria(ResponseArgUtils.getArgByInterfaceId(interfaceId));
+        stringer.array();
+        if (headers != null) {
+            for (RequestHeaderEntity req : headers) {
+                stringer.object()
+                        .key("id").value(req.getId())
+                        .key("name").value(req.getName())
+                        .key("defaultValue").value(req.getValue())
+                        .key("description").value(req.getNote() == null ? "" : req.getNote())
+                        .key("require").value(true)
+                        .key("children").array().endArray();
+                stringer.endObject();
+            }
+        }
+        stringer.endArray();
+        return stringer.toString();
+    }
+
+
+    private String globalHeaderToJson(String projectId) {
+        JSONStringer stringer = new JSONStringer();
+        List<RequestHeaderEntity> headers = mRequestHeaderService.executeCriteria(ResponseArgUtils.getGlobal(projectId));
+        stringer.array();
+        if (headers != null) {
+            for (RequestHeaderEntity req : headers) {
+                stringer.object()
+                        .key("id").value(req.getId())
+                        .key("name").value(req.getName())
+                        .key("defaultValue").value(req.getValue())
+                        .key("description").value(req.getNote() == null ? "" : req.getNote())
+                        .key("require").value(true)
+                        .key("children").array().endArray();
+                stringer.endObject();
+            }
+        }
+        stringer.endArray();
+        return stringer.toString();
+    }
+
+
+    private String globalRequestToJson(String projectId) {
+        JSONStringer stringer = new JSONStringer();
+        List<RequestArgEntity> requestArgEntities = mRequestArgService.executeCriteria(ResponseArgUtils.getGlobal(projectId));
+        stringer.array();
+        if (requestArgEntities != null) {
+            for (RequestArgEntity req : requestArgEntities) {
+                stringer.object()
+                        .key("id").value(req.getId())
+                        .key("name").value(req.getName())
+                        .key("pid").value(req.getPid())
+                        .key("defaultValue").value(req.getDefaultValue() == null ? "" : req.getDefaultValue())
+                        .key("require").value(req.getRequire() == null ? true : req.getRequire())
+                        .key("typeId").value(req.getTypeId())
+                        .key("description").value(req.getNote() == null ? "" : req.getNote());
+                if (req.getTypeId() == null) {
+                    req.setTypeId(7);
+                }
+                switch (req.getTypeId()) {
+                    case ResponseArgEntity.TYPE_STRING:
+                        stringer.key("type").value("string");
+                        stringer.key("children").array().endArray();
+                        break;
+                    case ResponseArgEntity.TYPE_NUMBER:
+                        stringer.key("type").value("number");
+                        stringer.key("children").array().endArray();
+                        break;
+                    case ResponseArgEntity.TYPE_OBJECT:
+                        stringer.key("type").value("object");
+                        stringer.key("children").array().endArray();
+                        break;
+                    case ResponseArgEntity.TYPE_ARRAY:
+                        stringer.key("type").value("array");
+                        stringer.key("children").array().endArray();
+                        break;
+                    case ResponseArgEntity.TYPE_FILE:
+                        stringer.key("type").value("file");
+                        stringer.key("children").array().endArray();
+                        break;
+                    default:
+                        stringer.key("type").value("未知");
+                        stringer.key("children").array().endArray();
+                        break;
+                }
+                stringer.endObject();
+            }
+        }
+        stringer.endArray();
+        return stringer.toString();
+    }
+
+    private String globalResponseToJson(String projectId) {
+        JSONStringer stringer = new JSONStringer();
+        List<ResponseArgEntity> responseArgEntities = mResponseArgService.executeCriteria(ResponseArgUtils.getGlobal(projectId));
+        stringer.array();
+        if (responseArgEntities != null) {
+            for (ResponseArgEntity responseArgEntity : responseArgEntities) {
+                stringer.object()
+                        .key("id").value(responseArgEntity.getId())
+                        .key("name").value(responseArgEntity.getName())
+                        .key("pid").value(responseArgEntity.getPid())
+                        .key("defaultValue").value(responseArgEntity.getDefaultValue() == null ? "" : responseArgEntity.getDefaultValue())
+                        .key("typeId").value(responseArgEntity.getTypeId())
+                        .key("description").value(responseArgEntity.getNote() == null ? "" : responseArgEntity.getNote());
+                if (responseArgEntity.getTypeId() == null) {
+                    responseArgEntity.setTypeId(7);
+                }
+                switch (responseArgEntity.getTypeId()) {
+                    case ResponseArgEntity.TYPE_STRING:
+                        stringer.key("type").value("string");
+                        stringer.key("children").array().endArray();
+                        break;
+                    case ResponseArgEntity.TYPE_NUMBER:
+                        stringer.key("type").value("number");
+                        stringer.key("children").array().endArray();
+                        break;
+                    case ResponseArgEntity.TYPE_OBJECT:
+                        stringer.key("type").value("object");
+                        stringer.key("children").array().endArray();
+                        break;
+                    case ResponseArgEntity.TYPE_ARRAY:
+                        stringer.key("type").value("array");
+                        stringer.key("children").array().endArray();
+                        break;
+                    case ResponseArgEntity.TYPE_FILE:
+                        stringer.key("type").value("file");
+                        stringer.key("children").array().endArray();
+                        break;
+                    default:
+                        stringer.key("type").value("未知");
+                        stringer.key("children").array().endArray();
+                        break;
+                }
+                stringer.endObject();
+            }
+        }
+        stringer.endArray();
+        return stringer.toString();
+    }
+
+    private void responseToChildJson(JSONStringer stringer, String interfaceId, String pid) {
+        List<ResponseArgEntity> responseArgEntities = mResponseArgService.executeCriteria(ResponseArgUtils.getArgByInterfaceIdAndPid(interfaceId, pid));
+        stringer.key("children").array();
+        if (responseArgEntities != null) {
+            for (ResponseArgEntity responseArgEntity : responseArgEntities) {
+                stringer.object()
+                        .key("id").value(responseArgEntity.getId())
+                        .key("name").value(responseArgEntity.getName())
+                        .key("defaultValue").value(responseArgEntity.getDefaultValue() == null ? "" : responseArgEntity.getDefaultValue())
+                        .key("pid").value(responseArgEntity.getPid())
+                        .key("typeId").value(responseArgEntity.getTypeId())
+                        .key("description").value(responseArgEntity.getNote() == null ? "" : responseArgEntity.getNote());
+                if (responseArgEntity.getTypeId() == null) {
+                    responseArgEntity.setTypeId(7);
+                }
+                switch (responseArgEntity.getTypeId()) {
+                    case ResponseArgEntity.TYPE_STRING:
+                        stringer.key("type").value("string");
+                        stringer.key("children").array().endArray();
+                        break;
+                    case ResponseArgEntity.TYPE_NUMBER:
+                        stringer.key("type").value("number");
+                        stringer.key("children").array().endArray();
+                        break;
+                    case ResponseArgEntity.TYPE_ARRAY_OBJECT:
+                        stringer.key("type").value("array[object]");
+                        responseToChildJson(stringer, interfaceId, responseArgEntity.getId());
+                        break;
+                    case ResponseArgEntity.TYPE_OBJECT:
+                        stringer.key("type").value("object");
+                        responseToChildJson(stringer, interfaceId, responseArgEntity.getId());
+                        break;
+                    case ResponseArgEntity.TYPE_ARRAY:
+                        stringer.key("type").value("array");
+                        stringer.key("children").array().endArray();
+                        break;
+                    case ResponseArgEntity.TYPE_FILE:
+                        stringer.key("type").value("file");
+                        stringer.key("children").array().endArray();
+                        break;
+                    default:
+                        stringer.key("type").value("未知");
+                        stringer.key("children").array().endArray();
+                        break;
+                }
+                stringer.endObject();
+            }
+        }
+        stringer.endArray();
+    }
+
+    /***********************************下载 group API 结束**************************************/
 }

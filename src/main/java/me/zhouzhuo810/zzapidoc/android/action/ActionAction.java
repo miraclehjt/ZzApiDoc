@@ -44,9 +44,11 @@ public class ActionAction extends BaseController<ActionEntity> {
             @RequestParam(value = "hintText", required = false) String hintText,
             @RequestParam(value = "defText", required = false) String defText,
             @RequestParam(value = "userId") String userId,
-            @RequestParam(value = "showOrHide") boolean showOrHide
+            @RequestParam(value = "showOrHide") boolean showOrHide,
+            @RequestParam(value = "okApiId") String okApiId,
+            @RequestParam(value = "okActId") String okActId
     ) {
-        return getBaseService().addAction(type, name, widgetId, title, msg, okText, cancelText, hintText, defText, showOrHide, userId);
+        return getBaseService().addAction(type, name, widgetId, title, msg, okText, cancelText, hintText, defText, showOrHide, okApiId, okActId, userId);
     }
 
     @ResponseBody
@@ -63,9 +65,11 @@ public class ActionAction extends BaseController<ActionEntity> {
             @RequestParam(value = "hintText", required = false) String hintText,
             @RequestParam(value = "defText", required = false) String defText,
             @RequestParam(value = "userId") String userId,
-            @RequestParam(value = "showOrHide") boolean showOrHide
+            @RequestParam(value = "showOrHide") boolean showOrHide,
+            @RequestParam(value = "okApiId") String okApiId,
+            @RequestParam(value = "okActId") String okActId
     ) {
-        return getBaseService().updateAction(actionId, type, name, widgetId, title, msg, okText, cancelText, hintText, defText, showOrHide, userId);
+        return getBaseService().updateAction(actionId, type, name, widgetId, title, msg, okText, cancelText, hintText, defText, showOrHide, okApiId, okActId, userId);
     }
 
 
@@ -81,9 +85,10 @@ public class ActionAction extends BaseController<ActionEntity> {
     @ResponseBody
     @RequestMapping(value = "/getAllActions", method = RequestMethod.GET)
     public BaseResult getAllActions(
+            @RequestParam(value = "widgetId") String widgetId,
             @RequestParam(value = "userId") String userId
     ) {
-        return getBaseService().getAllActions(userId);
+        return getBaseService().getAllActions(widgetId, userId);
     }
 
 }
