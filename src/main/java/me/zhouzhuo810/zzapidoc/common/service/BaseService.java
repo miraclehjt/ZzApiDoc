@@ -2,6 +2,7 @@ package me.zhouzhuo810.zzapidoc.common.service;
 
 import me.zhouzhuo810.zzapidoc.common.dao.BaseDao;
 import me.zhouzhuo810.zzapidoc.common.entity.BaseEntity;
+import me.zhouzhuo810.zzapidoc.common.result.BaseResult;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 
@@ -74,4 +75,5 @@ public interface BaseService<E extends BaseEntity> {
     int executeCriteriaRow(Criterion[] criteria);
 
     E executeCriteriaForObject(Criterion[] criteria);
+
 }

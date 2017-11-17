@@ -43,7 +43,7 @@ public class ResponseArgAction extends BaseController<ResponseArgEntity> {
             @RequestParam(value = "userId") String userId,
             @RequestParam(value = "isGlobal") boolean isGlobal
     ) {
-        return getService().addResponseArg(pid, name, defValue == null ? "":defValue, type, projectId, interfaceId, note, userId, isGlobal);
+        return getService().addResponseArg(pid, name, defValue == null ? "" : defValue, type, projectId, interfaceId, note, userId, isGlobal);
     }
 
     @ResponseBody
@@ -59,7 +59,7 @@ public class ResponseArgAction extends BaseController<ResponseArgEntity> {
             @RequestParam(value = "userId") String userId,
             @RequestParam(value = "isGlobal") boolean isGlobal
     ) {
-        return getService().updateResponseArg(pid, responseArgId, name, defValue == null ? "":defValue, type, interfaceId, note, userId, isGlobal);
+        return getService().updateResponseArg(pid, responseArgId, name, defValue == null ? "" : defValue, type, interfaceId, note, userId, isGlobal);
     }
 
     @ResponseBody
@@ -90,4 +90,15 @@ public class ResponseArgAction extends BaseController<ResponseArgEntity> {
     ) {
         return getService().getResponseArgDetails(id, userId);
     }
+
+    @ResponseBody
+    @RequestMapping(value = "/importResponseArg", method = RequestMethod.POST)
+    public BaseResult importResponseArg(
+            @RequestParam(value = "interfaceId") String interfaceId,
+            @RequestParam(value = "userId") String userId,
+            @RequestParam(value = "json") String json
+    ) {
+        return getService().importResponseArg(interfaceId, userId, json);
+    }
+
 }

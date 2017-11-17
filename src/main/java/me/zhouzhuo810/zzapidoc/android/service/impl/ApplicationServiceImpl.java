@@ -674,15 +674,11 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 "    //bugly\n" +
                 "    compile 'com.tencent.bugly:crashreport:latest.release'\n" +
                 "    //zzandframe\n" +
-                "    compile 'com.github.zhouzhuo810:ZzAndFrame:1.0.12'\n" +
+                "    compile 'com.github.zhouzhuo810:ZzAndFrame:1.0.16'\n" +
                 "    //xutils\n" +
                 "    compile 'org.xutils:xutils:3.1.26'\n" +
-                "    //Glide\n" +
-                "    compile 'com.github.bumptech.glide:glide:3.7.0'\n" +
                 "    //RxPermissions\n" +
                 "    compile 'com.tbruyelle.rxpermissions:rxpermissions:0.9.4@aar'\n" +
-                "    //PhotoView\n" +
-                "    compile 'com.github.chrisbanes:PhotoView:2.0.0'\n" +
                 "    //Logger\n" +
                 "    compile 'com.orhanobut:logger:2.1.1'\n" +
                 "    //okgo\n" +

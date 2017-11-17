@@ -17,6 +17,8 @@ import me.zhouzhuo810.zzapidoc.project.utils.ProjectUtils;
 import me.zhouzhuo810.zzapidoc.project.utils.ResponseArgUtils;
 import me.zhouzhuo810.zzapidoc.user.entity.UserEntity;
 import me.zhouzhuo810.zzapidoc.user.service.UserService;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -212,5 +214,71 @@ public class ResponseArgServiceImpl extends BaseServiceImpl<ResponseArgEntity> i
     @Override
     public List<ResponseArgEntity> getGlobalResponseArgs(String projectId) {
         return getBaseDao().executeCriteria(ResponseArgUtils.getGlobal(projectId));
+    }
+
+    @Override
+    public BaseResult importResponseArg(String interfaceId, String userId, String json) {
+        UserEntity user = mUserService.get(userId);
+        if (user == null) {
+            return new BaseResult(0, "用户不合法");
+        }
+        InterfaceEntity interfaceEntity = mInterfaceService.get(interfaceId);
+        if (interfaceEntity == null) {
+            return new BaseResult(0, "接口不存在或已被删除！");
+        }
+        JSONObject obj = new JSONObject(json);
+        parseObj(interfaceEntity.getProjectId(), interfaceId, userId, user.getName(), obj, "0");
+        return new BaseResult(1, "参数导入成功！");
+    }
+
+    private void parseObj(String projectId, String interfaceId, String userId, String userName, JSONObject obj, final String pid) {
+        if (obj != null) {
+            Iterator<String> keys = obj.keys();
+            while (keys.hasNext()) {
+                String key = keys.next();
+                Object o = obj.get(key);
+                if (o instanceof JSONObject) {
+                    JSONObject o1 = (JSONObject) o;
+                    String mPid = addArg(pid, projectId, interfaceId, userId, userName, key, "", ResponseArgEntity.TYPE_OBJECT);
+                    parseObj(projectId, interfaceId, userId, userName, o1, mPid);
+                } else if (o instanceof JSONArray) {
+                    JSONArray o1 = (JSONArray) o;
+                    String mPid = addArg(pid, projectId, interfaceId, userId, userName, key, "", ResponseArgEntity.TYPE_ARRAY_OBJECT);
+                    for (int i = 0; i < o1.length(); i++) {
+                        Object o2 = o1.get(i);
+                        if (o2 instanceof JSONObject) {
+                            String cPid = addArg(mPid, projectId, interfaceId, userId, userName, key, "", ResponseArgEntity.TYPE_OBJECT);
+                            parseObj(projectId, interfaceId, userId, userName, (JSONObject) o2, cPid);
+                        }
+                    }
+                } else if (o instanceof String) {
+                    addArg(pid, projectId, interfaceId, userId, userName, key, (String) o, ResponseArgEntity.TYPE_STRING);
+                } else if (o instanceof Integer) {
+                    addArg(pid, projectId, interfaceId, userId, userName, key, "" + ((Integer) o), ResponseArgEntity.TYPE_NUMBER);
+                } else if (o instanceof Double) {
+                    addArg(pid, projectId, interfaceId, userId, userName, key, "" + ((Double) o), ResponseArgEntity.TYPE_NUMBER);
+                }
+            }
+        }
+    }
+
+    private String addArg(String pid, String projectId, String interfaceId, String userId, String userName, String name, String note, int typeId) {
+        ResponseArgEntity arg = new ResponseArgEntity();
+        arg.setName(name);
+        arg.setNote(note);
+        arg.setProjectId(projectId);
+        arg.setInterfaceId(interfaceId);
+        arg.setCreateUserID(userId);
+        arg.setGlobal(false);
+        arg.setCreateUserName(userName);
+        arg.setTypeId(typeId);
+        arg.setPid(pid == null ? "0" : pid);
+        try {
+            getBaseDao().save(arg);
+            return arg.getId();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

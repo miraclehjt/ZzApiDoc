@@ -25,4 +25,6 @@ public interface ResponseArgService extends BaseService<ResponseArgEntity> {
     BaseResult getResponseArgDetails(String id, String userId);
 
     List<ResponseArgEntity> getGlobalResponseArgs(String projectId);
+
+    BaseResult importResponseArg(String interfaceId, String userId, String json);
 }
