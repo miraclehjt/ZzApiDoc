@@ -17,6 +17,7 @@ import me.zhouzhuo810.zzapidoc.user.entity.UserEntity;
 import me.zhouzhuo810.zzapidoc.user.service.UserService;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
+import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -565,6 +566,51 @@ public class ProjectServiceImpl extends BaseServiceImpl<ProjectEntity> implement
             return new BaseResult(0, "导入失败！JSON格式不正确");
         }
         return new BaseResult(1, "导入成功！");
+    }
+
+    @Override
+    public BaseResult restoreResponseArgFromExample(String projectId, String userId) {
+        UserEntity user = mUserService.get(userId);
+        if (user == null) {
+            return new BaseResult(0, "用户不合法！");
+        }
+        if (!user.getManager()) {
+            return new BaseResult(0, "该功能只有管理员可以使用！");
+        }
+        ProjectEntity entity = getBaseDao().get(projectId);
+        if (entity == null) {
+            return new BaseResult(0, "该项目不存在或已被删除！");
+        }
+        List<InterfaceGroupEntity> groups = mInterfaceGroupService.executeCriteria(new Criterion[]{
+                Restrictions.eq("deleteFlag", BaseEntity.DELETE_FLAG_NO),
+                Restrictions.eq("projectId", projectId)
+        });
+        List<String> fails = new ArrayList<>();
+        if (groups != null) {
+            for (InterfaceGroupEntity group : groups) {
+                List<InterfaceEntity> interfaceEntities = mInterfaceService.executeCriteria(new Criterion[]{
+                        Restrictions.eq("deleteFlag", BaseEntity.DELETE_FLAG_NO),
+                        Restrictions.eq("groupId", group.getId())
+                });
+                if (interfaceEntities != null) {
+                    for (InterfaceEntity interfaceEntity : interfaceEntities) {
+                        String example = interfaceEntity.getExample();
+                        if (example != null && example.length() > 0) {
+                            try {
+                                JSONObject obj = new JSONObject(example);
+                                mResponseArgService.parseObj(projectId, interfaceEntity.getId(), userId, user.getName(), obj, "0");
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                fails.add("**** " + interfaceEntity.getGroupName() + " 分组的 " + interfaceEntity.getName()
+                                        + " 接口还原失败， json内容是：\n example = " + interfaceEntity.getExample()
+                                        + " 异常：" + e.toString());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return new BaseResult(1, "返回参数还原完成", fails);
     }
 
     private void importChildResponseArgs(List<ArgEntity.DataBean> children, String projectId, String interfaceId, String userId, String userName, boolean global, String pid) throws Exception {

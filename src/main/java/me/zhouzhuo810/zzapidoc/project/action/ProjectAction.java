@@ -99,4 +99,13 @@ public class ProjectAction extends BaseController<ProjectEntity> {
     ) {
         return getService().importProject(json, property, userId);
     }
+
+    @ResponseBody
+    @RequestMapping(value = "/restoreResponseArgFromExample", method = RequestMethod.POST)
+    public BaseResult restoreResponseArgFromExample(
+            @RequestParam(value = "projectId") String projectId,
+            @RequestParam(value = "userId") String userId
+    ) {
+        return getService().restoreResponseArgFromExample(projectId, userId);
+    }
 }

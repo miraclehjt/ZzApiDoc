@@ -231,7 +231,8 @@ public class ResponseArgServiceImpl extends BaseServiceImpl<ResponseArgEntity> i
         return new BaseResult(1, "参数导入成功！");
     }
 
-    private void parseObj(String projectId, String interfaceId, String userId, String userName, JSONObject obj, final String pid) {
+    @Override
+    public void parseObj(String projectId, String interfaceId, String userId, String userName, JSONObject obj, final String pid) {
         if (obj != null) {
             Iterator<String> keys = obj.keys();
             while (keys.hasNext()) {
@@ -244,11 +245,10 @@ public class ResponseArgServiceImpl extends BaseServiceImpl<ResponseArgEntity> i
                 } else if (o instanceof JSONArray) {
                     JSONArray o1 = (JSONArray) o;
                     String mPid = addArg(pid, projectId, interfaceId, userId, userName, key, "", ResponseArgEntity.TYPE_ARRAY_OBJECT);
-                    for (int i = 0; i < o1.length(); i++) {
-                        Object o2 = o1.get(i);
+                    if (o1.length() > 0) {
+                        Object o2 = o1.get(0);
                         if (o2 instanceof JSONObject) {
-                            String cPid = addArg(mPid, projectId, interfaceId, userId, userName, key, "", ResponseArgEntity.TYPE_OBJECT);
-                            parseObj(projectId, interfaceId, userId, userName, (JSONObject) o2, cPid);
+                            parseObj(projectId, interfaceId, userId, userName, (JSONObject) o2, mPid);
                         }
                     }
                 } else if (o instanceof String) {

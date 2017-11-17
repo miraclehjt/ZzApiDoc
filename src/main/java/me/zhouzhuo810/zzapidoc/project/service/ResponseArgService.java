@@ -4,6 +4,7 @@ import me.zhouzhuo810.zzapidoc.common.result.BaseResult;
 import me.zhouzhuo810.zzapidoc.common.service.BaseService;
 import me.zhouzhuo810.zzapidoc.project.entity.ResponseArgEntity;
 import me.zhouzhuo810.zzapidoc.project.entity.ResponseArgEntity;
+import org.json.JSONObject;
 
 import java.util.List;
 
@@ -27,4 +28,6 @@ public interface ResponseArgService extends BaseService<ResponseArgEntity> {
     List<ResponseArgEntity> getGlobalResponseArgs(String projectId);
 
     BaseResult importResponseArg(String interfaceId, String userId, String json);
+
+    void parseObj(String projectId, String interfaceId, String userId, String userName, JSONObject obj, final String pid);
 }
