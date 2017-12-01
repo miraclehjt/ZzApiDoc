@@ -2,6 +2,7 @@ package me.zhouzhuo810.zzapidoc.project.service.impl;
 
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
+import com.itextpdf.text.pdf.StringUtils;
 import me.zhouzhuo810.zzapidoc.android.utils.ZipUtils;
 import me.zhouzhuo810.zzapidoc.android.widget.apicreator.ApiTool;
 import me.zhouzhuo810.zzapidoc.cache.entity.CacheEntity;
@@ -23,6 +24,7 @@ import me.zhouzhuo810.zzapidoc.project.utils.ResponseArgUtils;
 import me.zhouzhuo810.zzapidoc.user.entity.UserEntity;
 import me.zhouzhuo810.zzapidoc.user.service.UserService;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.*;
 import org.apache.log4j.Logger;
 import org.aspectj.util.FileUtil;
 import org.hibernate.criterion.Criterion;
@@ -44,6 +46,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.URL;
 import java.util.*;
 import java.util.List;
@@ -1463,6 +1466,12 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
 
     /***********************************下载JSON 结束**************************************/
 
+
+    public static String getIpAddr() throws Exception {
+        InetAddress addr = InetAddress.getLocalHost();
+        return addr.getHostAddress();//获得本机IP
+    }
+
     /***********************************下载 PDF 开始**************************************/
 
     @Override
@@ -1527,7 +1536,12 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                     addTextLine(document, DataUtils.formatDate(project.getCreateTime()), fontChinese);
                     addText(document, "项目说明：", fontChinese, true);
                     addTextLine(document, project.getNote(), fontChinese);
-
+                    addText(document, "文档下载及更新地址：", fontChinese, true);
+                    try {
+                        addUnderLineText(document, "http://" + getIpAddr() + ":8080/" + "ZzApiDoc/v1/interface/downloadPdf?userId=" + userId + "&projectId=" + projectId, fontPath);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                     List<InterfaceGroupEntity> groups = mInterfaceGroupService.executeCriteria(InterfaceUtils.getInterfaceByProjectId(projectId));
                         /*模块数组开始*/
                     if (groups != null) {
@@ -1587,10 +1601,19 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                     //关闭书写器
                     pdfWriter.close();
 
+                    /*尝试添加水印*/
+                    String waterPath = filePath;
+                    String waterName = new String(project.getName().getBytes("UTF-8"), "iso-8859-1") + "_" + System.currentTimeMillis() % 1000 + ".pdf";
+                    try {
+                        waterPath = addWaterMark(filePath, mPath + File.separator + waterName, "ZzApiDoc", 400, 400);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        waterPath = filePath;
+                    }
                     HttpHeaders headers = new HttpHeaders();
                     headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
                     headers.setContentDispositionFormData("attachment", realFileName);
-                    return new ResponseEntity<byte[]>(FileUtils.readFileToByteArray(new File(mPath + File.separator + realFileName)), headers, HttpStatus.CREATED);
+                    return new ResponseEntity<byte[]>(FileUtils.readFileToByteArray(new File(waterPath)), headers, HttpStatus.CREATED);
                 } catch (DocumentException | FileNotFoundException e) {
                     e.printStackTrace();
                     LOGGER.error("PDF ERROR", e);
@@ -1622,7 +1645,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
 
         if (globals != null && globals.size() > 0) {
             //设置列宽
-            float[] columnWidths = {3f, 2f, 5f};
+            float[] columnWidths = {3f, 1f, 5f};
             String[][] values = new String[args.size()][3];
             for (int i = 0; i < args.size(); i++) {
                 RequestHeaderEntity entity = args.get(i);
@@ -1635,7 +1658,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
 
         if (args != null && args.size() > 0) {
             //设置列宽
-            float[] columnWidths = {3f, 2f, 5f};
+            float[] columnWidths = {3f, 1f, 5f};
             String[][] values = new String[args.size()][3];
             for (int i = 0; i < args.size(); i++) {
                 RequestHeaderEntity entity = args.get(i);
@@ -1724,7 +1747,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
 
         if (globals != null && globals.size() > 0) {
             //设置列宽
-            float[] columnWidths = {3f, 1f, 2f, 2f, 5f};
+            float[] columnWidths = {3f, 1f, 2f, 1f, 4f};
             String[][] values = new String[globals.size()][columnWidths.length];
             for (int i = 0; i < globals.size(); i++) {
                 RequestArgEntity entity = globals.get(i);
@@ -1772,7 +1795,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
 
         if (args != null && args.size() > 0) {
             //设置列宽
-            float[] columnWidths = {3f, 1f, 2f, 2f, 5f};
+            float[] columnWidths = {3f, 1f, 2f, 1f, 4f};
             String[][] values = new String[args.size()][columnWidths.length];
             for (int i = 0; i < args.size(); i++) {
                 RequestArgEntity entity = args.get(i);
@@ -1824,7 +1847,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
         if (globals != null && globals.size() > 0) {
 
             //设置列宽
-            float[] columnWidths = {3f, 2f, 2f, 4f};
+            float[] columnWidths = {4f, 2f, 1f, 4f};
             String[][] values = new String[globals.size()][columnWidths.length];
             for (int i = 0; i < globals.size(); i++) {
                 ResponseArgEntity entity = globals.get(i);
@@ -1872,7 +1895,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
             font.setStyle(Font.NORMAL);
             font.setSize(12f);
             //设置列宽
-            float[] columnWidths = {3f, 2f, 2f, 4f};
+            float[] columnWidths = {4f, 2f, 1f, 4f};
             PdfPTable inter = new PdfPTable(columnWidths.length);
             inter.setWidthPercentage(100); // 宽度100%填充
             inter.setSpacingBefore(1f); // 前间距
@@ -2211,6 +2234,50 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
             }
         }
 
+    }
+
+    /**
+     * 【功能描述：添加图片和文字水印】 【功能详细描述：功能详细描述】
+     *
+     * @param srcFile    待加水印文件
+     * @param destFile   加水印后存放地址
+     * @param text       加水印的文本内容
+     * @param textWidth  文字横坐标
+     * @param textHeight 文字纵坐标
+     * @throws Exception
+     */
+    public String addWaterMark(String srcFile, String destFile, String text,
+                               int textWidth, int textHeight) throws Exception {
+        // 待加水印的文件
+        PdfReader reader = new PdfReader(srcFile);
+        // 加完水印的文件
+        PdfStamper stamper = new PdfStamper(reader, new FileOutputStream(
+                destFile));
+        int total = reader.getNumberOfPages() + 1;
+        PdfContentByte content;
+        // 设置字体
+        BaseFont font = BaseFont.createFont();
+        // 循环对每页插入水印
+        for (int i = 1; i < total; i++) {
+            // 水印的起始
+            content = stamper.getUnderContent(i);
+            // 开始
+            content.beginText();
+            // 设置颜色 默认为蓝色
+            content.setColorFill(new BaseColor(238, 238, 238));
+            // content.setColorFill(Color.GRAY);
+            // 设置字体及字号
+            content.setFontAndSize(font, 50);
+            // 设置起始位置
+            // content.setTextMatrix(400, 880);
+            content.setTextMatrix(textWidth, textHeight);
+            // 开始写入水印
+            content.showTextAligned(Element.ALIGN_CENTER, text, textWidth,
+                    textHeight, 45);
+            content.endText();
+        }
+        stamper.close();
+        return destFile;
     }
 
     /***********************************下载 PDF 结束**************************************/
