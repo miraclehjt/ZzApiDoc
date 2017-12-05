@@ -162,7 +162,10 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                 case ResponseArgEntity.TYPE_STRING:
 
                     break;
-                case ResponseArgEntity.TYPE_NUMBER:
+                case ResponseArgEntity.TYPE_INT:
+
+                    break;
+                case ResponseArgEntity.TYPE_FLOAT:
 
                     break;
                 case ResponseArgEntity.TYPE_OBJECT:
@@ -602,9 +605,16 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                             e.printStackTrace();
                         }
                         break;
-                    case ResponseArgEntity.TYPE_NUMBER:
+                    case ResponseArgEntity.TYPE_INT:
                         try {
                             stringer.key(resG.getName()).value(0);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        break;
+                    case ResponseArgEntity.TYPE_FLOAT:
+                        try {
+                            stringer.key(resG.getName()).value(0.1);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -616,12 +626,23 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                             e.printStackTrace();
                         }
                         break;
-                    case ResponseArgEntity.TYPE_ARRAY_NUMBER:
+                    case ResponseArgEntity.TYPE_ARRAY_INT:
                         try {
                             stringer.key(resG.getName());
                             stringer.array();
                             stringer.value(0);
                             stringer.value(1);
+                            stringer.endArray();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        break;
+                    case ResponseArgEntity.TYPE_ARRAY_FLOAT:
+                        try {
+                            stringer.key(resG.getName());
+                            stringer.array();
+                            stringer.value(0.1);
+                            stringer.value(0.2);
                             stringer.endArray();
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -668,9 +689,16 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                         e.printStackTrace();
                     }
                     break;
-                case ResponseArgEntity.TYPE_NUMBER:
+                case ResponseArgEntity.TYPE_INT:
                     try {
                         stringer.key(res.getName()).value(0);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case ResponseArgEntity.TYPE_FLOAT:
+                    try {
+                        stringer.key(res.getName()).value(0.0);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -697,12 +725,23 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                         e.printStackTrace();
                     }
                     break;
-                case ResponseArgEntity.TYPE_ARRAY_NUMBER:
+                case ResponseArgEntity.TYPE_ARRAY_INT:
                     try {
                         stringer.key(res.getName());
                         stringer.array();
                         stringer.value(0);
                         stringer.value(1);
+                        stringer.endArray();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case ResponseArgEntity.TYPE_ARRAY_FLOAT:
+                    try {
+                        stringer.key(res.getName());
+                        stringer.array();
+                        stringer.value(0.1);
+                        stringer.value(0.2);
                         stringer.endArray();
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -767,9 +806,16 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                         e.printStackTrace();
                     }
                     break;
-                case ResponseArgEntity.TYPE_NUMBER:
+                case ResponseArgEntity.TYPE_INT:
                     try {
                         stringer.key(res.getName()).value(0);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case ResponseArgEntity.TYPE_FLOAT:
+                    try {
+                        stringer.key(res.getName()).value(0.0);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -796,12 +842,23 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                         e.printStackTrace();
                     }
                     break;
-                case ResponseArgEntity.TYPE_ARRAY_NUMBER:
+                case ResponseArgEntity.TYPE_ARRAY_INT:
                     try {
                         stringer.key(res.getName());
                         stringer.array();
                         stringer.value(0);
                         stringer.value(1);
+                        stringer.endArray();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case ResponseArgEntity.TYPE_ARRAY_FLOAT:
+                    try {
+                        stringer.key(res.getName());
+                        stringer.array();
+                        stringer.value(0.1);
+                        stringer.value(0.2);
                         stringer.endArray();
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -1080,8 +1137,12 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                         stringer.key("type").value("string");
                         stringer.key("children").array().endArray();
                         break;
-                    case ResponseArgEntity.TYPE_NUMBER:
-                        stringer.key("type").value("number");
+                    case ResponseArgEntity.TYPE_INT:
+                        stringer.key("type").value("int");
+                        stringer.key("children").array().endArray();
+                        break;
+                    case ResponseArgEntity.TYPE_FLOAT:
+                        stringer.key("type").value("float");
                         stringer.key("children").array().endArray();
                         break;
                     case ResponseArgEntity.TYPE_ARRAY_OBJECT:
@@ -1132,8 +1193,12 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                         stringer.key("type").value("string");
                         stringer.key("children").array().endArray();
                         break;
-                    case ResponseArgEntity.TYPE_NUMBER:
-                        stringer.key("type").value("number");
+                    case ResponseArgEntity.TYPE_INT:
+                        stringer.key("type").value("int");
+                        stringer.key("children").array().endArray();
+                        break;
+                    case ResponseArgEntity.TYPE_FLOAT:
+                        stringer.key("type").value("float");
                         stringer.key("children").array().endArray();
                         break;
                     case ResponseArgEntity.TYPE_ARRAY_OBJECT:
@@ -1170,8 +1235,12 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                         stringer.key("type").value("string");
                         stringer.key("children").array().endArray();
                         break;
-                    case ResponseArgEntity.TYPE_NUMBER:
-                        stringer.key("type").value("number");
+                    case ResponseArgEntity.TYPE_INT:
+                        stringer.key("type").value("int");
+                        stringer.key("children").array().endArray();
+                        break;
+                    case ResponseArgEntity.TYPE_FLOAT:
+                        stringer.key("type").value("float");
                         stringer.key("children").array().endArray();
                         break;
                     case ResponseArgEntity.TYPE_ARRAY_OBJECT:
@@ -1261,8 +1330,12 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                         stringer.key("type").value("string");
                         stringer.key("children").array().endArray();
                         break;
-                    case ResponseArgEntity.TYPE_NUMBER:
-                        stringer.key("type").value("number");
+                    case ResponseArgEntity.TYPE_INT:
+                        stringer.key("type").value("int");
+                        stringer.key("children").array().endArray();
+                        break;
+                    case ResponseArgEntity.TYPE_FLOAT:
+                        stringer.key("type").value("float");
                         stringer.key("children").array().endArray();
                         break;
                     case ResponseArgEntity.TYPE_ARRAY_OBJECT:
@@ -1336,8 +1409,12 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                         stringer.key("type").value("string");
                         stringer.key("children").array().endArray();
                         break;
-                    case ResponseArgEntity.TYPE_NUMBER:
-                        stringer.key("type").value("number");
+                    case ResponseArgEntity.TYPE_INT:
+                        stringer.key("type").value("int");
+                        stringer.key("children").array().endArray();
+                        break;
+                    case ResponseArgEntity.TYPE_FLOAT:
+                        stringer.key("type").value("float");
                         stringer.key("children").array().endArray();
                         break;
                     case ResponseArgEntity.TYPE_OBJECT:
@@ -1385,8 +1462,12 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                         stringer.key("type").value("string");
                         stringer.key("children").array().endArray();
                         break;
-                    case ResponseArgEntity.TYPE_NUMBER:
-                        stringer.key("type").value("number");
+                    case ResponseArgEntity.TYPE_INT:
+                        stringer.key("type").value("int");
+                        stringer.key("children").array().endArray();
+                        break;
+                    case ResponseArgEntity.TYPE_FLOAT:
+                        stringer.key("type").value("float");
                         stringer.key("children").array().endArray();
                         break;
                     case ResponseArgEntity.TYPE_OBJECT:
@@ -1433,8 +1514,12 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                         stringer.key("type").value("string");
                         stringer.key("children").array().endArray();
                         break;
-                    case ResponseArgEntity.TYPE_NUMBER:
-                        stringer.key("type").value("number");
+                    case ResponseArgEntity.TYPE_INT:
+                        stringer.key("type").value("int");
+                        stringer.key("children").array().endArray();
+                        break;
+                    case ResponseArgEntity.TYPE_FLOAT:
+                        stringer.key("type").value("float");
                         stringer.key("children").array().endArray();
                         break;
                     case ResponseArgEntity.TYPE_ARRAY_OBJECT:
@@ -1761,7 +1846,10 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                         values[i][2] = "string";
                         break;
                     case 1:
-                        values[i][2] = "number";
+                        values[i][2] = "int";
+                        break;
+                    case 9:
+                        values[i][2] = "float";
                         break;
                     case 2:
                         values[i][2] = "object";
@@ -1779,7 +1867,10 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                         values[i][2] = "file";
                         break;
                     case 8:
-                        values[i][2] = "array[number]";
+                        values[i][2] = "array[int]";
+                        break;
+                    case 10:
+                        values[i][2] = "array[float]";
                         break;
                     default:
                         values[i][2] = "未知";
@@ -1809,7 +1900,10 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                         values[i][2] = "string";
                         break;
                     case 1:
-                        values[i][2] = "number";
+                        values[i][2] = "int";
+                        break;
+                    case 9:
+                        values[i][2] = "float";
                         break;
                     case 2:
                         values[i][2] = "object";
@@ -1827,7 +1921,10 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                         values[i][2] = "file";
                         break;
                     case 8:
-                        values[i][2] = "array[number]";
+                        values[i][2] = "array[int]";
+                        break;
+                    case 10:
+                        values[i][2] = "array[float]";
                         break;
                     default:
                         values[i][2] = "未知";
@@ -1860,7 +1957,10 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                         values[i][1] = "string";
                         break;
                     case 1:
-                        values[i][1] = "number";
+                        values[i][1] = "int";
+                        break;
+                    case 9:
+                        values[i][1] = "float";
                         break;
                     case 2:
                         values[i][1] = "object";
@@ -1878,7 +1978,10 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                         values[i][1] = "file";
                         break;
                     case 8:
-                        values[i][1] = "array[number]";
+                        values[i][1] = "array[int]";
+                        break;
+                    case 10:
+                        values[i][1] = "array[float]";
                         break;
                     default:
                         values[i][1] = "未知";
@@ -1939,7 +2042,10 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                         cells[1] = new PdfPCell(new Paragraph("string", font));
                         break;
                     case 1:
-                        cells[1] = new PdfPCell(new Paragraph("number", font));
+                        cells[1] = new PdfPCell(new Paragraph("int", font));
+                        break;
+                    case 9:
+                        cells[1] = new PdfPCell(new Paragraph("float", font));
                         break;
                     case 2:
                         cells[1] = new PdfPCell(new Paragraph("object", font));
@@ -1957,7 +2063,10 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                         cells[1] = new PdfPCell(new Paragraph("file", font));
                         break;
                     case 8:
-                        cells[1] = new PdfPCell(new Paragraph("array[number]", font));
+                        cells[1] = new PdfPCell(new Paragraph("array[int]", font));
+                        break;
+                    case 10:
+                        cells[1] = new PdfPCell(new Paragraph("array[float]", font));
                         break;
                     default:
                         cells[1] = new PdfPCell(new Paragraph("未知", font));
@@ -1999,7 +2108,10 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                         cells[1] = new PdfPCell(new Paragraph("string", font));
                         break;
                     case 1:
-                        cells[1] = new PdfPCell(new Paragraph("number", font));
+                        cells[1] = new PdfPCell(new Paragraph("int", font));
+                        break;
+                    case 9:
+                        cells[1] = new PdfPCell(new Paragraph("float", font));
                         break;
                     case 2:
                         cells[1] = new PdfPCell(new Paragraph("object", font));
@@ -2017,7 +2129,10 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                         cells[1] = new PdfPCell(new Paragraph("file", font));
                         break;
                     case 8:
-                        cells[1] = new PdfPCell(new Paragraph("array[number]", font));
+                        cells[1] = new PdfPCell(new Paragraph("array[int]", font));
+                        break;
+                    case 10:
+                        cells[1] = new PdfPCell(new Paragraph("array[float]", font));
                         break;
                     default:
                         cells[1] = new PdfPCell(new Paragraph("未知", font));

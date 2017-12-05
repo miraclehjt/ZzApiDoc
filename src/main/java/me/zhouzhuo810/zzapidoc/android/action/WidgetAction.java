@@ -69,6 +69,7 @@ public class WidgetAction extends BaseController<WidgetEntity> {
             @RequestParam(value = "orientation", required = false) String orientation,
             @RequestParam(value = "relativeId") String relativeId,
             @RequestParam(value = "targetApiId", required = false) String targetApiId,
+            @RequestParam(value = "groupPosition", required = false) int groupPosition,
             @RequestParam(value = "appId", required = false) String appId,
             @RequestParam(value = "textColor", required = false) String textColor,
             @RequestParam(value = "textSize", required = false) int textSize,
@@ -78,7 +79,7 @@ public class WidgetAction extends BaseController<WidgetEntity> {
                 leftTitleText, rightTitleText, leftTitleImg, rightTitleImg, showLeftTitleImg,
                 showRightTitleImg, showLeftTitleText, showRightTitleText, showLeftTitleLayout, showRightTitleLayout,clickToClose,
                 pid, background, width, height, weight, marginLeft, marginRight, marginTop, marginBottom, paddingLeft,
-                paddingRight, paddingTop, paddingBottom, gravity, targetActId, orientation, relativeId, targetApiId, appId, textColor, textSize, userId);
+                paddingRight, paddingTop, paddingBottom, gravity, targetActId, orientation, relativeId, targetApiId, groupPosition, appId, textColor, textSize, userId);
     }
 
     @ResponseBody

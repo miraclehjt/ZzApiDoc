@@ -254,9 +254,9 @@ public class ResponseArgServiceImpl extends BaseServiceImpl<ResponseArgEntity> i
                 } else if (o instanceof String) {
                     addArg(pid, projectId, interfaceId, userId, userName, key, (String) o, ResponseArgEntity.TYPE_STRING);
                 } else if (o instanceof Integer) {
-                    addArg(pid, projectId, interfaceId, userId, userName, key, "" + ((Integer) o), ResponseArgEntity.TYPE_NUMBER);
+                    addArg(pid, projectId, interfaceId, userId, userName, key, "" + ((Integer) o), ResponseArgEntity.TYPE_INT);
                 } else if (o instanceof Double) {
-                    addArg(pid, projectId, interfaceId, userId, userName, key, "" + ((Double) o), ResponseArgEntity.TYPE_NUMBER);
+                    addArg(pid, projectId, interfaceId, userId, userName, key, "" + ((Double) o), ResponseArgEntity.TYPE_FLOAT);
                 }
             }
         }

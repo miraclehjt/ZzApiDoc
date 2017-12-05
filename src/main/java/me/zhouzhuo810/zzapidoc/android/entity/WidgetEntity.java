@@ -72,6 +72,8 @@ public class WidgetEntity extends BaseEntity {
     /*接口id*/
     @Column(name = "targetApiId")
     private String targetApiId;
+    @Column(name = "GroupPosition")
+    private Integer groupPosition = 0;
     @Column(name = "pid")
     private String pid;
     @Column(name = "Background")
@@ -108,6 +110,14 @@ public class WidgetEntity extends BaseEntity {
     private String textColor;
     @Column(name = "TextSize")
     private Integer textSize;
+
+    public Integer getGroupPosition() {
+        return groupPosition;
+    }
+
+    public void setGroupPosition(Integer groupPosition) {
+        this.groupPosition = groupPosition;
+    }
 
     public String getTextColor() {
         return textColor;

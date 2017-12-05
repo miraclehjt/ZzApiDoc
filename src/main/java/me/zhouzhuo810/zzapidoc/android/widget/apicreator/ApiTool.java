@@ -56,6 +56,7 @@ public class ApiTool {
                                         sbApi.append("\nimport java.net.CookiePolicy;");
                                         sbApi.append("\nimport java.util.concurrent.TimeUnit;");
                                         sbApi.append("\n\n");
+                                        sbApi.append("\nimport ").append(packageName).append(".MyApplication;\n");
                                         sbApi.append("\nimport okhttp3.Cache;");
                                         sbApi.append("\nimport okhttp3.OkHttpClient;");
                                         sbApi.append("\nimport okhttp3.logging.HttpLoggingInterceptor;");
@@ -87,7 +88,7 @@ public class ApiTool {
                                             sb.append("\n * ").append(foldersBean.getName());
                                             sb.append("\n */");
                                             sb.append("\npublic interface Api").append(i1).append(" {");
-                                            sbApi.append("\n    private static final String SERVER_IP").append(i1).append(" = ").append("\"").append(ip == null ? "":ip).append("\"").append(";");
+                                            sbApi.append("\n    private static final String SERVER_IP").append(i1).append(" = ").append("\"").append(ip == null ? "" : ip).append("\"").append(";");
                                             sbApi.append("\n    private static Api").append(i1).append(" api").append(i1).append(";");
                                             sbApi.append("\n    public static Api").append(i1).append(" getApi").append(i1).append("() {");
                                             sbApi.append("\n        if (api").append(i1).append(" == null) {");
@@ -121,8 +122,6 @@ public class ApiTool {
                                             sbApi.append("\n        return api").append(i1).append(";");
                                             sbApi.append("\n    }");
                                             sbApi.append("\n\n");
-
-
 
 
                                             //接口
@@ -173,7 +172,7 @@ public class ApiTool {
                                                         generateJavaBean2(root, sbEntity);
                                                         sbEntity.append("\n}");
                                                         System.out.println(sbEntity.toString());
-                                                        FileUtils.saveFileToPathWithName(sbEntity.toString(), path+File.separator+"entity", beanClazz + ".java");
+                                                        FileUtils.saveFileToPathWithName(sbEntity.toString(), path + File.separator + "entity", beanClazz + ".java");
                                                     } catch (Exception e) {
                                                         e.printStackTrace();
                                                         System.out.println(url + "接口的返回json实例解析异常");
@@ -190,14 +189,18 @@ public class ApiTool {
                                                         List<ArgEntity.DataBean> data = argEntity1.getData();
                                                         //添加全局参数
                                                         if (method.equals("GET")) {
-                                                            if (type1.equals("number")) {
+                                                            if (type1.equals("int")) {
                                                                 sb.append("@Query(\"").append(name1).append("\") ").append("int ").append(name1).append(",");
+                                                            } else if (type1.equals("float")) {
+                                                                sb.append("@Query(\"").append(name1).append("\") ").append("float ").append(name1).append(",");
                                                             } else {
                                                                 sb.append("@Query(\"").append(name1).append("\") ").append("String ").append(name1).append(",");
                                                             }
                                                         } else {
-                                                            if (type1.equals("number")) {
+                                                            if (type1.equals("int")) {
                                                                 sb.append("@Field(\"").append(name1).append("\") ").append("int ").append(name1).append(",");
+                                                            } else if (type1.equals("float")) {
+                                                                sb.append("@Field(\"").append(name1).append("\") ").append("float ").append(name1).append(",");
                                                             } else {
                                                                 sb.append("@Field(\"").append(name1).append("\") ").append("String ").append(name1).append(",");
                                                             }
@@ -206,14 +209,18 @@ public class ApiTool {
                                                             String name = aData.getName();
                                                             String type = aData.getType();
                                                             if (method.equals("GET")) {
-                                                                if (type.equals("number")) {
+                                                                if (type.equals("int")) {
                                                                     sb.append("@Query(\"").append(name).append("\") ").append("int ").append(name).append(",");
+                                                                } else if (type.equals("float")) {
+                                                                    sb.append("@Query(\"").append(name1).append("\") ").append("float ").append(name1).append(",");
                                                                 } else {
                                                                     sb.append("@Query(\"").append(name).append("\") ").append("String ").append(name).append(",");
                                                                 }
                                                             } else {
-                                                                if (type.equals("number")) {
+                                                                if (type.equals("int")) {
                                                                     sb.append("@Field(\"").append(name).append("\") ").append("int ").append(name).append(",");
+                                                                } else if (type.equals("float")) {
+                                                                    sb.append("@Field(\"").append(name1).append("\") ").append("float ").append(name1).append(",");
                                                                 } else {
                                                                     sb.append("@Field(\"").append(name).append("\") ").append("String ").append(name).append(",");
                                                                 }
@@ -246,7 +253,7 @@ public class ApiTool {
                                             }
                                             sb.append("\n}");
                                             //TODO 创建Api
-                                            FileUtils.saveFileToPathWithName(sb.toString(),path, "Api" + i1 + ".java");
+                                            FileUtils.saveFileToPathWithName(sb.toString(), path, "Api" + i1 + ".java");
                                         }
                                         sbApi.append("\n    private static CookieManager getCookieManager() {");
                                         sbApi.append("\n        CookieManager cookieManager = new CookieManager();");
@@ -255,7 +262,7 @@ public class ApiTool {
                                         sbApi.append("\n    }");
                                         sbApi.append("\n}");
                                         //TODO 创建Api调用
-                                        FileUtils.saveFileToPathWithName(sbApi.toString(),path, "Api.java");
+                                        FileUtils.saveFileToPathWithName(sbApi.toString(), path, "Api.java");
                                     }
                                 }
                             } else {
@@ -391,7 +398,7 @@ public class ApiTool {
                                                 generateJavaBean2(root, sbEntity);
                                                 sbEntity.append("\n}");
                                                 System.out.println(sbEntity.toString());
-                                                FileUtils.saveFileToPathWithName(sbEntity.toString(),path + File.separator + "entity", beanClazz + ".java");
+                                                FileUtils.saveFileToPathWithName(sbEntity.toString(), path + File.separator + "entity", beanClazz + ".java");
                                             } catch (Exception e) {
                                                 e.printStackTrace();
                                                 System.out.println(url + "接口的返回json实例解析异常");
@@ -412,14 +419,18 @@ public class ApiTool {
                                                     String name = aData.getName();
                                                     String type = aData.getType();
                                                     if (method.equals("GET")) {
-                                                        if (type.equals("number")) {
+                                                        if (type.equals("int")) {
                                                             sb.append("@Query(\"").append(name).append("\") ").append("int ").append(name).append(",");
+                                                        } else if (type.equals("float")) {
+                                                            sb.append("@Query(\"").append(name).append("\") ").append("float ").append(name).append(",");
                                                         } else {
                                                             sb.append("@Query(\"").append(name).append("\") ").append("String ").append(name).append(",");
                                                         }
                                                     } else {
-                                                        if (type.equals("number")) {
+                                                        if (type.equals("int")) {
                                                             sb.append("@Field(\"").append(name).append("\") ").append("int ").append(name).append(",");
+                                                        } else if (type.equals("float")) {
+                                                            sb.append("@Field(\"").append(name).append("\") ").append("float ").append(name).append(",");
                                                         } else {
                                                             sb.append("@Field(\"").append(name).append("\") ").append("String ").append(name).append(",");
                                                         }
@@ -484,9 +495,9 @@ public class ApiTool {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        System.out.println("type="+type+", name="+name);
+        System.out.println("type=" + type + ", name=" + name);
         switch (type) {
-            case "number":
+            case "int":
                 sb.append("\n       private int ").append(name).append("; ").append(desc == null ? "" : " //" + desc);
                 //setter
                 sb.append("\n       public void set").append(name.substring(0, 1).toUpperCase()).append(name.substring(1, name.length())).append("(int ").append(name).append(") {");
@@ -494,6 +505,18 @@ public class ApiTool {
                 sb.append("\n       }");
                 //getter
                 sb.append("\n       public int get").append(name.substring(0, 1).toUpperCase()).append(name.substring(1, name.length())).append("() {");
+                sb.append("\n           return ").append(name).append(";");
+                sb.append("\n       }");
+
+                break;
+            case "float":
+                sb.append("\n       private float ").append(name).append("; ").append(desc == null ? "" : " //" + desc);
+                //setter
+                sb.append("\n       public void set").append(name.substring(0, 1).toUpperCase()).append(name.substring(1, name.length())).append("(float ").append(name).append(") {");
+                sb.append("\n           this.").append(name).append(" = ").append(name).append(";");
+                sb.append("\n       }");
+                //getter
+                sb.append("\n       public float get").append(name.substring(0, 1).toUpperCase()).append(name.substring(1, name.length())).append("() {");
                 sb.append("\n           return ").append(name).append(";");
                 sb.append("\n       }");
 
@@ -551,7 +574,7 @@ public class ApiTool {
         }
     }
 
-    private static void generateString(String name ,String desc, StringBuilder sb) {
+    private static void generateString(String name, String desc, StringBuilder sb) {
         sb.append("\n       private String ").append(name).append("; ").append(desc == null ? "" : " //" + desc);
         //setter
         sb.append("\n       public void set").append(name.substring(0, 1).toUpperCase()).append(name.substring(1, name.length())).append("(String ").append(name).append(") {");

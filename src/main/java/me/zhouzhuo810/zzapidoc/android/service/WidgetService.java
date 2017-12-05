@@ -19,7 +19,7 @@ public interface WidgetService extends BaseService<WidgetEntity> {
                          String pid, String background, int width, int height, double weight, int marginLeft,
                          int marginRight, int marginTop, int marginBottom, int paddingLeft, int paddingRight,
                          int paddingTop, int paddingBottom, String gravity,
-                         String targetActId, String orientation, String relativeId, String targetApiId, String appId, String textColor, int textSize, String userId);
+                         String targetActId, String orientation, String relativeId, String targetApiId, int groupPosition, String appId, String textColor, int textSize, String userId);
 
     BaseResult getAllMyWidget(String relativeId, String pid, String userId);
 

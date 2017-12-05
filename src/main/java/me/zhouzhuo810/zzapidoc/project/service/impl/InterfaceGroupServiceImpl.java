@@ -383,8 +383,12 @@ public class InterfaceGroupServiceImpl extends BaseServiceImpl<InterfaceGroupEnt
                         stringer.key("type").value("string");
                         stringer.key("children").array().endArray();
                         break;
-                    case ResponseArgEntity.TYPE_NUMBER:
-                        stringer.key("type").value("number");
+                    case ResponseArgEntity.TYPE_INT:
+                        stringer.key("type").value("int");
+                        stringer.key("children").array().endArray();
+                        break;
+                    case ResponseArgEntity.TYPE_FLOAT:
+                        stringer.key("type").value("float");
                         stringer.key("children").array().endArray();
                         break;
                     case ResponseArgEntity.TYPE_ARRAY_OBJECT:
@@ -435,8 +439,12 @@ public class InterfaceGroupServiceImpl extends BaseServiceImpl<InterfaceGroupEnt
                         stringer.key("type").value("string");
                         stringer.key("children").array().endArray();
                         break;
-                    case ResponseArgEntity.TYPE_NUMBER:
-                        stringer.key("type").value("number");
+                    case ResponseArgEntity.TYPE_INT:
+                        stringer.key("type").value("int");
+                        stringer.key("children").array().endArray();
+                        break;
+                    case ResponseArgEntity.TYPE_FLOAT:
+                        stringer.key("type").value("float");
                         stringer.key("children").array().endArray();
                         break;
                     case ResponseArgEntity.TYPE_ARRAY_OBJECT:
@@ -473,8 +481,12 @@ public class InterfaceGroupServiceImpl extends BaseServiceImpl<InterfaceGroupEnt
                         stringer.key("type").value("string");
                         stringer.key("children").array().endArray();
                         break;
-                    case ResponseArgEntity.TYPE_NUMBER:
-                        stringer.key("type").value("number");
+                    case ResponseArgEntity.TYPE_INT:
+                        stringer.key("type").value("int");
+                        stringer.key("children").array().endArray();
+                        break;
+                    case ResponseArgEntity.TYPE_FLOAT:
+                        stringer.key("type").value("float");
                         stringer.key("children").array().endArray();
                         break;
                     case ResponseArgEntity.TYPE_ARRAY_OBJECT:
@@ -570,8 +582,12 @@ public class InterfaceGroupServiceImpl extends BaseServiceImpl<InterfaceGroupEnt
                         stringer.key("type").value("string");
                         stringer.key("children").array().endArray();
                         break;
-                    case ResponseArgEntity.TYPE_NUMBER:
-                        stringer.key("type").value("number");
+                    case ResponseArgEntity.TYPE_INT:
+                        stringer.key("type").value("int");
+                        stringer.key("children").array().endArray();
+                        break;
+                    case ResponseArgEntity.TYPE_FLOAT:
+                        stringer.key("type").value("float");
                         stringer.key("children").array().endArray();
                         break;
                     case ResponseArgEntity.TYPE_OBJECT:
@@ -619,8 +635,12 @@ public class InterfaceGroupServiceImpl extends BaseServiceImpl<InterfaceGroupEnt
                         stringer.key("type").value("string");
                         stringer.key("children").array().endArray();
                         break;
-                    case ResponseArgEntity.TYPE_NUMBER:
-                        stringer.key("type").value("number");
+                    case ResponseArgEntity.TYPE_INT:
+                        stringer.key("type").value("int");
+                        stringer.key("children").array().endArray();
+                        break;
+                    case ResponseArgEntity.TYPE_FLOAT:
+                        stringer.key("type").value("float");
                         stringer.key("children").array().endArray();
                         break;
                     case ResponseArgEntity.TYPE_OBJECT:
@@ -667,8 +687,12 @@ public class InterfaceGroupServiceImpl extends BaseServiceImpl<InterfaceGroupEnt
                         stringer.key("type").value("string");
                         stringer.key("children").array().endArray();
                         break;
-                    case ResponseArgEntity.TYPE_NUMBER:
-                        stringer.key("type").value("number");
+                    case ResponseArgEntity.TYPE_INT:
+                        stringer.key("type").value("int");
+                        stringer.key("children").array().endArray();
+                        break;
+                    case ResponseArgEntity.TYPE_FLOAT:
+                        stringer.key("type").value("float");
                         stringer.key("children").array().endArray();
                         break;
                     case ResponseArgEntity.TYPE_ARRAY_OBJECT:

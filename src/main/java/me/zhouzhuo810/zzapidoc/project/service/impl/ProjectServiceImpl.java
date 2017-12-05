@@ -275,8 +275,11 @@ public class ProjectServiceImpl extends BaseServiceImpl<ProjectEntity> implement
                                         case "string":
                                             mReqArg.setTypeId(0);
                                             break;
-                                        case "number":
+                                        case "int":
                                             mReqArg.setTypeId(1);
+                                            break;
+                                        case "float":
+                                            mReqArg.setTypeId(9);
                                             break;
                                         case "object":
                                             mReqArg.setTypeId(2);
@@ -293,8 +296,11 @@ public class ProjectServiceImpl extends BaseServiceImpl<ProjectEntity> implement
                                         case "file":
                                             mReqArg.setTypeId(6);
                                             break;
-                                        case "array[number]":
+                                        case "array[int]":
                                             mReqArg.setTypeId(8);
+                                            break;
+                                        case "array[float]":
+                                            mReqArg.setTypeId(10);
                                             break;
                                         default:
                                             mReqArg.setTypeId(7);
@@ -329,8 +335,11 @@ public class ProjectServiceImpl extends BaseServiceImpl<ProjectEntity> implement
                                         case "string":
                                             mResArg.setTypeId(0);
                                             break;
-                                        case "number":
+                                        case "int":
                                             mResArg.setTypeId(1);
+                                            break;
+                                        case "float":
+                                            mResArg.setTypeId(9);
                                             break;
                                         case "object":
                                             mResArg.setTypeId(2);
@@ -347,8 +356,11 @@ public class ProjectServiceImpl extends BaseServiceImpl<ProjectEntity> implement
                                         case "file":
                                             mResArg.setTypeId(6);
                                             break;
-                                        case "array[number]":
+                                        case "array[int]":
                                             mResArg.setTypeId(8);
+                                            break;
+                                        case "array[float]":
+                                            mResArg.setTypeId(10);
                                             break;
                                         default:
                                             mResArg.setTypeId(7);
@@ -454,8 +466,11 @@ public class ProjectServiceImpl extends BaseServiceImpl<ProjectEntity> implement
                                                         case "string":
                                                             mResArg.setTypeId(0);
                                                             break;
-                                                        case "number":
+                                                        case "int":
                                                             mResArg.setTypeId(1);
+                                                            break;
+                                                        case "float":
+                                                            mResArg.setTypeId(9);
                                                             break;
                                                         case "object":
                                                             mResArg.setTypeId(2);
@@ -472,8 +487,11 @@ public class ProjectServiceImpl extends BaseServiceImpl<ProjectEntity> implement
                                                         case "file":
                                                             mResArg.setTypeId(6);
                                                             break;
-                                                        case "array[number]":
+                                                        case "array[int]":
                                                             mResArg.setTypeId(8);
+                                                            break;
+                                                        case "array[float]":
+                                                            mResArg.setTypeId(10);
                                                             break;
                                                         default:
                                                             mResArg.setTypeId(7);
@@ -526,8 +544,11 @@ public class ProjectServiceImpl extends BaseServiceImpl<ProjectEntity> implement
                                                     case "string":
                                                         mReqArg.setTypeId(0);
                                                         break;
-                                                    case "number":
+                                                    case "int":
                                                         mReqArg.setTypeId(1);
+                                                        break;
+                                                    case "float":
+                                                        mReqArg.setTypeId(9);
                                                         break;
                                                     case "object":
                                                         mReqArg.setTypeId(2);
@@ -544,8 +565,11 @@ public class ProjectServiceImpl extends BaseServiceImpl<ProjectEntity> implement
                                                     case "file":
                                                         mReqArg.setTypeId(6);
                                                         break;
-                                                    case "array[number]":
+                                                    case "array[int]":
                                                         mReqArg.setTypeId(8);
+                                                        break;
+                                                    case "array[float]":
+                                                        mReqArg.setTypeId(10);
                                                         break;
                                                     default:
                                                         mReqArg.setTypeId(7);
@@ -631,8 +655,11 @@ public class ProjectServiceImpl extends BaseServiceImpl<ProjectEntity> implement
                     case "string":
                         mResArg.setTypeId(0);
                         break;
-                    case "number":
+                    case "int":
                         mResArg.setTypeId(1);
+                        break;
+                    case "float":
+                        mResArg.setTypeId(9);
                         break;
                     case "object":
                         mResArg.setTypeId(2);
@@ -649,8 +676,11 @@ public class ProjectServiceImpl extends BaseServiceImpl<ProjectEntity> implement
                     case "file":
                         mResArg.setTypeId(6);
                         break;
-                    case "array[number]":
+                    case "array[int]":
                         mResArg.setTypeId(8);
+                        break;
+                    case "array[float]":
+                        mResArg.setTypeId(10);
                         break;
                     default:
                         mResArg.setTypeId(7);

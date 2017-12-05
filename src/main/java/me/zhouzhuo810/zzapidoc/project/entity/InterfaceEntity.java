@@ -36,9 +36,9 @@ public class InterfaceEntity extends BaseEntity {
     private String example;
     @Formula("(SELECT count(*) FROM request_header r WHERE r.InterfaceId = ID AND r.DelFlag = 0)")
     private int requestHeadersNo;
-    @Formula("(SELECT count(*) FROM request_args r WHERE r.InterfaceId = ID AND r.DelFlag = 0)")
+    @Formula("(SELECT count(*) FROM request_args r WHERE (r.InterfaceId = ID AND r.DelFlag = 0) OR (r.ProjectId = ProjectId AND r.IsGlobal = 1 AND r.DelFlag = 0))")
     private int requestParamsNo;
-    @Formula("(SELECT count(*) FROM response_args r WHERE r.InterfaceId = ID AND r.DelFlag = 0)")
+    @Formula("(SELECT count(*) FROM response_args r WHERE (r.InterfaceId = ID AND r.DelFlag = 0) OR (r.ProjectId = ProjectId AND r.IsGlobal = 1 AND r.DelFlag = 0))")
     private int responseParamsNo;
     @Column(name = "IsTest")
     private Boolean isTest;

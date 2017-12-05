@@ -15,14 +15,16 @@ import javax.persistence.Table;
 public class ResponseArgEntity extends BaseEntity {
 
     public static final int TYPE_STRING = 0;
-    public static final int TYPE_NUMBER = 1;
+    public static final int TYPE_INT = 1;
+    public static final int TYPE_FLOAT = 9;
+    public static final int TYPE_ARRAY_FLOAT = 10;
     public static final int TYPE_OBJECT = 2;
     public static final int TYPE_ARRAY_OBJECT = 3;
     public static final int TYPE_ARRAY_STRING = 4;
     public static final int TYPE_ARRAY = 5;
     public static final int TYPE_FILE = 6;
     public static final int TYPE_UNKNOWN = 7;
-    public static final int TYPE_ARRAY_NUMBER = 8;
+    public static final int TYPE_ARRAY_INT = 8;
 
     @Column(name = "TypeId", length = 11)
     private Integer typeId = 0;
