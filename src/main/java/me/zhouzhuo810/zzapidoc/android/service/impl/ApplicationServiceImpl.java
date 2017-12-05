@@ -622,6 +622,9 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 "        targetSdkVersion " + app.getTargetSDK() + "\n" +
                 "        versionCode " + app.getVersionCode() + "\n" +
                 "        versionName \"" + app.getVersionName() + "\"\n" +
+                "        ndk { \n" +
+                "              abiFilters\"armeabi\",\"armeabi-v7a\",\"x86\",\"mips\"\n" +
+                "        }\n"+
                 "    }\n" +
                 "\n" +
                 "    aaptOptions {\n" +
