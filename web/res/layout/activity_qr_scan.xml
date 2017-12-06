@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:zz="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <SurfaceView
+        android:id="@+id/capture_preview_deprecated"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <FrameLayout
+        android:id="@+id/capture_preview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <ImageView
+        android:id="@+id/top_mask"
+        android:layout_width="match_parent"
+        android:layout_height="400px"
+        android:layout_alignParentTop="true"
+        android:background="@drawable/scan_mask" />
+
+    <RelativeLayout
+        android:id="@+id/capture_crop_layout"
+        android:layout_width="700px"
+        android:layout_height="700px"
+        android:layout_below="@id/top_mask"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/capture"
+        zz:layout_auto_baseheight="width">
+
+        <ImageView
+            android:id="@+id/capture_scan_line"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_margin="10px"
+            android:background="@drawable/scan_line" />
+    </RelativeLayout>
+
+    <ImageView
+        android:id="@+id/bottom_mask"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentBottom="true"
+        android:layout_below="@id/capture_crop_layout"
+        android:background="@drawable/scan_mask" />
+
+    <ImageView
+        android:id="@+id/left_mask"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/bottom_mask"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@id/top_mask"
+        android:layout_toLeftOf="@id/capture_crop_layout"
+        android:background="@drawable/scan_mask" />
+
+    <ImageView
+        android:id="@+id/right_mask"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/bottom_mask"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/top_mask"
+        android:layout_toRightOf="@id/capture_crop_layout"
+        android:background="@drawable/scan_mask" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/capture_crop_layout"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="100px"
+        android:text="@string/scan_tips"
+        android:textColor="@android:color/white"
+        android:textSize="40px" />
+
+    <zhouzhuo810.me.zzandframe.ui.widget.TitleBar
+        android:id="@+id/capture_title_bar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/title_height"
+        android:layout_alignParentTop="true"
+        android:background="@color/colorMain"
+        zz:leftImg="@drawable/back"
+        zz:showRightLayout="false"
+        zz:showTitle="true"
+        zz:textSizeTitle="50px"
+        zz:titleText="二维码扫码" />
+
+</RelativeLayout>

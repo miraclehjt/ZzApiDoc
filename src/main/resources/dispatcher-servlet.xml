@@ -34,7 +34,6 @@
     <mvc:resources location="/API/" mapping="/API/**"/>
     <mvc:resources location="/QrCode/" mapping="/QrCode/**"/>
 
-
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
         <property name="prefix" value="/WEB-INF/"/>
         <property name="suffix" value=".jsp"/>

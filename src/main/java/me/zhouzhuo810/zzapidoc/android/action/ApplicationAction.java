@@ -44,14 +44,17 @@ public class ApplicationAction extends BaseController<ApplicationEntity> {
             @RequestParam(value = "compileSDK") int compileSDK,
             @RequestParam(value = "targetSDK") int targetSDK,
             @RequestParam(value = "versionCode") int versionCode,
+            @RequestParam(value = "enableQrCode", required = false) boolean enableQrCode,
             @RequestParam(value = "multiDex", required = false) boolean multiDex,
             @RequestParam(value = "minifyEnabled", required = false) boolean minifyEnabled,
             @RequestParam(value = "apiId", required = false) String apiId,
             @RequestBody(required = false) MultipartFile logo,
             @RequestParam(value = "userId") String userId
     ) {
-        return getBaseService().addApplication(chName, appName, versionName, packageName, logo,
-                colorMain, minSDK, compileSDK, targetSDK, versionCode, multiDex, minifyEnabled, apiId, userId);
+        return getBaseService().addApplication(chName, appName, versionName, packageName,
+                logo, colorMain, minSDK, compileSDK, targetSDK,
+                versionCode, enableQrCode, multiDex, minifyEnabled,
+                apiId, userId);
     }
 
     @ResponseBody

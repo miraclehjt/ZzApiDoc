@@ -15,8 +15,8 @@ public interface ApplicationService extends BaseService<ApplicationEntity> {
                               String packageName, MultipartFile logo,
                               String colorMain, int minSDK,
                               int compileSDK, int targetSDK,
-                              int versionCode, boolean multiDex,
-                              boolean minifyEnabled,
+                              int versionCode, boolean enableQrCode,
+                              boolean multiDex, boolean minifyEnabled,
                               String apiId,
                               String userId);
 

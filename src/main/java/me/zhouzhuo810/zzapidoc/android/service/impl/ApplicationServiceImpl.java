@@ -103,7 +103,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
 
     @Override
     public BaseResult addApplication(String chName, String appName, String versionName, String packageName, MultipartFile logo,
-                                     String colorMain, int minSDK, int compileSDK, int targetSDK, int versionCode,
+                                     String colorMain, int minSDK, int compileSDK, int targetSDK, int versionCode, boolean enableQrCode,
                                      boolean multiDex, boolean minifyEnabled, String apiId, String userId) {
         UserEntity user = mUserService.get(userId);
         if (user == null) {
@@ -125,10 +125,12 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 e.printStackTrace();
             }
         }
+        entity.setEnableQrCode(enableQrCode);
         entity.setPackageName(packageName);
         entity.setVersionCode(versionCode);
         entity.setVersionName(versionName);
         entity.setTargetSDK(targetSDK);
+        entity.setMultiDex(multiDex);
         entity.setCompileSDK(compileSDK);
         entity.setMinSDK(minSDK);
         try {
@@ -186,6 +188,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
             map.put("versionCode", applicationEntity.getVersionCode());
             map.put("versionName", applicationEntity.getVersionName());
             map.put("logo", applicationEntity.getLogo());
+            map.put("enableQrCode", applicationEntity.getEnableQrCode());
             map.put("createTime", DataUtils.formatDate(applicationEntity.getCreateTime()));
             map.put("colorMain", applicationEntity.getColorMain());
             map.put("packageName", applicationEntity.getPackageName());
@@ -266,6 +269,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                     }
                 }
 
+                copyLibs(realPath, appDirPath, app);
                 createSettingGradleFile(appDirPath);
                 createGradleProperties(appDirPath);
                 createBuildGralde(appDirPath);
@@ -285,7 +289,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                     /*压缩完毕，删除源文件*/
                     FileUtil.deleteContents(new File(appDirPath));
                 } else {
-                 /*压缩完毕，删除源文件*/
+                    /*压缩完毕，删除源文件*/
                     FileUtil.deleteContents(new File(appDirPath));
                 }
 
@@ -299,6 +303,18 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
             e.printStackTrace();
         }
         return null;
+    }
+
+
+    private void copyLibs(String rootPath, String appDirPath, ApplicationEntity app) throws IOException {
+
+        String libPath = appDirPath + File.separator + "app" + File.separator + "libs";
+        if (app.getEnableQrCode() != null) {
+            if (app.getEnableQrCode()) {
+                FileUtil.copyDir(new File(rootPath + File.separator + "res" + File.separator + "libs" + File.separator + "zbar")
+                        , new File(libPath));
+            }
+        }
     }
 
     /***********************************下载 APK 结束**************************************/
@@ -369,6 +385,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                     }
                 }
 
+                copyLibs(realPath, appDirPath, app);
                 createSettingGradleFile(appDirPath);
                 createGradleProperties(appDirPath);
                 createBuildGralde(appDirPath);
@@ -556,6 +573,431 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 + File.separator + ".gitignore"
         ), new File(appDirPath + File.separator + ".gitignore"));
 
+
+        /*qrcode*/
+        if (app.getEnableQrCode() != null) {
+            if (app.getEnableQrCode()) {
+                FileUtil.copyDir(new File(rootPath
+                        + File.separator + "res"
+                        + File.separator + "java"
+                        + File.separator + "zbar"
+                ), new File(appDirPath + File.separator + "app" + File.separator + "src" + File.separator + "main" + File.separator + "java"
+                        + File.separator + "com" + File.separator + "obsessive" + File.separator + "zbar"));
+                FileUtils.saveFileToPathWithName("package com.obsessive.zbar;\n" +
+                        "\n" +
+                        "import android.content.Intent;\n" +
+                        "import android.content.res.AssetFileDescriptor;\n" +
+                        "import android.graphics.Rect;\n" +
+                        "import android.hardware.Camera;\n" +
+                        "import android.hardware.Camera.AutoFocusCallback;\n" +
+                        "import android.hardware.Camera.PreviewCallback;\n" +
+                        "import android.hardware.Camera.Size;\n" +
+                        "import android.media.AudioManager;\n" +
+                        "import android.media.MediaPlayer;\n" +
+                        "import android.os.Bundle;\n" +
+                        "import android.os.Handler;\n" +
+                        "import android.os.Vibrator;\n" +
+                        "import android.text.TextUtils;\n" +
+                        "import android.view.animation.Animation;\n" +
+                        "import android.view.animation.LinearInterpolator;\n" +
+                        "import android.view.animation.TranslateAnimation;\n" +
+                        "import android.widget.FrameLayout;\n" +
+                        "import android.widget.ImageView;\n" +
+                        "import android.widget.RelativeLayout;\n" +
+                        "import android.widget.TextView;\n" +
+                        "import android.widget.Toast;\n" +
+                        "\n" +
+                        "\n" +
+                        "import net.sourceforge.zbar.Config;\n" +
+                        "import net.sourceforge.zbar.Image;\n" +
+                        "import net.sourceforge.zbar.ImageScanner;\n" +
+                        "import net.sourceforge.zbar.Symbol;\n" +
+                        "import net.sourceforge.zbar.SymbolSet;\n" +
+                        "\n" +
+                        "import java.io.IOException;\n" +
+                        "import java.lang.reflect.Field;\n" +
+                        "\n" +
+                        "import " + app.getPackageName() + ".R;\n" +
+                        "import " + app.getPackageName() + ".common.cons.Cons;\n" +
+                        "import zhouzhuo810.me.zzandframe.common.utils.StrUtils;\n" +
+                        "import zhouzhuo810.me.zzandframe.common.utils.ToastUtils;\n" +
+                        "import zhouzhuo810.me.zzandframe.ui.act.BaseActivity;\n" +
+                        "import zhouzhuo810.me.zzandframe.ui.widget.TitleBar;\n" +
+                        "\n" +
+                        "public class CaptureActivity extends BaseActivity {\n" +
+                        "\n" +
+                        "    private TitleBar titleBar;\n" +
+                        "\n" +
+                        "    private Camera mCamera;\n" +
+                        "    private CameraPreview mPreview;\n" +
+                        "    private Handler autoFocusHandler;\n" +
+                        "    private CameraManager mCameraManager;\n" +
+                        "\n" +
+                        "    private Rect mCropRect = null;\n" +
+                        "    private boolean barcodeScanned = false;\n" +
+                        "    private boolean previewing = true;\n" +
+                        "    private ImageScanner mImageScanner = null;\n" +
+                        "\n" +
+                        "    private MediaPlayer mediaPlayer;\n" +
+                        "    private boolean playBeep;\n" +
+                        "    private static final float BEEP_VOLUME = 0.50f;\n" +
+                        "    private boolean vibrate;\n" +
+                        "    private RelativeLayout mContainer = null;\n" +
+                        "    private RelativeLayout mCropLayout = null;\n" +
+                        "\n" +
+                        "    static {\n" +
+                        "        System.loadLibrary(\"iconv\");\n" +
+                        "    }\n" +
+                        "\n" +
+                        "    private static final long VIBRATE_DURATION = 200L;\n" +
+                        "\n" +
+                        "    private FrameLayout scanPreview;\n" +
+                        "\n" +
+                        "    private boolean isFlashOpen = false;\n" +
+                        "\n" +
+                        "    @Override\n" +
+                        "    public int getLayoutId() {\n" +
+                        "        return R.layout.activity_qr_scan;\n" +
+                        "    }\n" +
+                        "\n" +
+                        "    @Override\n" +
+                        "    public boolean defaultBack() {\n" +
+                        "        return false;\n" +
+                        "    }\n" +
+                        "\n" +
+                        "    @Override\n" +
+                        "    public void initView() {\n" +
+                        "\n" +
+                        "        titleBar = (TitleBar) findViewById(R.id.capture_title_bar);\n" +
+                        "\n" +
+                        "        mContainer = (RelativeLayout) findViewById(R.id.root);\n" +
+                        "        mCropLayout = (RelativeLayout) findViewById(R.id.capture_crop_layout);\n" +
+                        "\n" +
+                        "        scanPreview = (FrameLayout) findViewById(R.id.capture_preview);\n" +
+                        "\n" +
+                        "        mImageScanner = new ImageScanner();\n" +
+                        "        mImageScanner.setConfig(0, Config.X_DENSITY, 3);\n" +
+                        "        mImageScanner.setConfig(0, Config.Y_DENSITY, 3);\n" +
+                        "\n" +
+                        "        autoFocusHandler = new Handler();\n" +
+                        "        mCameraManager = new CameraManager(this);\n" +
+                        "\n" +
+                        "        try {\n" +
+                        "            mCameraManager.openDriver();\n" +
+                        "        } catch (IOException | RuntimeException e) {\n" +
+                        "            ToastUtils.showCustomBgToast(getString(R.string.camera_permissin_text));\n" +
+                        "            closeAct();\n" +
+                        "            e.printStackTrace();\n" +
+                        "        }\n" +
+                        "\n" +
+                        "        mCamera = mCameraManager.getCamera();\n" +
+                        "        mPreview = new CameraPreview(this, mCamera, previewCb, autoFocusCB);\n" +
+                        "        scanPreview.addView(mPreview);\n" +
+                        "\n" +
+                        "        ImageView mQrLineView = (ImageView) findViewById(R.id.capture_scan_line);\n" +
+                        "        TranslateAnimation mAnimation = new TranslateAnimation(TranslateAnimation.ABSOLUTE, 0f, TranslateAnimation.ABSOLUTE, 0f,\n" +
+                        "                TranslateAnimation.RELATIVE_TO_PARENT, 0f, TranslateAnimation.RELATIVE_TO_PARENT, 0.9f);\n" +
+                        "        mAnimation.setDuration(1500);\n" +
+                        "        mAnimation.setRepeatCount(-1);\n" +
+                        "        mAnimation.setRepeatMode(Animation.REVERSE);\n" +
+                        "        mAnimation.setInterpolator(new LinearInterpolator());\n" +
+                        "        mQrLineView.setAnimation(mAnimation);\n" +
+                        "\n" +
+                        "    }\n" +
+                        "\n" +
+                        "\n" +
+                        "    private void initBeepSound() {\n" +
+                        "        if (playBeep && mediaPlayer == null) {\n" +
+                        "            setVolumeControlStream(AudioManager.STREAM_MUSIC);\n" +
+                        "            mediaPlayer = new MediaPlayer();\n" +
+                        "            mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);\n" +
+                        "            mediaPlayer.setOnCompletionListener(beepListener);\n" +
+                        "\n" +
+                        "            AssetFileDescriptor file = getResources().openRawResourceFd(R.raw.beep);\n" +
+                        "            try {\n" +
+                        "                mediaPlayer.setDataSource(file.getFileDescriptor(), file.getStartOffset(), file.getLength());\n" +
+                        "                file.close();\n" +
+                        "                mediaPlayer.setVolume(BEEP_VOLUME, BEEP_VOLUME);\n" +
+                        "                mediaPlayer.prepare();\n" +
+                        "            } catch (IOException e) {\n" +
+                        "                mediaPlayer = null;\n" +
+                        "            }\n" +
+                        "        }\n" +
+                        "    }\n" +
+                        "\n" +
+                        "    private final MediaPlayer.OnCompletionListener beepListener = new MediaPlayer.OnCompletionListener() {\n" +
+                        "        public void onCompletion(MediaPlayer mediaPlayer) {\n" +
+                        "            mediaPlayer.seekTo(0);\n" +
+                        "        }\n" +
+                        "    };\n" +
+                        "\n" +
+                        "    private void playBeepSoundAndVibrate() {\n" +
+                        "        if (playBeep && mediaPlayer != null) {\n" +
+                        "            mediaPlayer.start();\n" +
+                        "        }\n" +
+                        "        if (vibrate) {\n" +
+                        "            Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);\n" +
+                        "            vibrator.vibrate(VIBRATE_DURATION);\n" +
+                        "        }\n" +
+                        "    }\n" +
+                        "\n" +
+                        "    @Override\n" +
+                        "    protected void onResume() {\n" +
+                        "        super.onResume();\n" +
+                        "        playBeep = true;\n" +
+                        "        AudioManager audioService = (AudioManager) getSystemService(AUDIO_SERVICE);\n" +
+                        "        if (audioService.getRingerMode() != AudioManager.RINGER_MODE_NORMAL) {\n" +
+                        "            playBeep = false;\n" +
+                        "        }\n" +
+                        "        initBeepSound();\n" +
+                        "        vibrate = true;\n" +
+                        "    }\n" +
+                        "\n" +
+                        "    @Override\n" +
+                        "    public void initData() {\n" +
+                        "\n" +
+                        "    }\n" +
+                        "\n" +
+                        "    @Override\n" +
+                        "    public void initEvent() {\n" +
+                        "        titleBar.setOnTitleClickListener(new TitleBar.OnTitleClick() {\n" +
+                        "            @Override\n" +
+                        "            public void onLeftClick(ImageView imageView, TextView textView) {\n" +
+                        "                closeAct();\n" +
+                        "            }\n" +
+                        "\n" +
+                        "            @Override\n" +
+                        "            public void onTitleClick(TextView textView) {\n" +
+                        "\n" +
+                        "            }\n" +
+                        "\n" +
+                        "            @Override\n" +
+                        "            public void onRightClick(ImageView imageView, TextView textView) {\n" +
+                        "                if (isFlashOpen) {\n" +
+                        "                    closeFlashlight();\n" +
+                        "                } else {\n" +
+                        "                    openFlashlight();\n" +
+                        "                }\n" +
+                        "            }\n" +
+                        "        });\n" +
+                        "    }\n" +
+                        "\n" +
+                        "    @Override\n" +
+                        "    public void resume() {\n" +
+                        "\n" +
+                        "    }\n" +
+                        "\n" +
+                        "    @Override\n" +
+                        "    public void pause() {\n" +
+                        "\n" +
+                        "    }\n" +
+                        "\n" +
+                        "    @Override\n" +
+                        "    public void destroy() {\n" +
+                        "\n" +
+                        "    }\n" +
+                        "\n" +
+                        "    @Override\n" +
+                        "    public void saveState(Bundle bundle) {\n" +
+                        "\n" +
+                        "    }\n" +
+                        "\n" +
+                        "    @Override\n" +
+                        "    public void restoreState(Bundle bundle) {\n" +
+                        "\n" +
+                        "    }\n" +
+                        "\n" +
+                        "\n" +
+                        "    /*处理结果*/\n" +
+                        "    public void handleDecode(String result) {\n" +
+                        "//\t\tToast.makeText(getApplicationContext(), result, Toast.LENGTH_SHORT).show();\n" +
+                        "        playBeepSoundAndVibrate();\n" +
+                        "\n" +
+                        "        //FIXME\n" +
+                        "        if (StrUtils.isEmpty(result)) {\n" +
+                        "            Toast.makeText(CaptureActivity.this, getString(R.string.scan_fail), Toast.LENGTH_SHORT).show();\n" +
+                        "            closeAct();\n" +
+                        "        } else {\n" +
+                        "            Intent intent = new Intent();\n" +
+                        "            intent.putExtra(Cons.SCAN_RESULT, result);\n" +
+                        "            setResult(RESULT_OK, intent);\n" +
+                        "            closeAct();\n" +
+                        "        }\n" +
+                        "        // 连续扫描，不发送此消息扫描一次结束后就不能再次扫描\n" +
+                        "//\t\thandler.sendEmptyMessage(R.id.restart_preview);\n" +
+                        "    }\n" +
+                        "\n" +
+                        "\n" +
+                        "    public void onPause() {\n" +
+                        "        super.onPause();\n" +
+                        "        releaseCamera();\n" +
+                        "    }\n" +
+                        "\n" +
+                        "    private void releaseCamera() {\n" +
+                        "        if (mCamera != null) {\n" +
+                        "            previewing = false;\n" +
+                        "            mCamera.setPreviewCallback(null);\n" +
+                        "            mCamera.release();\n" +
+                        "            mCamera = null;\n" +
+                        "        }\n" +
+                        "    }\n" +
+                        "\n" +
+                        "    private Runnable doAutoFocus = new Runnable() {\n" +
+                        "        public void run() {\n" +
+                        "            if (previewing)\n" +
+                        "                mCamera.autoFocus(autoFocusCB);\n" +
+                        "        }\n" +
+                        "    };\n" +
+                        "\n" +
+                        "    PreviewCallback previewCb = new PreviewCallback() {\n" +
+                        "        public void onPreviewFrame(byte[] data, Camera camera) {\n" +
+                        "            Size size = camera.getParameters().getPreviewSize();\n" +
+                        "\n" +
+                        "            // 这里需要将获取的data翻转一下，因为相机默认拿的的横屏的数据\n" +
+                        "            if (data == null) {\n" +
+                        "                closeAct();\n" +
+                        "                return;\n" +
+                        "            }\n" +
+                        "            byte[] rotatedData = new byte[data.length];\n" +
+                        "            for (int y = 0; y < size.height; y++) {\n" +
+                        "                for (int x = 0; x < size.width; x++)\n" +
+                        "                    rotatedData[x * size.height + size.height - y - 1] = data[x\n" +
+                        "                            + y * size.width];\n" +
+                        "            }\n" +
+                        "\n" +
+                        "            // 宽高也要调整\n" +
+                        "            int tmp = size.width;\n" +
+                        "            size.width = size.height;\n" +
+                        "            size.height = tmp;\n" +
+                        "\n" +
+                        "            initCrop();\n" +
+                        "\n" +
+                        "            Image barcode = new Image(size.width, size.height, \"Y800\");\n" +
+                        "            barcode.setData(rotatedData);\n" +
+                        "            barcode.setCrop(mCropRect.left, mCropRect.top, mCropRect.width(),\n" +
+                        "                    mCropRect.height());\n" +
+                        "\n" +
+                        "            int result = mImageScanner.scanImage(barcode);\n" +
+                        "            String resultStr = null;\n" +
+                        "\n" +
+                        "            if (result != 0) {\n" +
+                        "                SymbolSet syms = mImageScanner.getResults();\n" +
+                        "                for (Symbol sym : syms) {\n" +
+                        "                    resultStr = sym.getData();\n" +
+                        "                }\n" +
+                        "            }\n" +
+                        "\n" +
+                        "            if (!TextUtils.isEmpty(resultStr)) {\n" +
+                        "                previewing = false;\n" +
+                        "                mCamera.setPreviewCallback(null);\n" +
+                        "                mCamera.stopPreview();\n" +
+                        "\n" +
+                        "//\t\t\t\tToastUtils.showCustomBgToast(resultStr);\n" +
+                        "                //TODO 处理结果\n" +
+                        "                handleDecode(resultStr);\n" +
+                        "\n" +
+                        "                barcodeScanned = true;\n" +
+                        "            }\n" +
+                        "        }\n" +
+                        "    };\n" +
+                        "\n" +
+                        "    // Mimic continuous auto-focusing\n" +
+                        "    AutoFocusCallback autoFocusCB = new AutoFocusCallback() {\n" +
+                        "        public void onAutoFocus(boolean success, Camera camera) {\n" +
+                        "            autoFocusHandler.postDelayed(doAutoFocus, 1000);\n" +
+                        "        }\n" +
+                        "    };\n" +
+                        "\n" +
+                        "    /**\n" +
+                        "     * 初始化截取的矩形区域\n" +
+                        "     */\n" +
+                        "    private void initCrop() {\n" +
+                        "        int cameraWidth = mCameraManager.getCameraResolution().y;\n" +
+                        "        int cameraHeight = mCameraManager.getCameraResolution().x;\n" +
+                        "\n" +
+                        "        /** 获取布局中扫描框的位置信息 */\n" +
+                        "        int[] location = new int[2];\n" +
+                        "        mCropLayout.getLocationInWindow(location);\n" +
+                        "\n" +
+                        "        int cropLeft = location[0];\n" +
+                        "        int cropTop = location[1] - getStatusBarHeight();\n" +
+                        "\n" +
+                        "        int cropWidth = mCropLayout.getWidth();\n" +
+                        "        int cropHeight = mCropLayout.getHeight();\n" +
+                        "\n" +
+                        "        /** 获取布局容器的宽高 */\n" +
+                        "        int containerWidth = mContainer.getWidth();\n" +
+                        "        int containerHeight = mContainer.getHeight();\n" +
+                        "\n" +
+                        "        /** 计算最终截取的矩形的左上角顶点x坐标 */\n" +
+                        "        int x = cropLeft * cameraWidth / containerWidth;\n" +
+                        "        /** 计算最终截取的矩形的左上角顶点y坐标 */\n" +
+                        "        int y = cropTop * cameraHeight / containerHeight;\n" +
+                        "\n" +
+                        "        /** 计算最终截取的矩形的宽度 */\n" +
+                        "        int width = cropWidth * cameraWidth / containerWidth;\n" +
+                        "        /** 计算最终截取的矩形的高度 */\n" +
+                        "        int height = cropHeight * cameraHeight / containerHeight;\n" +
+                        "\n" +
+                        "        /** 生成最终的截取的矩形 */\n" +
+                        "        mCropRect = new Rect(x, y, width + x, height + y);\n" +
+                        "    }\n" +
+                        "\n" +
+                        "    private int getStatusBarHeight() {\n" +
+                        "        try {\n" +
+                        "            Class<?> c = Class.forName(\"com.android.internal.R$dimen\");\n" +
+                        "            Object obj = c.newInstance();\n" +
+                        "            Field field = c.getField(\"status_bar_height\");\n" +
+                        "            int x = Integer.parseInt(field.get(obj).toString());\n" +
+                        "            return getResources().getDimensionPixelSize(x);\n" +
+                        "        } catch (Exception e) {\n" +
+                        "            e.printStackTrace();\n" +
+                        "        }\n" +
+                        "        return 0;\n" +
+                        "    }\n" +
+                        "\n" +
+                        "    private void openFlashlight() {\n" +
+                        "        if (mCamera != null) {\n" +
+                        "            mCamera.startPreview();\n" +
+                        "            Camera.Parameters parameters = mCamera.getParameters();\n" +
+                        "            parameters.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);\n" +
+                        "            mCamera.setParameters(parameters);\n" +
+                        "            isFlashOpen = true;\n" +
+                        "            titleBar.getIvRight().setImageResource(R.drawable.flash_close);\n" +
+                        "        } else {\n" +
+                        "            ToastUtils.showCustomBgToast(getString(R.string.open_flashlight_fail));\n" +
+                        "        }\n" +
+                        "    }\n" +
+                        "\n" +
+                        "    private void closeFlashlight() {\n" +
+                        "        if (mCamera != null) {\n" +
+                        "            Camera.Parameters parameters = mCamera.getParameters();\n" +
+                        "            parameters.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);\n" +
+                        "            mCamera.setParameters(parameters);\n" +
+                        "            isFlashOpen = false;\n" +
+                        "            titleBar.getIvRight().setImageResource(R.drawable.flash_open);\n" +
+                        "        } else {\n" +
+                        "            ToastUtils.showCustomBgToast(getString(R.string.close_flashlight_fail));\n" +
+                        "        }\n" +
+                        "    }\n" +
+                        "\n" +
+                        "    @Override\n" +
+                        "    protected void onStop() {\n" +
+                        "        super.onStop();\n" +
+                        "        if (mCamera != null) {\n" +
+                        "            Camera.Parameters parameters = mCamera.getParameters();\n" +
+                        "            parameters.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);\n" +
+                        "            mCamera.setParameters(parameters);\n" +
+                        "            isFlashOpen = false;\n" +
+                        "            titleBar.getIvRight().setImageResource(R.drawable.flash_open);\n" +
+                        "        }\n" +
+                        "\n" +
+                        "    }\n" +
+                        "}\n", appDirPath + File.separator + "app" + File.separator + "src" + File.separator + "main" + File.separator + "java"
+                        + File.separator + "com" + File.separator + "obsessive" + File.separator + "zbar", "CaptureActivity.java");
+            }
+        }
+
         StringBuilder sbArrays = new StringBuilder();
         sbArrays.append("<resources>\n");
         StringBuilder sbStrings = new StringBuilder();
@@ -571,6 +1013,15 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 "    <string name=\"add_text\">新增</string>\n" +
                 "    <string name=\"loading_text\">加载中...</string>\n" +
                 "    <string name=\"no_data_text\">暂无数据</string>\n");
+        if (app.getEnableQrCode() != null) {
+            if (app.getEnableQrCode()) {
+                sbStrings.append("    <string name=\"scan_tips\">将二维码图片对准扫描框即可自动扫描</string>\n" +
+                        "    <string name=\"camera_permissin_text\">请在设置中打开本应用摄像头权限</string>\n" +
+                        "    <string name=\"scan_fail\">扫描失败，请重试</string>\n" +
+                        "    <string name=\"open_flashlight_fail\">闪光灯打开失败~</string>\n" +
+                        "    <string name=\"close_flashlight_fail\">闪光灯关闭失败~</string>\n");
+            }
+        }
         String packageName = app.getPackageName();
         String packagePath = packageName.replace(".", File.separator);
         File javaDir = new File(appDirPath
@@ -583,6 +1034,18 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
         if (!javaDir.exists()) {
             javaDir.mkdirs();
         }
+        /*cons*/
+        FileUtils.saveFileToPathWithName("package " + app.getPackageName() + ".common.cons;\n" +
+                "\n" +
+                "/**\n" +
+                " * 常量类.\n" +
+                " * Created by zz on 2017/12/6.\n" +
+                " */\n" +
+                "\n" +
+                "public class Cons {\n" +
+                "    public static final String SCAN_RESULT = \"scan_result\";\n" +
+                "}\n", javaDir + File.separator + "common" + File.separator + "cons", "Cons.java");
+
         generateJavaAndLayoutAndAndroidManifest(rootPath, app, appDirPath, packageName, sbStrings, sbArrays);
         sbArrays.append("\n</resources>");
         sbStrings.append("\n</resources>");
@@ -596,6 +1059,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
 
         generateJavaAndRes(rootPath, appDirPath, app.getLogo(), app);
 
+        /*values*/
         String valuesPath = appDirPath + File.separator + "app"
                 + File.separator + "src"
                 + File.separator + "main"
@@ -603,8 +1067,17 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 + File.separator + "values";
         FileUtils.saveFileToPathWithName(sbStrings.toString(), valuesPath, "strings.xml");
         FileUtils.saveFileToPathWithName(sbArrays.toString(), valuesPath, "arrays.xml");
-
-
+        /*raw*/
+        if (app.getEnableQrCode() != null) {
+            if (app.getEnableQrCode()) {
+                String rawPath = appDirPath + File.separator + "app"
+                        + File.separator + "src"
+                        + File.separator + "main"
+                        + File.separator + "res"
+                        + File.separator + "raw";
+                FileUtil.copyDir(new File(rootPath + File.separator + "res" + File.separator + "raw"), new File(rawPath));
+            }
+        }
     }
 
     private void generateJavaAndRes(String rootPath, String appDirPath, String logoPath, ApplicationEntity app) throws IOException {
@@ -623,8 +1096,8 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 "        versionCode " + app.getVersionCode() + "\n" +
                 "        versionName \"" + app.getVersionName() + "\"\n" +
                 "        ndk { \n" +
-                "              abiFilters\"armeabi\",\"armeabi-v7a\",\"x86\",\"mips\"\n" +
-                "        }\n"+
+                "              abiFilters \"armeabi\",\"armeabi-v7a\",\"x86\",\"mips\",\"arm64-v8a\",\"mips64\",\"x86_64\"\n" +
+                "        }\n" +
                 "    }\n" +
                 "\n" +
                 "    aaptOptions {\n" +
@@ -660,6 +1133,10 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 "        }\n" +
                 "    }\n" +
                 "\n" +
+                "    sourceSets.main {\n" +
+                "        jniLibs.srcDirs = ['libs']  // <-- Set your folder here!\n" +
+                "    }\n"
+                +
                 "    buildTypes {\n" +
                 "        debug {\n" +
                 "            signingConfig signingConfigs.debugConfig\n" +
@@ -772,7 +1249,18 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 + File.separator + "main"
                 + File.separator + "res"
                 + File.separator + "drawable";
-        FileUtil.copyDir(new File(rootPath + File.separator + "res" + File.separator + "drawable"), new File(drawablePath));
+        String drawableHPath = appDirPath
+                + File.separator + "app"
+                + File.separator + "src"
+                + File.separator + "main"
+                + File.separator + "res"
+                + File.separator + "drawable-hdpi";
+        FileUtil.copyDir(new File(rootPath + File.separator + "res" + File.separator + "drawable" + File.separator + "common"), new File(drawablePath));
+        if (app.getEnableQrCode() != null) {
+            if (app.getEnableQrCode()) {
+                FileUtil.copyDir(new File(rootPath + File.separator + "res" + File.separator + "drawable" + File.separator + "zbar"), new File(drawableHPath));
+            }
+        }
         /*xml*/
         String xmlPath = appDirPath
                 + File.separator + "app"
@@ -790,8 +1278,13 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 + File.separator + "res"
                 + File.separator + "layout";
         /*layouts*/
-        FileUtil.copyDir(new File(rootPath + File.separator + "res" + File.separator + "layout"), new File(layoutPath));
-
+        FileUtil.copyDir(new File(rootPath + File.separator + "res" + File.separator + "layout" + File.separator + "common"), new File(layoutPath));
+        if (app.getEnableQrCode() != null) {
+            if (app.getEnableQrCode()) {
+                FileUtil.copyFile(new File(rootPath + File.separator + "res" + File.separator + "layout" + File.separator + "activity_qr_scan.xml"),
+                        new File(layoutPath + File.separator + "activity_qr_scan.xml"));
+            }
+        }
     }
 
     private void generateJavaAndLayoutAndAndroidManifest(String rootPath, ApplicationEntity app, String appDirPath, String packageName, StringBuilder sbStrings, StringBuilder sbArrays) throws IOException {
@@ -827,26 +1320,45 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 "    <uses-permission android:name=\"android.permission.ACCESS_LOCATION_EXTRA_COMMANDS\" />\n" +
                 "    <!-- bugly start-->\n" +
                 "    <uses-permission android:name=\"android.permission.READ_LOGS\" />\n" +
-                "    <!--bugly end-->\n" +
-                "\n" +
+                "    <!--bugly end-->\n");
+        if (app.getEnableQrCode() != null) {
+            if (app.getEnableQrCode()) {
+                sbManifest.append("    <!--二维码 -->\n" +
+                        "    <uses-permission android:name=\"android.permission.VIBRATE\" />\n" +
+                        "    <uses-permission android:name=\"android.permission.FLASHLIGHT\" />\n" +
+                        "\n" +
+                        "    <uses-feature android:name=\"android.hardware.camera\" />\n" +
+                        "    <uses-feature android:name=\"android.hardware.camera.autofocus\" />\n\n");
+            }
+        }
+        sbManifest.append(
                 "    <application\n" +
-                "        android:name=\".MyApplication\"\n" +
-                "        android:allowBackup=\"true\"\n" +
-                "        android:icon=\"@mipmap/" + logoName + "\"\n" +
-                "        android:label=\"@string/app_name\"\n" +
-                "        android:roundIcon=\"@mipmap/" + logoName + "\"\n" +
-                "        android:supportsRtl=\"true\"\n" +
-                "        android:theme=\"@style/AppTheme\">\n" +
-                "\n" +
-                "        <meta-data\n" +
-                "            android:name=\"design_width\"\n" +
-                "            android:value=\"1080\" />\n" +
-                "        <meta-data\n" +
-                "            android:name=\"design_height\"\n" +
-                "            android:value=\"1920\" />\n");
+                        "        android:name=\".MyApplication\"\n" +
+                        "        android:allowBackup=\"true\"\n" +
+                        "        android:icon=\"@mipmap/" + logoName + "\"\n" +
+                        "        android:label=\"@string/app_name\"\n" +
+                        "        android:roundIcon=\"@mipmap/" + logoName + "\"\n" +
+                        "        android:supportsRtl=\"true\"\n" +
+                        "        android:theme=\"@style/AppTheme\">\n" +
+                        "\n" +
+                        "        <meta-data\n" +
+                        "            android:name=\"design_width\"\n" +
+                        "            android:value=\"1080\" />\n" +
+                        "        <meta-data\n" +
+                        "            android:name=\"design_height\"\n" +
+                        "            android:value=\"1920\" />\n");
         sbManifest.append("        <activity android:name=\"zhouzhuo810.me.zzandframe.ui.act.ImagePreviewActivity\"/>\n" +
                 "        <activity android:name=\"zhouzhuo810.me.zzandframe.ui.act.MultiImagePreviewActivity\"/>\n"
         );
+        if (app.getEnableQrCode() != null) {
+            if (app.getEnableQrCode()) {
+                sbManifest.append("        <activity\n" +
+                        "            android:name=\"com.obsessive.zbar.CaptureActivity\"\n" +
+                        "            android:configChanges=\"orientation|keyboardHidden|layoutDirection|screenSize|screenLayout\"\n" +
+                        "            android:screenOrientation=\"portrait\"\n" +
+                        "            android:windowSoftInputMode=\"stateAlwaysHidden\" />\n");
+            }
+        }
         /*查找splashactivity*/
         List<ActivityEntity> activityEntities = mActivityService.executeCriteria(new Criterion[]{
                 Restrictions.eq("deleteFlag", BaseEntity.DELETE_FLAG_NO),
@@ -874,6 +1386,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 "import android.content.Context;\n" +
                 "\n" +
                 "import zhouzhuo810.me.zzandframe.ui.app.BaseApplication;\n" +
+                "import zhouzhuo810.me.zzandframe.common.utils.ToastUtils;\n" +
                 ((app.getMultiDex() == null ? false : app.getMultiDex()) ? "import android.support.multidex.MultiDex;\n" : "") +
                 "\n" +
                 "/**\n" +
@@ -887,6 +1400,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 "    public void onCreate() {\n" +
                 "        super.onCreate();\n" +
                 "        INSTANCE = this;\n" +
+                "        ToastUtils.init(this, R.color.colorMain, R.color.colorWhite);\n" +
                 "    }\n" +
                 "\n" +
                 "    public static MyApplication getContext() {\n" +

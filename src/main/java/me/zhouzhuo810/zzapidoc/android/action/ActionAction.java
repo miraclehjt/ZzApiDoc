@@ -72,7 +72,6 @@ public class ActionAction extends BaseController<ActionEntity> {
         return getBaseService().updateAction(actionId, type, name, widgetId, title, msg, okText, cancelText, hintText, defText, showOrHide, okApiId, okActId, userId);
     }
 
-
     @ResponseBody
     @RequestMapping(value = "/deleteAction", method = RequestMethod.POST)
     public BaseResult deleteAction(

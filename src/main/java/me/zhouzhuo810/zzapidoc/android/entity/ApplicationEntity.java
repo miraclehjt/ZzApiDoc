@@ -43,6 +43,16 @@ public class ApplicationEntity extends BaseEntity{
     private Integer fgmCount = 0;
     @Formula("(SELECT count(*) FROM activity a WHERE a.ApplicationId = ID AND a.DelFlag = 0)")
     private Integer actCount = 0;
+    @Column(name = "EnableQrCode")
+    private Boolean enableQrCode = false;
+
+    public Boolean getEnableQrCode() {
+        return enableQrCode;
+    }
+
+    public void setEnableQrCode(Boolean enableQrCode) {
+        this.enableQrCode = enableQrCode;
+    }
 
     public Integer getFgmCount() {
         return fgmCount;
