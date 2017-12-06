@@ -1186,7 +1186,11 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
             if (!mipmapDir.exists()) {
                 mipmapDir.mkdirs();
             }
-            FileUtil.copyFile(new File(logoPath), new File(mipmapPath + File.separator + new File(logoPath).getName()));
+            try {
+                FileUtil.copyFile(new File(logoPath), new File(mipmapPath + File.separator + new File(logoPath).getName()));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         /*style*/
         String style = "<resources>\n" +
