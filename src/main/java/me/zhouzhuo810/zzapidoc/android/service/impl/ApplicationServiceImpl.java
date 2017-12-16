@@ -1,14 +1,8 @@
 package me.zhouzhuo810.zzapidoc.android.service.impl;
 
 import me.zhouzhuo810.zzapidoc.android.dao.ApplicationDao;
-import me.zhouzhuo810.zzapidoc.android.entity.ActivityEntity;
-import me.zhouzhuo810.zzapidoc.android.entity.ApplicationEntity;
-import me.zhouzhuo810.zzapidoc.android.entity.FragmentEntity;
-import me.zhouzhuo810.zzapidoc.android.entity.WidgetEntity;
-import me.zhouzhuo810.zzapidoc.android.service.ActivityService;
-import me.zhouzhuo810.zzapidoc.android.service.ApplicationService;
-import me.zhouzhuo810.zzapidoc.android.service.FragmentService;
-import me.zhouzhuo810.zzapidoc.android.service.WidgetService;
+import me.zhouzhuo810.zzapidoc.android.entity.*;
+import me.zhouzhuo810.zzapidoc.android.service.*;
 import me.zhouzhuo810.zzapidoc.android.utils.ZipUtils;
 import me.zhouzhuo810.zzapidoc.android.widget.apicreator.ApiTool;
 import me.zhouzhuo810.zzapidoc.cache.entity.CacheEntity;
@@ -85,6 +79,9 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
 
     @Resource(name = "interfaceServiceImpl")
     InterfaceService mInterfaceService;
+
+    @Resource(name = "actionServiceImpl")
+    ActionService mActionService;
 
     @Resource(name = "requestArgServiceImpl")
     RequestArgService mRequestArgService;
@@ -550,6 +547,18 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 "-keep public class rx.android.** { *; }\n" +
                 "\n" +
                 "##---------------End: proguard configuration for rxjava  ----------\n" +
+                "##---------------BEGIN: proguard configuration for BaseRecyclerViewAdapterHelper  ----------\n" +
+                "\n" +
+                "-keep class com.chad.library.adapter.** {\n" +
+                "*;\n" +
+                "}\n" +
+                "-keep public class * extends com.chad.library.adapter.base.BaseQuickAdapter\n" +
+                "-keep public class * extends com.chad.library.adapter.base.BaseViewHolder\n" +
+                "-keepclassmembers  class **$** extends com.chad.library.adapter.base.BaseViewHolder {\n" +
+                "     <init>(...);\n" +
+                "}\n" +
+                "\n" +
+                "##---------------End: proguard configuration for BaseRecyclerViewAdapterHelper  ----------\n" +
                 "\n", appDirPath + File.separator + "app", "proguard-rules.pro");
 
         /*sign file*/
@@ -1154,9 +1163,9 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 "    //bugly\n" +
                 "    compile 'com.tencent.bugly:crashreport:latest.release'\n" +
                 "    //zzandframe\n" +
-                "    compile 'com.github.zhouzhuo810:ZzAndFrame:1.1.2'\n" +
+                "    compile 'com.github.zhouzhuo810:ZzAndFrame:1.1.5'\n" +
                 "    //xutils\n" +
-                "    compile 'org.xutils:xutils:3.1.26'\n" +
+                "    compile 'org.xutils:xutils:3.3.38'\n" +
                 "    //RxPermissions\n" +
                 "    //compile 'com.tbruyelle.rxpermissions:rxpermissions:0.9.4@aar'\n" +
                 "    //Logger\n" +
@@ -1169,9 +1178,8 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 "    compile 'com.github.yalantis:ucrop:2.2.1'\n" +
                 "    //SwipeRecyclerView\n" +
                 "    compile 'com.yanzhenjie:recyclerview-swipe:1.1.3'\n" +
-                ((app.getMultiDex() == null ? false : app.getMultiDex()) ? "    //multidex\n" +
-                        "    compile 'com.android.support:multidex:1.0.1'\n" : "") +
-                "\n" +
+                "    //BaseRecyclerViewAdapterHelper\n" +
+                "    //compile 'com.github.CymChad:BaseRecyclerViewAdapterHelper:2.9.30'\n" +
                 "}\n", appDirPath + File.separator + "app", "build.gradle");
 
         /*拷贝桌面LOGO*/
@@ -1634,7 +1642,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 }
             }
         }
-        sbManifest.append("        <provider\n" +
+        sbManifest.append("\n        <provider\n" +
                 "            android:name=\"android.support.v4.content.FileProvider\"\n" +
                 "            android:authorities=\"" + packageName + ".provider\"\n" +
                 "            android:exported=\"false\"\n" +
@@ -1663,8 +1671,8 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
             }
             layoutName += c;
         }
-        final String realLayoutName = layoutName.toLowerCase();
-        layoutName = layoutName.replace("activity_", "").replace("__", "_").toLowerCase();
+        layoutName = layoutName.replace("activity_", "").replace("_activity", "").replace("__", "_").toLowerCase();
+        final String realLayoutName = "activity_" + layoutName.toLowerCase();
 
         /*layout*/
         StringBuilder sbLayout = new StringBuilder();
@@ -1683,13 +1691,13 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 "        android:layout_width=\"match_parent\"\n" +
                 "        android:layout_height=\"@dimen/title_height\"\n" +
                 "        android:background=\"@color/colorPrimary\"\n" +
-                "        app:leftImg=\"@drawable/back\"\n" +
-                "        app:showLeftImg=\"true\"\n" +
-                "        app:showLeftLayout=\"false\"\n" +
-                "        app:showLeftText=\"false\"\n" +
-                "        app:textColorAll=\"@color/colorWhite\"\n" +
-                "        app:textSizeTitle=\"@dimen/title_text_size\"\n" +
-                "        app:titleText=\"@string/" + layoutName + "_title_text\" />\n" +
+                "        app:ttb_leftImg=\"@drawable/back\"\n" +
+                "        app:ttb_showLeftImg=\"true\"\n" +
+                "        app:ttb_showLeftLayout=\"false\"\n" +
+                "        app:ttb_showLeftText=\"false\"\n" +
+                "        app:ttb_textColorAll=\"@color/colorWhite\"\n" +
+                "        app:ttb_textSizeTitle=\"@dimen/title_text_size\"\n" +
+                "        app:ttb_titleText=\"@string/" + layoutName + "_title_text\" />\n" +
                 "\n" +
                 "    <zhouzhuo810.me.zzandframe.ui.widget.zzpagerindicator.ZzPagerIndicator\n" +
                 "        android:id=\"@+id/indicator\"\n" +
@@ -1750,7 +1758,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
         StringBuilder sbEditInfo = new StringBuilder();
         StringBuilder sbMethods = new StringBuilder();
 
-        sbInit.append("        title_bar = (TitleBar) findViewById(R.id.title_bar);\n" +
+        sbInit.append("        titleBar = (TitleBar) findViewById(R.id.title_bar);\n" +
                 "        indicator = (ZzPagerIndicator) findViewById(R.id.indicator);\n" +
                 "        viewPager = (ViewPager) findViewById(R.id.view_pager);\n");
 
@@ -1833,7 +1841,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                  StringBuilder sbImp, StringBuilder sbJava, StringBuilder sbDef, StringBuilder sbInit, StringBuilder sbEvent,
                                  StringBuilder sbMethods, StringBuilder sbArrays) throws IOException {
         sbDef.append("\n" +
-                "    private TitleBar title_bar;\n" +
+                "    private TitleBar titleBar;\n" +
                 "    private ZzPagerIndicator indicator;\n" +
                 "    private ViewPager viewPager;\n" +
                 "    List<Fragment> fragments;\n");
@@ -1879,8 +1887,8 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                     }
                     layoutName += c;
                 }
-                final String realLayoutName = layoutName.toLowerCase();
-                layoutName = layoutName.replace("fragment_", "").replace("__", "_").toLowerCase();
+                layoutName = layoutName.replace("fragment_", "").replace("_fragment", "").replace("__", "_").toLowerCase();
+                final String realLayoutName = "fragment_" + layoutName.toLowerCase();
 
                 sbData.append("\n        fragments.add(new " + fragment.getName() + "());");
 
@@ -2009,8 +2017,8 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
             }
             layoutName += c;
         }
-        final String realLayoutName = layoutName.toLowerCase();
-        layoutName = layoutName.replace("activity_", "").replace("__", "_").toLowerCase();
+        layoutName = layoutName.replace("activity_", "").replace("_activity", "").replace("__", "_").toLowerCase();
+        final String realLayoutName = "activity_" + layoutName.toLowerCase();
 
         /*layout*/
         StringBuilder sbLayout = new StringBuilder();
@@ -2231,8 +2239,8 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                     }
                     layoutName += c;
                 }
-                final String realLayoutName = layoutName.toLowerCase();
-                layoutName = layoutName.replace("fragment_", "").replace("__", "_").toLowerCase();
+                layoutName = layoutName.replace("fragment_", "").replace("_fragment", "").replace("__", "_").toLowerCase();
+                final String realLayoutName = "fragment_" + layoutName.toLowerCase();
                 sbDef.append("\n    private " + fragment.getName() + " " + realLayoutName + ";");
                 sbAttach.append("\n        if (" + realLayoutName + " == null && fragment instanceof " + fragment.getName() + ") {\n" +
                         "            " + realLayoutName + " = (" + fragment.getName() + ") fragment;\n" +
@@ -2869,8 +2877,8 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
             layoutName += c;
         }
 
-        final String realLayoutName = layoutName.toLowerCase();
-        layoutName = layoutName.replace("activity_", "").replace("__", "_").toLowerCase();
+        layoutName = layoutName.replace("activity_", "").replace("_activity", "").replace("__", "_").toLowerCase();
+        final String realLayoutName = "activity_" + layoutName.toLowerCase();
 
         /*layout*/
         StringBuilder sbLayout = new StringBuilder();
@@ -3030,10 +3038,11 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         heightString = height + "px";
                         break;
                 }
+                String actions = genearteActions(widgetEntity.getId());
                 switch (widgetEntity.getType()) {
                     case WidgetEntity.TYPE_TITLE_BAR:
-                        sbDef.append("\n    private TitleBar title_bar;");
-                        sbInit.append("\n        title_bar = (TitleBar) rootView.findViewById(R.id.title_bar);");
+                        sbDef.append("\n    private TitleBar titleBar;");
+                        sbInit.append("\n        titleBar = (TitleBar) rootView.findViewById(R.id.title_bar);");
                         if (!sbStrings.toString().contains("\"" + layoutName + "_text\"")) {
                             sbStrings.append("    <string name=\"" + layoutName + "_text\">" + fragmentEntity.getTitle() + "</string>\n");
                         }
@@ -3042,17 +3051,18 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "        android:layout_width=\"match_parent\"\n" +
                                 "        android:layout_height=\"@dimen/title_height\"\n" +
                                 "        android:background=\"@color/colorPrimary\"\n" +
-                                "        app:showLeftLayout=\"" + widgetEntity.getShowLeftTitleLayout() + "\"\n" +
-                                "        app:showRightLayout=\"" + widgetEntity.getShowRightTitleLayout() + "\"\n" +
-                                "        app:showLeftText=\"" + widgetEntity.getShowLeftTitleText() + "\"\n" +
-                                "        app:leftImg=\"@drawable/back\"\n" +
-                                "        app:textColorAll=\"@color/colorWhite\"\n" +
-                                "        app:textSizeTitle=\"@dimen/title_text_size\"\n" +
-                                "        app:titleText=\"@string/" + layoutName + "_text\" />");
+                                "        app:ttb_showLeftLayout=\"" + widgetEntity.getShowLeftTitleLayout() + "\"\n" +
+                                "        app:ttb_showRightLayout=\"" + widgetEntity.getShowRightTitleLayout() + "\"\n" +
+                                "        app:ttb_showLeftText=\"" + widgetEntity.getShowLeftTitleText() + "\"\n" +
+                                "        app:ttb_leftImg=\"@drawable/back\"\n" +
+                                "        app:ttb_textColorAll=\"@color/colorWhite\"\n" +
+                                "        app:ttb_textSizeTitle=\"@dimen/title_text_size\"\n" +
+                                "        app:ttb_titleText=\"@string/" + layoutName + "_text\" />");
                         break;
                     case WidgetEntity.TYPE_SETTING_ITEM:
-                        sbDef.append("\n    private LinearLayout ll_" + widgetEntity.getResId() + ";");
-                        sbInit.append("\n        ll_" + widgetEntity.getResId() + " = (LinearLayout) rootView.findViewById(R.id.ll_" + widgetEntity.getResId() + ");");
+                        String varName = generateVarName("ll", widgetEntity.getResId());
+                        sbDef.append("\n    private LinearLayout " + varName + ";");
+                        sbInit.append("\n        " + varName + " = (LinearLayout) rootView.findViewById(R.id.ll_" + widgetEntity.getResId() + ");");
                         sbStrings.append("\n    <string name=\"si_" + widgetEntity.getResId() + "_text\">" + widgetEntity.getTitle() + "</string>");
                         sbLayout.append("\n            <LinearLayout\n" +
                                 "                android:id=\"@+id/ll_" + widgetEntity.getResId() + "\"\n" +
@@ -3094,11 +3104,13 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "                android:layout_marginLeft=\"40px\" />\n");
                         break;
                     case WidgetEntity.TYPE_TITLE_EDIT_ITEM:
-                        sbDef.append("\n    private EditText et_" + widgetEntity.getResId() + ";");
-                        sbDef.append("\n    private ImageView iv_clear_" + widgetEntity.getResId() + ";");
-                        sbInit.append("\n        et_" + widgetEntity.getResId() + " = (EditText) rootView.findViewById(R.id.et_" + widgetEntity.getResId() + ");");
-                        sbInit.append("\n        iv_clear_" + widgetEntity.getResId() + " = (ImageView) rootView.findViewById(R.id.iv_clear_" + widgetEntity.getResId() + ");");
-                        sbEvent.append("\n        setEditListener(et_" + widgetEntity.getResId() + ", iv_clear_" + widgetEntity.getResId() + ");");
+                        String varNameEt = generateVarName("et", widgetEntity.getResId());
+                        String varNameIvClear = generateVarName("ivClear", widgetEntity.getResId());
+                        sbDef.append("\n    private EditText " + varNameEt + ";");
+                        sbDef.append("\n    private ImageView " + varNameIvClear + ";");
+                        sbInit.append("\n        " + varNameEt + " = (EditText) rootView.findViewById(R.id.et_" + widgetEntity.getResId() + ");");
+                        sbInit.append("\n        " + varNameIvClear + " = (ImageView) rootView.findViewById(R.id.iv_clear_" + widgetEntity.getResId() + ");");
+                        sbEvent.append("\n        setEditListener(" + varNameEt + ", " + varNameIvClear + ");");
                         if (!sbStrings.toString().contains("\"" + widgetEntity.getResId() + "_text\"")) {
                             sbStrings.append("    <string name=\"" + widgetEntity.getResId() + "_text\">" + widgetEntity.getTitle() + "</string>\n");
                         }
@@ -3152,18 +3164,20 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "        android:background=\"@color/colorGrayBg\" />");
                         break;
                     case WidgetEntity.TYPE_UNDERLINE_EDIT_ITEM:
-                        sbDef.append("\n    private EditText et_" + widgetEntity.getResId() + ";");
-                        sbDef.append("\n    private ImageView iv_clear_" + widgetEntity.getResId() + ";");
-                        sbInit.append("\n        et_" + widgetEntity.getResId() + " = (EditText) findViewById(R.id.et_" + widgetEntity.getResId() + ");");
-                        sbInit.append("\n        iv_clear_" + widgetEntity.getResId() + " = (ImageView) findViewById(R.id.iv_clear_" + widgetEntity.getResId() + ");");
-                        sbEvent.append("\n        setEditListener(et_" + widgetEntity.getResId() + ", iv_clear_" + widgetEntity.getResId() + ");");
+                        String uderLineEtName = generateVarName("et", widgetEntity.getResId());
+                        String uderLineIvName = generateVarName("ivClear", widgetEntity.getResId());
+                        sbDef.append("\n    private EditText " + uderLineEtName + ";");
+                        sbDef.append("\n    private ImageView " + uderLineIvName + ";");
+                        sbInit.append("\n        " + uderLineEtName + " = (EditText) findViewById(R.id.et_" + widgetEntity.getResId() + ");");
+                        sbInit.append("\n        " + uderLineIvName + " = (ImageView) findViewById(R.id.iv_clear_" + widgetEntity.getResId() + ");");
+                        sbEvent.append("\n        setEditListener(" + uderLineEtName + ", " + uderLineIvName + ");");
                         if (!sbStrings.toString().contains("\"" + widgetEntity.getResId() + "_text\"")) {
                             sbStrings.append("    <string name=\"" + widgetEntity.getResId() + "_text\">" + widgetEntity.getTitle() + "</string>\n");
                         }
                         if (!sbStrings.toString().contains("\"" + widgetEntity.getResId() + "_hint_text\"")) {
                             sbStrings.append("    <string name=\"" + widgetEntity.getResId() + "_hint_text\">请输入" + widgetEntity.getTitle() + "</string>\n");
                         }
-                        sbEditInfo.append("\n        String " + widgetEntity.getResId() + " = et_" + widgetEntity.getResId() + ".getText().toString().trim();");
+                        sbEditInfo.append("\n        String " + widgetEntity.getResId() + " = " + uderLineEtName + ".getText().toString().trim();");
                         sbLayout.append("\n" +
                                 "        <RelativeLayout\n" +
                                 "            android:layout_width=\"match_parent\"\n" +
@@ -3196,8 +3210,9 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "        </RelativeLayout>\n");
                         break;
                     case WidgetEntity.TYPE_SUBMIT_BTN_ITEM:
-                        sbDef.append("\n    private Button btn_" + widgetEntity.getResId() + ";");
-                        sbInit.append("\n        btn_" + widgetEntity.getResId() + " = (Button) rootView.findViewById(R.id.btn_" + widgetEntity.getResId() + ");");
+                        String submitBtnName = generateVarName("btn", widgetEntity.getResId());
+                        sbDef.append("\n    private Button " + submitBtnName + ";");
+                        sbInit.append("\n        btn_" + submitBtnName + " = (Button) rootView.findViewById(R.id.btn_" + widgetEntity.getResId() + ");");
                         if (!sbStrings.toString().contains("\"" + widgetEntity.getResId() + "_btn_text\"")) {
                             sbStrings.append("    <string name=\"" + widgetEntity.getResId() + "_btn_text\">" + widgetEntity.getTitle() + "</string>\n");
                         }
@@ -3230,6 +3245,8 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 }
                                 sbMethods.append("    public void do_" + widgetEntity.getResId() + "() {\n");
                                 sbMethods.append(sbEditInfo.toString());
+                                sbMethods.append("\n");
+                                sbMethods.append(actions);
                                 sbMethods.append("\n        showPd(getString(R.string." + widgetEntity.getResId() + "ing_text), false);\n" +
                                         "        Api.getApi" + widgetEntity.getGroupPosition() + "()\n" +
                                         "                ." + apiMethod + "(");
@@ -3280,7 +3297,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                     sbMethods.append("          getBaseAct().closeAct();\n");
                                 }
                                 sbMethods.append("    }\n");
-                                sbEvent.append("\n        btn_" + widgetEntity.getResId() + ".setOnClickListener(new View.OnClickListener() {\n" +
+                                sbEvent.append("\n        " + submitBtnName + ".setOnClickListener(new View.OnClickListener() {\n" +
                                         "            @Override\n" +
                                         "            public void onClick(View v) {\n" +
                                         "                do_" + widgetEntity.getResId() + "();\n" +
@@ -3292,7 +3309,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                             if (widgetEntity.getTargetActivityId() != null && widgetEntity.getTargetActivityId().length() > 0) {
                                 targetAct = mActivityService.get(widgetEntity.getTargetActivityId());
                             }
-                            sbEvent.append("        btn_" + widgetEntity.getResId() + ".setOnClickListener(new View.OnClickListener() {\n" +
+                            sbEvent.append("        " + submitBtnName + ".setOnClickListener(new View.OnClickListener() {\n" +
                                     "            @Override\n" +
                                     "            public void onClick(View v) {\n" +
                                     "                Intent intent = new Intent(getActivity(), " + (targetAct == null ? activityEntity.getName() : targetAct.getName()) + ".class);\n" +
@@ -3305,8 +3322,9 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         }
                         break;
                     case WidgetEntity.TYPE_EXIT_BTN_ITEM:
-                        sbDef.append("\n    private Button btn_" + widgetEntity.getResId() + ";");
-                        sbInit.append("\n        btn_" + widgetEntity.getResId() + " = (Button) rootView.findViewById(R.id.btn_" + widgetEntity.getResId() + ");");
+                        String exitBtnName = generateVarName("btn", widgetEntity.getResId());
+                        sbDef.append("\n    private Button " + exitBtnName + ";");
+                        sbInit.append("\n        " + exitBtnName + " = (Button) rootView.findViewById(R.id.btn_" + widgetEntity.getResId() + ");");
                         if (!sbStrings.toString().contains("\"" + widgetEntity.getResId() + "_text\"")) {
                             sbStrings.append("    <string name=\"" + widgetEntity.getResId() + "_text\">" + widgetEntity.getTitle() + "</string>\n");
                         }
@@ -3339,6 +3357,8 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 }
                                 sbMethods.append("    public void do_" + widgetEntity.getResId() + "() {\n");
                                 sbMethods.append(sbEditInfo.toString());
+                                sbMethods.append("\n");
+                                sbMethods.append(actions);
                                 sbMethods.append("\n        showPd(getString(R.string." + widgetEntity.getResId() + "ing_text), false);\n" +
                                         "        Api.getApi" + widgetEntity.getGroupPosition() + "()\n" +
                                         "                ." + apiMethod + "(");
@@ -3382,7 +3402,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 sbMethods.append("                    }\n" +
                                         "                });");
                                 sbMethods.append("    }\n");
-                                sbEvent.append("\n        btn_" + widgetEntity.getResId() + ".setOnClickListener(new View.OnClickListener() {\n" +
+                                sbEvent.append("\n        " + exitBtnName + ".setOnClickListener(new View.OnClickListener() {\n" +
                                         "            @Override\n" +
                                         "            public void onClick(View v) {\n" +
                                         "                do_" + widgetEntity.getResId() + "();\n" +
@@ -3394,7 +3414,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                             if (widgetEntity.getTargetActivityId() != null && widgetEntity.getTargetActivityId().length() > 0) {
                                 targetAct = mActivityService.get(widgetEntity.getTargetActivityId());
                             }
-                            sbEvent.append("        btn_" + widgetEntity.getResId() + ".setOnClickListener(new View.OnClickListener() {\n" +
+                            sbEvent.append("        " + exitBtnName + ".setOnClickListener(new View.OnClickListener() {\n" +
                                     "            @Override\n" +
                                     "            public void onClick(View v) {\n" +
                                     "                Intent intent = new Intent(getActivity(), " + (targetAct == null ? activityEntity.getName() : targetAct.getName()) + ".class);\n" +
@@ -3418,7 +3438,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 .append("\n        rv = (RecyclerView) rootView.findViewById(R.id.rv);")
                                 .append("\n        rv.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager." + widgetEntity.getOrientation().toUpperCase() + ", false));")
                                 .append("\n        tvNoData = (TextView) rootView.findViewById(R.id.tv_no_data);");
-                        sbEvent.append("\n        title_bar.setOnTitleClickListener(new TitleBar.OnTitleClick() {\n" +
+                        sbEvent.append("\n        titleBar.setOnTitleClickListener(new TitleBar.OnTitleClick() {\n" +
                                 "            @Override\n" +
                                 "            public void onLeftClick(ImageView imageView, TextView textView) {\n" +
                                 "                getBaseAct().closeAct();\n" +
@@ -3485,7 +3505,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         sbInit.append("\n        refresh = (ZzLvRefreshLayout) rootView.findViewById(R.id.refresh);")
                                 .append("\n        rv = (RecyclerView) rootView.findViewById(R.id.rv);")
                                 .append("\n        tvNoData = (TextView) rootView.findViewById(R.id.tv_no_data);");
-                        sbEvent.append("\n        title_bar.setOnTitleClickListener(new TitleBar.OnTitleClick() {\n" +
+                        sbEvent.append("\n        titleBar.setOnTitleClickListener(new TitleBar.OnTitleClick() {\n" +
                                 "            @Override\n" +
                                 "            public void onLeftClick(ImageView imageView, TextView textView) {\n" +
                                 "                getBaseAct().closeAct();\n" +
@@ -3544,9 +3564,10 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "    </RelativeLayout>\n");
                         break;
                     case WidgetEntity.TYPE_SCROLLABLE_LV:
+                        String scrollLvName = generateVarName("lv", widgetEntity.getResId());
                         sbImp.append("\nimport " + app.getPackageName() + ".ui.widget.ScrollableListView;");
-                        sbDef.append("\n    private ScrollableListView lv_" + widgetEntity.getResId() + ";");
-                        sbInit.append("\n        lv_" + widgetEntity.getResId() + " = (ScrollableListView) rootView.findViewById(R.id.lv_" + widgetEntity.getResId() + ");");
+                        sbDef.append("\n    private ScrollableListView " + scrollLvName + ";");
+                        sbInit.append("\n        " + scrollLvName + " = (ScrollableListView) rootView.findViewById(R.id.lv_" + widgetEntity.getResId() + ");");
                         sbLayout.append("\n            <" + app.getPackageName() + ".ui.widget.ScrollableListView\n" +
                                 "                android:id=\"@+id/lv_" + widgetEntity.getResId() + "\"\n" +
                                 "                android:layout_width=\"match_parent\"\n" +
@@ -3987,8 +4008,9 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         sbLayout.append("    </RelativeLayout>\n");
                         break;
                     case WidgetEntity.TYPE_IMAGE_VIEW:
-                        sbDef.append("\n    private ImageView iv_" + widgetEntity.getResId() + ";");
-                        sbInit.append("\n        iv_" + widgetEntity.getResId() + " = (ImageView) rootView.findViewById(R.id.iv_" + widgetEntity.getResId() + ");");
+                        String ivName = generateVarName("iv", widgetEntity.getResId());
+                        sbDef.append("\n    private ImageView " + ivName + ";");
+                        sbInit.append("\n        " + ivName + " = (ImageView) rootView.findViewById(R.id.iv_" + widgetEntity.getResId() + ");");
                         sbLayout.append("\n    <ImageView\n" +
                                 "        android:id=\"@+id/iv_" + widgetEntity.getResId() + "\"\n" +
                                 "        android:layout_width=\"" + widthString + "\"\n" +
@@ -4002,9 +4024,10 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         if (widgetEntity.getTargetActivityId() != null && widgetEntity.getTargetActivityId().length() > 0) {
                             targetAct = mActivityService.get(widgetEntity.getTargetActivityId());
                             if (targetAct != null) {
-                                sbEvent.append("\n        iv_" + widgetEntity.getResId() + ".setOnClickListener(new View.OnClickListener() {\n" +
+                                sbEvent.append("\n        " + ivName + ".setOnClickListener(new View.OnClickListener() {\n" +
                                         "            @Override\n" +
                                         "            public void onClick(View v) {\n" +
+                                        actions + "\n" +
                                         "                Intent intent = new Intent(getActivity(), " + targetAct.getName() + ".class);\n" +
                                         "                startActWithIntent(intent);\n");
                                 sbEvent.append("            }\n" +
@@ -4013,8 +4036,9 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         }
                         break;
                     case WidgetEntity.TYPE_TEXT_VIEW:
-                        sbDef.append("\n    private TextView tv_" + widgetEntity.getResId() + ";");
-                        sbInit.append("\n        tv_" + widgetEntity.getResId() + " = (TextView) rootView.findViewById(R.id.tv_" + widgetEntity.getResId() + ");");
+                        String tvName = generateVarName("tv", widgetEntity.getResId());
+                        sbDef.append("\n    private TextView " + tvName + ";");
+                        sbInit.append("\n        " + tvName + " = (TextView) rootView.findViewById(R.id.tv_" + widgetEntity.getResId() + ");");
                         if (!sbStrings.toString().contains("\"" + widgetEntity.getResId() + "_tv_text\"")) {
                             sbStrings.append("    <string name=\"" + widgetEntity.getResId() + "_tv_text\">" + widgetEntity.getTitle() + "</string>\n");
                         }
@@ -4040,8 +4064,9 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "        android:textSize=\"" + widgetEntity.getTextSize() + "px\" />");
                         break;
                     case WidgetEntity.TYPE_CHECK_BOX:
-                        sbDef.append("\n    private CheckBox cb_" + widgetEntity.getResId() + ";");
-                        sbInit.append("\n        cb_" + widgetEntity.getResId() + " = (CheckBox) rootView.findViewById(R.id.cb_" + widgetEntity.getResId() + ");");
+                        String cbName = generateVarName("cb", widgetEntity.getResId());
+                        sbDef.append("\n    private CheckBox " + cbName + ";");
+                        sbInit.append("\n        " + cbName + " = (CheckBox) rootView.findViewById(R.id.cb_" + widgetEntity.getResId() + ");");
                         sbLayout.append("\n    <CheckBox\n" +
                                 "        android:id=\"@+id/cb_" + widgetEntity.getResId() + "\"\n" +
                                 "        android:layout_width=\"99px\"\n" +
@@ -4097,11 +4122,13 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         heightString = height + "px";
                         break;
                 }
+                String actions = genearteActions(widgetEntity.getId());
                 switch (widgetEntity.getType()) {
                     case WidgetEntity.TYPE_TITLE_BAR:
-                        sbDef.append("\n    private TitleBar title_bar;");
-                        sbInit.append("\n        title_bar = (TitleBar) findViewById(R.id.title_bar);");
-                        sbEvent.append("\n        title_bar.setOnTitleClickListener(new TitleBar.OnTitleClick() {\n" +
+                        // TODO: 2017/12/16 添加动作
+                        sbDef.append("\n    private TitleBar titleBar;");
+                        sbInit.append("\n        titleBar = (TitleBar) findViewById(R.id.title_bar);");
+                        sbEvent.append("\n        titleBar.setOnTitleClickListener(new TitleBar.OnTitleClick() {\n" +
                                 "            @Override\n" +
                                 "            public void onLeftClick(ImageView imageView, TextView textView) {\n" +
                                 "                closeAct();\n" +
@@ -4114,8 +4141,8 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "\n" +
                                 "            @Override\n" +
                                 "            public void onRightClick(ImageView imageView, TextView textView) {\n" +
-                                "\n" +
-                                "            }\n" +
+                                "\n" + actions +
+                                "\n            }\n" +
                                 "        });");
                         if (!sbStrings.toString().contains("\"" + layoutName + "_text\"")) {
                             sbStrings.append("    <string name=\"" + layoutName + "_text\">" + activityEntity.getTitle() + "</string>\n");
@@ -4125,18 +4152,25 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "        android:layout_width=\"match_parent\"\n" +
                                 "        android:layout_height=\"@dimen/title_height\"\n" +
                                 "        android:background=\"@color/colorPrimary\"\n" +
-                                "        app:leftImg=\"@drawable/back\"\n" +
-                                "        app:showLeftImg=\"" + widgetEntity.getShowLeftTitleImg() + "\"\n" +
-                                "        app:showLeftLayout=\"" + widgetEntity.getShowLeftTitleLayout() + "\"\n" +
-                                "        app:showLeftText=\"" + widgetEntity.getShowLeftTitleText() + "\"\n" +
-                                "        app:textColorAll=\"@color/colorWhite\"\n" +
-                                "        app:textSizeTitle=\"@dimen/title_text_size\"\n" +
-                                "        app:titleText=\"@string/" + layoutName + "_text\" />");
+                                "        app:ttb_leftImg=\"@drawable/back\"\n" +
+                                "        app:ttb_showLeftImg=\"" + widgetEntity.getShowLeftTitleImg() + "\"\n" +
+                                "        app:ttb_showLeftLayout=\"" + widgetEntity.getShowLeftTitleLayout() + "\"\n" +
+                                "        app:ttb_showLeftText=\"" + widgetEntity.getShowLeftTitleText() + "\"\n" +
+                                "        app:ttb_textColorAll=\"@color/colorWhite\"\n" +
+                                "        app:ttb_textSizeTitle=\"@dimen/title_text_size\"\n" +
+                                "        app:ttb_titleText=\"@string/" + layoutName + "_text\" />");
                         break;
                     case WidgetEntity.TYPE_SETTING_ITEM:
-                        sbDef.append("\n    private LinearLayout ll_" + widgetEntity.getResId() + ";");
-                        sbInit.append("\n        ll_" + widgetEntity.getResId() + " = (LinearLayout) findViewById(R.id.ll_" + widgetEntity.getResId() + ");");
+                        String siName = generateVarName("si", widgetEntity.getResId());
+                        sbDef.append("\n    private LinearLayout " + siName + ";");
+                        sbInit.append("\n        " + siName + " = (LinearLayout) findViewById(R.id.ll_" + widgetEntity.getResId() + ");");
                         sbStrings.append("\n    <string name=\"si_" + widgetEntity.getResId() + "_text\">" + widgetEntity.getTitle() + "</string>");
+                        sbEvent.append("\n        " + siName + ".setOnClickListener(new View.OnClickListener() {\n" +
+                                "            @Override\n" +
+                                "            public void onClick(View v) {\n" +
+                                "                \n" + actions +
+                                "\n            }\n" +
+                                "        });");
                         sbLayout.append("\n            <LinearLayout\n" +
                                 "                android:id=\"@+id/ll_" + widgetEntity.getResId() + "\"\n" +
                                 "                android:layout_width=\"match_parent\"\n" +
@@ -4177,11 +4211,13 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "                android:layout_marginLeft=\"40px\" />\n");
                         break;
                     case WidgetEntity.TYPE_TITLE_EDIT_ITEM:
-                        sbDef.append("\n    private EditText et_" + widgetEntity.getResId() + ";");
-                        sbDef.append("\n    private ImageView iv_clear_" + widgetEntity.getResId() + ";");
-                        sbInit.append("\n        et_" + widgetEntity.getResId() + " = (EditText) findViewById(R.id.et_" + widgetEntity.getResId() + ");");
-                        sbInit.append("\n        iv_clear_" + widgetEntity.getResId() + " = (ImageView) findViewById(R.id.iv_clear_" + widgetEntity.getResId() + ");");
-                        sbEvent.append("\n        setEditListener(et_" + widgetEntity.getResId() + ", iv_clear_" + widgetEntity.getResId() + ");");
+                        String titleEtName = generateVarName("et", widgetEntity.getResId());
+                        String titleIvName = generateVarName("ivClear", widgetEntity.getResId());
+                        sbDef.append("\n    private EditText " + titleEtName + ";");
+                        sbDef.append("\n    private ImageView " + titleIvName + ";");
+                        sbInit.append("\n        " + titleEtName + " = (EditText) findViewById(R.id.et_" + widgetEntity.getResId() + ");");
+                        sbInit.append("\n        " + titleIvName + " = (ImageView) findViewById(R.id.iv_clear_" + widgetEntity.getResId() + ");");
+                        sbEvent.append("\n        setEditListener(" + titleEtName + ", " + titleIvName + ");");
                         if (!sbStrings.toString().contains("\"" + widgetEntity.getResId() + "_et_text\"")) {
                             sbStrings.append("    <string name=\"" + widgetEntity.getResId() + "_et_text\">" + widgetEntity.getTitle() + "</string>\n");
                         }
@@ -4235,11 +4271,13 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "        android:background=\"@color/colorGrayBg\" />");
                         break;
                     case WidgetEntity.TYPE_UNDERLINE_EDIT_ITEM:
-                        sbDef.append("\n    private EditText et_" + widgetEntity.getResId() + ";");
-                        sbDef.append("\n    private ImageView iv_clear_" + widgetEntity.getResId() + ";");
-                        sbInit.append("\n        et_" + widgetEntity.getResId() + " = (EditText) findViewById(R.id.et_" + widgetEntity.getResId() + ");");
-                        sbInit.append("\n        iv_clear_" + widgetEntity.getResId() + " = (ImageView) findViewById(R.id.iv_clear_" + widgetEntity.getResId() + ");");
-                        sbEvent.append("\n        setEditListener(et_" + widgetEntity.getResId() + ", iv_clear_" + widgetEntity.getResId() + ");");
+                        String underEtName = generateVarName("et", widgetEntity.getResId());
+                        String underIvName = generateVarName("ivClear", widgetEntity.getResId());
+                        sbDef.append("\n    private EditText " + underEtName + ";");
+                        sbDef.append("\n    private ImageView " + underIvName + ";");
+                        sbInit.append("\n        " + underEtName + " = (EditText) findViewById(R.id.et_" + widgetEntity.getResId() + ");");
+                        sbInit.append("\n        " + underIvName + " = (ImageView) findViewById(R.id.iv_clear_" + widgetEntity.getResId() + ");");
+                        sbEvent.append("\n        setEditListener(" + underEtName + ", " + underIvName + ");");
                         if (!sbStrings.toString().contains("\"" + widgetEntity.getResId() + "_et_hint_text\"")) {
                             sbStrings.append("    <string name=\"" + widgetEntity.getResId() + "_et_hint_text\">请输入" + widgetEntity.getTitle() + "</string>\n");
                         }
@@ -4277,8 +4315,9 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "        </RelativeLayout>\n");
                         break;
                     case WidgetEntity.TYPE_SUBMIT_BTN_ITEM:
-                        sbDef.append("\n    private Button btn_" + widgetEntity.getResId() + ";");
-                        sbInit.append("\n        btn_" + widgetEntity.getResId() + " = (Button) findViewById(R.id.btn_" + widgetEntity.getResId() + ");");
+                        String submitBtnName = generateVarName("btn", widgetEntity.getResId());
+                        sbDef.append("\n    private Button " + submitBtnName + ";");
+                        sbInit.append("\n        " + submitBtnName + " = (Button) findViewById(R.id.btn_" + widgetEntity.getResId() + ");");
                         if (!sbStrings.toString().contains("\"" + widgetEntity.getResId() + "_btn_text\"")) {
                             sbStrings.append("    <string name=\"" + widgetEntity.getResId() + "_btn_text\">" + widgetEntity.getTitle() + "</string>\n");
                         }
@@ -4311,6 +4350,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 }
                                 sbMethods.append("    public void do_" + widgetEntity.getResId() + "() {\n");
                                 sbMethods.append(sbEditInfo.toString());
+                                sbMethods.append("\n").append(actions);
                                 sbMethods.append("\n        showPd(getString(R.string." + widgetEntity.getResId() + "ing_text), false);\n" +
                                         "        Api.getApi" + widgetEntity.getGroupPosition() + "()\n" +
                                         "                ." + apiMethod + "(");
@@ -4359,7 +4399,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                     sbMethods.append("                            closeAct();\n");
                                 }
                                 sbMethods.append("    }\n");
-                                sbEvent.append("\n        btn_" + widgetEntity.getResId() + ".setOnClickListener(new View.OnClickListener() {\n" +
+                                sbEvent.append("\n        " + submitBtnName + ".setOnClickListener(new View.OnClickListener() {\n" +
                                         "            @Override\n" +
                                         "            public void onClick(View v) {\n" +
                                         "                do_" + widgetEntity.getResId() + "();\n" +
@@ -4371,9 +4411,10 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                             if (widgetEntity.getTargetActivityId() != null && widgetEntity.getTargetActivityId().length() > 0) {
                                 targetAct = mActivityService.get(widgetEntity.getTargetActivityId());
                             }
-                            sbEvent.append("\n        btn_" + widgetEntity.getResId() + ".setOnClickListener(new View.OnClickListener() {\n" +
+                            sbEvent.append("\n        " + submitBtnName + ".setOnClickListener(new View.OnClickListener() {\n" +
                                     "            @Override\n" +
                                     "            public void onClick(View v) {\n" +
+                                    actions + "\n" +
                                     "                Intent intent = new Intent(" + activityEntity.getName() + ".this, " + (targetAct == null ? activityEntity.getName() : targetAct.getName()) + ".class);\n" +
                                     "                startActWithIntent(intent);\n");
                             if (widgetEntity.getClickToClose()) {
@@ -4384,8 +4425,9 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         }
                         break;
                     case WidgetEntity.TYPE_EXIT_BTN_ITEM:
-                        sbDef.append("\n    private Button btn_" + widgetEntity.getResId() + ";");
-                        sbInit.append("\n        btn_" + widgetEntity.getResId() + " = (Button) findViewById(R.id.btn_" + widgetEntity.getResId() + ");");
+                        String exitBtnName = generateVarName("btn", widgetEntity.getResId());
+                        sbDef.append("\n    private Button " + exitBtnName + ";");
+                        sbInit.append("\n        " + exitBtnName + " = (Button) findViewById(R.id.btn_" + widgetEntity.getResId() + ");");
                         if (!sbStrings.toString().contains("\"" + widgetEntity.getResId() + "_btn_text\"")) {
                             sbStrings.append("    <string name=\"" + widgetEntity.getResId() + "_btn_text\">" + widgetEntity.getTitle() + "</string>\n");
                         }
@@ -4418,6 +4460,8 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 }
                                 sbMethods.append("    public void do_" + widgetEntity.getResId() + "() {\n");
                                 sbMethods.append(sbEditInfo.toString());
+                                sbMethods.append("\n");
+                                sbMethods.append(actions);
                                 sbMethods.append("\n        showPd(getString(R.string." + widgetEntity.getResId() + "ing_text), false);\n" +
                                         "        Api.getApi" + widgetEntity.getGroupPosition() + "()\n" +
                                         "                ." + apiMethod + "(");
@@ -4459,7 +4503,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 sbMethods.append("                    }\n" +
                                         "                });");
                                 sbMethods.append("    }\n");
-                                sbEvent.append("\n        btn_" + widgetEntity.getResId() + ".setOnClickListener(new View.OnClickListener() {\n" +
+                                sbEvent.append("\n        " + exitBtnName + ".setOnClickListener(new View.OnClickListener() {\n" +
                                         "            @Override\n" +
                                         "            public void onClick(View v) {\n" +
                                         "                do_" + widgetEntity.getResId() + "();\n" +
@@ -4471,9 +4515,10 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                             if (widgetEntity.getTargetActivityId() != null && widgetEntity.getTargetActivityId().length() > 0) {
                                 targetAct = mActivityService.get(widgetEntity.getTargetActivityId());
                             }
-                            sbEvent.append("\n        btn_" + widgetEntity.getResId() + ".setOnClickListener(new View.OnClickListener() {\n" +
+                            sbEvent.append("\n        " + exitBtnName + ".setOnClickListener(new View.OnClickListener() {\n" +
                                     "            @Override\n" +
                                     "            public void onClick(View v) {\n" +
+                                    actions + "\n" +
                                     "                Intent intent = new Intent(" + activityEntity.getName() + ".this, " + (targetAct == null ? activityEntity.getName() : targetAct.getName()) + ".class);\n" +
                                     "                startActWithIntent(intent);\n");
                             if (widgetEntity.getClickToClose()) {
@@ -4495,7 +4540,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 .append("\n        rv = (RecyclerView) findViewById(R.id.rv);")
                                 .append("\n        rv.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager." + widgetEntity.getOrientation().toUpperCase() + ", false));")
                                 .append("\n        tvNoData = (TextView) findViewById(R.id.tv_no_data);");
-                        sbEvent.append("\n        title_bar.setOnTitleClickListener(new TitleBar.OnTitleClick() {\n" +
+                        sbEvent.append("\n        titleBar.setOnTitleClickListener(new TitleBar.OnTitleClick() {\n" +
                                 "            @Override\n" +
                                 "            public void onLeftClick(ImageView imageView, TextView textView) {\n" +
                                 "                closeAct();\n" +
@@ -4562,7 +4607,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         sbInit.append("\n        refresh = (ZzLvRefreshLayout) findViewById(R.id.refresh);")
                                 .append("\n        rv = (RecyclerView) findViewById(R.id.rv);")
                                 .append("\n        tvNoData = (TextView) findViewById(R.id.tv_no_data);");
-                        sbEvent.append("\n        title_bar.setOnTitleClickListener(new TitleBar.OnTitleClick() {\n" +
+                        sbEvent.append("\n        titleBar.setOnTitleClickListener(new TitleBar.OnTitleClick() {\n" +
                                 "            @Override\n" +
                                 "            public void onLeftClick(ImageView imageView, TextView textView) {\n" +
                                 "                closeAct();\n" +
@@ -4621,9 +4666,10 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "    </RelativeLayout>\n");
                         break;
                     case WidgetEntity.TYPE_SCROLLABLE_LV:
+                        String srollLvName = generateVarName("lv", widgetEntity.getResId());
                         sbImp.append("\nimport " + app.getPackageName() + ".ui.widget.ScrollableListView;");
-                        sbDef.append("\n    private ScrollableListView lv_" + widgetEntity.getResId() + ";");
-                        sbInit.append("\n        lv_" + widgetEntity.getResId() + " = (ScrollableListView) findViewById(R.id.lv_" + widgetEntity.getResId() + ");");
+                        sbDef.append("\n    private ScrollableListView " + srollLvName + ";");
+                        sbInit.append("\n        " + srollLvName + " = (ScrollableListView) findViewById(R.id.lv_" + widgetEntity.getResId() + ");");
                         sbLayout.append("\n            <" + app.getPackageName() + ".ui.widget.ScrollableListView\n" +
                                 "                android:id=\"@+id/lv_" + widgetEntity.getResId() + "\"\n" +
                                 "                android:layout_width=\"match_parent\"\n" +
@@ -5065,8 +5111,9 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         sbLayout.append("    </RelativeLayout>\n");
                         break;
                     case WidgetEntity.TYPE_IMAGE_VIEW:
-                        sbDef.append("\n    private ImageView iv_" + widgetEntity.getResId() + ";");
-                        sbInit.append("\n        iv_" + widgetEntity.getResId() + " = (ImageView) findViewById(R.id.iv_" + widgetEntity.getResId() + ");");
+                        String ivName = generateVarName("iv", widgetEntity.getResId());
+                        sbDef.append("\n    private ImageView " + ivName + ";");
+                        sbInit.append("\n        " + ivName + " = (ImageView) findViewById(R.id.iv_" + widgetEntity.getResId() + ");");
                         sbLayout.append("\n    <ImageView\n" +
                                 "        android:id=\"@+id/iv_" + widgetEntity.getResId() + "\"\n" +
                                 "        android:layout_width=\"" + widthString + "\"\n" +
@@ -5080,9 +5127,10 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         if (widgetEntity.getTargetActivityId() != null && widgetEntity.getTargetActivityId().length() > 0) {
                             targetAct = mActivityService.get(widgetEntity.getTargetActivityId());
                             if (targetAct != null) {
-                                sbEvent.append("\n        iv_" + widgetEntity.getResId() + ".setOnClickListener(new View.OnClickListener() {\n" +
+                                sbEvent.append("\n        " + ivName + ".setOnClickListener(new View.OnClickListener() {\n" +
                                         "            @Override\n" +
                                         "            public void onClick(View v) {\n" +
+                                        actions + "\n" +
                                         "                Intent intent = new Intent(" + activityEntity.getName() + ".this, " + targetAct.getName() + ".class);\n" +
                                         "                startActWithIntent(intent);\n");
                                 sbEvent.append("            }\n" +
@@ -5091,8 +5139,9 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         }
                         break;
                     case WidgetEntity.TYPE_TEXT_VIEW:
-                        sbDef.append("\n    private TextView tv_" + widgetEntity.getResId() + ";");
-                        sbInit.append("\n        tv_" + widgetEntity.getResId() + " = (TextView) findViewById(R.id.tv_" + widgetEntity.getResId() + ");");
+                        String tvName = generateVarName("tv", widgetEntity.getResId());
+                        sbDef.append("\n    private TextView " + tvName + ";");
+                        sbInit.append("\n        " + tvName + " = (TextView) findViewById(R.id.tv_" + widgetEntity.getResId() + ");");
                         if (!sbStrings.toString().contains("\"" + widgetEntity.getResId() + "_tv_text\"")) {
                             sbStrings.append("    <string name=\"" + widgetEntity.getResId() + "_tv_text\">" + widgetEntity.getTitle() + "</string>\n");
                         }
@@ -5117,8 +5166,9 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "        android:textSize=\"" + widgetEntity.getTextSize() + "px\" />");
                         break;
                     case WidgetEntity.TYPE_CHECK_BOX:
-                        sbDef.append("\n    private CheckBox cb_" + widgetEntity.getResId() + ";");
-                        sbInit.append("\n        cb_" + widgetEntity.getResId() + " = (CheckBox) findViewById(R.id.cb_" + widgetEntity.getResId() + ");");
+                        String cbName = generateVarName("cb", widgetEntity.getResId());
+                        sbDef.append("\n    private CheckBox " + cbName + ";");
+                        sbInit.append("\n        " + cbName + " = (CheckBox) findViewById(R.id.cb_" + widgetEntity.getResId() + ");");
                         sbLayout.append("\n    <CheckBox\n" +
                                 "        android:id=\"@+id/cb_" + widgetEntity.getResId() + "\"\n" +
                                 "        android:layout_width=\"99px\"\n" +
@@ -5131,6 +5181,54 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 }
             }
         }
+    }
+
+    private String genearteActions(String widgetId) {
+        List<ActionEntity> actions = mActionService.executeCriteria(new Criterion[]{
+                Restrictions.eq("deleteFlag", BaseEntity.DELETE_FLAG_NO),
+                Restrictions.eq("widgetId", widgetId)
+        });
+        StringBuilder sbActions = new StringBuilder();
+        if (actions != null && actions.size() > 0) {
+            for (ActionEntity action : actions) {
+                switch (action.getType()) {
+                    case ActionEntity.TYPE_DIALOG_PROGRESS:
+
+                        break;
+                    case ActionEntity.TYPE_DIALOG_TWO_BTN:
+
+                        break;
+                    case ActionEntity.TYPE_DIALOG_EDIT:
+
+                        break;
+                    case ActionEntity.TYPE_DIALOG_UPDATE:
+
+                        break;
+                    case ActionEntity.TYPE_DIALOG_LIST:
+
+                        break;
+                    case ActionEntity.TYPE_DIALOG_TWO_BTN_IOS:
+
+                        break;
+                    case ActionEntity.TYPE_CHOOSE_PIC:
+
+                        break;
+                    case ActionEntity.TYPE_USE_API:
+
+                        break;
+                    case ActionEntity.TYPE_TARGET_ACT:
+
+                        break;
+                    case ActionEntity.TYPE_CLOSE_ACT:
+
+                        break;
+                    case ActionEntity.TYPE_CLOSE_ALL_ACT:
+
+                        break;
+                }
+            }
+        }
+        return sbActions.toString();
     }
 
     private void copyGradleWrapper(String rootPath, String appDirPath) throws IOException {
@@ -5191,5 +5289,21 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
 
     /***********************************下载 项目文件 结束**************************************/
 
+
+    private String generateVarName(String prefix, String resId) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(prefix);
+        if (resId.contains("_")) {
+            String[] split = resId.split("_");
+            for (String s : split) {
+                if (s.length() > 0) {
+                    sb.append(s.substring(0, 1).toUpperCase()).append(s.substring(1).toLowerCase());
+                }
+            }
+        } else {
+            sb.append(resId.substring(0, 1).toUpperCase()).append(resId.substring(1).toLowerCase());
+        }
+        return sb.toString();
+    }
 
 }

@@ -17,7 +17,12 @@ public class ActionEntity extends BaseEntity {
     public static final int TYPE_DIALOG_EDIT = 2;
     public static final int TYPE_DIALOG_UPDATE = 3;
     public static final int TYPE_DIALOG_LIST = 4;
-    public static final int TYPE_CHOOSE_PIC = 5;
+    public static final int TYPE_DIALOG_TWO_BTN_IOS = 5;
+    public static final int TYPE_CHOOSE_PIC = 6;
+    public static final int TYPE_USE_API = 7;
+    public static final int TYPE_TARGET_ACT = 8;
+    public static final int TYPE_CLOSE_ACT = 9;
+    public static final int TYPE_CLOSE_ALL_ACT = 10;
 
     @Column(name = "Type")
     private int type = TYPE_DIALOG_PROGRESS;
