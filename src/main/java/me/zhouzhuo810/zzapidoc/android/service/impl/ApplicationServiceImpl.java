@@ -631,6 +631,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         "import zhouzhuo810.me.zzandframe.common.utils.StrUtils;\n" +
                         "import zhouzhuo810.me.zzandframe.common.utils.ToastUtils;\n" +
                         "import zhouzhuo810.me.zzandframe.ui.act.BaseActivity;\n" +
+                        "import zhouzhuo810.me.zzandframe.ui.widget.MarkView;\n" +
                         "import zhouzhuo810.me.zzandframe.ui.widget.TitleBar;\n" +
                         "\n" +
                         "public class CaptureActivity extends BaseActivity {\n" +
@@ -771,7 +772,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         "    public void initEvent() {\n" +
                         "        titleBar.setOnTitleClickListener(new TitleBar.OnTitleClick() {\n" +
                         "            @Override\n" +
-                        "            public void onLeftClick(ImageView imageView, TextView textView) {\n" +
+                        "            public void onLeftClick(ImageView imageView, MarkView markView, TextView textView) {\n" +
                         "                closeAct();\n" +
                         "            }\n" +
                         "\n" +
@@ -781,7 +782,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         "            }\n" +
                         "\n" +
                         "            @Override\n" +
-                        "            public void onRightClick(ImageView imageView, TextView textView) {\n" +
+                        "            public void onRightClick(ImageView imageView, MarkView markView, TextView textView) {\n" +
                         "                if (isFlashOpen) {\n" +
                         "                    closeFlashlight();\n" +
                         "                } else {\n" +
@@ -1741,6 +1742,8 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         "import android.widget.ImageView;\n" +
                         "import android.widget.TextView;\n" +
                         "import android.widget.LinearLayout;\n" +
+                        "import java.util.ArrayList;\n" +
+                        "import java.util.List;\n" +
                         "\n" +
                         "import " + app.getPackageName() + ".R;\n" +
                         "import zhouzhuo810.me.zzandframe.ui.act.BaseActivity;\n" +
@@ -1749,7 +1752,9 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         "import rx.Subscriber;\n" +
                         "import zhouzhuo810.me.zzandframe.common.rx.RxHelper;\n" +
                         "import zhouzhuo810.me.zzandframe.common.utils.ToastUtils;\n" +
-                        "import zhouzhuo810.me.zzandframe.ui.widget.TitleBar;\n");
+                        "import zhouzhuo810.me.zzandframe.ui.widget.MarkView;\n" +
+                        "import zhouzhuo810.me.zzandframe.ui.widget.TitleBar;\n"
+        );
 
         StringBuilder sbDef = new StringBuilder();
         StringBuilder sbInit = new StringBuilder();
@@ -1930,7 +1935,9 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "import rx.Subscriber;\n" +
                                 "import zhouzhuo810.me.zzandframe.common.rx.RxHelper;\n" +
                                 "import zhouzhuo810.me.zzandframe.common.utils.ToastUtils;\n" +
-                                "import zhouzhuo810.me.zzandframe.ui.widget.TitleBar;\n");
+                                "import zhouzhuo810.me.zzandframe.ui.widget.MarkView;\n" +
+                                "import zhouzhuo810.me.zzandframe.ui.widget.TitleBar;\n"
+                );
 
                 fillFgmWidget(logoName, app, activityEntity, fragment, layoutName, layoutPath, javaPath, "0", sbStrings, sbLayout1, sbImp1, sbJava1, sbDef1, sbInit1, sbData1, sbEvent1, sbEditInfo1, sbMethods1);
 
@@ -2053,6 +2060,8 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         "import android.widget.ImageView;\n" +
                         "import android.widget.TextView;\n" +
                         "import android.widget.LinearLayout;\n" +
+                        "import java.util.ArrayList;\n" +
+                        "import java.util.List;\n" +
                         "\n" +
                         "import " + app.getPackageName() + ".R;\n" +
                         "import zhouzhuo810.me.zzandframe.ui.act.BaseActivity;\n" +
@@ -2061,6 +2070,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         "import rx.Subscriber;\n" +
                         "import zhouzhuo810.me.zzandframe.common.rx.RxHelper;\n" +
                         "import zhouzhuo810.me.zzandframe.common.utils.ToastUtils;\n" +
+                        "import zhouzhuo810.me.zzandframe.ui.widget.MarkView;\n" +
                         "import zhouzhuo810.me.zzandframe.ui.widget.TitleBar;\n");
 
         StringBuilder sbDef = new StringBuilder();
@@ -2287,6 +2297,8 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "import android.widget.ImageView;\n" +
                                 "import android.widget.TextView;\n" +
                                 "import android.widget.LinearLayout;\n" +
+                                "import java.util.ArrayList;\n" +
+                                "import java.util.List;\n" +
                                 "\n" +
                                 "import " + app.getPackageName() + ".R;\n" +
                                 "import zhouzhuo810.me.zzandframe.ui.fgm.BaseFragment;\n" +
@@ -2295,6 +2307,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "import rx.Subscriber;\n" +
                                 "import zhouzhuo810.me.zzandframe.common.rx.RxHelper;\n" +
                                 "import zhouzhuo810.me.zzandframe.common.utils.ToastUtils;\n" +
+                                "import zhouzhuo810.me.zzandframe.ui.widget.MarkView;\n" +
                                 "import zhouzhuo810.me.zzandframe.ui.widget.TitleBar;\n");
 
                 fillFgmWidget(logoName, app, activityEntity, fragment, layoutName, layoutPath, javaPath, "0", sbStrings, sbLayout1, sbImp1, sbJava1, sbDef1, sbInit1, sbData1, sbEvent1, sbEditInfo1, sbMethods1);
@@ -2904,6 +2917,8 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         "import android.widget.ImageView;\n" +
                         "import android.widget.TextView;\n" +
                         "import android.widget.LinearLayout;\n" +
+                        "import java.util.ArrayList;\n" +
+                        "import java.util.List;\n" +
                         "\n" +
                         "import " + app.getPackageName() + ".R;\n" +
                         "import zhouzhuo810.me.zzandframe.ui.act.BaseActivity;\n" +
@@ -2912,6 +2927,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         "import rx.Subscriber;\n" +
                         "import zhouzhuo810.me.zzandframe.common.rx.RxHelper;\n" +
                         "import zhouzhuo810.me.zzandframe.common.utils.ToastUtils;\n" +
+                        "import zhouzhuo810.me.zzandframe.ui.widget.MarkView;\n" +
                         "import zhouzhuo810.me.zzandframe.ui.widget.TitleBar;\n");
 
         StringBuilder sbDef = new StringBuilder();
@@ -3038,7 +3054,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         heightString = height + "px";
                         break;
                 }
-                String actions = genearteActions(widgetEntity.getId());
+                String actions = genearteActions(widgetEntity.getId(), true, activityEntity.getName(), sbStrings, sbImp);
                 switch (widgetEntity.getType()) {
                     case WidgetEntity.TYPE_TITLE_BAR:
                         sbDef.append("\n    private TitleBar titleBar;");
@@ -3440,7 +3456,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 .append("\n        tvNoData = (TextView) rootView.findViewById(R.id.tv_no_data);");
                         sbEvent.append("\n        titleBar.setOnTitleClickListener(new TitleBar.OnTitleClick() {\n" +
                                 "            @Override\n" +
-                                "            public void onLeftClick(ImageView imageView, TextView textView) {\n" +
+                                "            public void onLeftClick(ImageView imageView, MarkView markView, TextView textView) {\n" +
                                 "                getBaseAct().closeAct();\n" +
                                 "            }\n" +
                                 "\n" +
@@ -3450,7 +3466,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "            }\n" +
                                 "\n" +
                                 "            @Override\n" +
-                                "            public void onRightClick(ImageView imageView, TextView textView) {\n" +
+                                "            public void onRightClick(ImageView imageView, MarkView markView, TextView textView) {\n" +
                                 "\n" +
                                 "            }\n" +
                                 "        });\n")
@@ -3507,7 +3523,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 .append("\n        tvNoData = (TextView) rootView.findViewById(R.id.tv_no_data);");
                         sbEvent.append("\n        titleBar.setOnTitleClickListener(new TitleBar.OnTitleClick() {\n" +
                                 "            @Override\n" +
-                                "            public void onLeftClick(ImageView imageView, TextView textView) {\n" +
+                                "            public void onLeftClick(ImageView imageView, MarkView markView, TextView textView) {\n" +
                                 "                getBaseAct().closeAct();\n" +
                                 "            }\n" +
                                 "\n" +
@@ -3517,7 +3533,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "            }\n" +
                                 "\n" +
                                 "            @Override\n" +
-                                "            public void onRightClick(ImageView imageView, TextView textView) {\n" +
+                                "            public void onRightClick(ImageView imageView, MarkView markView, TextView textView) {\n" +
                                 "\n" +
                                 "            }\n" +
                                 "        });\n")
@@ -4122,7 +4138,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         heightString = height + "px";
                         break;
                 }
-                String actions = genearteActions(widgetEntity.getId());
+                String actions = genearteActions(widgetEntity.getId(), false, "", sbStrings, sbImp);
                 switch (widgetEntity.getType()) {
                     case WidgetEntity.TYPE_TITLE_BAR:
                         // TODO: 2017/12/16 添加动作
@@ -4130,7 +4146,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         sbInit.append("\n        titleBar = (TitleBar) findViewById(R.id.title_bar);");
                         sbEvent.append("\n        titleBar.setOnTitleClickListener(new TitleBar.OnTitleClick() {\n" +
                                 "            @Override\n" +
-                                "            public void onLeftClick(ImageView imageView, TextView textView) {\n" +
+                                "            public void onLeftClick(ImageView imageView, MarkView markView, TextView textView) {\n" +
                                 "                closeAct();\n" +
                                 "            }\n" +
                                 "\n" +
@@ -4140,7 +4156,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "            }\n" +
                                 "\n" +
                                 "            @Override\n" +
-                                "            public void onRightClick(ImageView imageView, TextView textView) {\n" +
+                                "            public void onRightClick(ImageView imageView, MarkView markView, TextView textView) {\n" +
                                 "\n" + actions +
                                 "\n            }\n" +
                                 "        });");
@@ -4542,7 +4558,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 .append("\n        tvNoData = (TextView) findViewById(R.id.tv_no_data);");
                         sbEvent.append("\n        titleBar.setOnTitleClickListener(new TitleBar.OnTitleClick() {\n" +
                                 "            @Override\n" +
-                                "            public void onLeftClick(ImageView imageView, TextView textView) {\n" +
+                                "            public void onLeftClick(ImageView imageView, MarkView markView, TextView textView) {\n" +
                                 "                closeAct();\n" +
                                 "            }\n" +
                                 "\n" +
@@ -4552,7 +4568,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "            }\n" +
                                 "\n" +
                                 "            @Override\n" +
-                                "            public void onRightClick(ImageView imageView, TextView textView) {\n" +
+                                "            public void onRightClick(ImageView imageView, MarkView markView, TextView textView) {\n" +
                                 "\n" +
                                 "            }\n" +
                                 "        });\n")
@@ -4609,7 +4625,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 .append("\n        tvNoData = (TextView) findViewById(R.id.tv_no_data);");
                         sbEvent.append("\n        titleBar.setOnTitleClickListener(new TitleBar.OnTitleClick() {\n" +
                                 "            @Override\n" +
-                                "            public void onLeftClick(ImageView imageView, TextView textView) {\n" +
+                                "            public void onLeftClick(ImageView imageView, MarkView markView, TextView textView) {\n" +
                                 "                closeAct();\n" +
                                 "            }\n" +
                                 "\n" +
@@ -4619,7 +4635,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "            }\n" +
                                 "\n" +
                                 "            @Override\n" +
-                                "            public void onRightClick(ImageView imageView, TextView textView) {\n" +
+                                "            public void onRightClick(ImageView imageView, MarkView markView, TextView textView) {\n" +
                                 "\n" +
                                 "            }\n" +
                                 "        });\n")
@@ -5183,7 +5199,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
         }
     }
 
-    private String genearteActions(String widgetId) {
+    private String genearteActions(String widgetId, boolean fgm, String actName, StringBuilder sbStrings, StringBuilder sbImp) {
         List<ActionEntity> actions = mActionService.executeCriteria(new Criterion[]{
                 Restrictions.eq("deleteFlag", BaseEntity.DELETE_FLAG_NO),
                 Restrictions.eq("widgetId", widgetId)
@@ -5191,39 +5207,296 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
         StringBuilder sbActions = new StringBuilder();
         if (actions != null && actions.size() > 0) {
             for (ActionEntity action : actions) {
+
                 switch (action.getType()) {
                     case ActionEntity.TYPE_DIALOG_PROGRESS:
-
+                        if (fgm) {
+                            //fragment
+                            if (action.getShowOrHide()) {
+                                //hide
+                                sbActions.append("\n                getBaseAct().hidePd();");
+                            } else {
+                                //show
+                                sbActions.append("\n                getBaseAct().showPd(\"" + action.getMsg() + "\", false);");
+                            }
+                        } else {
+                            //activity
+                            if (action.getShowOrHide()) {
+                                //hide
+                                sbActions.append("\n                hidePd();");
+                            } else {
+                                //show
+                                sbActions.append("\n                showPd(\"" + action.getMsg() + "\", false);");
+                            }
+                        }
                         break;
                     case ActionEntity.TYPE_DIALOG_TWO_BTN:
-
+                        if (fgm) {
+                            //fragment
+                            if (action.getShowOrHide()) {
+                                //hide
+                                sbActions.append("\n                getBaseAct().hideTwoBtnDialog();();");
+                            } else {
+                                //show
+                                sbActions.append("\n                getBaseAct().showTwoBtnDialog(\""+action.getTitle()+"\", \""+action.getMsg()+"\", false, new OnTwoBtnClick() {\n" +
+                                        "                    @Override\n" +
+                                        "                    public void onOk() {\n" +
+                                        "\n" +
+                                        "                    }\n" +
+                                        "\n" +
+                                        "                    @Override\n" +
+                                        "                    public void onCancel() {\n" +
+                                        "\n" +
+                                        "                    }\n" +
+                                        "                });");
+                            }
+                        } else {
+                            //activity
+                            if (action.getShowOrHide()) {
+                                //hide
+                                sbActions.append("\n                hideTwoBtnDialog();();");
+                            } else {
+                                //show
+                                sbActions.append("\n                showTwoBtnDialog(\""+action.getTitle()+"\", \""+action.getMsg()+"\", false, new OnTwoBtnClick() {\n" +
+                                        "                    @Override\n" +
+                                        "                    public void onOk() {\n" +
+                                        "\n" +
+                                        "                    }\n" +
+                                        "\n" +
+                                        "                    @Override\n" +
+                                        "                    public void onCancel() {\n" +
+                                        "\n" +
+                                        "                    }\n" +
+                                        "                });");
+                            }
+                        }
                         break;
                     case ActionEntity.TYPE_DIALOG_EDIT:
-
+                        if (fgm) {
+                            //fragment
+                            if (action.getShowOrHide()) {
+                                //hide
+                                sbActions.append("\n                getBaseAct().hideTwoBtnEditDialog();");
+                            } else {
+                                //show
+                                sbActions.append("\n                getBaseAct().showTwoBtnEditDialog(\""+action.getTitle()+"\", \""+action.getHintText()+"\", \""+action.getDefText()+"\", false, new OnTwoBtnEditClick() {\n" +
+                                        "                    @Override\n" +
+                                        "                    public void onOk(String s) {\n" +
+                                        "                        \n" +
+                                        "                    }\n" +
+                                        "\n" +
+                                        "                    @Override\n" +
+                                        "                    public void onCancel() {\n" +
+                                        "\n" +
+                                        "                    }\n" +
+                                        "                });");
+                            }
+                        } else {
+                            //activity
+                            if (action.getShowOrHide()) {
+                                //hide
+                                sbActions.append("\n                hideTwoBtnEditDialog();");
+                            } else {
+                                //show
+                                sbActions.append("\n                showTwoBtnEditDialog(\""+action.getTitle()+"\", \""+action.getHintText()+"\", \""+action.getDefText()+"\", false, new OnTwoBtnEditClick() {\n" +
+                                        "                    @Override\n" +
+                                        "                    public void onOk(String s) {\n" +
+                                        "                        \n" +
+                                        "                    }\n" +
+                                        "\n" +
+                                        "                    @Override\n" +
+                                        "                    public void onCancel() {\n" +
+                                        "\n" +
+                                        "                    }\n" +
+                                        "                });");
+                            }
+                        }
                         break;
                     case ActionEntity.TYPE_DIALOG_UPDATE:
-
+                        if (fgm) {
+                            //fragment
+                            if (action.getShowOrHide()) {
+                                //hide
+                                sbActions.append("\n                getBaseAct().hideUpdateDialog();");
+                            } else {
+                                //show
+                                sbActions.append("\n                getBaseAct().showUpdateDialog(\""+action.getTitle()+"\", \""+action.getMsg()+"\", false, new OnOneBtnClickListener() {\n" +
+                                        "                    @Override\n" +
+                                        "                    public void onProgress(TextView textView, ProgressBar progressBar) {\n" +
+                                        "\n" +
+                                        "                    }\n" +
+                                        "\n" +
+                                        "                    @Override\n" +
+                                        "                    public void onOK() {\n" +
+                                        "\n" +
+                                        "                    }\n" +
+                                        "                });");
+                            }
+                        } else {
+                            //activity
+                            if (action.getShowOrHide()) {
+                                //hide
+                                sbActions.append("\n                hideUpdateDialog();");
+                            } else {
+                                //show
+                                sbActions.append("\n                showUpdateDialog(\""+action.getTitle()+"\", \""+action.getMsg()+"\", false, new OnOneBtnClickListener() {\n" +
+                                        "                    @Override\n" +
+                                        "                    public void onProgress(TextView textView, ProgressBar progressBar) {\n" +
+                                        "\n" +
+                                        "                    }\n" +
+                                        "\n" +
+                                        "                    @Override\n" +
+                                        "                    public void onOK() {\n" +
+                                        "\n" +
+                                        "                    }\n" +
+                                        "                });");
+                            }
+                        }
                         break;
                     case ActionEntity.TYPE_DIALOG_LIST:
-
+                        if (fgm) {
+                            //fragment
+                            if (action.getShowOrHide()) {
+                                //hide
+                                sbActions.append("\n                getBaseAct().hideListDialog();");
+                            } else {
+                                //show
+                                String items = action.getItems();
+                                if (items != null) {
+                                    sbActions.append("\n                List<String> items = new ArrayList<String>();\n");
+                                    String[] split = items.split(",");
+                                    for (String s : split) {
+                                        sbActions.append("                    items.add(\"" + s + "\");\n");
+                                    }
+                                    sbActions.append("                }\n" +
+                                            "                getBaseAct().showListDialog(items, false, null, new OnItemClick() {\n" +
+                                            "                    @Override\n" +
+                                            "                    public void onItemClick(int i, String s) {\n" +
+                                            "\n" +
+                                            "                    }\n" +
+                                            "                });");
+                                }
+                            }
+                        } else {
+                            //activity
+                            if (action.getShowOrHide()) {
+                                //hide
+                                sbActions.append("\n                hideListDialog();");
+                            } else {
+                                //show
+                                String items = action.getItems();
+                                if (items != null) {
+                                    sbActions.append("\n                List<String> items = new ArrayList<String>();\n");
+                                    String[] split = items.split(",");
+                                    for (String s : split) {
+                                        sbActions.append("                    items.add(\"" + s + "\");\n");
+                                    }
+                                    sbActions.append("                }\n" +
+                                            "                showListDialog(items, false, null, new OnItemClick() {\n" +
+                                            "                    @Override\n" +
+                                            "                    public void onItemClick(int i, String s) {\n" +
+                                            "\n" +
+                                            "                    }\n" +
+                                            "                });");
+                                }
+                            }
+                        }
                         break;
                     case ActionEntity.TYPE_DIALOG_TWO_BTN_IOS:
-
+                        if (fgm) {
+                            //fragment
+                            if (action.getShowOrHide()) {
+                                //hide
+                                sbActions.append("\n                getBaseAct().hideTwoBtnDialog();");
+                            } else {
+                                //show
+                                sbActions.append("\n                getBaseAct().showTwoBtnDialogIOSStyle(\""+action.getTitle()+"\", \""+action.getMsg()+"\", \"确定\", \"取消\", 0xff000000, 0xff000000, false, new OnIOSTwoBtnEditClick() {\n" +
+                                        "                    @Override\n" +
+                                        "                    public void onLeftClick() {\n" +
+                                        "                        \n" +
+                                        "                    }\n" +
+                                        "\n" +
+                                        "                    @Override\n" +
+                                        "                    public void onRightClick() {\n" +
+                                        "\n" +
+                                        "                    }\n" +
+                                        "                });");
+                            }
+                        } else {
+                            //activity
+                            if (action.getShowOrHide()) {
+                                //hide
+                                sbActions.append("\n                hideTwoBtnDialog();");
+                            } else {
+                                //show
+                                sbActions.append("\n                showTwoBtnDialogIOSStyle(\""+action.getTitle()+"\", \""+action.getMsg()+"\", \"确定\", \"取消\", 0xff000000, 0xff000000, false, new OnIOSTwoBtnEditClick() {\n" +
+                                        "                    @Override\n" +
+                                        "                    public void onLeftClick() {\n" +
+                                        "                        \n" +
+                                        "                    }\n" +
+                                        "\n" +
+                                        "                    @Override\n" +
+                                        "                    public void onRightClick() {\n" +
+                                        "\n" +
+                                        "                    }\n" +
+                                        "                });");
+                            }
+                        }
                         break;
                     case ActionEntity.TYPE_CHOOSE_PIC:
-
+                        if (fgm) {
+                            //fragment
+                            sbImp.append("\nimport android.os.Environment;");
+                            sbActions.append("\n                getBaseAct().choosePhoto(Environment.getExternalStorageDirectory().getAbsolutePath(), true);");
+                        } else {
+                            //activity
+                            sbImp.append("\nimport android.os.Environment;");
+                            sbActions.append("\n                choosePhoto(Environment.getExternalStorageDirectory().getAbsolutePath(), true);");
+                        }
                         break;
                     case ActionEntity.TYPE_USE_API:
-
+                        if (fgm) {
+                            //fragment
+                        } else {
+                            //activity
+                        }
                         break;
                     case ActionEntity.TYPE_TARGET_ACT:
-
+                        if (fgm) {
+                            //fragment
+                            String okActId = action.getOkActId();
+                            ActivityEntity activityEntity = mActivityService.get(okActId);
+                            if (activityEntity != null) {
+                                sbActions.append("\n                Intent intent = new Intent(getActivity(), "+activityEntity.getName()+".class);\n" +
+                                        "                startActWithIntent(intent);");
+                            }
+                        } else {
+                            //activity
+                            String okActId = action.getOkActId();
+                            ActivityEntity activityEntity = mActivityService.get(okActId);
+                            if (activityEntity != null) {
+                                sbActions.append("\n                Intent intent = new Intent("+actName+".this, "+activityEntity.getName()+".class);\n" +
+                                        "                startActWithIntent(intent);");
+                            }
+                        }
                         break;
                     case ActionEntity.TYPE_CLOSE_ACT:
-
+                        if (fgm) {
+                            //fragment
+                            sbActions.append("\n        getBaseAct().closeAct();");
+                        } else {
+                            //activity
+                            sbActions.append("\n        closeAct();");
+                        }
                         break;
                     case ActionEntity.TYPE_CLOSE_ALL_ACT:
-
+                        if (fgm) {
+                            //fragment
+                            sbActions.append("\n        getBaseAct().closeAllAct();");
+                        } else {
+                            //activity
+                            sbActions.append("\n        closeAllAct();");
+                        }
                         break;
                 }
             }

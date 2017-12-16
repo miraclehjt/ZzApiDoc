@@ -45,8 +45,8 @@ public class ActionAction extends BaseController<ActionEntity> {
             @RequestParam(value = "defText", required = false) String defText,
             @RequestParam(value = "userId") String userId,
             @RequestParam(value = "showOrHide") boolean showOrHide,
-            @RequestParam(value = "okApiId") String okApiId,
-            @RequestParam(value = "okActId") String okActId
+            @RequestParam(value = "okApiId", required = false) String okApiId,
+            @RequestParam(value = "okActId", required = false) String okActId
     ) {
         return getBaseService().addAction(type, name, widgetId, title, msg, okText, cancelText, hintText, defText, showOrHide, okApiId, okActId, userId);
     }
@@ -66,8 +66,8 @@ public class ActionAction extends BaseController<ActionEntity> {
             @RequestParam(value = "defText", required = false) String defText,
             @RequestParam(value = "userId") String userId,
             @RequestParam(value = "showOrHide") boolean showOrHide,
-            @RequestParam(value = "okApiId") String okApiId,
-            @RequestParam(value = "okActId") String okActId
+            @RequestParam(value = "okApiId", required = false) String okApiId,
+            @RequestParam(value = "okActId", required = false) String okActId
     ) {
         return getBaseService().updateAction(actionId, type, name, widgetId, title, msg, okText, cancelText, hintText, defText, showOrHide, okApiId, okActId, userId);
     }
