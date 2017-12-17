@@ -43,7 +43,7 @@ public class ActionServiceImpl extends BaseServiceImpl<ActionEntity> implements 
     }
 
     @Override
-    public BaseResult addAction(int type, String name, String widgetId, String title, String msg, String okText, String cancelText, String hintText, String defText, boolean showOrHide,
+    public BaseResult addAction(int type, String pid, String name, String widgetId, String title, String msg, String okText, String cancelText, String hintText, String defText, boolean showOrHide,
                                 String items, String okApiId, int groupPosition, String okActId, String userId) {
         UserEntity user = mUserService.get(userId);
         if (user == null) {
@@ -52,6 +52,7 @@ public class ActionServiceImpl extends BaseServiceImpl<ActionEntity> implements 
         ActionEntity entity = new ActionEntity();
         entity.setType(type);
         entity.setName(name);
+        entity.setPid(pid == null ? "0" : pid);
         entity.setWidgetId(widgetId);
         entity.setTitle(title);
         entity.setMsg(msg);
@@ -99,7 +100,7 @@ public class ActionServiceImpl extends BaseServiceImpl<ActionEntity> implements 
     }
 
     @Override
-    public BaseResult updateAction(String actionId, int type, String name, String widgetId, String title, String msg, String okText, String cancelText, String hintText, String defText, boolean showOrHide,
+    public BaseResult updateAction(String actionId, String pid, int type, String name, String widgetId, String title, String msg, String okText, String cancelText, String hintText, String defText, boolean showOrHide,
                                    String items, String okApiId, int groupPosition, String okActId, String userId) {
         UserEntity user = mUserService.get(userId);
         if (user == null) {
@@ -111,6 +112,7 @@ public class ActionServiceImpl extends BaseServiceImpl<ActionEntity> implements 
         }
         entity.setType(type);
         entity.setName(name);
+        entity.setPid(pid == null ? "0" : pid);
         entity.setWidgetId(widgetId);
         entity.setTitle(title);
         entity.setMsg(msg);
@@ -136,7 +138,7 @@ public class ActionServiceImpl extends BaseServiceImpl<ActionEntity> implements 
     }
 
     @Override
-    public BaseResult getAllActions(String widgetId, String userId) {
+    public BaseResult getAllActions(String widgetId, String pid, String userId) {
         UserEntity user = mUserService.get(userId);
         if (user == null) {
             return new BaseResult(0, "用户不合法！");
@@ -144,6 +146,7 @@ public class ActionServiceImpl extends BaseServiceImpl<ActionEntity> implements 
         if (widgetId != null) {
             List<ActionEntity> actions = executeCriteria(new Criterion[]{
                     Restrictions.eq("deleteFlag", BaseEntity.DELETE_FLAG_NO),
+                    Restrictions.eq("pid", pid),
                     Restrictions.eq("widgetId", widgetId)
             });
             if (actions != null && actions.size() > 0) {
@@ -152,6 +155,7 @@ public class ActionServiceImpl extends BaseServiceImpl<ActionEntity> implements 
                     MapUtils map = new MapUtils();
                     map.put("id", action.getId());
                     map.put("name", action.getName());
+                    map.put("pid", action.getPid());
                     map.put("type", action.getType());
                     map.put("title", action.getTitle());
                     map.put("createTime", DataUtils.formatDate(action.getCreateTime()));

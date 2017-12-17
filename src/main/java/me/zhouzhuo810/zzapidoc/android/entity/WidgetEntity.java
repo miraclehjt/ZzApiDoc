@@ -29,6 +29,7 @@ public class WidgetEntity extends BaseEntity {
     public static final int TYPE_RV = 14;
     public static final int TYPE_LV = 15;
     public static final int TYPE_SCROLLABLE_LV = 16;
+    public static final int TYPE_EDIT_TEXT = 17;
 
     @Column(name = "Type")
     private Integer type = TYPE_TITLE_BAR;
@@ -66,14 +67,6 @@ public class WidgetEntity extends BaseEntity {
     private Boolean showLeftTitleLayout;
     @Column(name = "ShowRightTitleLayout")
     private Boolean showRightTitleLayout;
-    /*点击跳转的Activity*/
-    @Column(name = "targetActivityId")
-    private String targetActivityId;
-    /*接口id*/
-    @Column(name = "targetApiId")
-    private String targetApiId;
-    @Column(name = "GroupPosition")
-    private Integer groupPosition = 0;
     @Column(name = "pid")
     private String pid;
     @Column(name = "Background")
@@ -104,20 +97,10 @@ public class WidgetEntity extends BaseEntity {
     private String gravity;
     @Column(name = "Orientation")
     private String orientation;
-    @Column(name = "ClickToClose")
-    private Boolean clickToClose = false;
     @Column(name = "TextColor")
     private String textColor;
     @Column(name = "TextSize")
     private Integer textSize;
-
-    public Integer getGroupPosition() {
-        return groupPosition;
-    }
-
-    public void setGroupPosition(Integer groupPosition) {
-        this.groupPosition = groupPosition;
-    }
 
     public String getTextColor() {
         return textColor;
@@ -133,14 +116,6 @@ public class WidgetEntity extends BaseEntity {
 
     public void setTextSize(Integer textSize) {
         this.textSize = textSize;
-    }
-
-    public Boolean getClickToClose() {
-        return clickToClose;
-    }
-
-    public void setClickToClose(Boolean clickToClose) {
-        this.clickToClose = clickToClose;
     }
 
     public String getOrientation() {
@@ -263,28 +238,12 @@ public class WidgetEntity extends BaseEntity {
         this.pid = pid;
     }
 
-    public String getTargetApiId() {
-        return targetApiId;
-    }
-
-    public void setTargetApiId(String targetApiId) {
-        this.targetApiId = targetApiId;
-    }
-
     public String getResId() {
         return resId;
     }
 
     public void setResId(String resId) {
         this.resId = resId;
-    }
-
-    public String getTargetActivityId() {
-        return targetActivityId;
-    }
-
-    public void setTargetActivityId(String targetActivityId) {
-        this.targetActivityId = targetActivityId;
     }
 
     public String getName() {

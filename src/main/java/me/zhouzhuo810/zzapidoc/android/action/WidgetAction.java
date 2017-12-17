@@ -50,7 +50,6 @@ public class WidgetAction extends BaseController<WidgetEntity> {
             @RequestParam(value = "showRightTitleText", required = false) boolean showRightTitleText,
             @RequestParam(value = "showLeftTitleLayout", required = false) boolean showLeftTitleLayout,
             @RequestParam(value = "showRightTitleLayout", required = false) boolean showRightTitleLayout,
-            @RequestParam(value = "clickToClose", required = false) boolean clickToClose,
             @RequestParam(value = "pid", required = false) String pid,
             @RequestParam(value = "background", required = false) String background,
             @RequestParam(value = "width", required = false) int width,
@@ -65,11 +64,8 @@ public class WidgetAction extends BaseController<WidgetEntity> {
             @RequestParam(value = "paddingTop", required = false) int paddingTop,
             @RequestParam(value = "paddingBottom", required = false) int paddingBottom,
             @RequestParam(value = "gravity", required = false) String gravity,
-            @RequestParam(value = "targetActId", required = false) String targetActId,
             @RequestParam(value = "orientation", required = false) String orientation,
             @RequestParam(value = "relativeId") String relativeId,
-            @RequestParam(value = "targetApiId", required = false) String targetApiId,
-            @RequestParam(value = "groupPosition", required = false) int groupPosition,
             @RequestParam(value = "appId", required = false) String appId,
             @RequestParam(value = "textColor", required = false) String textColor,
             @RequestParam(value = "textSize", required = false) int textSize,
@@ -77,9 +73,9 @@ public class WidgetAction extends BaseController<WidgetEntity> {
     ) {
         return getBaseService().addWidget(name, title, resId, type, defValue, hint,
                 leftTitleText, rightTitleText, leftTitleImg, rightTitleImg, showLeftTitleImg,
-                showRightTitleImg, showLeftTitleText, showRightTitleText, showLeftTitleLayout, showRightTitleLayout,clickToClose,
+                showRightTitleImg, showLeftTitleText, showRightTitleText, showLeftTitleLayout, showRightTitleLayout,
                 pid, background, width, height, weight, marginLeft, marginRight, marginTop, marginBottom, paddingLeft,
-                paddingRight, paddingTop, paddingBottom, gravity, targetActId, orientation, relativeId, targetApiId, groupPosition, appId, textColor, textSize, userId);
+                paddingRight, paddingTop, paddingBottom, gravity, orientation, relativeId, appId, textColor, textSize, userId);
     }
 
     @ResponseBody

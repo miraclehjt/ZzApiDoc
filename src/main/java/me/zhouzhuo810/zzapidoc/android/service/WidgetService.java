@@ -15,11 +15,11 @@ public interface WidgetService extends BaseService<WidgetEntity> {
                          String hint, String leftTitleText, String rightTitleText,
                          MultipartFile leftTitleImg, MultipartFile rightTitleImg, boolean showLeftTitleImg,
                          boolean showRightTitleImg, boolean showLeftTitleText, boolean showRightTitleText,
-                         boolean showLeftTitleLayout, boolean showRightTitleLayout,boolean clickToClose,
+                         boolean showLeftTitleLayout, boolean showRightTitleLayout,
                          String pid, String background, int width, int height, double weight, int marginLeft,
                          int marginRight, int marginTop, int marginBottom, int paddingLeft, int paddingRight,
                          int paddingTop, int paddingBottom, String gravity,
-                         String targetActId, String orientation, String relativeId, String targetApiId, int groupPosition, String appId, String textColor, int textSize, String userId);
+                         String orientation, String relativeId, String appId, String textColor, int textSize, String userId);
 
     BaseResult getAllMyWidget(String relativeId, String pid, String userId);
 

@@ -52,10 +52,10 @@ public class WidgetServiceImpl extends BaseServiceImpl<WidgetEntity> implements 
                                 String leftTitleText, String rightTitleText, MultipartFile leftTitleImg,
                                 MultipartFile rightTitleImg, boolean showLeftTitleImg, boolean showRightTitleImg,
                                 boolean showLeftTitleText, boolean showRightTitleText, boolean showLeftTitleLayout,
-                                boolean showRightTitleLayout, boolean clickToClose, String pid, String background, int width, int height,
+                                boolean showRightTitleLayout, String pid, String background, int width, int height,
                                 double weight, int marginLeft, int marginRight, int marginTop, int marginBottom,
-                                int paddingLeft, int paddingRight, int paddingTop, int paddingBottom, String gravity,
-                                String targetActId, String orientation, String relativeId, String targetApiId, int groupPosition, String appId, String textColor, int textSize, String userId) {
+                                int paddingLeft, int paddingRight, int paddingTop, int paddingBottom, String gravity, String orientation, String relativeId,
+                                String appId, String textColor, int textSize, String userId) {
         UserEntity user = mUserService.get(userId);
         if (user == null) {
             return new BaseResult(0, "用户不合法");
@@ -66,17 +66,14 @@ public class WidgetServiceImpl extends BaseServiceImpl<WidgetEntity> implements 
         entity.setName(name);
         entity.setResId(resId);
         entity.setHint(hint);
-        entity.setTargetApiId(targetApiId);
         entity.setRelativeId(relativeId);
         entity.setPid(pid==null?"0":pid);
         entity.setBackground(background==null?"@android:color/transparent":background);
         entity.setWidth(width);
         entity.setHeight(height);
-        entity.setClickToClose(clickToClose);
         entity.setTextColor(textColor==null?"000":textColor);
         entity.setTextSize(textSize);
         entity.setGravity(gravity);
-        entity.setGroupPosition(groupPosition);
         entity.setOrientation(orientation);
         entity.setWeight(weight);
         entity.setMarginLeft(marginLeft);
@@ -90,7 +87,6 @@ public class WidgetServiceImpl extends BaseServiceImpl<WidgetEntity> implements 
         entity.setTitle(title);
         entity.setDefValue(defValue);
         entity.setApplicationId(appId);
-        entity.setTargetActivityId(targetActId);
         if (leftTitleImg != null) {
             try {
                 String path = FileUtils.saveFile(leftTitleImg.getBytes(), "image", leftTitleImg.getOriginalFilename());
@@ -171,7 +167,6 @@ public class WidgetServiceImpl extends BaseServiceImpl<WidgetEntity> implements 
             map.put("resId", widgetEntity.getResId());
             map.put("defValue", widgetEntity.getDefValue());
             map.put("hint", widgetEntity.getHint());
-            map.put("clickToClose", widgetEntity.getClickToClose());
             map.put("leftTitleImg", widgetEntity.getLeftTitleImg());
             map.put("rightTitleImg", widgetEntity.getRightTitleImg());
             map.put("leftTitleText", widgetEntity.getLeftTitleText());
@@ -183,7 +178,6 @@ public class WidgetServiceImpl extends BaseServiceImpl<WidgetEntity> implements 
             map.put("showLeftTitleLayout", widgetEntity.getShowLeftTitleLayout());
             map.put("showRightTitleLayout", widgetEntity.getShowRightTitleLayout());
             map.put("appId", widgetEntity.getApplicationId());
-            map.put("targetActivityId", widgetEntity.getTargetActivityId());
             map.put("createTime", DataUtils.formatDate(widgetEntity.getCreateTime()));
             map.put("createUserName", widgetEntity.getCreateUserName());
             result.add(map.build());

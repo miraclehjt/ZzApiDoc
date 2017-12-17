@@ -35,6 +35,7 @@ public class ActionAction extends BaseController<ActionEntity> {
     @RequestMapping(value = "/addAction", method = RequestMethod.POST)
     public BaseResult addAction(
             @RequestParam(value = "type") int type,
+            @RequestParam(value = "pid") String pid,
             @RequestParam(value = "name") String name,
             @RequestParam(value = "widgetId") String widgetId,
             @RequestParam(value = "title") String title,
@@ -50,13 +51,14 @@ public class ActionAction extends BaseController<ActionEntity> {
             @RequestParam(value = "okApiId", required = false) String okApiId,
             @RequestParam(value = "okActId", required = false) String okActId
     ) {
-        return getBaseService().addAction(type, name, widgetId, title, msg, okText, cancelText, hintText, defText, showOrHide, items,  okApiId, groupPosition, okActId, userId);
+        return getBaseService().addAction(type, pid, name, widgetId, title, msg, okText, cancelText, hintText, defText, showOrHide, items,  okApiId, groupPosition, okActId, userId);
     }
 
     @ResponseBody
     @RequestMapping(value = "/updateAction", method = RequestMethod.POST)
     public BaseResult updateAction(
             @RequestParam(value = "actionId") String actionId,
+            @RequestParam(value = "pid") String pid,
             @RequestParam(value = "type") int type,
             @RequestParam(value = "name") String name,
             @RequestParam(value = "widgetId") String widgetId,
@@ -73,7 +75,7 @@ public class ActionAction extends BaseController<ActionEntity> {
             @RequestParam(value = "okApiId", required = false) String okApiId,
             @RequestParam(value = "okActId", required = false) String okActId
     ) {
-        return getBaseService().updateAction(actionId, type, name, widgetId, title, msg, okText, cancelText, hintText, defText, showOrHide, items, okApiId, groupPosition, okActId, userId);
+        return getBaseService().updateAction(actionId, pid, type, name, widgetId, title, msg, okText, cancelText, hintText, defText, showOrHide, items, okApiId, groupPosition, okActId, userId);
     }
 
     @ResponseBody
@@ -89,9 +91,10 @@ public class ActionAction extends BaseController<ActionEntity> {
     @RequestMapping(value = "/getAllActions", method = RequestMethod.GET)
     public BaseResult getAllActions(
             @RequestParam(value = "widgetId") String widgetId,
+            @RequestParam(value = "pid") String pid,
             @RequestParam(value = "userId") String userId
     ) {
-        return getBaseService().getAllActions(widgetId, userId);
+        return getBaseService().getAllActions(widgetId, pid, userId);
     }
 
 }
