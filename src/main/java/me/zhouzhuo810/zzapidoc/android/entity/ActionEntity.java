@@ -46,10 +46,30 @@ public class ActionEntity extends BaseEntity {
     private Boolean showOrHide = false;
     @Column(name = "OkApiId")
     private String okApiId;
+    @Column(name = "OkApiGroupPosition")
+    private Integer okApiGroupPosition = 0;
     @Column(name = "OkActId")
     private String okActId;
     @Column(name = "Items")
     private String items;
+    @Column(name = "pid")
+    private String pid;
+
+    public Integer getOkApiGroupPosition() {
+        return okApiGroupPosition;
+    }
+
+    public void setOkApiGroupPosition(Integer okApiGroupPosition) {
+        this.okApiGroupPosition = okApiGroupPosition;
+    }
+
+    public String getPid() {
+        return pid;
+    }
+
+    public void setPid(String pid) {
+        this.pid = pid;
+    }
 
     public String getItems() {
         return items;

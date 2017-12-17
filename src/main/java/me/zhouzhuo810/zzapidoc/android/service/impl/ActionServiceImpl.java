@@ -44,7 +44,7 @@ public class ActionServiceImpl extends BaseServiceImpl<ActionEntity> implements 
 
     @Override
     public BaseResult addAction(int type, String name, String widgetId, String title, String msg, String okText, String cancelText, String hintText, String defText, boolean showOrHide,
-                                String okApiId, String okActId, String userId) {
+                                String items, String okApiId, int groupPosition, String okActId, String userId) {
         UserEntity user = mUserService.get(userId);
         if (user == null) {
             return new BaseResult(0, "用户不合法！");
@@ -59,6 +59,8 @@ public class ActionServiceImpl extends BaseServiceImpl<ActionEntity> implements 
         entity.setCancelText(cancelText);
         entity.setHintText(hintText);
         entity.setDefText(defText);
+        entity.setOkApiGroupPosition(groupPosition);
+        entity.setItems(items);
         entity.setShowOrHide(showOrHide);
         entity.setCreateUserID(user.getId());
         entity.setCreateUserName(user.getName());
@@ -97,7 +99,8 @@ public class ActionServiceImpl extends BaseServiceImpl<ActionEntity> implements 
     }
 
     @Override
-    public BaseResult updateAction(String actionId, int type, String name, String widgetId, String title, String msg, String okText, String cancelText, String hintText, String defText, boolean showOrHide, String okApiId, String okActId, String userId) {
+    public BaseResult updateAction(String actionId, int type, String name, String widgetId, String title, String msg, String okText, String cancelText, String hintText, String defText, boolean showOrHide,
+                                   String items, String okApiId, int groupPosition, String okActId, String userId) {
         UserEntity user = mUserService.get(userId);
         if (user == null) {
             return new BaseResult(0, "用户不合法！");
@@ -111,10 +114,12 @@ public class ActionServiceImpl extends BaseServiceImpl<ActionEntity> implements 
         entity.setWidgetId(widgetId);
         entity.setTitle(title);
         entity.setMsg(msg);
+        entity.setOkApiGroupPosition(groupPosition);
         entity.setOkText(okText);
         entity.setCancelText(cancelText);
         entity.setHintText(hintText);
         entity.setDefText(defText);
+        entity.setItems(items);
         entity.setShowOrHide(showOrHide);
         entity.setModifyUserID(user.getId());
         entity.setModifyUserName(user.getName());

@@ -3054,11 +3054,27 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         heightString = height + "px";
                         break;
                 }
-                String actions = genearteActions(widgetEntity.getId(), true, activityEntity.getName(), sbStrings, sbImp);
+                String actions = genearteActions(widgetEntity.getId(), true, activityEntity.getName(), sbStrings, sbImp, sbData);
                 switch (widgetEntity.getType()) {
                     case WidgetEntity.TYPE_TITLE_BAR:
                         sbDef.append("\n    private TitleBar titleBar;");
                         sbInit.append("\n        titleBar = (TitleBar) rootView.findViewById(R.id.title_bar);");
+                        sbEvent.append("\n        titleBar.setOnTitleClickListener(new TitleBar.OnTitleClick() {\n" +
+                                "            @Override\n" +
+                                "            public void onLeftClick(ImageView imageView, MarkView markView, TextView textView) {\n" +
+                                "                closeAct();\n" +
+                                "            }\n" +
+                                "\n" +
+                                "            @Override\n" +
+                                "            public void onTitleClick(TextView textView) {\n" +
+                                "\n" +
+                                "            }\n" +
+                                "\n" +
+                                "            @Override\n" +
+                                "            public void onRightClick(ImageView imageView, MarkView markView, TextView textView) {\n" +
+                                "\n" + actions +
+                                "\n            }\n" +
+                                "        });\n");
                         if (!sbStrings.toString().contains("\"" + layoutName + "_text\"")) {
                             sbStrings.append("    <string name=\"" + layoutName + "_text\">" + fragmentEntity.getTitle() + "</string>\n");
                         }
@@ -3244,98 +3260,15 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "        android:text=\"@string/" + widgetEntity.getResId() + "_btn_text\"\n" +
                                 "        android:textColor=\"#fff\"\n" +
                                 "        android:textSize=\"@dimen/submit_btn_text_size\" />");
-                        if (widgetEntity.getTargetApiId() != null && widgetEntity.getTargetApiId().length() > 0) {
-                            InterfaceEntity interfaceEntity = mInterfaceService.get(widgetEntity.getTargetApiId());
-                            if (interfaceEntity != null) {
-                                int requestParamsNo = interfaceEntity.getRequestParamsNo();
-                                ActivityEntity targetAct = null;
-                                if (widgetEntity.getTargetActivityId() != null && widgetEntity.getTargetActivityId().length() > 0) {
-                                    targetAct = mActivityService.get(widgetEntity.getTargetActivityId());
-                                }
-                                String url = interfaceEntity.getPath();
-                                String m = url.substring(url.lastIndexOf("/") + 1, url.length());
-                                String beanClazz = m.substring(0, 1).toUpperCase() + m.substring(1, m.length()) + "Result";
-                                String apiMethod = url.substring(url.lastIndexOf("/") + 1, url.length());
-                                if (!sbStrings.toString().contains("\"" + widgetEntity.getResId() + "ing_text\"")) {
-                                    sbStrings.append("    <string name=\"" + widgetEntity.getResId() + "ing_text\">" + widgetEntity.getTitle() + "中...</string>\n");
-                                }
-                                sbMethods.append("    public void do_" + widgetEntity.getResId() + "() {\n");
-                                sbMethods.append(sbEditInfo.toString());
-                                sbMethods.append("\n");
-                                sbMethods.append(actions);
-                                sbMethods.append("\n        showPd(getString(R.string." + widgetEntity.getResId() + "ing_text), false);\n" +
-                                        "        Api.getApi" + widgetEntity.getGroupPosition() + "()\n" +
-                                        "                ." + apiMethod + "(");
-                                if (requestParamsNo > 0) {
-                                    for (int i1 = 0; i1 < requestParamsNo; i1++) {
-                                        sbMethods.append("\"\", ");
-                                    }
-                                    sbMethods.deleteCharAt(sbMethods.length() - 1);
-                                    sbMethods.deleteCharAt(sbMethods.length() - 1);
-                                }
-                                sbData.append("        startRefresh(refreshLayout);\n" +
-                                        "        getData();\n");
-                                sbMethods.append(
-                                        ")\n" +
-                                                "                .compose(RxHelper.<" + beanClazz + ">io_main())\n" +
-                                                "                .subscribe(new Subscriber<" + beanClazz + ">() {\n" +
-                                                "                    @Override\n" +
-                                                "                    public void onCompleted() {\n" +
-                                                "\n" +
-                                                "                    }\n" +
-                                                "\n" +
-                                                "                    @Override\n" +
-                                                "                    public void onError(Throwable e) {\n" +
-                                                "                        hidePd();\n" +
-                                                "                        ToastUtils.showCustomBgToast(getString(R.string.no_net_text) + e.toString());\n" +
-                                                "                    }\n" +
-                                                "\n" +
-                                                "                    @Override\n" +
-                                                "                    public void onNext(" + beanClazz + " result) {\n" +
-                                                "                        hidePd();\n" +
-                                                "                    /*    ToastUtils.showCustomBgToast(result.getMsg());\n" +
-                                                "                        if (result.getCode() == 1) {\n" +
-                                                "                            Intent intent = new Intent(getActivity(), " + (targetAct == null ? activityEntity.getName() : targetAct.getName()) + ".class);\n" +
-                                                "                            startActWithIntent(intent);\n" +
-                                                "                        }\n*/")
-                                        .append("                            Intent intent = new Intent(getActivity(), " + (targetAct == null ? activityEntity.getName() : targetAct.getName()) + ".class);\n" +
-                                                "                            startActWithIntent(intent);\n");
-                                if (widgetEntity.getClickToClose()) {
-                                    sbMethods.append("                            getBaseAct().closeAct();\n");
-                                }
-                                sbMethods.append("                    }\n" +
-                                        "                });");
-                                if (widgetEntity.getClickToClose()) {
-                                    if (targetAct != null) {
-                                        sbMethods.append("          Intent intent = new Intent(getActivity(), " + targetAct.getName() + ".class);\n" +
-                                                "          startActWithIntent(intent);\n");
-                                    }
-                                    sbMethods.append("          getBaseAct().closeAct();\n");
-                                }
-                                sbMethods.append("    }\n");
-                                sbEvent.append("\n        " + submitBtnName + ".setOnClickListener(new View.OnClickListener() {\n" +
-                                        "            @Override\n" +
-                                        "            public void onClick(View v) {\n" +
-                                        "                do_" + widgetEntity.getResId() + "();\n" +
-                                        "            }\n" +
-                                        "        });");
-                            }
-                        } else {
-                            ActivityEntity targetAct = null;
-                            if (widgetEntity.getTargetActivityId() != null && widgetEntity.getTargetActivityId().length() > 0) {
-                                targetAct = mActivityService.get(widgetEntity.getTargetActivityId());
-                            }
-                            sbEvent.append("        " + submitBtnName + ".setOnClickListener(new View.OnClickListener() {\n" +
-                                    "            @Override\n" +
-                                    "            public void onClick(View v) {\n" +
-                                    "                Intent intent = new Intent(getActivity(), " + (targetAct == null ? activityEntity.getName() : targetAct.getName()) + ".class);\n" +
-                                    "                startActWithIntent(intent);\n");
-                            if (widgetEntity.getClickToClose()) {
-                                sbEvent.append("                getBaseAct().closeAct();\n");
-                            }
-                            sbEvent.append("            }\n" +
-                                    "        });");
+                        sbEvent.append("        " + submitBtnName + ".setOnClickListener(new View.OnClickListener() {\n" +
+                                "            @Override\n" +
+                                "            public void onClick(View v) {\n" + actions + "\n"
+                        );
+                        if (widgetEntity.getClickToClose()) {
+                            sbEvent.append("                getBaseAct().closeAct();\n");
                         }
+                        sbEvent.append("            }\n" +
+                                "        });");
                         break;
                     case WidgetEntity.TYPE_EXIT_BTN_ITEM:
                         String exitBtnName = generateVarName("btn", widgetEntity.getResId());
@@ -4043,9 +3976,8 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 sbEvent.append("\n        " + ivName + ".setOnClickListener(new View.OnClickListener() {\n" +
                                         "            @Override\n" +
                                         "            public void onClick(View v) {\n" +
-                                        actions + "\n" +
-                                        "                Intent intent = new Intent(getActivity(), " + targetAct.getName() + ".class);\n" +
-                                        "                startActWithIntent(intent);\n");
+                                        actions + "\n"
+                                );
                                 sbEvent.append("            }\n" +
                                         "        });");
                             }
@@ -4138,7 +4070,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         heightString = height + "px";
                         break;
                 }
-                String actions = genearteActions(widgetEntity.getId(), false, "", sbStrings, sbImp);
+                String actions = genearteActions(widgetEntity.getId(), false, "", sbStrings, sbImp, sbData);
                 switch (widgetEntity.getType()) {
                     case WidgetEntity.TYPE_TITLE_BAR:
                         // TODO: 2017/12/16 添加动作
@@ -4423,16 +4355,11 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                         "        });");
                             }
                         } else {
-                            ActivityEntity targetAct = null;
-                            if (widgetEntity.getTargetActivityId() != null && widgetEntity.getTargetActivityId().length() > 0) {
-                                targetAct = mActivityService.get(widgetEntity.getTargetActivityId());
-                            }
                             sbEvent.append("\n        " + submitBtnName + ".setOnClickListener(new View.OnClickListener() {\n" +
                                     "            @Override\n" +
                                     "            public void onClick(View v) {\n" +
-                                    actions + "\n" +
-                                    "                Intent intent = new Intent(" + activityEntity.getName() + ".this, " + (targetAct == null ? activityEntity.getName() : targetAct.getName()) + ".class);\n" +
-                                    "                startActWithIntent(intent);\n");
+                                    actions + "\n"
+                            );
                             if (widgetEntity.getClickToClose()) {
                                 sbEvent.append("                closeAct();\n");
                             }
@@ -5199,7 +5126,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
         }
     }
 
-    private String genearteActions(String widgetId, boolean fgm, String actName, StringBuilder sbStrings, StringBuilder sbImp) {
+    private String genearteActions(String widgetId, boolean fgm, String actName, StringBuilder sbStrings, StringBuilder sbImp, StringBuilder sbData) {
         List<ActionEntity> actions = mActionService.executeCriteria(new Criterion[]{
                 Restrictions.eq("deleteFlag", BaseEntity.DELETE_FLAG_NO),
                 Restrictions.eq("widgetId", widgetId)
@@ -5238,7 +5165,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 sbActions.append("\n                getBaseAct().hideTwoBtnDialog();();");
                             } else {
                                 //show
-                                sbActions.append("\n                getBaseAct().showTwoBtnDialog(\""+action.getTitle()+"\", \""+action.getMsg()+"\", false, new OnTwoBtnClick() {\n" +
+                                sbActions.append("\n                getBaseAct().showTwoBtnDialog(\"" + action.getTitle() + "\", \"" + action.getMsg() + "\", false, new OnTwoBtnClick() {\n" +
                                         "                    @Override\n" +
                                         "                    public void onOk() {\n" +
                                         "\n" +
@@ -5257,7 +5184,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 sbActions.append("\n                hideTwoBtnDialog();();");
                             } else {
                                 //show
-                                sbActions.append("\n                showTwoBtnDialog(\""+action.getTitle()+"\", \""+action.getMsg()+"\", false, new OnTwoBtnClick() {\n" +
+                                sbActions.append("\n                showTwoBtnDialog(\"" + action.getTitle() + "\", \"" + action.getMsg() + "\", false, new OnTwoBtnClick() {\n" +
                                         "                    @Override\n" +
                                         "                    public void onOk() {\n" +
                                         "\n" +
@@ -5279,7 +5206,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 sbActions.append("\n                getBaseAct().hideTwoBtnEditDialog();");
                             } else {
                                 //show
-                                sbActions.append("\n                getBaseAct().showTwoBtnEditDialog(\""+action.getTitle()+"\", \""+action.getHintText()+"\", \""+action.getDefText()+"\", false, new OnTwoBtnEditClick() {\n" +
+                                sbActions.append("\n                getBaseAct().showTwoBtnEditDialog(\"" + action.getTitle() + "\", \"" + action.getHintText() + "\", \"" + action.getDefText() + "\", false, new OnTwoBtnEditClick() {\n" +
                                         "                    @Override\n" +
                                         "                    public void onOk(String s) {\n" +
                                         "                        \n" +
@@ -5298,7 +5225,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 sbActions.append("\n                hideTwoBtnEditDialog();");
                             } else {
                                 //show
-                                sbActions.append("\n                showTwoBtnEditDialog(\""+action.getTitle()+"\", \""+action.getHintText()+"\", \""+action.getDefText()+"\", false, new OnTwoBtnEditClick() {\n" +
+                                sbActions.append("\n                showTwoBtnEditDialog(\"" + action.getTitle() + "\", \"" + action.getHintText() + "\", \"" + action.getDefText() + "\", false, new OnTwoBtnEditClick() {\n" +
                                         "                    @Override\n" +
                                         "                    public void onOk(String s) {\n" +
                                         "                        \n" +
@@ -5320,7 +5247,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 sbActions.append("\n                getBaseAct().hideUpdateDialog();");
                             } else {
                                 //show
-                                sbActions.append("\n                getBaseAct().showUpdateDialog(\""+action.getTitle()+"\", \""+action.getMsg()+"\", false, new OnOneBtnClickListener() {\n" +
+                                sbActions.append("\n                getBaseAct().showUpdateDialog(\"" + action.getTitle() + "\", \"" + action.getMsg() + "\", false, new OnOneBtnClickListener() {\n" +
                                         "                    @Override\n" +
                                         "                    public void onProgress(TextView textView, ProgressBar progressBar) {\n" +
                                         "\n" +
@@ -5339,7 +5266,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 sbActions.append("\n                hideUpdateDialog();");
                             } else {
                                 //show
-                                sbActions.append("\n                showUpdateDialog(\""+action.getTitle()+"\", \""+action.getMsg()+"\", false, new OnOneBtnClickListener() {\n" +
+                                sbActions.append("\n                showUpdateDialog(\"" + action.getTitle() + "\", \"" + action.getMsg() + "\", false, new OnOneBtnClickListener() {\n" +
                                         "                    @Override\n" +
                                         "                    public void onProgress(TextView textView, ProgressBar progressBar) {\n" +
                                         "\n" +
@@ -5368,8 +5295,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                     for (String s : split) {
                                         sbActions.append("                    items.add(\"" + s + "\");\n");
                                     }
-                                    sbActions.append("                }\n" +
-                                            "                getBaseAct().showListDialog(items, false, null, new OnItemClick() {\n" +
+                                    sbActions.append("                getBaseAct().showListDialog(items, false, null, new OnItemClick() {\n" +
                                             "                    @Override\n" +
                                             "                    public void onItemClick(int i, String s) {\n" +
                                             "\n" +
@@ -5391,8 +5317,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                     for (String s : split) {
                                         sbActions.append("                    items.add(\"" + s + "\");\n");
                                     }
-                                    sbActions.append("                }\n" +
-                                            "                showListDialog(items, false, null, new OnItemClick() {\n" +
+                                    sbActions.append("                showListDialog(items, false, null, new OnItemClick() {\n" +
                                             "                    @Override\n" +
                                             "                    public void onItemClick(int i, String s) {\n" +
                                             "\n" +
@@ -5410,7 +5335,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 sbActions.append("\n                getBaseAct().hideTwoBtnDialog();");
                             } else {
                                 //show
-                                sbActions.append("\n                getBaseAct().showTwoBtnDialogIOSStyle(\""+action.getTitle()+"\", \""+action.getMsg()+"\", \"确定\", \"取消\", 0xff000000, 0xff000000, false, new OnIOSTwoBtnEditClick() {\n" +
+                                sbActions.append("\n                getBaseAct().showTwoBtnDialogIOSStyle(\"" + action.getTitle() + "\", \"" + action.getMsg() + "\", \"确定\", \"取消\", 0xff000000, 0xff000000, false, new OnIOSTwoBtnEditClick() {\n" +
                                         "                    @Override\n" +
                                         "                    public void onLeftClick() {\n" +
                                         "                        \n" +
@@ -5429,7 +5354,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 sbActions.append("\n                hideTwoBtnDialog();");
                             } else {
                                 //show
-                                sbActions.append("\n                showTwoBtnDialogIOSStyle(\""+action.getTitle()+"\", \""+action.getMsg()+"\", \"确定\", \"取消\", 0xff000000, 0xff000000, false, new OnIOSTwoBtnEditClick() {\n" +
+                                sbActions.append("\n                showTwoBtnDialogIOSStyle(\"" + action.getTitle() + "\", \"" + action.getMsg() + "\", \"确定\", \"取消\", 0xff000000, 0xff000000, false, new OnIOSTwoBtnEditClick() {\n" +
                                         "                    @Override\n" +
                                         "                    public void onLeftClick() {\n" +
                                         "                        \n" +
@@ -5457,8 +5382,112 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                     case ActionEntity.TYPE_USE_API:
                         if (fgm) {
                             //fragment
+                            InterfaceEntity interfaceEntity = mInterfaceService.get(action.getOkApiId());
+                            if (interfaceEntity != null) {
+                                int requestParamsNo = interfaceEntity.getRequestParamsNo();
+                                ActivityEntity targetAct = null;
+                                if (action.getOkActId() != null && action.getOkActId().length() > 0) {
+                                    targetAct = mActivityService.get(action.getOkActId());
+                                }
+                                String url = interfaceEntity.getPath();
+                                String m = url.substring(url.lastIndexOf("/") + 1, url.length());
+                                String beanClazz = m.substring(0, 1).toUpperCase() + m.substring(1, m.length()) + "Result";
+                                String apiMethod = url.substring(url.lastIndexOf("/") + 1, url.length());
+                                sbActions.append("\n        getBaseAct().showPd(getString(R.string.loading_text), false);\n" +
+                                        "        Api.getApi" + action.getOkApiGroupPosition() + "()\n" +
+                                        "                ." + apiMethod + "(");
+                                if (requestParamsNo > 0) {
+                                    for (int i1 = 0; i1 < requestParamsNo; i1++) {
+                                        sbActions.append("\"\", ");
+                                    }
+                                    sbActions.deleteCharAt(sbActions.length() - 1);
+                                    sbActions.deleteCharAt(sbActions.length() - 1);
+                                }
+                                sbData.append("        startRefresh(refreshLayout);\n" +
+                                        "        getData();\n");
+                                sbActions.append(
+                                        ")\n" +
+                                                "                .compose(RxHelper.<" + beanClazz + ">io_main())\n" +
+                                                "                .subscribe(new Subscriber<" + beanClazz + ">() {\n" +
+                                                "                    @Override\n" +
+                                                "                    public void onCompleted() {\n" +
+                                                "\n" +
+                                                "                    }\n" +
+                                                "\n" +
+                                                "                    @Override\n" +
+                                                "                    public void onError(Throwable e) {\n" +
+                                                "                        hidePd();\n" +
+                                                "                        ToastUtils.showCustomBgToast(getString(R.string.no_net_text) + e.toString());\n" +
+                                                "                    }\n" +
+                                                "\n" +
+                                                "                    @Override\n" +
+                                                "                    public void onNext(" + beanClazz + " result) {\n" +
+                                                "                        hidePd();\n" +
+                                                "                    /*    ToastUtils.showCustomBgToast(result.getMsg());\n" +
+                                                "                        if (result.getCode() == 1) {\n" +
+                                                "                            Intent intent = new Intent(getActivity(), " + (targetAct == null ? actName : targetAct.getName()) + ".class);\n" +
+                                                "                            startActWithIntent(intent);\n" +
+                                                "                        }\n*/")
+                                        .append("                            Intent intent = new Intent(getActivity(), " + (targetAct == null ? actName : targetAct.getName()) + ".class);\n" +
+                                                "                            startActWithIntent(intent);\n");
+                                sbActions.append("                    }\n" +
+                                        "                });\n");
+                                sbActions.append("    }\n");
+                            }
                         } else {
                             //activity
+                            InterfaceEntity interfaceEntity = mInterfaceService.get(action.getOkApiId());
+                            if (interfaceEntity != null) {
+                                int requestParamsNo = interfaceEntity.getRequestParamsNo();
+                                ActivityEntity targetAct = null;
+                                if (action.getOkActId() != null && action.getOkActId().length() > 0) {
+                                    targetAct = mActivityService.get(action.getOkActId());
+                                }
+                                String url = interfaceEntity.getPath();
+                                String m = url.substring(url.lastIndexOf("/") + 1, url.length());
+                                String beanClazz = m.substring(0, 1).toUpperCase() + m.substring(1, m.length()) + "Result";
+                                String apiMethod = url.substring(url.lastIndexOf("/") + 1, url.length());
+                                sbActions.append("\n        showPd(getString(R.string.loading_text), false);\n" +
+                                        "        Api.getApi" + action.getOkApiGroupPosition() + "()\n" +
+                                        "                ." + apiMethod + "(");
+                                if (requestParamsNo > 0) {
+                                    for (int i1 = 0; i1 < requestParamsNo; i1++) {
+                                        sbActions.append("\"\", ");
+                                    }
+                                    sbActions.deleteCharAt(sbActions.length() - 1);
+                                    sbActions.deleteCharAt(sbActions.length() - 1);
+                                }
+                                sbData.append("        startRefresh(refreshLayout);\n" +
+                                        "        getData();\n");
+                                sbActions.append(
+                                        ")\n" +
+                                                "                .compose(RxHelper.<" + beanClazz + ">io_main())\n" +
+                                                "                .subscribe(new Subscriber<" + beanClazz + ">() {\n" +
+                                                "                    @Override\n" +
+                                                "                    public void onCompleted() {\n" +
+                                                "\n" +
+                                                "                    }\n" +
+                                                "\n" +
+                                                "                    @Override\n" +
+                                                "                    public void onError(Throwable e) {\n" +
+                                                "                        hidePd();\n" +
+                                                "                        ToastUtils.showCustomBgToast(getString(R.string.no_net_text) + e.toString());\n" +
+                                                "                    }\n" +
+                                                "\n" +
+                                                "                    @Override\n" +
+                                                "                    public void onNext(" + beanClazz + " result) {\n" +
+                                                "                        hidePd();\n" +
+                                                "                    /*    ToastUtils.showCustomBgToast(result.getMsg());\n" +
+                                                "                        if (result.getCode() == 1) {\n" +
+                                                "                            Intent intent = new Intent("+actName+".this, " + (targetAct == null ? actName : targetAct.getName()) + ".class);\n" +
+                                                "                            startActWithIntent(intent);\n" +
+                                                "                        }\n*/")
+                                        .append("                            Intent intent = new Intent("+actName+".this, "+ (targetAct == null ? actName : targetAct.getName()) + ".class);\n" +
+                                                "                            startActWithIntent(intent);\n");
+                                sbActions.append("                    }\n" +
+                                        "                });\n");
+                                sbActions.append("    }\n");
+                            }
                         }
                         break;
                     case ActionEntity.TYPE_TARGET_ACT:
@@ -5467,7 +5496,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                             String okActId = action.getOkActId();
                             ActivityEntity activityEntity = mActivityService.get(okActId);
                             if (activityEntity != null) {
-                                sbActions.append("\n                Intent intent = new Intent(getActivity(), "+activityEntity.getName()+".class);\n" +
+                                sbActions.append("\n                Intent intent = new Intent(getActivity(), " + activityEntity.getName() + ".class);\n" +
                                         "                startActWithIntent(intent);");
                             }
                         } else {
@@ -5475,7 +5504,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                             String okActId = action.getOkActId();
                             ActivityEntity activityEntity = mActivityService.get(okActId);
                             if (activityEntity != null) {
-                                sbActions.append("\n                Intent intent = new Intent("+actName+".this, "+activityEntity.getName()+".class);\n" +
+                                sbActions.append("\n                Intent intent = new Intent(" + actName + ".this, " + activityEntity.getName() + ".class);\n" +
                                         "                startActWithIntent(intent);");
                             }
                         }
