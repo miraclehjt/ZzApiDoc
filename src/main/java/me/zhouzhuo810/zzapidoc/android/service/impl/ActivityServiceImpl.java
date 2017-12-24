@@ -60,7 +60,7 @@ public class ActivityServiceImpl extends BaseServiceImpl<ActivityEntity> impleme
 
 
     @Override
-    public BaseResult addActivity(String name, String title, boolean showTitle, boolean isFirst,
+    public BaseResult addActivity(String name, String title, boolean isFirst,
                                   MultipartFile splashImg, int splashSecond, int type, String appId, String targetActId, String userId) {
         UserEntity user = mUserService.get(userId);
         if (user == null) {
@@ -74,7 +74,6 @@ public class ActivityServiceImpl extends BaseServiceImpl<ActivityEntity> impleme
         entity.setTargetActId(targetActId);
         entity.setTitle(title);
         entity.setSplashSecond(splashSecond == 0 ? 5 : splashSecond);
-        entity.setShowTitleBar(showTitle);
         if (splashImg != null) {
             try {
                 String path = FileUtils.saveFile(splashImg.getBytes(), "image", splashImg.getOriginalFilename());
@@ -229,7 +228,6 @@ public class ActivityServiceImpl extends BaseServiceImpl<ActivityEntity> impleme
             map.put("splashImg", applicationEntity.getSplashImg());
             map.put("splashSecond", applicationEntity.getSplashSecond() == null ? 5 : applicationEntity.getSplashSecond());
             map.put("title", applicationEntity.getTitle());
-            map.put("showTitle", applicationEntity.getShowTitleBar());
             map.put("appId", applicationEntity.getApplicationId());
             map.put("targetActId", applicationEntity.getTargetActId());
             map.put("targetActName", applicationEntity.getTargetActName());

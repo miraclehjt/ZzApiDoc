@@ -53,7 +53,6 @@ public class FragmentServiceImpl extends BaseServiceImpl<FragmentEntity> impleme
         entity.setName(name);
         entity.setPosition(position);
         entity.setTitle(title);
-        entity.setShowTitle(showTitle);
         entity.setApplicationId(appId);
         entity.setActivityId(activityId);
         entity.setType(type);
@@ -108,7 +107,6 @@ public class FragmentServiceImpl extends BaseServiceImpl<FragmentEntity> impleme
             map.put("name", applicationEntity.getName());
             map.put("type", applicationEntity.getType());
             map.put("title", applicationEntity.getTitle());
-            map.put("showTitle", applicationEntity.getShowTitle());
             map.put("appId", applicationEntity.getApplicationId());
             map.put("activityId", applicationEntity.getActivityId());
             map.put("createTime", DataUtils.formatDate(applicationEntity.getCreateTime()));

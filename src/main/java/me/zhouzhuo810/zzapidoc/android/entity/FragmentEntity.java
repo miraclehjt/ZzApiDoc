@@ -22,8 +22,6 @@ public class FragmentEntity extends BaseEntity{
     private String title;
     @Column(name = "Name")
     private String name;
-    @Column(name = "ShowTitle")
-    private Boolean showTitle;
     @Column(name = "ApplicationId")
     private String applicationId;
     @Column(name = "ActivityId")
@@ -79,11 +77,4 @@ public class FragmentEntity extends BaseEntity{
         this.name = name;
     }
 
-    public Boolean getShowTitle() {
-        return showTitle;
-    }
-
-    public void setShowTitle(Boolean showTitle) {
-        this.showTitle = showTitle;
-    }
 }

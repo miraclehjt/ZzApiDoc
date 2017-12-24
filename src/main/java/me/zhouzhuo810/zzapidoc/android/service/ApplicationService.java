@@ -29,4 +29,5 @@ public interface ApplicationService extends BaseService<ApplicationEntity> {
 
     ResponseEntity<byte[]> downloadApplication(String appId, String userId);
 
+    ResponseEntity<byte[]> downloadAppJson(String appId, String userId);
 }

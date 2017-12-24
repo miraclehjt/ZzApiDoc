@@ -31,6 +31,7 @@ import org.gradle.tooling.*;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
+import org.json.JSONStringer;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -46,6 +47,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -406,6 +408,237 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
             e.printStackTrace();
         }
         return null;
+    }
+
+    @Override
+    public ResponseEntity<byte[]> downloadAppJson(String appId, String userId) {
+        UserEntity user = mUserService.get(userId);
+        if (user == null) {
+            return null;
+        }
+        ApplicationEntity app = get(appId);
+        if (app == null) {
+            return null;
+        }
+
+        String json = convertToJson(app);
+        try {
+            ClassLoader classLoader = this.getClass().getClassLoader();
+            URL resource = classLoader.getResource("../../empty_file.txt");
+            if (resource != null) {
+                String path = resource.getPath();
+                if (path != null) {
+                    String mPath = new File(path).getParent() + File.separator + "JSON";
+                    CacheEntity cacheEntity = new CacheEntity();
+                    cacheEntity.setCachePath(mPath);
+                    try {
+                        List<CacheEntity> cacheEntities = mCacheService.executeCriteria(new Criterion[]{
+                                Restrictions.eq("deleteFlag", BaseEntity.DELETE_FLAG_NO),
+                                Restrictions.eq("cachePath", mPath)});
+                        if (cacheEntities == null || cacheEntities.size() == 0) {
+                            mCacheService.save(cacheEntity);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    String fileName = me.zhouzhuo810.zzapidoc.common.utils.FileUtils.saveFileToPathWithRandomName(json, mPath);
+                    HttpHeaders headers = new HttpHeaders();
+                    headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+                    headers.setContentDispositionFormData("attachment", fileName);
+                    return new ResponseEntity<byte[]>(org.apache.commons.io.FileUtils.readFileToByteArray(new File(mPath + File.separator + fileName)), headers, HttpStatus.CREATED);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private String convertToJson(ApplicationEntity app) {
+        JSONStringer stringer = new JSONStringer();
+        stringer.object();
+
+        //app start
+        stringer.key("appId").value(app.getId())
+                .key("targetSDK").value(app.getTargetSDK())
+                .key("apiId").value(app.getApiId())
+                .key("appName").value(app.getAppName())
+                .key("chName").value(app.getChName())
+                .key("colorMain").value(app.getColorMain())
+                .key("compileSDK").value(app.getCompileSDK())
+                .key("minSDK").value(app.getMinSDK())
+                .key("minifyEnable").value(app.getMinifyEnabled())
+                .key("qrCodeEnable").value(app.getEnableQrCode())
+                .key("multiDexEnable").value(app.getMultiDex())
+                .key("packageName").value(app.getPackageName())
+                .key("versionCode").value(app.getVersionCode())
+                .key("versionName").value(app.getVersionName())
+                .key("logo").value(app.getLogo());
+        //acts start
+        stringer.key("activities").array();
+        List<ActivityEntity> acts = mActivityService.executeCriteria(new Criterion[]{
+                Restrictions.eq("deleteFlag", BaseEntity.DELETE_FLAG_NO),
+                Restrictions.eq("applicationId", app.getId())
+        });
+        if (acts != null) {
+            for (ActivityEntity act : acts) {
+                //act start
+                stringer.object();
+                stringer
+                        .key("acdId").value(act.getId())
+                        .key("name").value(act.getName())
+                        .key("isFirst").value(act.getFirst())
+                        .key("splashImg").value(act.getSplashImg())
+                        .key("title").value(act.getTitle())
+                        .key("appId").value(act.getApplicationId())
+                        .key("splashSecond").value(act.getSplashSecond())
+                        .key("targetActId").value(act.getTargetActId())
+                        .key("targetActName").value(act.getTargetActName())
+                        .key("type").value(act.getType());
+                //widgets start
+                stringer.key("widgets").array();
+                widgetToJson(stringer, act.getId(), "0");
+                stringer.endArray();
+                //widgets end
+
+                //fgms start
+                stringer.key("fragments").array();
+                List<FragmentEntity> fgms = mFragmentService.executeCriteria(new Criterion[]{
+                        Restrictions.eq("deleteFlag", BaseEntity.DELETE_FLAG_NO),
+                        Restrictions.eq("activityId", act.getId())
+                });
+                if (fgms != null) {
+                    for (FragmentEntity fgm : fgms) {
+                        //fgm start
+                        stringer.object()
+                                .key("id").value(fgm.getId())
+                                .key("position").value(fgm.getPosition())
+                                .key("title").value(fgm.getTitle())
+                                .key("type").value(fgm.getType())
+                                .key("name").value(fgm.getName())
+                                .key("actId").value(fgm.getActivityId())
+                                .key("appId").value(fgm.getApplicationId());
+
+                        //widgets start
+                        stringer.key("widgets").array();
+                        widgetToJson(stringer, fgm.getId(), "0");
+                        stringer.endArray();
+                        //widgets end
+
+                        //fgm end
+                        stringer.endObject();
+                    }
+                }
+                //fgms end
+                stringer.endArray();
+                //act end
+                stringer.endObject();
+            }
+        }
+
+
+        //acts end
+        stringer.endArray();
+        //app end
+        stringer.endObject();
+        return stringer.toString();
+    }
+
+    private void widgetToJson(JSONStringer stringer, String relativeId, String pid) {
+        List<WidgetEntity> widgets = mWidgetService.executeCriteria(new Criterion[]{
+                Restrictions.eq("deleteFlag", BaseEntity.DELETE_FLAG_NO),
+                Restrictions.eq("pid", pid),
+                Restrictions.eq("relativeId", relativeId)
+        });
+        if (widgets != null) {
+            for (WidgetEntity widget : widgets) {
+                //widget start
+                stringer.object()
+                        .key("id").value(widget.getId())
+                        .key("appId").value(widget.getApplicationId())
+                        .key("getRelativeId").value(widget.getRelativeId())
+                        .key("pid").value(widget.getPid())
+                        .key("hint").value(widget.getHint())
+                        .key("background").value(widget.getBackground())
+                        .key("defValue").value(widget.getDefValue())
+                        .key("gravity").value(widget.getGravity())
+                        .key("height").value(widget.getHeight())
+                        .key("width").value(widget.getWidth())
+                        .key("leftImg").value(widget.getLeftTitleImg())
+                        .key("leftText").value(widget.getLeftTitleText())
+                        .key("rightImg").value(widget.getRightTitleImg())
+                        .key("rightText").value(widget.getRightTitleText())
+                        .key("title").value(widget.getTitle())
+                        .key("marginLeft").value(widget.getMarginLeft())
+                        .key("marginTop").value(widget.getMarginTop())
+                        .key("marginRight").value(widget.getMarginRight())
+                        .key("marginBottom").value(widget.getMarginBottom())
+                        .key("paddingLeft").value(widget.getPaddingLeft())
+                        .key("paddingRight").value(widget.getPaddingRight())
+                        .key("paddingTop").value(widget.getPaddingTop())
+                        .key("paddingBottom").value(widget.getPaddingBottom())
+                        .key("orientation").value(widget.getOrientation())
+                        .key("name").value(widget.getName())
+                        .key("resId").value(widget.getResId())
+                        .key("textColor").value(widget.getTextColor())
+                        .key("textSize").value(widget.getTextSize())
+                        .key("weight").value(widget.getWeight())
+                        .key("showLeftImg").value(widget.getShowLeftTitleImg())
+                        .key("showRightImg").value(widget.getShowRightTitleImg())
+                        .key("showLeftText").value(widget.getShowLeftTitleText())
+                        .key("showRightText").value(widget.getShowRightTitleText())
+                        .key("showLeftLayout").value(widget.getShowLeftTitleLayout())
+                        .key("showRightLayout").value(widget.getShowRightTitleLayout());
+
+                //actions start
+                stringer.key("actions").array();
+                actionToJson(stringer, widget.getId(), "0");
+                //actions end
+                stringer.endArray();
+
+                //children start
+                stringer.key("children").array();
+                widgetToJson(stringer, relativeId, widget.getId());
+                //children end
+                stringer.endArray();
+                //widget start
+                stringer.endObject();
+            }
+        }
+    }
+
+    private void actionToJson(JSONStringer stringer, String widgetId, String pid) {
+        List<ActionEntity> actions = mActionService.executeCriteria(new Criterion[]{
+                Restrictions.eq("deleteFlag", BaseEntity.DELETE_FLAG_NO),
+                Restrictions.eq("pid", pid),
+                Restrictions.eq("widgetId", widgetId)
+        });
+        if (actions != null) {
+            for (ActionEntity action : actions) {
+                stringer.object()
+                        .key("id").value(action.getId())
+                        .key("cancelText").value(action.getCancelText())
+                        .key("defText").value(action.getDefText())
+                        .key("hintText").value(action.getHintText())
+                        .key("name").value(action.getName())
+                        .key("msg").value(action.getMsg())
+                        .key("items").value(action.getItems())
+                        .key("okActId").value(action.getOkActId())
+                        .key("okApiId").value(action.getOkApiId())
+                        .key("okGroupPos").value(action.getOkApiGroupPosition())
+                        .key("pid").value(action.getPid())
+                        .key("isHide").value(action.getShowOrHide())
+                        .key("title").value(action.getTitle())
+                        .key("type").value(action.getType())
+                        .key("widgetId").value(action.getWidgetId());
+                stringer.key("children")
+                        .array();
+                actionToJson(stringer, widgetId, action.getId());
+                stringer.endArray();
+                stringer.endObject();
+
+            }
+        }
     }
 
     public boolean buildLauncher(final String projectPath, final String apkPath, final String fileName, final String realPath) {
@@ -3455,9 +3688,9 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                             sbStrings.append("    <string name=\"" + widgetEntity.getResId() + "_hint_text\">请输入" + widgetEntity.getTitle() + "</string>\n");
                         }
                         sbLayout.append("\n    <EditText\n" +
-                                "        android:id=\"@+id/et_"+widgetEntity.getResId()+"\"\n" +
-                                "        android:layout_width=\""+widthString+"\"\n" +
-                                "        android:layout_height=\""+heightString+"\"\n" +
+                                "        android:id=\"@+id/et_" + widgetEntity.getResId() + "\"\n" +
+                                "        android:layout_width=\"" + widthString + "\"\n" +
+                                "        android:layout_height=\"" + heightString + "\"\n" +
                                 (widgetEntity.getWeight() > 0 ? "        android:layout_weight=\"" + widgetEntity.getWeight() + "\"\n" : "") +
                                 (widgetEntity.getMarginLeft() == 0 ? "" : "        android:layout_marginLeft=\"" + widgetEntity.getMarginLeft() + "px\"\n") +
                                 (widgetEntity.getMarginRight() == 0 ? "" : "        android:layout_marginRight=\"" + widgetEntity.getMarginRight() + "px\"\n") +
@@ -3469,7 +3702,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 (widgetEntity.getPaddingRight() == 0 ? "" : "        android:paddingRight=\"" + widgetEntity.getPaddingRight() + "px\"\n") +
                                 (widgetEntity.getPaddingTop() == 0 ? "" : "        android:paddingTop=\"" + widgetEntity.getPaddingTop() + "px\"\n") +
                                 (widgetEntity.getPaddingBottom() == 0 ? "" : "        android:paddingBottom=\"" + widgetEntity.getPaddingBottom() + "px\"\n") +
-                                "        android:gravity=\""+widgetEntity.getGravity()+"\"\n" +
+                                "        android:gravity=\"" + widgetEntity.getGravity() + "\"\n" +
                                 "        android:textColor=\"@color/colorBlack\"\n" +
                                 "        android:textColorHint=\"@color/colorGrayB\"\n" +
                                 "        android:textSize=\"40px\" />\n");
@@ -4366,9 +4599,9 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         sbDef.append("\n    private EditText " + etName + ";");
                         sbInit.append("\n        " + etName + " = (EditText) findViewById(R.id.et_" + widgetEntity.getResId() + ");");
                         sbLayout.append("\n    <EditText\n" +
-                                "        android:id=\"@+id/et_"+widgetEntity.getResId()+"\"\n" +
-                                "        android:layout_width=\""+widthString+"\"\n" +
-                                "        android:layout_height=\""+heightString+"\"\n" +
+                                "        android:id=\"@+id/et_" + widgetEntity.getResId() + "\"\n" +
+                                "        android:layout_width=\"" + widthString + "\"\n" +
+                                "        android:layout_height=\"" + heightString + "\"\n" +
                                 (widgetEntity.getWeight() > 0 ? "        android:layout_weight=\"" + widgetEntity.getWeight() + "\"\n" : "") +
                                 (widgetEntity.getMarginLeft() == 0 ? "" : "        android:layout_marginLeft=\"" + widgetEntity.getMarginLeft() + "px\"\n") +
                                 (widgetEntity.getMarginRight() == 0 ? "" : "        android:layout_marginRight=\"" + widgetEntity.getMarginRight() + "px\"\n") +
@@ -4380,7 +4613,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 (widgetEntity.getPaddingRight() == 0 ? "" : "        android:paddingRight=\"" + widgetEntity.getPaddingRight() + "px\"\n") +
                                 (widgetEntity.getPaddingTop() == 0 ? "" : "        android:paddingTop=\"" + widgetEntity.getPaddingTop() + "px\"\n") +
                                 (widgetEntity.getPaddingBottom() == 0 ? "" : "        android:paddingBottom=\"" + widgetEntity.getPaddingBottom() + "px\"\n") +
-                                "        android:gravity=\""+widgetEntity.getGravity()+"\"\n" +
+                                "        android:gravity=\"" + widgetEntity.getGravity() + "\"\n" +
                                 "        android:textColor=\"@color/colorBlack\"\n" +
                                 "        android:textColorHint=\"@color/colorGrayB\"\n" +
                                 "        android:textSize=\"40px\" />\n");

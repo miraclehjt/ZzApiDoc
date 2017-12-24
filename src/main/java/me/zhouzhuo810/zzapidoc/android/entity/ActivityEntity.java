@@ -28,8 +28,6 @@ public class ActivityEntity extends BaseEntity {
     private String title;
     @Column(name = "SplashImg")
     private String splashImg;
-    @Column(name = "ShowTitleBar")
-    private Boolean showTitleBar;
     @Column(name = "IsFirst")
     private Boolean isFirst = false;
     @Column(name = "ApplicationId")
@@ -83,14 +81,6 @@ public class ActivityEntity extends BaseEntity {
 
     public void setApplicationId(String applicationId) {
         this.applicationId = applicationId;
-    }
-
-    public Boolean getShowTitleBar() {
-        return showTitleBar;
-    }
-
-    public void setShowTitleBar(Boolean showTitleBar) {
-        this.showTitleBar = showTitleBar;
     }
 
     public String getSplashImg() {

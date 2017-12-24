@@ -94,4 +94,15 @@ public class ApplicationAction extends BaseController<ApplicationEntity> {
         return getBaseService().downloadApplication(appId, userId);
     }
 
+
+    @ResponseBody
+    @RequestMapping(value = "/downloadAppJson", method = RequestMethod.GET)
+    public ResponseEntity<byte[]> downloadAppJson(
+            @RequestParam(value = "appId") String appId,
+            @RequestParam(value = "userId") String userId
+    ) throws IOException {
+        return getBaseService().downloadAppJson(appId, userId);
+    }
+
+
 }
