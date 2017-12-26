@@ -38,6 +38,16 @@ public class ActivityEntity extends BaseEntity {
     private String targetActName;
     @Column(name = "SplashSecond")
     private Integer splashSecond = 5;
+    @Column(name = "IsLandscape")
+    private Boolean isLandscape = false;
+
+    public Boolean getLandscape() {
+        return isLandscape;
+    }
+
+    public void setLandscape(Boolean landscape) {
+        isLandscape = landscape;
+    }
 
     public Boolean getFirst() {
         return isFirst;

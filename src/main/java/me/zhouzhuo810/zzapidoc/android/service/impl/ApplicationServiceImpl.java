@@ -1849,7 +1849,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                     sbManifest.append("        <activity\n" +
                             "            android:name=\".ui.act." + activityEntity.getName() + "\"\n" +
                             "            android:configChanges=\"orientation|keyboardHidden|layoutDirection|screenSize|screenLayout\"\n" +
-                            "            android:screenOrientation=\"portrait\"\n" +
+                            "            android:screenOrientation=\""+((activityEntity.getLandscape()==null)?"portrait":(activityEntity.getLandscape()?"portrait":"portrait"))+"\"\n" +
                             "            android:windowSoftInputMode=\"stateAlwaysHidden\">\n" +
                             "            <intent-filter>\n" +
                             "                <action android:name=\"android.intent.action.MAIN\" />\n" +
@@ -1861,7 +1861,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                     sbManifest.append("        <activity\n" +
                             "            android:name=\".ui.act." + activityEntity.getName() + "\"\n" +
                             "            android:configChanges=\"orientation|keyboardHidden|layoutDirection|screenSize|screenLayout\"\n" +
-                            "            android:screenOrientation=\"portrait\"\n" +
+                            "            android:screenOrientation=\""+((activityEntity.getLandscape()==null)?"portrait":(activityEntity.getLandscape()?"portrait":"portrait"))+"\"\n" +
                             "            android:windowSoftInputMode=\"stateAlwaysHidden\" />\n");
                 }
                 switch (activityEntity.getType()) {

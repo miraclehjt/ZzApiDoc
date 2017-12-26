@@ -15,6 +15,7 @@ public interface ActivityService extends BaseService<ActivityEntity> {
                            int splashSecond,
                            int type, String appId,
                            String targetActId,
+                           boolean isLandscape,
                            String userId);
 
     BaseResult deleteActivity(String id, String userId);

@@ -61,7 +61,7 @@ public class ActivityServiceImpl extends BaseServiceImpl<ActivityEntity> impleme
 
     @Override
     public BaseResult addActivity(String name, String title, boolean isFirst,
-                                  MultipartFile splashImg, int splashSecond, int type, String appId, String targetActId, String userId) {
+                                  MultipartFile splashImg, int splashSecond, int type, String appId, String targetActId, boolean isLandscape, String userId) {
         UserEntity user = mUserService.get(userId);
         if (user == null) {
             return new BaseResult(0, "用户不合法");
@@ -73,6 +73,7 @@ public class ActivityServiceImpl extends BaseServiceImpl<ActivityEntity> impleme
         entity.setFirst(isFirst);
         entity.setTargetActId(targetActId);
         entity.setTitle(title);
+        entity.setLandscape(isLandscape);
         entity.setSplashSecond(splashSecond == 0 ? 5 : splashSecond);
         if (splashImg != null) {
             try {
@@ -230,6 +231,7 @@ public class ActivityServiceImpl extends BaseServiceImpl<ActivityEntity> impleme
             map.put("title", applicationEntity.getTitle());
             map.put("appId", applicationEntity.getApplicationId());
             map.put("targetActId", applicationEntity.getTargetActId());
+            map.put("isLandscape", applicationEntity.getLandscape());
             map.put("targetActName", applicationEntity.getTargetActName());
             map.put("createTime", DataUtils.formatDate(applicationEntity.getCreateTime()));
             result.add(map.build());
