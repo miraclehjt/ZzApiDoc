@@ -41,8 +41,8 @@ public class FragmentServiceImpl extends BaseServiceImpl<FragmentEntity> impleme
     }
 
     @Override
-    public BaseResult addFragment(String name, String title, boolean showTitle, int type,
-                                  int position ,String appId, String activityId, String userId) {
+    public BaseResult addFragment(String pid, String name, String title, int type,
+                                  int position, String appId, String activityId, String userId) {
         UserEntity user = mUserService.get(userId);
         if (user == null) {
             return new BaseResult(0, "用户不合法");
@@ -51,6 +51,7 @@ public class FragmentServiceImpl extends BaseServiceImpl<FragmentEntity> impleme
         entity.setCreateUserID(user.getId());
         entity.setCreateUserName(user.getName());
         entity.setName(name);
+        entity.setPid(pid == null ? "0" : pid);
         entity.setPosition(position);
         entity.setTitle(title);
         entity.setApplicationId(appId);
@@ -86,7 +87,7 @@ public class FragmentServiceImpl extends BaseServiceImpl<FragmentEntity> impleme
     }
 
     @Override
-    public BaseResult getAllMyFragment( String activityId, String userId) {
+    public BaseResult getAllMyFragment(String activityId, String pid, String userId) {
         UserEntity user = mUserService.get(userId);
         if (user == null) {
             return new BaseResult(0, "用户不合法");
@@ -94,6 +95,7 @@ public class FragmentServiceImpl extends BaseServiceImpl<FragmentEntity> impleme
         List<FragmentEntity> applicationEntities = getBaseDao().executeCriteria(new Criterion[]{
                 Restrictions.eq("deleteFlag", BaseEntity.DELETE_FLAG_NO),
                 Restrictions.eq("activityId", activityId),
+                Restrictions.eq("pid", pid == null ? "0" : pid),
                 Restrictions.eq("createUserID", user.getId())
         });
         if (applicationEntities == null) {
@@ -109,6 +111,7 @@ public class FragmentServiceImpl extends BaseServiceImpl<FragmentEntity> impleme
             map.put("title", applicationEntity.getTitle());
             map.put("appId", applicationEntity.getApplicationId());
             map.put("activityId", applicationEntity.getActivityId());
+            map.put("pid", applicationEntity.getPid() == null ? "0" : applicationEntity.getPid());
             map.put("createTime", DataUtils.formatDate(applicationEntity.getCreateTime()));
             result.add(map.build());
         }

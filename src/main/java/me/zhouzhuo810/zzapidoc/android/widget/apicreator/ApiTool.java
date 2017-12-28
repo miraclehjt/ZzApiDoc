@@ -150,6 +150,9 @@ public class ApiTool {
 
                                                     //方法名
                                                     String m = url.substring(url.lastIndexOf("/") + 1, url.length());
+                                                    if (m.length()>0) {
+                                                        m = m.substring(0,1).toLowerCase()+m.substring(1);
+                                                    }
 
                                                     //请求方式GET或POST
                                                     String method = childrenBean.getRequestMethod();
@@ -377,6 +380,9 @@ public class ApiTool {
 
                                             //方法名
                                             String m = url.substring(url.lastIndexOf("/") + 1, url.length());
+                                            if (m.length()>0) {
+                                                m = m.substring(0,1).toLowerCase()+m.substring(1);
+                                            }
                                             //请求方式GET或POST
                                             String method = childrenBean.getRequestMethod();
                                             if (method.equals("GET")) {

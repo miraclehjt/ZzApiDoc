@@ -36,23 +36,24 @@ public class FragmentAction extends BaseController<FragmentEntity> {
     public BaseResult addFragment(
             @RequestParam(value = "name") String name,
             @RequestParam(value = "title") String title,
-            @RequestParam(value = "showTitle") boolean showTitle,
             @RequestParam(value = "type") int type,
             @RequestParam(value = "position") int position,
             @RequestParam(value = "appId", required = false) String appId,
+            @RequestParam(value = "pid", required = false) String pid,
             @RequestParam(value = "activityId", required = false) String activityId,
             @RequestParam(value = "userId") String userId
     ) {
-        return getBaseService().addFragment(name, title, showTitle, type, position, appId,activityId, userId);
+        return getBaseService().addFragment(pid, name, title, type, position, appId, activityId, userId);
     }
 
     @ResponseBody
     @RequestMapping(value = "/getAllMyFragment", method = RequestMethod.GET)
     public BaseResult getAllMyFragment(
             @RequestParam(value = "activityId") String activityId,
+            @RequestParam(value = "pid", required = false) String pid,
             @RequestParam(value = "userId") String userId
     ) {
-        return getBaseService().getAllMyFragment(activityId, userId);
+        return getBaseService().getAllMyFragment(activityId, pid, userId);
     }
 
 

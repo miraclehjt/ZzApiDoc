@@ -549,7 +549,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 Restrictions.eq("deleteFlag", BaseEntity.DELETE_FLAG_NO),
                 Restrictions.eq("pid", pid),
                 Restrictions.eq("relativeId", relativeId)
-        });
+        }, Order.asc("createTime"));
         if (widgets != null) {
             for (WidgetEntity widget : widgets) {
                 //widget start
@@ -2004,10 +2004,9 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 "        indicator = (ZzPagerIndicator) findViewById(R.id.indicator);\n" +
                 "        viewPager = (ViewPager) findViewById(R.id.view_pager);\n");
 
-        String arrayName = "tan_names_" + layoutName;
+        String arrayName = "tab_names_" + layoutName;
         sbArrays.append("\n    <string-array name=\"" + arrayName + "\">");
         fillTopFragment(arrayName, logoName, app, activityEntity, layoutPath, javaPath, sbData, sbStrings, sbImp, sbJava, sbDef, sbInit, sbEvent, sbMethods, sbArrays);
-        sbArrays.append("\n    </string-array>");
 
         sbJava.append("package " + app.getPackageName() + ".ui.act;\n" +
                 "\n")
@@ -2097,7 +2096,186 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
         sbData.append("\n        fragments = new ArrayList<>();");
         List<FragmentEntity> fragments = mFragmentService.executeCriteria(new Criterion[]{
                 Restrictions.eq("deleteFlag", BaseEntity.DELETE_FLAG_NO),
-                Restrictions.eq("activityId", activityEntity.getId())
+                Restrictions.eq("activityId", activityEntity.getId()),
+                Restrictions.eq("pid", "0")
+        }, Order.asc("position"));
+        if (fragments != null && fragments.size() > 0) {
+            StringBuilder sbPic = new StringBuilder();
+            for (int i = 0; i < fragments.size(); i++) {
+                sbPic.append("\n            R.mipmap." + logoName + ",");
+            }
+            sbPic.deleteCharAt(sbPic.length() - 1);
+            sbDef.append("\n    private int[] pressIcons = {")
+                    .append(sbPic.toString())
+                    .append("\n    };\n")
+                    .append("\n    private int[] normalIcons = {")
+                    .append(sbPic.toString())
+                    .append("\n    };\n");
+            StringBuilder sbArray2 = new StringBuilder();
+            for (int i1 = 0; i1 < fragments.size(); i1++) {
+                FragmentEntity fragment = fragments.get(i1);
+                sbImp.append("\nimport " + app.getPackageName() + ".ui.fgm." + fragment.getName() + ";");
+                sbArrays.append("\n        <item>" + fragment.getTitle() + "</item>");
+
+                String layoutName = "";
+                boolean isNotFirst = false;
+                for (int i = 0; i < fragment.getName().length(); i++) {
+                    char c = fragment.getName().charAt(i);
+                    if (c >= 'A' && c <= 'Z') {
+                        if (isNotFirst) {
+                            layoutName += "_";
+                        }
+                        isNotFirst = true;
+                    }
+                    layoutName += c;
+                }
+                layoutName = layoutName.replace("fragment_", "").replace("_fragment", "").replace("__", "_").toLowerCase();
+                final String realLayoutName = "fragment_" + layoutName.toLowerCase();
+
+                sbData.append("\n        fragments.add(new " + fragment.getName() + "());");
+
+                StringBuilder sbLayout1 = new StringBuilder();
+                StringBuilder sbImp1 = new StringBuilder();
+                StringBuilder sbJava1 = new StringBuilder();
+                StringBuilder sbDef1 = new StringBuilder();
+                StringBuilder sbInit1 = new StringBuilder();
+                StringBuilder sbData1 = new StringBuilder();
+                StringBuilder sbEvent1 = new StringBuilder();
+                StringBuilder sbEditInfo1 = new StringBuilder();
+                StringBuilder sbMethods1 = new StringBuilder();
+
+                sbLayout1.append("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
+                        "<LinearLayout xmlns:android=\"http://schemas.android.com/apk/res/android\"\n" +
+                        "    xmlns:app=\"http://schemas.android.com/apk/res-auto\"\n" +
+                        "    android:layout_width=\"match_parent\"\n" +
+                        "    android:layout_height=\"match_parent\"\n" +
+                        "    android:background=\"@color/colorGrayBg\"\n" +
+                        "    android:orientation=\"vertical\">\n");
+
+                sbImp1.append(
+                        "\nimport android.os.Bundle;\n" +
+                                "import android.support.annotation.Nullable;\n" +
+                                "import android.content.Intent;\n" +
+                                "import android.view.View;\n" +
+                                "import android.view.ViewGroup;\n" +
+                                "import android.widget.Button;\n" +
+                                "import android.widget.CheckBox;\n" +
+                                "import android.widget.EditText;\n" +
+                                "import android.widget.ImageView;\n" +
+                                "import android.widget.TextView;\n" +
+                                "import android.widget.LinearLayout;\n" +
+                                "\n" +
+                                "import " + app.getPackageName() + ".R;\n" +
+                                "import zhouzhuo810.me.zzandframe.ui.fgm.BaseFragment;\n" +
+                                "import " + app.getPackageName() + ".common.api.Api;\n" +
+                                "import " + app.getPackageName() + ".common.api.entity.*;\n" +
+                                "import rx.Subscriber;\n" +
+                                "import zhouzhuo810.me.zzandframe.common.rx.RxHelper;\n" +
+                                "import zhouzhuo810.me.zzandframe.common.utils.ToastUtils;\n" +
+                                "import zhouzhuo810.me.zzandframe.ui.widget.MarkView;\n" +
+                                "import zhouzhuo810.me.zzandframe.ui.widget.TitleBar;\n"
+                );
+
+                fillFgmWidget(logoName, app, activityEntity, fragment, layoutName, layoutPath, javaPath, "0", sbStrings, sbLayout1, sbImp1, sbJava1, sbDef1, sbInit1, sbData1, sbEvent1, sbEditInfo1, sbMethods1);
+
+                if (fragment.getChildCount() > 0) {
+                    String arrayName1 = "child_tab_names_" + layoutName;
+                    sbArray2.append("\n    <string-array name=\"" + arrayName1 + "\">");
+                    fillChildTopFragment(arrayName1, logoName, app, activityEntity, layoutPath, javaPath, sbData1, sbStrings, sbImp1, sbJava1, sbDef1, sbInit1, sbEvent1, sbMethods1, sbArray2, fragment.getId());
+                    sbArray2.append("\n    </string-array>");
+                }
+
+                sbJava1.append("package " + app.getPackageName() + ".ui.fgm;\n" +
+                        "\n")
+                        .append(sbImp1.toString())
+                        .append("\n" +
+                                "/**\n" +
+                                " *\n" +
+                                " * Created by admin on 2017/8/27.\n" +
+                                " */\n" +
+                                "public class " + fragment.getName() + " extends BaseFragment {\n")
+                        .append(sbDef1.toString())
+                        .append("\n\n    @Override\n" +
+                                "    public int getLayoutId() {\n" +
+                                "        return R.layout." + realLayoutName + ";\n" +
+                                "    }\n")
+                        .append("    @Override\n" +
+                                "    public void initView() {\n")
+                        .append(sbInit1.toString())
+                        .append("\n    }\n" +
+                                "\n" +
+                                "    @Override\n" +
+                                "    public void initData() {\n" +
+                                sbData1.toString() +
+                                "\n    }\n")
+                        .append("\n" +
+                                "    @Override\n" +
+                                "    public void initEvent() {\n")
+                        .append(sbEvent1.toString())
+                        .append("\n    }\n");
+
+                sbJava1.append(sbMethods1.toString());
+
+                sbJava1.append("\n" +
+                        "    @Override\n" +
+                        "    public void resume() {\n" +
+                        "\n" +
+                        "    }\n" +
+                        "\n" +
+                        "    @Override\n" +
+                        "       public void destroyView() {\n" +
+                        "\n" +
+                        "    }\n" +
+                        "\n" +
+                        "    @Override\n" +
+                        "    public void saveState(Bundle bundle) {\n" +
+                        "\n" +
+                        "    }\n" +
+                        "\n" +
+                        "    @Override\n" +
+                        "    public void restoreState(@Nullable Bundle bundle) {\n" +
+                        "\n" +
+                        "    }\n" +
+                        "\n" +
+                        "}\n");
+                sbLayout1.append("\n" +
+                        "</LinearLayout>");
+
+
+                FileUtils.saveFileToPathWithName(sbLayout1.toString(), layoutPath, realLayoutName + ".xml");
+                FileUtils.saveFileToPathWithName(sbJava1.toString(), javaPath + File.separator + "ui" + File.separator + "fgm", fragment.getName() + ".java");
+
+            }
+            sbArrays.append("\n    </string-array>");
+            sbArrays.append("\n").append(sbArray2.toString());
+            sbData.append("\n        String[] titles = getResources().getStringArray(R.array." + arrayName + ");\n" +
+                    "        viewPager.setAdapter(new ZzFragmentPagerAdapter(getSupportFragmentManager(), fragments, titles,\n" +
+                    "                pressIcons, normalIcons));\n" +
+                    "\n" +
+                    "        indicator.setViewPager(viewPager);\n");
+        }
+    }
+
+    private void fillChildTopFragment(String arrayName, String logoName, ApplicationEntity app, ActivityEntity activityEntity, String layoutPath, String javaPath, StringBuilder sbData, StringBuilder sbStrings,
+                                 StringBuilder sbImp, StringBuilder sbJava, StringBuilder sbDef, StringBuilder sbInit, StringBuilder sbEvent,
+                                 StringBuilder sbMethods, StringBuilder sbArrays, String pid) throws IOException {
+        sbDef.append("\n" +
+                "    private TitleBar titleBar;\n" +
+                "    private ZzPagerIndicator indicator;\n" +
+                "    private ViewPager viewPager;\n" +
+                "    List<Fragment> fragments;\n");
+        sbImp.append("import android.support.v4.app.Fragment;\n" +
+                "import android.support.v4.view.ViewPager;\n" +
+                "import java.util.ArrayList;\n" +
+                "import java.util.List;\n\n" +
+                "import zhouzhuo810.me.zzandframe.ui.widget.zzpagerindicator.ZzPagerIndicator;\n" +
+                "import zhouzhuo810.me.zzandframe.ui.widget.zzpagerindicator.adapter.ZzFragmentPagerAdapter;\n")
+                .append("import zhouzhuo810.me.zzandframe.ui.widget.TabBar;\n");
+        sbData.append("\n        fragments = new ArrayList<>();");
+        List<FragmentEntity> fragments = mFragmentService.executeCriteria(new Criterion[]{
+                Restrictions.eq("deleteFlag", BaseEntity.DELETE_FLAG_NO),
+                Restrictions.eq("activityId", activityEntity.getId()),
+                Restrictions.eq("pid", pid)
         }, Order.asc("position"));
         if (fragments != null && fragments.size() > 0) {
             StringBuilder sbPic = new StringBuilder();
@@ -2241,7 +2419,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
             }
 
             sbData.append("\n        String[] titles = getResources().getStringArray(R.array." + arrayName + ");\n" +
-                    "        viewPager.setAdapter(new ZzFragmentPagerAdapter(getSupportFragmentManager(), fragments, titles,\n" +
+                    "        viewPager.setAdapter(new ZzFragmentPagerAdapter(getChildFragmentManager(), fragments, titles,\n" +
                     "                pressIcons, normalIcons));\n" +
                     "\n" +
                     "        indicator.setViewPager(viewPager);\n");
@@ -2336,7 +2514,6 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
         String arrayName = "tan_names_" + layoutName;
         sbArrays.append("\n    <string-array name=\"" + arrayName + "\">");
         fillBottomFragment(arrayName, logoName, app, activityEntity, layoutPath, javaPath, sbAttach, sbStrings, sbLayout, sbImp, sbJava, sbDef, sbInit, sbEvent, sbMethods, sbArrays);
-        sbArrays.append("\n    </string-array>");
         sbAttach.append("\n    }\n");
 
         sbJava.append("package " + app.getPackageName() + ".ui.act;\n" +
@@ -2421,7 +2598,8 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 .append("import zhouzhuo810.me.zzandframe.ui.widget.TabBar;\n");
         List<FragmentEntity> fragments = mFragmentService.executeCriteria(new Criterion[]{
                 Restrictions.eq("deleteFlag", BaseEntity.DELETE_FLAG_NO),
-                Restrictions.eq("activityId", activityEntity.getId())
+                Restrictions.eq("activityId", activityEntity.getId()),
+                Restrictions.eq("pid", "0")
         }, Order.asc("position"));
         if (fragments != null && fragments.size() > 0) {
             String tabCount = "FIVE";
@@ -2469,6 +2647,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
 
             StringBuilder sbSelect = new StringBuilder();
             StringBuilder sbHide = new StringBuilder();
+            StringBuilder sbArray2 = new StringBuilder();
             for (int i1 = 0; i1 < fragments.size(); i1++) {
                 FragmentEntity fragment = fragments.get(i1);
                 sbImp.append("\nimport " + app.getPackageName() + ".ui.fgm." + fragment.getName() + ";");
@@ -2549,6 +2728,14 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
 
                 fillFgmWidget(logoName, app, activityEntity, fragment, layoutName, layoutPath, javaPath, "0", sbStrings, sbLayout1, sbImp1, sbJava1, sbDef1, sbInit1, sbData1, sbEvent1, sbEditInfo1, sbMethods1);
 
+                // TODO: 2017/12/29 添加子Fragment
+                if (fragment.getChildCount() > 0) {
+                    String arrayName1 = "child_tab_names_" + layoutName;
+                    sbArray2.append("\n    <string-array name=\"" + arrayName1 + "\">");
+                    fillChildTopFragment(arrayName1, logoName, app, activityEntity, layoutPath, javaPath, sbData1, sbStrings, sbImp1, sbJava1, sbDef1, sbInit1, sbEvent1, sbMethods1, sbArray2, fragment.getId());
+                    sbArray2.append("\n    </string-array>");
+                }
+
                 sbJava1.append("package " + app.getPackageName() + ".ui.fgm;\n" +
                         "\n")
                         .append(sbImp1.toString())
@@ -2610,7 +2797,8 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 FileUtils.saveFileToPathWithName(sbJava1.toString(), javaPath + File.separator + "ui" + File.separator + "fgm", fragment.getName() + ".java");
 
             }
-
+            sbArrays.append("\n    </string-array>");
+            sbArrays.append("\n").append(sbArray2.toString());
             sbMethods
                     .append("\n" +
                             "    private void select(int position) {\n" +
@@ -3259,7 +3447,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         Restrictions.eq("deleteFlag", BaseEntity.DELETE_FLAG_NO),
                         Restrictions.eq("pid", pid),
                         Restrictions.eq("relativeId", fragmentEntity.getId())
-                }
+                }, Order.asc("createTime")
         );
 
         if (widgetEntities != null && widgetEntities.size() > 0) {
@@ -3299,7 +3487,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         sbEvent.append("\n        titleBar.setOnTitleClickListener(new TitleBar.OnTitleClick() {\n" +
                                 "            @Override\n" +
                                 "            public void onLeftClick(ImageView imageView, MarkView markView, TextView textView) {\n" +
-                                "                closeAct();\n" +
+                                "                getBaseAct().closeAct();\n" +
                                 "            }\n" +
                                 "\n" +
                                 "            @Override\n" +
@@ -4167,7 +4355,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         Restrictions.eq("deleteFlag", BaseEntity.DELETE_FLAG_NO),
                         Restrictions.eq("pid", pid),
                         Restrictions.eq("relativeId", activityEntity.getId())
-                }
+                }, Order.asc("createTime")
         );
 
         if (widgetEntities != null && widgetEntities.size() > 0) {
@@ -5345,10 +5533,12 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 String url = interfaceEntity.getPath();
                                 String m = url.substring(url.lastIndexOf("/") + 1, url.length());
                                 String beanClazz = m.substring(0, 1).toUpperCase() + m.substring(1, m.length()) + "Result";
-                                String apiMethod = url.substring(url.lastIndexOf("/") + 1, url.length());
+                                if (m.length()>0) {
+                                    m = m.substring(0,1).toLowerCase()+m.substring(1);
+                                }
                                 sbActions.append("\n        getBaseAct().showPd(getString(R.string.loading_text), false);\n" +
                                         "        Api.getApi" + action.getOkApiGroupPosition() + "()\n" +
-                                        "                ." + apiMethod + "(");
+                                        "                ." + m + "(");
                                 if (requestParamsNo > 0) {
                                     for (int i1 = 0; i1 < requestParamsNo; i1++) {
                                         sbActions.append("\"\", ");
@@ -5395,10 +5585,12 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 String url = interfaceEntity.getPath();
                                 String m = url.substring(url.lastIndexOf("/") + 1, url.length());
                                 String beanClazz = m.substring(0, 1).toUpperCase() + m.substring(1, m.length()) + "Result";
-                                String apiMethod = url.substring(url.lastIndexOf("/") + 1, url.length());
+                                if (m.length()>0) {
+                                    m = m.substring(0,1).toLowerCase()+m.substring(1);
+                                }
                                 sbActions.append("\n        showPd(getString(R.string.loading_text), false);\n" +
                                         "        Api.getApi" + action.getOkApiGroupPosition() + "()\n" +
-                                        "                ." + apiMethod + "(");
+                                        "                ." + m + "(");
                                 if (requestParamsNo > 0) {
                                     for (int i1 = 0; i1 < requestParamsNo; i1++) {
                                         sbActions.append("\"\", ");

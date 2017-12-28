@@ -1,6 +1,7 @@
 package me.zhouzhuo810.zzapidoc.android.entity;
 
 import me.zhouzhuo810.zzapidoc.common.entity.BaseEntity;
+import org.hibernate.annotations.Formula;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -11,7 +12,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "fragment")
-public class FragmentEntity extends BaseEntity{
+public class FragmentEntity extends BaseEntity {
     public static final int TYPE_LV_FGM = 0;
     public static final int TYPE_RV_FGM = 1;
     public static final int TYPE_SETTING_FGM = 2;
@@ -28,6 +29,26 @@ public class FragmentEntity extends BaseEntity{
     private String activityId;
     @Column(name = "Position")
     private Integer position = 0;
+    @Column(name = "pid")
+    private String pid;
+    @Formula("(SELECT COUNT(*) FROM fragment f where f.pid = ID)")
+    private long childCount;
+
+    public long getChildCount() {
+        return childCount;
+    }
+
+    public void setChildCount(long childCount) {
+        this.childCount = childCount;
+    }
+
+    public String getPid() {
+        return pid;
+    }
+
+    public void setPid(String pid) {
+        this.pid = pid;
+    }
 
     public Integer getPosition() {
         return position;

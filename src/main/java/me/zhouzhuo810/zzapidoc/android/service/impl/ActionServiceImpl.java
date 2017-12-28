@@ -12,6 +12,7 @@ import me.zhouzhuo810.zzapidoc.common.utils.MapUtils;
 import me.zhouzhuo810.zzapidoc.user.entity.UserEntity;
 import me.zhouzhuo810.zzapidoc.user.service.UserService;
 import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Service;
 
@@ -148,7 +149,7 @@ public class ActionServiceImpl extends BaseServiceImpl<ActionEntity> implements 
                     Restrictions.eq("deleteFlag", BaseEntity.DELETE_FLAG_NO),
                     Restrictions.eq("pid", pid),
                     Restrictions.eq("widgetId", widgetId)
-            });
+            }, Order.asc("createTime"));
             if (actions != null && actions.size() > 0) {
                 List<Map<String, Object>> result = new ArrayList<>();
                 for (ActionEntity action : actions) {
@@ -166,6 +167,8 @@ public class ActionServiceImpl extends BaseServiceImpl<ActionEntity> implements 
                     map.put("hintText", action.getHintText());
                     map.put("msg", action.getMsg());
                     map.put("items", action.getItems());
+                    map.put("okActName", action.getOkActName());
+                    map.put("okApiName", action.getOkApiName());
                     result.add(map.build());
                 }
                 return new BaseResult(1, "ok", result);

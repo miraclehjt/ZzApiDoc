@@ -1,6 +1,7 @@
 package me.zhouzhuo810.zzapidoc.android.entity;
 
 import me.zhouzhuo810.zzapidoc.common.entity.BaseEntity;
+import org.hibernate.annotations.Formula;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -46,14 +47,34 @@ public class ActionEntity extends BaseEntity {
     private Boolean showOrHide = false;
     @Column(name = "OkApiId")
     private String okApiId;
+    @Formula("(SELECT i.Name FROM interfaces i WHERE i.ID = OkApiId)")
+    private String okApiName;
     @Column(name = "OkApiGroupPosition")
     private Integer okApiGroupPosition = 0;
     @Column(name = "OkActId")
     private String okActId;
+    @Formula("(SELECT a.Name FROM activity a WHERE a.ID = OkActId)")
+    private String okActName;
     @Column(name = "Items")
     private String items;
     @Column(name = "pid")
     private String pid;
+
+    public String getOkApiName() {
+        return okApiName;
+    }
+
+    public void setOkApiName(String okApiName) {
+        this.okApiName = okApiName;
+    }
+
+    public String getOkActName() {
+        return okActName;
+    }
+
+    public void setOkActName(String okActName) {
+        this.okActName = okActName;
+    }
 
     public Integer getOkApiGroupPosition() {
         return okApiGroupPosition;

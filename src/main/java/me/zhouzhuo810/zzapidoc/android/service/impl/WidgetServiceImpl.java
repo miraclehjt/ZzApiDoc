@@ -17,6 +17,7 @@ import me.zhouzhuo810.zzapidoc.common.utils.MapUtils;
 import me.zhouzhuo810.zzapidoc.user.entity.UserEntity;
 import me.zhouzhuo810.zzapidoc.user.service.UserService;
 import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -147,18 +148,18 @@ public class WidgetServiceImpl extends BaseServiceImpl<WidgetEntity> implements 
         if (user == null) {
             return new BaseResult(0, "用户不合法");
         }
-        List<WidgetEntity> applicationEntities = getBaseDao().executeCriteria(new Criterion[]{
+        List<WidgetEntity> widgetEntities = getBaseDao().executeCriteria(new Criterion[]{
                 Restrictions.eq("deleteFlag", BaseEntity.DELETE_FLAG_NO),
                 Restrictions.eq("createUserID", user.getId()),
                 Restrictions.eq("pid", pid),
                 Restrictions.eq("relativeId", relativeId)
-        });
-        if (applicationEntities == null) {
+        }, Order.asc("createTime"));
+        if (widgetEntities == null) {
             return new BaseResult(1, "ok");
         }
 
         List<Map<String, Object>> result = new ArrayList<>();
-        for (WidgetEntity widgetEntity : applicationEntities) {
+        for (WidgetEntity widgetEntity : widgetEntities) {
             MapUtils map = new MapUtils();
             map.put("id", widgetEntity.getId());
             map.put("name", widgetEntity.getName());

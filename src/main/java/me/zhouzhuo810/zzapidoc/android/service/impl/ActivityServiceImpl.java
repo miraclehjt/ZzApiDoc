@@ -20,6 +20,7 @@ import me.zhouzhuo810.zzapidoc.common.utils.MapUtils;
 import me.zhouzhuo810.zzapidoc.user.entity.UserEntity;
 import me.zhouzhuo810.zzapidoc.user.service.UserService;
 import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -165,7 +166,7 @@ public class ActivityServiceImpl extends BaseServiceImpl<ActivityEntity> impleme
                 Restrictions.eq("deleteFlag", BaseEntity.DELETE_FLAG_NO),
                 Restrictions.eq("pid", pid),
                 Restrictions.eq("relativeId", relativeId)
-        });
+        }, Order.asc("createTime"));
 
         if (widgetEntities != null && widgetEntities.size() > 0) {
             for (WidgetEntity widgetEntity : widgetEntities) {
