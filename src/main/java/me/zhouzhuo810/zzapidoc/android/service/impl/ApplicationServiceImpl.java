@@ -1849,7 +1849,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                     sbManifest.append("        <activity\n" +
                             "            android:name=\".ui.act." + activityEntity.getName() + "\"\n" +
                             "            android:configChanges=\"orientation|keyboardHidden|layoutDirection|screenSize|screenLayout\"\n" +
-                            "            android:screenOrientation=\""+((activityEntity.getLandscape()==null)?"portrait":(activityEntity.getLandscape()?"portrait":"portrait"))+"\"\n" +
+                            "            android:screenOrientation=\"" + ((activityEntity.getLandscape() == null) ? "portrait" : (activityEntity.getLandscape() ? "portrait" : "portrait")) + "\"\n" +
                             "            android:windowSoftInputMode=\"stateAlwaysHidden\">\n" +
                             "            <intent-filter>\n" +
                             "                <action android:name=\"android.intent.action.MAIN\" />\n" +
@@ -1861,7 +1861,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                     sbManifest.append("        <activity\n" +
                             "            android:name=\".ui.act." + activityEntity.getName() + "\"\n" +
                             "            android:configChanges=\"orientation|keyboardHidden|layoutDirection|screenSize|screenLayout\"\n" +
-                            "            android:screenOrientation=\""+((activityEntity.getLandscape()==null)?"portrait":(activityEntity.getLandscape()?"portrait":"portrait"))+"\"\n" +
+                            "            android:screenOrientation=\"" + ((activityEntity.getLandscape() == null) ? "portrait" : (activityEntity.getLandscape() ? "portrait" : "portrait")) + "\"\n" +
                             "            android:windowSoftInputMode=\"stateAlwaysHidden\" />\n");
                 }
                 switch (activityEntity.getType()) {
@@ -2257,8 +2257,8 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
     }
 
     private void fillChildTopFragment(String arrayName, String logoName, ApplicationEntity app, ActivityEntity activityEntity, String layoutPath, String javaPath, StringBuilder sbData, StringBuilder sbStrings,
-                                 StringBuilder sbImp, StringBuilder sbJava, StringBuilder sbDef, StringBuilder sbInit, StringBuilder sbEvent,
-                                 StringBuilder sbMethods, StringBuilder sbArrays, String pid) throws IOException {
+                                      StringBuilder sbImp, StringBuilder sbJava, StringBuilder sbDef, StringBuilder sbInit, StringBuilder sbEvent,
+                                      StringBuilder sbMethods, StringBuilder sbArrays, String pid) throws IOException {
         sbDef.append("\n" +
                 "    private TitleBar titleBar;\n" +
                 "    private ZzPagerIndicator indicator;\n" +
@@ -2271,6 +2271,9 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 "import zhouzhuo810.me.zzandframe.ui.widget.zzpagerindicator.ZzPagerIndicator;\n" +
                 "import zhouzhuo810.me.zzandframe.ui.widget.zzpagerindicator.adapter.ZzFragmentPagerAdapter;\n")
                 .append("import zhouzhuo810.me.zzandframe.ui.widget.TabBar;\n");
+        sbInit.append("        titleBar = (TitleBar) rootView.findViewById(R.id.title_bar);\n" +
+                "        indicator = (ZzPagerIndicator) rootView.findViewById(R.id.indicator);\n" +
+                "        viewPager = (ViewPager) rootView.findViewById(R.id.view_pager);\n");
         sbData.append("\n        fragments = new ArrayList<>();");
         List<FragmentEntity> fragments = mFragmentService.executeCriteria(new Criterion[]{
                 Restrictions.eq("deleteFlag", BaseEntity.DELETE_FLAG_NO),
@@ -5533,8 +5536,8 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 String url = interfaceEntity.getPath();
                                 String m = url.substring(url.lastIndexOf("/") + 1, url.length());
                                 String beanClazz = m.substring(0, 1).toUpperCase() + m.substring(1, m.length()) + "Result";
-                                if (m.length()>0) {
-                                    m = m.substring(0,1).toLowerCase()+m.substring(1);
+                                if (m.length() > 0) {
+                                    m = m.substring(0, 1).toLowerCase() + m.substring(1);
                                 }
                                 sbActions.append("\n        getBaseAct().showPd(getString(R.string.loading_text), false);\n" +
                                         "        Api.getApi" + action.getOkApiGroupPosition() + "()\n" +
@@ -5585,8 +5588,8 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 String url = interfaceEntity.getPath();
                                 String m = url.substring(url.lastIndexOf("/") + 1, url.length());
                                 String beanClazz = m.substring(0, 1).toUpperCase() + m.substring(1, m.length()) + "Result";
-                                if (m.length()>0) {
-                                    m = m.substring(0,1).toLowerCase()+m.substring(1);
+                                if (m.length() > 0) {
+                                    m = m.substring(0, 1).toLowerCase() + m.substring(1);
                                 }
                                 sbActions.append("\n        showPd(getString(R.string.loading_text), false);\n" +
                                         "        Api.getApi" + action.getOkApiGroupPosition() + "()\n" +

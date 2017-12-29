@@ -80,6 +80,9 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
     @Resource(name = "cacheServiceImpl")
     CacheService mCacheService;
 
+    @Resource(name = "errorCodeServiceImpl")
+    ErrorCodeService mErrorCodeService;
+
     @Override
     @Resource(name = "interfaceDaoImpl")
     public void setBaseDao(BaseDao<InterfaceEntity> baseDao) {
@@ -1627,6 +1630,26 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
+                    addTextLine(document, "", fontChinese);
+                    addTextLine(document, "", fontChinese);
+
+                    List<ErrorCodeEntity> globalErrorCodes = mErrorCodeService.executeCriteria(new Criterion[]{
+                            Restrictions.eq("deleteFlag", BaseEntity.DELETE_FLAG_NO),
+                            Restrictions.eq("projectId", projectId),
+                            Restrictions.eq("isGlobal", true)
+                    });
+                    if (globalErrorCodes != null && globalErrorCodes.size() > 0) {
+                        //设置列宽
+                        float[] columnWidths = {3f, 6f};
+                        String[][] values = new String[globalErrorCodes.size()][2];
+                        for (int i = 0; i < globalErrorCodes.size(); i++) {
+                            ErrorCodeEntity entity = globalErrorCodes.get(i);
+                            values[i][0] = entity.getCode()+"";
+                            values[i][1] = entity.getNote() == null ? "" : entity.getNote();
+                        }
+                        addTable(document, "全局错误码说明", new String[]{"错误码", "说明"}, columnWidths, values, null, fontChinese);
+                    }
+
                     List<InterfaceGroupEntity> groups = mInterfaceGroupService.executeCriteria(InterfaceUtils.getInterfaceByProjectId(projectId));
                         /*模块数组开始*/
                     if (groups != null) {
@@ -1644,6 +1667,23 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                             addText(document, "服务器Ip地址：", fontChinese, true);
                             addUnderLineText(document, interfaceGroupEntity.getIp(), fontPath);
                             addTextLine(document, "", fontChinese);
+                            addTextLine(document, "", fontChinese);
+                            List<ErrorCodeEntity> groupErrorCodes = mErrorCodeService.executeCriteria(new Criterion[]{
+                                    Restrictions.eq("deleteFlag", BaseEntity.DELETE_FLAG_NO),
+                                    Restrictions.eq("groupId", interfaceGroupEntity.getId()),
+                                    Restrictions.eq("isGroup", true)
+                            });
+                            if (groupErrorCodes != null && groupErrorCodes.size() > 0) {
+                                //设置列宽
+                                float[] columnWidths = {3f, 6f};
+                                String[][] values = new String[groupErrorCodes.size()][2];
+                                for (int j = 0; j < groupErrorCodes.size(); j++) {
+                                    ErrorCodeEntity entity = groupErrorCodes.get(j);
+                                    values[j][0] = entity.getCode()+"";
+                                    values[j][1] = entity.getNote() == null ? "" : entity.getNote();
+                                }
+                                addTable(document, "错误码说明", new String[]{"错误码", "说明"}, columnWidths, values, null, fontChinese);
+                            }
                             addTextLine(document, "", fontChinese);
 
                             List<InterfaceEntity> list = getBaseDao().executeCriteria(InterfaceUtils.getInterfaceByGroupId(interfaceGroupEntity.getId()));
@@ -1668,6 +1708,24 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                                 addText(document, "接口说明：", fontChinese, true);
                                 addTextLine(document, entity.getNote(), fontChinese);
                                 addTextLine(document, "", fontChinese);
+                                addTextLine(document, "", fontChinese);
+                                List<ErrorCodeEntity> interfaceErrorCodes = mErrorCodeService.executeCriteria(new Criterion[]{
+                                        Restrictions.eq("deleteFlag", BaseEntity.DELETE_FLAG_NO),
+                                        Restrictions.eq("interfaceId", entity.getId()),
+                                        Restrictions.eq("isGroup", false),
+                                        Restrictions.eq("isGlobal", false)
+                                });
+                                if (interfaceErrorCodes != null && interfaceErrorCodes.size() > 0) {
+                                    //设置列宽
+                                    float[] columnWidths = {3f, 6f};
+                                    String[][] values = new String[interfaceErrorCodes.size()][2];
+                                    for (int j = 0; j < interfaceErrorCodes.size(); j++) {
+                                        ErrorCodeEntity err = interfaceErrorCodes.get(j);
+                                        values[j][0] = err.getCode()+"";
+                                        values[j][1] = err.getNote() == null ? "" : err.getNote();
+                                    }
+                                    addTable(document, "错误码说明", new String[]{"错误码", "说明"}, columnWidths, values, null, fontChinese);
+                                }
 
                                 pdfAddRequestHeaders(document, projectId, entity.getId(), fontChinese);
                                 pdfAddRequestParams(document, projectId, entity.getId(), fontChinese);
@@ -1731,9 +1789,9 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
         if (globals != null && globals.size() > 0) {
             //设置列宽
             float[] columnWidths = {3f, 1f, 5f};
-            String[][] values = new String[args.size()][3];
-            for (int i = 0; i < args.size(); i++) {
-                RequestHeaderEntity entity = args.get(i);
+            String[][] values = new String[globals.size()][3];
+            for (int i = 0; i < globals.size(); i++) {
+                RequestHeaderEntity entity = globals.get(i);
                 values[i][0] = entity.getName();
                 values[i][1] = entity.getValue() == null ? "" : entity.getValue();
                 values[i][2] = entity.getNote() == null ? "" : entity.getNote();
