@@ -2078,7 +2078,8 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
     }
 
 
-    private void fillTopFragment(String arrayName, String logoName, ApplicationEntity app, ActivityEntity activityEntity, String layoutPath, String javaPath, StringBuilder sbData, StringBuilder sbStrings,
+    private void fillTopFragment(String arrayName, String logoName, ApplicationEntity app, ActivityEntity activityEntity, String layoutPath, String javaPath,
+                                 StringBuilder sbData, StringBuilder sbStrings,
                                  StringBuilder sbImp, StringBuilder sbJava, StringBuilder sbDef, StringBuilder sbInit, StringBuilder sbEvent,
                                  StringBuilder sbMethods, StringBuilder sbArrays) throws IOException {
         sbDef.append("\n" +
@@ -2181,7 +2182,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 if (fragment.getChildCount() > 0) {
                     String arrayName1 = "child_tab_names_" + layoutName;
                     sbArray2.append("\n    <string-array name=\"" + arrayName1 + "\">");
-                    fillChildTopFragment(arrayName1, logoName, app, activityEntity, layoutPath, javaPath, sbData1, sbStrings, sbImp1, sbJava1, sbDef1, sbInit1, sbEvent1, sbMethods1, sbArray2, fragment.getId());
+                    fillChildTopFragment(layoutName, sbLayout1,  arrayName1, logoName, app, activityEntity, layoutPath, javaPath, sbData1, sbStrings, sbImp1, sbJava1, sbDef1, sbInit1, sbEvent1, sbMethods1, sbArray2, fragment.getId());
                     sbArray2.append("\n    </string-array>");
                 }
 
@@ -2256,11 +2257,42 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
         }
     }
 
-    private void fillChildTopFragment(String arrayName, String logoName, ApplicationEntity app, ActivityEntity activityEntity, String layoutPath, String javaPath, StringBuilder sbData, StringBuilder sbStrings,
+    private void fillChildTopFragment(String layoutName1, StringBuilder sbLayout, String arrayName, String logoName, ApplicationEntity app, ActivityEntity activityEntity, String layoutPath, String javaPath,
+                                      StringBuilder sbData, StringBuilder sbStrings,
                                       StringBuilder sbImp, StringBuilder sbJava, StringBuilder sbDef, StringBuilder sbInit, StringBuilder sbEvent,
                                       StringBuilder sbMethods, StringBuilder sbArrays, String pid) throws IOException {
+        if (!sbStrings.toString().contains("\"" + layoutName1 + "_title_text\"")) {
+            sbStrings.append("    <string name=\"" + layoutName1 + "_title_text\">" + activityEntity.getTitle() + "</string>\n");
+        }
+        sbLayout.append(
+                "\n" +
+                "    <zhouzhuo810.me.zzandframe.ui.widget.zzpagerindicator.ZzPagerIndicator\n" +
+                "        android:id=\"@+id/indicator\"\n" +
+                "        android:layout_width=\"match_parent\"\n" +
+                "        android:layout_height=\"wrap_content\"\n" +
+                "        android:paddingBottom=\"10px\"\n" +
+                "        android:paddingTop=\"10px\"\n" +
+                "        app:zz_indicator_type=\"tab_with_icon_and_text\"\n" +
+                "        app:zz_is_need_scale_in_px=\"true\"\n" +
+                "        app:zz_select_tab_text_color=\"@color/colorPrimary\"\n" +
+                "        app:zz_select_tab_text_size=\"@dimen/tab_text_size\"\n" +
+                "        app:zz_should_tab_expand=\"true\"\n" +
+                "        app:zz_tab_icon_size=\"@dimen/tab_img_size\"\n" +
+                "        app:zz_underline_color=\"@color/colorPrimary\"\n" +
+                "        app:zz_underline_height=\"4px\"\n" +
+                "        app:zz_unselect_tab_text_color=\"@color/colorBlack\"\n" +
+                "        app:zz_unselect_tab_text_size=\"@dimen/tab_text_size\" />\n" +
+                "\n" +
+                "    <android.support.v4.view.ViewPager\n" +
+                "        android:id=\"@+id/view_pager\"\n" +
+                "        android:layout_width=\"match_parent\"\n" +
+                "        android:layout_height=\"0dp\"\n" +
+                "        android:layout_weight=\"1\">\n" +
+                "\n" +
+                "    </android.support.v4.view.ViewPager>\n"
+        );
+
         sbDef.append("\n" +
-                "    private TitleBar titleBar;\n" +
                 "    private ZzPagerIndicator indicator;\n" +
                 "    private ViewPager viewPager;\n" +
                 "    List<Fragment> fragments;\n");
@@ -2271,8 +2303,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 "import zhouzhuo810.me.zzandframe.ui.widget.zzpagerindicator.ZzPagerIndicator;\n" +
                 "import zhouzhuo810.me.zzandframe.ui.widget.zzpagerindicator.adapter.ZzFragmentPagerAdapter;\n")
                 .append("import zhouzhuo810.me.zzandframe.ui.widget.TabBar;\n");
-        sbInit.append("        titleBar = (TitleBar) rootView.findViewById(R.id.title_bar);\n" +
-                "        indicator = (ZzPagerIndicator) rootView.findViewById(R.id.indicator);\n" +
+        sbInit.append("        indicator = (ZzPagerIndicator) rootView.findViewById(R.id.indicator);\n" +
                 "        viewPager = (ViewPager) rootView.findViewById(R.id.view_pager);\n");
         sbData.append("\n        fragments = new ArrayList<>();");
         List<FragmentEntity> fragments = mFragmentService.executeCriteria(new Criterion[]{
@@ -2735,7 +2766,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 if (fragment.getChildCount() > 0) {
                     String arrayName1 = "child_tab_names_" + layoutName;
                     sbArray2.append("\n    <string-array name=\"" + arrayName1 + "\">");
-                    fillChildTopFragment(arrayName1, logoName, app, activityEntity, layoutPath, javaPath, sbData1, sbStrings, sbImp1, sbJava1, sbDef1, sbInit1, sbEvent1, sbMethods1, sbArray2, fragment.getId());
+                    fillChildTopFragment(layoutName, sbLayout1, arrayName1, logoName, app, activityEntity, layoutPath, javaPath, sbData1, sbStrings, sbImp1, sbJava1, sbDef1, sbInit1, sbEvent1, sbMethods1, sbArray2, fragment.getId());
                     sbArray2.append("\n    </string-array>");
                 }
 
