@@ -1401,7 +1401,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 "    //xutils\n" +
                 "    compile 'org.xutils:xutils:3.3.38'\n" +
                 "    //RxPermissions\n" +
-                "    //compile 'com.tbruyelle.rxpermissions:rxpermissions:0.9.4@aar'\n" +
+                "    compile 'com.tbruyelle.rxpermissions:rxpermissions:0.9.4@aar'\n" +
                 "    //Logger\n" +
                 "    compile 'com.orhanobut:logger:2.1.1'\n" +
                 "    //okgo\n" +
@@ -2182,7 +2182,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 if (fragment.getChildCount() > 0) {
                     String arrayName1 = "child_tab_names_" + layoutName;
                     sbArray2.append("\n    <string-array name=\"" + arrayName1 + "\">");
-                    fillChildTopFragment(layoutName, sbLayout1,  arrayName1, logoName, app, activityEntity, layoutPath, javaPath, sbData1, sbStrings, sbImp1, sbJava1, sbDef1, sbInit1, sbEvent1, sbMethods1, sbArray2, fragment.getId());
+                    fillChildTopFragment(layoutName, sbLayout1, arrayName1, logoName, app, activityEntity, layoutPath, javaPath, sbData1, sbStrings, sbImp1, sbJava1, sbDef1, sbInit1, sbEvent1, sbMethods1, sbArray2, fragment.getId());
                     sbArray2.append("\n    </string-array>");
                 }
 
@@ -2266,30 +2266,30 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
         }
         sbLayout.append(
                 "\n" +
-                "    <zhouzhuo810.me.zzandframe.ui.widget.zzpagerindicator.ZzPagerIndicator\n" +
-                "        android:id=\"@+id/indicator\"\n" +
-                "        android:layout_width=\"match_parent\"\n" +
-                "        android:layout_height=\"wrap_content\"\n" +
-                "        android:paddingBottom=\"10px\"\n" +
-                "        android:paddingTop=\"10px\"\n" +
-                "        app:zz_indicator_type=\"tab_with_icon_and_text\"\n" +
-                "        app:zz_is_need_scale_in_px=\"true\"\n" +
-                "        app:zz_select_tab_text_color=\"@color/colorPrimary\"\n" +
-                "        app:zz_select_tab_text_size=\"@dimen/tab_text_size\"\n" +
-                "        app:zz_should_tab_expand=\"true\"\n" +
-                "        app:zz_tab_icon_size=\"@dimen/tab_img_size\"\n" +
-                "        app:zz_underline_color=\"@color/colorPrimary\"\n" +
-                "        app:zz_underline_height=\"4px\"\n" +
-                "        app:zz_unselect_tab_text_color=\"@color/colorBlack\"\n" +
-                "        app:zz_unselect_tab_text_size=\"@dimen/tab_text_size\" />\n" +
-                "\n" +
-                "    <android.support.v4.view.ViewPager\n" +
-                "        android:id=\"@+id/view_pager\"\n" +
-                "        android:layout_width=\"match_parent\"\n" +
-                "        android:layout_height=\"0dp\"\n" +
-                "        android:layout_weight=\"1\">\n" +
-                "\n" +
-                "    </android.support.v4.view.ViewPager>\n"
+                        "    <zhouzhuo810.me.zzandframe.ui.widget.zzpagerindicator.ZzPagerIndicator\n" +
+                        "        android:id=\"@+id/indicator\"\n" +
+                        "        android:layout_width=\"match_parent\"\n" +
+                        "        android:layout_height=\"wrap_content\"\n" +
+                        "        android:paddingBottom=\"10px\"\n" +
+                        "        android:paddingTop=\"10px\"\n" +
+                        "        app:zz_indicator_type=\"tab_with_icon_and_text\"\n" +
+                        "        app:zz_is_need_scale_in_px=\"true\"\n" +
+                        "        app:zz_select_tab_text_color=\"@color/colorPrimary\"\n" +
+                        "        app:zz_select_tab_text_size=\"@dimen/tab_text_size\"\n" +
+                        "        app:zz_should_tab_expand=\"true\"\n" +
+                        "        app:zz_tab_icon_size=\"@dimen/tab_img_size\"\n" +
+                        "        app:zz_underline_color=\"@color/colorPrimary\"\n" +
+                        "        app:zz_underline_height=\"4px\"\n" +
+                        "        app:zz_unselect_tab_text_color=\"@color/colorBlack\"\n" +
+                        "        app:zz_unselect_tab_text_size=\"@dimen/tab_text_size\" />\n" +
+                        "\n" +
+                        "    <android.support.v4.view.ViewPager\n" +
+                        "        android:id=\"@+id/view_pager\"\n" +
+                        "        android:layout_width=\"match_parent\"\n" +
+                        "        android:layout_height=\"0dp\"\n" +
+                        "        android:layout_weight=\"1\">\n" +
+                        "\n" +
+                        "    </android.support.v4.view.ViewPager>\n"
         );
 
         sbDef.append("\n" +
@@ -2303,7 +2303,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 "import zhouzhuo810.me.zzandframe.ui.widget.zzpagerindicator.ZzPagerIndicator;\n" +
                 "import zhouzhuo810.me.zzandframe.ui.widget.zzpagerindicator.adapter.ZzFragmentPagerAdapter;\n")
                 .append("import zhouzhuo810.me.zzandframe.ui.widget.TabBar;\n");
-        sbInit.append("        indicator = (ZzPagerIndicator) rootView.findViewById(R.id.indicator);\n" +
+        sbInit.append("\n        indicator = (ZzPagerIndicator) rootView.findViewById(R.id.indicator);\n" +
                 "        viewPager = (ViewPager) rootView.findViewById(R.id.view_pager);\n");
         sbData.append("\n        fragments = new ArrayList<>();");
         List<FragmentEntity> fragments = mFragmentService.executeCriteria(new Criterion[]{
@@ -2578,7 +2578,6 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         "    public void initEvent() {\n")
                 .append(sbEvent.toString())
                 .append("\n    }\n");
-
         sbJava.append(sbMethods.toString());
 
         sbJava.append("\n" +
@@ -3513,7 +3512,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         heightString = height + "px";
                         break;
                 }
-                String actions = genearteActions(widgetEntity.getId(), "0", true, "", sbStrings, sbImp, sbData);
+                String actions = genearteActions(widgetEntity.getId(), "0", true, app.getPackageName(),"", sbStrings, sbImp, sbData);
                 switch (widgetEntity.getType()) {
                     case WidgetEntity.TYPE_TITLE_BAR:
                         sbDef.append("\n    private TitleBar titleBar;");
@@ -3593,6 +3592,12 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "                android:layout_width=\"match_parent\"\n" +
                                 "                android:layout_height=\"1px\"\n" +
                                 "                android:layout_marginLeft=\"40px\" />\n");
+                        sbEvent.append("\n        "+varName+".setOnClickListener(new View.OnClickListener() {\n" +
+                                "            @Override\n" +
+                                "            public void onClick(View v) {\n" +
+                                "                \n" +actions+
+                                "\n            }\n" +
+                                "        });");
                         break;
                     case WidgetEntity.TYPE_TITLE_EDIT_ITEM:
                         String varNameEt = generateVarName("et", widgetEntity.getResId());
@@ -3745,7 +3750,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "        android:text=\"@string/" + widgetEntity.getResId() + "_text\"\n" +
                                 "        android:textColor=\"#fff\"\n" +
                                 "        android:textSize=\"@dimen/submit_btn_text_size\" />");
-                        sbEvent.append("        " + exitBtnName + ".setOnClickListener(new View.OnClickListener() {\n" +
+                        sbEvent.append("\n        " + exitBtnName + ".setOnClickListener(new View.OnClickListener() {\n" +
                                 "            @Override\n" +
                                 "            public void onClick(View v) {\n" + actions + "\n"
                         );
@@ -3756,31 +3761,15 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         sbImp.append("\nimport android.support.v4.widget.SwipeRefreshLayout;")
                                 .append("\nimport android.support.v7.widget.RecyclerView;")
                                 .append("\nimport android.support.v7.widget.LinearLayoutManager;")
-                                .append("\nimport zhouzhuo810.me.zzandframe.ui.widget.ZzRvRefreshLayout;");
-                        sbDef.append("\n    private ZzRvRefreshLayout refresh;")
+                                .append("\nimport android.support.v4.widget.SwipeRefreshLayout;");
+                        sbDef.append("\n    private SwipeRefreshLayout refresh;")
                                 .append("\n    private RecyclerView rv;")
                                 .append("\n    private TextView tvNoData;");
-                        sbInit.append("\n        refresh = (ZzRvRefreshLayout) rootView.findViewById(R.id.refresh);")
+                        sbInit.append("\n        refresh = (SwipeRefreshLayout) rootView.findViewById(R.id.refresh);")
                                 .append("\n        rv = (RecyclerView) rootView.findViewById(R.id.rv);")
                                 .append("\n        rv.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager." + widgetEntity.getOrientation().toUpperCase() + ", false));")
                                 .append("\n        tvNoData = (TextView) rootView.findViewById(R.id.tv_no_data);");
-                        sbEvent.append("\n        titleBar.setOnTitleClickListener(new TitleBar.OnTitleClick() {\n" +
-                                "            @Override\n" +
-                                "            public void onLeftClick(ImageView imageView, MarkView markView, TextView textView) {\n" +
-                                "                getBaseAct().closeAct();\n" +
-                                "            }\n" +
-                                "\n" +
-                                "            @Override\n" +
-                                "            public void onTitleClick(TextView textView) {\n" +
-                                "\n" +
-                                "            }\n" +
-                                "\n" +
-                                "            @Override\n" +
-                                "            public void onRightClick(ImageView imageView, MarkView markView, TextView textView) {\n" +
-                                "\n" +
-                                "            }\n" +
-                                "        });\n")
-                                .append("        refresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {\n" +
+                        sbEvent.append("        refresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {\n" +
                                         "            @Override\n" +
                                         "            public void onRefresh() {\n" +
                                         "                getData();\n" +
@@ -3797,16 +3786,16 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "        android:layout_width=\"match_parent\"\n" +
                                 "        android:layout_height=\"match_parent\">\n" +
                                 "\n" +
-                                "        <zhouzhuo810.me.zzandframe.ui.widget.ZzRvRefreshLayout\n" +
+                                "        <android.support.v4.widget.SwipeRefreshLayout\n" +
                                 "            android:id=\"@+id/refresh\"\n" +
                                 "            android:layout_width=\"match_parent\"\n" +
-                                "            android:layout_height=\"wrap_content\">\n" +
+                                "            android:layout_height=\"match_parent\">\n" +
                                 "\n" +
                                 "            <android.support.v7.widget.RecyclerView\n" +
                                 "                android:id=\"@+id/rv\"\n" +
                                 "                android:layout_width=\"match_parent\"\n" +
                                 "                android:layout_height=\"match_parent\" />\n" +
-                                "        </zhouzhuo810.me.zzandframe.ui.widget.ZzRvRefreshLayout>\n" +
+                                "        </android.support.v4.widget.SwipeRefreshLayout>\n" +
                                 "\n" +
                                 "        <TextView\n" +
                                 "            android:id=\"@+id/tv_no_data\"\n" +
@@ -3933,12 +3922,13 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         String testClazz = "RvTestResult";
                         String realClazz = "";
                         String entityPath = javaPath
+                                + File.separator + "common"
                                 + File.separator + "api"
                                 + File.separator + "entity";
                         FileUtils.saveFileToPathWithName("package " + app.getPackageName() + ".common.api.entity;\n" +
                                 "\n" +
                                 "import java.util.List;\n" +
-                                "import me.zhouzhuo810.logintest.ui.widget.sidebar.SortModel;\n" +
+                                "import " + app.getPackageName() + ".ui.widget.sidebar.SortModel;\n" +
                                 "import zhouzhuo810.me.zzandframe.common.rule.SearchAble;\n" +
                                 "\n" +
                                 "/**\n" +
@@ -4114,11 +4104,11 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "    private RxPermissions rxPermissions;\n" +
                                 "    private EditText et_search;\n" +
                                 "    private TextView tv_footer;");
-                        sbInit.append("\n        rxPermissions = new RxPermissions(this);\n" +
+                        sbInit.append("\n        rxPermissions = new RxPermissions(getActivity());\n" +
                                 "        refreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.refresh);\n" +
                                 "        lv = (SwipeMenuRecyclerView) rootView.findViewById(R.id.lv);\n" +
                                 "\n" +
-                                "        lv.setLayoutManager(new LinearLayoutManager(this));\n" +
+                                "        lv.setLayoutManager(new LinearLayoutManager(getActivity()));\n" +
                                 "\n" +
                                 "        sideBar = (SideBar) rootView.findViewById(R.id.side_bar);\n" +
                                 "        tv_toast = (TextView) rootView.findViewById(R.id.tv_toast);\n" +
@@ -4140,9 +4130,6 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "\n" +
                                 "        pinyinComparator = new PinyinComparator();\n" +
                                 "\n" +
-                                "        adapter = new " + activityEntity.getName().substring(0, 1).toUpperCase() + activityEntity.getName().substring(1) + "ListAdapter(this, list);\n" +
-                                "        lv.setAdapter(adapter);\n" +
-                                "\n" +
                                 "        lv.setSwipeMenuCreator(new SwipeMenuCreator() {\n" +
                                 "            @Override\n" +
                                 "            public void onCreateMenu(SwipeMenu swipeLeftMenu, SwipeMenu swipeRightMenu, int viewType) {\n" +
@@ -4154,7 +4141,29 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "                swipeRightMenu.addMenuItem(callItem);\n" +
                                 "\n" +
                                 "            }\n" +
-                                "        });");
+                                "        });\n"+
+                                "\n" +
+                                "        lv.setSwipeItemClickListener(new SwipeItemClickListener() {\n" +
+                                "            @Override\n" +
+                                "            public void onItemClick(View itemView, int position) {\n" +
+                                "            }\n" +
+                                "        });\n" +
+                                "\n" +
+                                "        lv.setSwipeMenuItemClickListener(new SwipeMenuItemClickListener() {\n" +
+                                "            @Override\n" +
+                                "            public void onItemClick(SwipeMenuBridge menuBridge) {\n" +
+                                "                switch (menuBridge.getPosition()) {\n" +
+                                "                    case 0:\n" +
+                                "                        //String id = list.get(menuBridge.getAdapterPosition()).getId();\n" +
+                                "                        //delete(id);\n" +
+                                "                        break;\n" +
+                                "                }\n" +
+                                "            }\n" +
+                                "        });\n" +
+                                "        adapter = new " + activityEntity.getName().substring(0, 1).toUpperCase() + activityEntity.getName().substring(1) + "ListAdapter(getActivity(), list);\n" +
+                                "        lv.setAdapter(adapter);\n"
+
+                        );
                         sbEvent.append("\n       refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {\n" +
                                 "            @Override\n" +
                                 "            public void onRefresh() {\n" +
@@ -4180,24 +4189,6 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "            }\n" +
                                 "        });\n" +
                                 "\n" +
-                                "\n" +
-                                "        lv.setSwipeItemClickListener(new SwipeItemClickListener() {\n" +
-                                "            @Override\n" +
-                                "            public void onItemClick(View itemView, int position) {\n" +
-                                "            }\n" +
-                                "        });\n" +
-                                "\n" +
-                                "        lv.setSwipeMenuItemClickListener(new SwipeMenuItemClickListener() {\n" +
-                                "            @Override\n" +
-                                "            public void onItemClick(SwipeMenuBridge menuBridge) {\n" +
-                                "                switch (menuBridge.getPosition()) {\n" +
-                                "                    case 0:\n" +
-                                "                        //String id = list.get(menuBridge.getAdapterPosition()).getId();\n" +
-                                "                        //delete(id);\n" +
-                                "                        break;\n" +
-                                "                }\n" +
-                                "            }\n" +
-                                "        });\n" +
                                 "\n" +
                                 "        et_search.addTextChangedListener(new TextWatcher() {\n" +
                                 "            @Override\n" +
@@ -4264,6 +4255,10 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "            android:layout_marginTop=\"90px\" />\n" +
                                 "    </FrameLayout>\n" +
                                 "\n");
+                        sbMethods.append("\n    private void getData() {\n" +
+                                "        getBaseAct().stopRefresh(refreshLayout);\n" +
+                                "    }\n");
+
                         break;
                     case WidgetEntity.TYPE_SCROLL_VIEW:
                         sbLayout.append("\n    <ScrollView\n" +
@@ -4421,7 +4416,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         heightString = height + "px";
                         break;
                 }
-                String actions = genearteActions(widgetEntity.getId(), "0", false, activityEntity.getName(), sbStrings, sbImp, sbData);
+                String actions = genearteActions(widgetEntity.getId(), "0", false, app.getPackageName(), activityEntity.getName(), sbStrings, sbImp, sbData);
                 switch (widgetEntity.getType()) {
                     case WidgetEntity.TYPE_TITLE_BAR:
                         // TODO: 2017/12/16 添加动作
@@ -4508,6 +4503,12 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "                android:layout_width=\"match_parent\"\n" +
                                 "                android:layout_height=\"1px\"\n" +
                                 "                android:layout_marginLeft=\"40px\" />\n");
+                        sbEvent.append("\n        "+siName+".setOnClickListener(new View.OnClickListener() {\n" +
+                                "            @Override\n" +
+                                "            public void onClick(View v) {\n" +
+                                "                \n" +actions+
+                                "\n            }\n" +
+                                "        });");
                         break;
                     case WidgetEntity.TYPE_TITLE_EDIT_ITEM:
                         String titleEtName = generateVarName("et", widgetEntity.getResId());
@@ -4670,31 +4671,15 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         sbImp.append("\nimport android.support.v4.widget.SwipeRefreshLayout;")
                                 .append("\nimport android.support.v7.widget.LinearLayoutManager;")
                                 .append("\nimport android.support.v7.widget.RecyclerView;")
-                                .append("\nimport zhouzhuo810.me.zzandframe.ui.widget.ZzRvRefreshLayout;");
-                        sbDef.append("\n    private ZzRvRefreshLayout refresh;")
+                                .append("\nimport android.support.v4.widget.SwipeRefreshLayout;");
+                        sbDef.append("\n    private SwipeRefreshLayout refresh;")
                                 .append("\n    private RecyclerView rv;")
                                 .append("\n    private TextView tvNoData;");
-                        sbInit.append("\n        refresh = (ZzRvRefreshLayout) findViewById(R.id.refresh);")
+                        sbInit.append("\n        refresh = (SwipeRefreshLayout) findViewById(R.id.refresh);")
                                 .append("\n        rv = (RecyclerView) findViewById(R.id.rv);")
                                 .append("\n        rv.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager." + widgetEntity.getOrientation().toUpperCase() + ", false));")
                                 .append("\n        tvNoData = (TextView) findViewById(R.id.tv_no_data);");
-                        sbEvent.append("\n        titleBar.setOnTitleClickListener(new TitleBar.OnTitleClick() {\n" +
-                                "            @Override\n" +
-                                "            public void onLeftClick(ImageView imageView, MarkView markView, TextView textView) {\n" +
-                                "                closeAct();\n" +
-                                "            }\n" +
-                                "\n" +
-                                "            @Override\n" +
-                                "            public void onTitleClick(TextView textView) {\n" +
-                                "\n" +
-                                "            }\n" +
-                                "\n" +
-                                "            @Override\n" +
-                                "            public void onRightClick(ImageView imageView, MarkView markView, TextView textView) {\n" +
-                                "\n" +
-                                "            }\n" +
-                                "        });\n")
-                                .append("        refresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {\n" +
+                        sbEvent.append("        refresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {\n" +
                                         "            @Override\n" +
                                         "            public void onRefresh() {\n" +
                                         "                getData();\n" +
@@ -4711,16 +4696,16 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "        android:layout_width=\"match_parent\"\n" +
                                 "        android:layout_height=\"match_parent\">\n" +
                                 "\n" +
-                                "        <zhouzhuo810.me.zzandframe.ui.widget.ZzRvRefreshLayout\n" +
+                                "        <android.support.v4.widget.SwipeRefreshLayout\n" +
                                 "            android:id=\"@+id/refresh\"\n" +
                                 "            android:layout_width=\"match_parent\"\n" +
-                                "            android:layout_height=\"wrap_content\">\n" +
+                                "            android:layout_height=\"match_parent\">\n" +
                                 "\n" +
                                 "            <android.support.v7.widget.RecyclerView\n" +
                                 "                android:id=\"@+id/rv\"\n" +
                                 "                android:layout_width=\"match_parent\"\n" +
                                 "                android:layout_height=\"match_parent\" />\n" +
-                                "        </zhouzhuo810.me.zzandframe.ui.widget.ZzRvRefreshLayout>\n" +
+                                "        </android.support.v4.widget.SwipeRefreshLayout>\n" +
                                 "\n" +
                                 "        <TextView\n" +
                                 "            android:id=\"@+id/tv_no_data\"\n" +
@@ -4841,9 +4826,11 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "        android:textSize=\"40px\" />\n");
                         break;
                     case WidgetEntity.TYPE_LETTER_RV:
+                        //activity
                         String testClazz = "RvTestResult";
                         String realClazz = "";
                         String entityPath = javaPath
+                                + File.separator + "common"
                                 + File.separator + "api"
                                 + File.separator + "entity";
                         FileUtils.saveFileToPathWithName("package " + app.getPackageName() + ".common.api.entity;\n" +
@@ -5051,9 +5038,6 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "\n" +
                                 "        pinyinComparator = new PinyinComparator();\n" +
                                 "\n" +
-                                "        adapter = new " + activityEntity.getName().substring(0, 1).toUpperCase() + activityEntity.getName().substring(1) + "ListAdapter(this, list);\n" +
-                                "        lv.setAdapter(adapter);\n" +
-                                "\n" +
                                 "        lv.setSwipeMenuCreator(new SwipeMenuCreator() {\n" +
                                 "            @Override\n" +
                                 "            public void onCreateMenu(SwipeMenu swipeLeftMenu, SwipeMenu swipeRightMenu, int viewType) {\n" +
@@ -5065,7 +5049,29 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "                swipeRightMenu.addMenuItem(callItem);\n" +
                                 "\n" +
                                 "            }\n" +
-                                "        });");
+                                "        });" +
+                                "\n" +
+                                "        lv.setSwipeItemClickListener(new SwipeItemClickListener() {\n" +
+                                "            @Override\n" +
+                                "            public void onItemClick(View itemView, int position) {\n" +
+                                "            }\n" +
+                                "        });\n" +
+                                "\n" +
+                                "        lv.setSwipeMenuItemClickListener(new SwipeMenuItemClickListener() {\n" +
+                                "            @Override\n" +
+                                "            public void onItemClick(SwipeMenuBridge menuBridge) {\n" +
+                                "                switch (menuBridge.getPosition()) {\n" +
+                                "                    case 0:\n" +
+                                "                        //String id = list.get(menuBridge.getAdapterPosition()).getId();\n" +
+                                "                        //delete(id);\n" +
+                                "                        break;\n" +
+                                "                }\n" +
+                                "            }\n" +
+                                "        });\n" +
+                                "\n" +
+                                "        adapter = new " + activityEntity.getName().substring(0, 1).toUpperCase() + activityEntity.getName().substring(1) + "ListAdapter(this, list);\n" +
+                                "        lv.setAdapter(adapter);\n"
+                        );
                         sbEvent.append("\n       refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {\n" +
                                 "            @Override\n" +
                                 "            public void onRefresh() {\n" +
@@ -5091,24 +5097,6 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "            }\n" +
                                 "        });\n" +
                                 "\n" +
-                                "\n" +
-                                "        lv.setSwipeItemClickListener(new SwipeItemClickListener() {\n" +
-                                "            @Override\n" +
-                                "            public void onItemClick(View itemView, int position) {\n" +
-                                "            }\n" +
-                                "        });\n" +
-                                "\n" +
-                                "        lv.setSwipeMenuItemClickListener(new SwipeMenuItemClickListener() {\n" +
-                                "            @Override\n" +
-                                "            public void onItemClick(SwipeMenuBridge menuBridge) {\n" +
-                                "                switch (menuBridge.getPosition()) {\n" +
-                                "                    case 0:\n" +
-                                "                        //String id = list.get(menuBridge.getAdapterPosition()).getId();\n" +
-                                "                        //delete(id);\n" +
-                                "                        break;\n" +
-                                "                }\n" +
-                                "            }\n" +
-                                "        });\n" +
                                 "\n" +
                                 "        et_search.addTextChangedListener(new TextWatcher() {\n" +
                                 "            @Override\n" +
@@ -5174,6 +5162,10 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "            android:layout_marginTop=\"90px\" />\n" +
                                 "    </FrameLayout>\n" +
                                 "\n");
+                        sbMethods.append("\n    private void getData() {\n" +
+                                "        stopRefresh(refreshLayout);\n" +
+                                "    }\n");
+
                         break;
                     case WidgetEntity.TYPE_SCROLL_VIEW:
                         sbLayout.append("\n    <ScrollView\n" +
@@ -5289,7 +5281,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
 
     }
 
-    private String genearteActions(String widgetId, String pid, boolean fgm, String actName, StringBuilder sbStrings, StringBuilder sbImp, StringBuilder sbData) {
+    private String genearteActions(String widgetId, String pid, boolean fgm,String packageName, String actName, StringBuilder sbStrings, StringBuilder sbImp, StringBuilder sbData) {
         List<ActionEntity> actions = mActionService.executeCriteria(new Criterion[]{
                 Restrictions.eq("deleteFlag", BaseEntity.DELETE_FLAG_NO),
                 Restrictions.eq("pid", pid),
@@ -5309,7 +5301,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                             } else {
                                 //show
                                 sbActions.append("\n                getBaseAct().showPd(\"" + action.getMsg() + "\", false);");
-                                sbActions.append(genearteActions(widgetId, action.getId(), fgm, actName, sbStrings, sbImp, sbData));
+                                sbActions.append(genearteActions(widgetId, action.getId(), fgm, packageName, actName, sbStrings, sbImp, sbData));
                             }
                         } else {
                             //activity
@@ -5319,7 +5311,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                             } else {
                                 //show
                                 sbActions.append("\n                showPd(\"" + action.getMsg() + "\", false);");
-                                sbActions.append(genearteActions(widgetId, action.getId(), fgm, actName, sbStrings, sbImp, sbData));
+                                sbActions.append(genearteActions(widgetId, action.getId(), fgm, packageName, actName, sbStrings, sbImp, sbData));
                             }
                         }
                         break;
@@ -5334,7 +5326,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 sbActions.append("\n                getBaseAct().showTwoBtnDialog(\"" + action.getTitle() + "\", \"" + action.getMsg() + "\", false, new OnTwoBtnClick() {\n" +
                                         "                    @Override\n" +
                                         "                    public void onOk() {\n");
-                                sbActions.append(genearteActions(widgetId, action.getId(), fgm, actName, sbStrings, sbImp, sbData));
+                                sbActions.append(genearteActions(widgetId, action.getId(), fgm, packageName, actName, sbStrings, sbImp, sbData));
                                 sbActions.append(
                                         "\n                    }\n" +
                                                 "\n" +
@@ -5354,7 +5346,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 sbActions.append("\n                showTwoBtnDialog(\"" + action.getTitle() + "\", \"" + action.getMsg() + "\", false, new OnTwoBtnClick() {\n" +
                                         "                    @Override\n" +
                                         "                    public void onOk() {\n");
-                                sbActions.append(genearteActions(widgetId, action.getId(), fgm, actName, sbStrings, sbImp, sbData));
+                                sbActions.append(genearteActions(widgetId, action.getId(), fgm, packageName, actName, sbStrings, sbImp, sbData));
                                 sbActions.append(
                                         "\n                    }\n" +
                                                 "\n" +
@@ -5377,7 +5369,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 sbActions.append("\n                getBaseAct().showTwoBtnEditDialog(\"" + action.getTitle() + "\", \"" + action.getHintText() + "\", \"" + action.getDefText() + "\", false, new OnTwoBtnEditClick() {\n" +
                                         "                    @Override\n" +
                                         "                    public void onOk(String s) {\n");
-                                sbActions.append(genearteActions(widgetId, action.getId(), fgm, actName, sbStrings, sbImp, sbData));
+                                sbActions.append(genearteActions(widgetId, action.getId(), fgm, packageName, actName, sbStrings, sbImp, sbData));
                                 sbActions.append(
                                         "\n                    }\n" +
                                                 "\n" +
@@ -5397,7 +5389,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 sbActions.append("\n                showTwoBtnEditDialog(\"" + action.getTitle() + "\", \"" + action.getHintText() + "\", \"" + action.getDefText() + "\", false, new OnTwoBtnEditClick() {\n" +
                                         "                    @Override\n" +
                                         "                    public void onOk(String s) {\n");
-                                sbActions.append(genearteActions(widgetId, action.getId(), fgm, actName, sbStrings, sbImp, sbData));
+                                sbActions.append(genearteActions(widgetId, action.getId(), fgm, packageName, actName, sbStrings, sbImp, sbData));
                                 sbActions.append(
                                         "\n                    }\n" +
                                                 "\n" +
@@ -5425,7 +5417,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                         "\n" +
                                         "                    @Override\n" +
                                         "                    public void onOK() {\n");
-                                sbActions.append(genearteActions(widgetId, action.getId(), fgm, actName, sbStrings, sbImp, sbData));
+                                sbActions.append(genearteActions(widgetId, action.getId(), fgm, packageName, actName, sbStrings, sbImp, sbData));
                                 sbActions.append(
                                         "\n                    }\n" +
                                                 "                });");
@@ -5445,7 +5437,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                         "\n" +
                                         "                    @Override\n" +
                                         "                    public void onOK() {\n");
-                                sbActions.append(genearteActions(widgetId, action.getId(), fgm, actName, sbStrings, sbImp, sbData));
+                                sbActions.append(genearteActions(widgetId, action.getId(), fgm, packageName, actName, sbStrings, sbImp, sbData));
                                 sbActions.append(
                                         "\n                    }\n" +
                                                 "                });");
@@ -5470,7 +5462,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                     sbActions.append("                getBaseAct().showListDialog(items, false, null, new OnItemClick() {\n" +
                                             "                    @Override\n" +
                                             "                    public void onItemClick(int i, String s) {\n");
-                                    sbActions.append(genearteActions(widgetId, action.getId(), fgm, actName, sbStrings, sbImp, sbData));
+                                    sbActions.append(genearteActions(widgetId, action.getId(), fgm, packageName, actName, sbStrings, sbImp, sbData));
                                     sbActions.append(
                                             "\n                    }\n" + "                });");
                                 }
@@ -5492,7 +5484,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                     sbActions.append("                showListDialog(items, false, null, new OnItemClick() {\n" +
                                             "                    @Override\n" +
                                             "                    public void onItemClick(int i, String s) {\n");
-                                    sbActions.append(genearteActions(widgetId, action.getId(), fgm, actName, sbStrings, sbImp, sbData));
+                                    sbActions.append(genearteActions(widgetId, action.getId(), fgm, packageName, actName, sbStrings, sbImp, sbData));
                                     sbActions.append(
                                             "\n                    }\n" +
                                                     "                });");
@@ -5516,7 +5508,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                         "\n" +
                                         "                    @Override\n" +
                                         "                    public void onRightClick() {\n");
-                                sbActions.append(genearteActions(widgetId, action.getId(), fgm, actName, sbStrings, sbImp, sbData));
+                                sbActions.append(genearteActions(widgetId, action.getId(), fgm, packageName, actName, sbStrings, sbImp, sbData));
                                 sbActions.append(
                                         "\n                    }\n" +
                                                 "                });");
@@ -5536,7 +5528,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                         "\n" +
                                         "                    @Override\n" +
                                         "                    public void onRightClick() {\n");
-                                sbActions.append(genearteActions(widgetId, action.getId(), fgm, actName, sbStrings, sbImp, sbData));
+                                sbActions.append(genearteActions(widgetId, action.getId(), fgm, packageName, actName, sbStrings, sbImp, sbData));
                                 sbActions.append(
                                         "\n                    }\n" +
                                                 "                });");
@@ -5603,7 +5595,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                                 "                            Intent intent = new Intent(getActivity(), " + (targetAct == null ? actName : targetAct.getName()) + ".class);\n" +
                                                 "                            startActWithIntent(intent);\n" +
                                                 "                        }\n*/\n");
-                                sbActions.append(genearteActions(widgetId, action.getId(), fgm, actName, sbStrings, sbImp, sbData));
+                                sbActions.append(genearteActions(widgetId, action.getId(), fgm, packageName, actName, sbStrings, sbImp, sbData));
                                 sbActions.append("\n                    }\n" +
                                         "                });\n");
                             }
@@ -5655,7 +5647,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                                 "                            Intent intent = new Intent(" + actName + ".this, " + (targetAct == null ? actName : targetAct.getName()) + ".class);\n" +
                                                 "                            startActWithIntent(intent);\n" +
                                                 "                        }\n*/");
-                                sbActions.append(genearteActions(widgetId, action.getId(), fgm, actName, sbStrings, sbImp, sbData));
+                                sbActions.append(genearteActions(widgetId, action.getId(), fgm, packageName, actName, sbStrings, sbImp, sbData));
                                 sbActions.append("                    }\n" +
                                         "                });\n");
                             }
@@ -5669,6 +5661,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                             if (activityEntity != null) {
                                 sbActions.append("\n                Intent intent = new Intent(getActivity(), " + activityEntity.getName() + ".class);\n" +
                                         "                startActWithIntent(intent);");
+                                sbImp.append("\nimport "+packageName+".ui.act."+activityEntity.getName()+";");
                             }
                         } else {
                             //activity
