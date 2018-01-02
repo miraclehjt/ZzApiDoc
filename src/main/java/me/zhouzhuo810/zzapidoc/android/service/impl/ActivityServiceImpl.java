@@ -1,12 +1,9 @@
 package me.zhouzhuo810.zzapidoc.android.service.impl;
 
 import me.zhouzhuo810.zzapidoc.android.dao.ActivityDao;
-import me.zhouzhuo810.zzapidoc.android.dao.ActivityDao;
-import me.zhouzhuo810.zzapidoc.android.entity.ActivityEntity;
 import me.zhouzhuo810.zzapidoc.android.entity.ActivityEntity;
 import me.zhouzhuo810.zzapidoc.android.entity.ApplicationEntity;
 import me.zhouzhuo810.zzapidoc.android.entity.WidgetEntity;
-import me.zhouzhuo810.zzapidoc.android.service.ActivityService;
 import me.zhouzhuo810.zzapidoc.android.service.ActivityService;
 import me.zhouzhuo810.zzapidoc.android.service.ApplicationService;
 import me.zhouzhuo810.zzapidoc.android.service.WidgetService;
@@ -62,7 +59,11 @@ public class ActivityServiceImpl extends BaseServiceImpl<ActivityEntity> impleme
 
     @Override
     public BaseResult addActivity(String name, String title, boolean isFirst,
-                                  MultipartFile splashImg, int splashSecond, int type, String appId, String targetActId, boolean isLandscape, String userId) {
+                                  MultipartFile splashImg, int splashSecond, int type, String appId,
+                                  String targetActId, boolean isLandscape, boolean isFullScreen,
+                                  int guideImgCount, MultipartFile guideImgOne, MultipartFile guideImgTwo,
+                                  MultipartFile guideImgThree, MultipartFile guideImgFour,
+                                  MultipartFile guideImgFive, String userId) {
         UserEntity user = mUserService.get(userId);
         if (user == null) {
             return new BaseResult(0, "用户不合法");
@@ -74,12 +75,54 @@ public class ActivityServiceImpl extends BaseServiceImpl<ActivityEntity> impleme
         entity.setFirst(isFirst);
         entity.setTargetActId(targetActId);
         entity.setTitle(title);
+        entity.setFullScreen(isFullScreen);
         entity.setLandscape(isLandscape);
         entity.setSplashSecond(splashSecond == 0 ? 5 : splashSecond);
+        entity.setGuideImgCount(guideImgCount);
         if (splashImg != null) {
             try {
                 String path = FileUtils.saveFile(splashImg.getBytes(), "image", splashImg.getOriginalFilename());
                 entity.setSplashImg(path);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        if (guideImgOne != null) {
+            try {
+                String path = FileUtils.saveFile(guideImgOne.getBytes(), "image", guideImgOne.getOriginalFilename());
+                entity.setGuideImgOne(path);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        if (guideImgTwo != null) {
+            try {
+                String path = FileUtils.saveFile(guideImgTwo.getBytes(), "image", guideImgTwo.getOriginalFilename());
+                entity.setGuideImgTwo(path);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        if (guideImgThree != null) {
+            try {
+                String path = FileUtils.saveFile(guideImgThree.getBytes(), "image", guideImgThree.getOriginalFilename());
+                entity.setGuideImgThree(path);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        if (guideImgFour != null) {
+            try {
+                String path = FileUtils.saveFile(guideImgFour.getBytes(), "image", guideImgFour.getOriginalFilename());
+                entity.setGuideImgFour(path);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        if (guideImgFive != null) {
+            try {
+                String path = FileUtils.saveFile(guideImgFive.getBytes(), "image", guideImgFive.getOriginalFilename());
+                entity.setGuideImgFive(path);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -228,6 +271,7 @@ public class ActivityServiceImpl extends BaseServiceImpl<ActivityEntity> impleme
             map.put("name", applicationEntity.getName());
             map.put("type", applicationEntity.getType());
             map.put("splashImg", applicationEntity.getSplashImg());
+            map.put("guideImgCount", applicationEntity.getGuideImgCount() == null ? 0 : applicationEntity.getGuideImgCount());
             map.put("splashSecond", applicationEntity.getSplashSecond() == null ? 5 : applicationEntity.getSplashSecond());
             map.put("title", applicationEntity.getTitle());
             map.put("appId", applicationEntity.getApplicationId());

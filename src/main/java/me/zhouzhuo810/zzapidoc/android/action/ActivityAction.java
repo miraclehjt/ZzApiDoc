@@ -39,11 +39,19 @@ public class ActivityAction extends BaseController<ActivityEntity> {
             @RequestParam(value = "appId", required = false) String appId,
             @RequestParam(value = "targetActId", required = false) String targetActId,
             @RequestParam(value = "isLandscape", required = false) boolean isLandscape,
+            @RequestParam(value = "isFullScreen", required = false) boolean isFullScreen,
             @RequestParam(value = "splashSecond") int splashSecond,
             @RequestBody(required = false) MultipartFile splashImg,
+            @RequestParam(value = "guideImgCount", required = false) int guideImgCount,
+            @RequestBody(required = false) MultipartFile guideImgOne,
+            @RequestBody(required = false) MultipartFile guideImgTwo,
+            @RequestBody(required = false) MultipartFile guideImgThree,
+            @RequestBody(required = false) MultipartFile guideImgFour,
+            @RequestBody(required = false) MultipartFile guideImgFive,
             @RequestParam(value = "userId") String userId
     ) {
-        return getBaseService().addActivity(name, title, isFirst, splashImg, splashSecond, type, appId, targetActId, isLandscape, userId);
+        return getBaseService().addActivity(name, title, isFirst, splashImg, splashSecond, type, appId, targetActId, isLandscape, isFullScreen,
+                guideImgCount, guideImgOne, guideImgTwo, guideImgThree, guideImgFour, guideImgFive, userId);
     }
 
     @ResponseBody

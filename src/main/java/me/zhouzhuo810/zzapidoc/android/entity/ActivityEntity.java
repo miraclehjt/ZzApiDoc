@@ -40,6 +40,77 @@ public class ActivityEntity extends BaseEntity {
     private Integer splashSecond = 5;
     @Column(name = "IsLandscape")
     private Boolean isLandscape = false;
+    @Column(name = "IsFullScreen")
+    private Boolean isFullScreen = false;
+    //Guide Activity 图片地址（最多5张）
+    @Column(name = "GuideImgOne")
+    private String guideImgOne;
+    @Column(name = "GuideImgTwo")
+    private String guideImgTwo;
+    @Column(name = "GuideImgThree")
+    private String guideImgThree;
+    @Column(name = "GuideImgFour")
+    private String guideImgFour;
+    @Column(name = "GuideImgFive")
+    private String guideImgFive;
+    @Column(name = "GuideImgCount")
+    private Integer guideImgCount = 0;
+
+    public String getGuideImgOne() {
+        return guideImgOne;
+    }
+
+    public void setGuideImgOne(String guideImgOne) {
+        this.guideImgOne = guideImgOne;
+    }
+
+    public String getGuideImgTwo() {
+        return guideImgTwo;
+    }
+
+    public void setGuideImgTwo(String guideImgTwo) {
+        this.guideImgTwo = guideImgTwo;
+    }
+
+    public String getGuideImgThree() {
+        return guideImgThree;
+    }
+
+    public void setGuideImgThree(String guideImgThree) {
+        this.guideImgThree = guideImgThree;
+    }
+
+    public String getGuideImgFour() {
+        return guideImgFour;
+    }
+
+    public void setGuideImgFour(String guideImgFour) {
+        this.guideImgFour = guideImgFour;
+    }
+
+    public String getGuideImgFive() {
+        return guideImgFive;
+    }
+
+    public void setGuideImgFive(String guideImgFive) {
+        this.guideImgFive = guideImgFive;
+    }
+
+    public Integer getGuideImgCount() {
+        return guideImgCount;
+    }
+
+    public void setGuideImgCount(Integer guideImgCount) {
+        this.guideImgCount = guideImgCount;
+    }
+
+    public Boolean getFullScreen() {
+        return isFullScreen;
+    }
+
+    public void setFullScreen(Boolean fullScreen) {
+        isFullScreen = fullScreen;
+    }
 
     public Boolean getLandscape() {
         return isLandscape;

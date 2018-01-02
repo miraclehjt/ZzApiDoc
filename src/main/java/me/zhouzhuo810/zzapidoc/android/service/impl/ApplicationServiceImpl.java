@@ -1729,6 +1729,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                     "import android.view.View;\n" +
                     "import android.widget.ImageView;\n" +
                     "import android.widget.TextView;\n" +
+                    "import android.view.WindowManager;\n" +
                     "\n" +
                     "import java.util.concurrent.TimeUnit;\n" +
                     "\n" +
@@ -1752,6 +1753,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                     "\n" +
                     "    @Override\n" +
                     "    public int getLayoutId() {\n" +
+                    "        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN); // 隐藏android系统的状态栏\n" +
                     "        return R.layout.activity_splash;\n" +
                     "    }\n" +
                     "\n" +
@@ -1869,7 +1871,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         generateEmptyActJavaAndLayout(logoName, layoutPath, javaPath, activityEntity, app, sbStrings);
                         break;
                     case ActivityEntity.TYPE_GUIDE:
-
+                        generateGuideActJavaAndLayout(drawablePath, logoName, layoutPath, javaPath, activityEntity, app, sbStrings);
                         break;
                     case ActivityEntity.TYPE_BOTTOM_FRAGMENT:
                         generateBottomFgmActJavaAndLayout(logoName, layoutPath, javaPath, activityEntity, app, sbStrings, sbArrays);
@@ -1894,6 +1896,333 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 "</manifest>");
 
         FileUtils.saveFileToPathWithName(sbManifest.toString(), filePath, "AndroidManifest.xml");
+    }
+
+    private void generateGuideActJavaAndLayout(String drawablePath, String logoName, String layoutPath, String javaPath, ActivityEntity activityEntity, ApplicationEntity app, StringBuilder sbStrings) throws IOException {
+        String layoutName = "";
+        boolean isNotFirst = false;
+        for (int i = 0; i < activityEntity.getName().length(); i++) {
+            char c = activityEntity.getName().charAt(i);
+            if (c >= 'A' && c <= 'Z') {
+                if (isNotFirst) {
+                    layoutName += "_";
+                }
+                isNotFirst = true;
+            }
+            layoutName += c;
+        }
+
+        layoutName = layoutName.replace("activity_", "").replace("_activity", "").replace("activity", "").replace("__", "_").toLowerCase();
+        final String realLayoutName = "activity_" + layoutName.toLowerCase();
+
+        String imgOne = null;
+        if (activityEntity.getGuideImgOne() != null && activityEntity.getGuideImgOne().length() > 0) {
+            File img = new File(activityEntity.getGuideImgOne());
+            if (img.exists()) {
+                String name = img.getName();
+                String suffix = name.substring(name.lastIndexOf("."));
+                imgOne = "guide_img_one";
+                FileUtil.copyFile(img, new File(drawablePath + File.separator + imgOne + suffix));
+            }
+        }
+        String imgTwo = null;
+        if (activityEntity.getGuideImgTwo() != null && activityEntity.getGuideImgTwo().length() > 0) {
+            File img = new File(activityEntity.getGuideImgTwo());
+            if (img.exists()) {
+                String name = img.getName();
+                String suffix = name.substring(name.lastIndexOf("."));
+                imgTwo = "guide_img_two";
+                FileUtil.copyFile(img, new File(drawablePath + File.separator + imgTwo + suffix));
+            }
+        }
+        String imgThree = null;
+        if (activityEntity.getGuideImgThree() != null && activityEntity.getGuideImgThree().length() > 0) {
+            File img = new File(activityEntity.getGuideImgThree());
+            if (img.exists()) {
+                String name = img.getName();
+                String suffix = name.substring(name.lastIndexOf("."));
+                imgThree = "guide_img_three";
+                FileUtil.copyFile(img, new File(drawablePath + File.separator + imgThree + suffix));
+            }
+        }
+        String imgFour = null;
+        if (activityEntity.getGuideImgFour() != null && activityEntity.getGuideImgFour().length() > 0) {
+            File img = new File(activityEntity.getGuideImgFour());
+            if (img.exists()) {
+                String name = img.getName();
+                String suffix = name.substring(name.lastIndexOf("."));
+                imgFour = "guide_img_four";
+                FileUtil.copyFile(img, new File(drawablePath + File.separator + imgFour + suffix));
+            }
+        }
+        String imgFive = null;
+        if (activityEntity.getGuideImgFive() != null && activityEntity.getGuideImgFive().length() > 0) {
+            File img = new File(activityEntity.getGuideImgFive());
+            if (img.exists()) {
+                String name = img.getName();
+                String suffix = name.substring(name.lastIndexOf("."));
+                imgFive = "guide_img_five";
+                FileUtil.copyFile(img, new File(drawablePath + File.separator + imgFive + suffix));
+            }
+        }
+
+        sbStrings.append("    <string name=\"enter_text\">立即体验</string>\n");
+        StringBuilder sbLayout = new StringBuilder();
+        sbLayout.append("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
+                "<FrameLayout xmlns:android=\"http://schemas.android.com/apk/res/android\"\n" +
+                "    xmlns:app=\"http://schemas.android.com/apk/res-auto\"\n" +
+                "    android:layout_width=\"match_parent\"\n" +
+                "    android:layout_height=\"match_parent\"\n" +
+                "    android:orientation=\"vertical\">\n" +
+                "\n" +
+                "    <android.support.v4.view.ViewPager\n" +
+                "        android:id=\"@+id/view_pager\"\n" +
+                "        android:layout_width=\"match_parent\"\n" +
+                "        android:layout_height=\"match_parent\" />\n" +
+                "\n" +
+                "    <zhouzhuo810.me.zzandframe.ui.widget.zzpagerindicator.ZzPagerIndicator\n" +
+                "        android:id=\"@+id/indicator\"\n" +
+                "        android:layout_width=\"wrap_content\"\n" +
+                "        android:layout_height=\"wrap_content\"\n" +
+                "        android:layout_gravity=\"bottom|center_horizontal\"\n" +
+                "        android:layout_marginBottom=\"100px\"\n" +
+                "        app:zz_indicator_type=\"round_point\"\n" +
+                "        app:zz_is_need_scale_in_px=\"true\"\n" +
+                "        app:zz_point_spacing=\"15px\"\n" +
+                "        app:zz_select_point_color=\"@color/colorMain\"\n" +
+                "        app:zz_select_point_size=\"15px\"\n" +
+                "        app:zz_unselect_point_color=\"@color/colorGrayD\"\n" +
+                "        app:zz_unselect_point_size=\"15px\" />\n" +
+                "\n" +
+                "    <Button\n" +
+                "        android:id=\"@+id/btn_ok\"\n" +
+                "        android:layout_width=\"match_parent\"\n" +
+                "        android:layout_height=\"120px\"\n" +
+                "        android:layout_gravity=\"bottom|center_horizontal\"\n" +
+                "        android:layout_marginBottom=\"160px\"\n" +
+                "        android:layout_marginLeft=\"130px\"\n" +
+                "        android:layout_marginRight=\"130px\"\n" +
+                "        android:layout_marginTop=\"40px\"\n" +
+                "        android:background=\"@drawable/btn_save_selector\"\n" +
+                "        android:gravity=\"center\"\n" +
+                "        android:text=\"@string/enter_text\"\n" +
+                "        android:textColor=\"@color/colorWhite\"\n" +
+                "        android:textSize=\"@dimen/title_text_size\"\n" +
+                "        android:visibility=\"gone\" />\n" +
+                "</FrameLayout>\n");
+        StringBuilder sbJava = new StringBuilder();
+
+        sbJava.append("package " + app.getPackageName() + ".ui.act;\n" +
+                "\n" +
+                "import android.annotation.SuppressLint;\n" +
+                "import android.content.Intent;\n" +
+                "import android.os.Bundle;\n" +
+                "import android.support.annotation.Nullable;\n" +
+                "import android.support.v4.view.ViewPager;\n" +
+                "import android.view.View;\n" +
+                "import android.view.WindowManager;\n" +
+                "import android.widget.Button;\n" +
+                "import android.widget.ImageView;\n" +
+                "\n" +
+                "import java.util.ArrayList;\n" +
+                "import java.util.List;\n" +
+                "\n" +
+                "import " + app.getPackageName() + ".R;\n" +
+                "import zhouzhuo810.me.zzandframe.ui.act.BaseActivity;\n" +
+                "import zhouzhuo810.me.zzandframe.ui.widget.zzpagerindicator.ZzPagerIndicator;\n" +
+                "import zhouzhuo810.me.zzandframe.ui.widget.zzpagerindicator.adapter.ZzBasePagerAdapter;\n" +
+                "\n" +
+                "public class " + activityEntity.getName() + " extends BaseActivity {\n" +
+                "\n" +
+                "    private ViewPager viewPager;\n" +
+                "    private ZzPagerIndicator indicator;\n" +
+                "    private Button btnOk;\n" +
+                "    private List<ImageView> imgs;\n" +
+                "\n" +
+                "    @Override\n" +
+                "    public int getLayoutId() {\n");
+        if (activityEntity.getFullScreen() != null && activityEntity.getFullScreen()) {
+            sbJava.append("        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN); // 隐藏android系统的状态栏\n");
+        }
+        sbJava.append("        return R.layout." + realLayoutName + ";\n" +
+                "    }\n" +
+                "\n" +
+                "    @Override\n" +
+                "    public void initView() {\n" +
+                "        viewPager = (ViewPager) findViewById(R.id.view_pager);\n" +
+                "        indicator = (ZzPagerIndicator) findViewById(R.id.indicator);\n" +
+                "        btnOk = (Button) findViewById(R.id.btn_ok);\n" +
+                "    }\n" +
+                "\n" +
+                "    @Override\n" +
+                "    public void initData() {\n" +
+                "\n" +
+                "        imgs = new ArrayList<>();\n" +
+                "        List<Integer> ids = new ArrayList<>();\n"
+        );
+        if (activityEntity.getGuideImgCount() != null) {
+            for (Integer i = 0; i < activityEntity.getGuideImgCount(); i++) {
+                switch (i) {
+                    case 0:
+                        sbJava.append("            ids.add(R.drawable.").append(imgOne).append(");\n");
+                        break;
+                    case 1:
+                        sbJava.append("            ids.add(R.drawable.").append(imgTwo).append(");\n");
+                        break;
+                    case 2:
+                        sbJava.append("            ids.add(R.drawable.").append(imgThree).append(");\n");
+                        break;
+                    case 3:
+                        sbJava.append("            ids.add(R.drawable.").append(imgFour).append(");\n");
+                        break;
+                    case 4:
+                        sbJava.append("            ids.add(R.drawable.").append(imgFive).append(");\n");
+                        break;
+                }
+            }
+        }
+        sbJava.append("        for (int i = 0; i < " + (activityEntity.getGuideImgCount() == null ? 0 : activityEntity.getGuideImgCount()) + "; i++) {\n" +
+                "            ImageView iv = new ImageView(this);\n" +
+                "            iv.setScaleType(ImageView.ScaleType.FIT_CENTER);\n" +
+                "            imgs.add(iv);\n" +
+                "        }\n" +
+                "        viewPager.setPageTransformer(false, new ZoomOutPageTransformer());\n" +
+                "        viewPager.setAdapter(new ZzBasePagerAdapter<ImageView, Integer>(this, imgs, ids) {\n" +
+                "            @Override\n" +
+                "            public void bindData(ImageView imageView, Integer integer) {\n" +
+                "                imageView.setImageResource(integer);\n" +
+                "            }\n" +
+                "\n" +
+                "            @Override\n" +
+                "            public String getTabText(Integer integer, int i) {\n" +
+                "                return i + \"\";\n" +
+                "            }\n" +
+                "\n" +
+                "            @Override\n" +
+                "            public int getSelectedIcon(int i) {\n" +
+                "                return 0;\n" +
+                "            }\n" +
+                "\n" +
+                "            @Override\n" +
+                "            public int getUnselectedIcon(int i) {\n" +
+                "                return 0;\n" +
+                "            }\n" +
+                "        });\n" +
+                "        indicator.setViewPager(viewPager);\n" +
+                "    }\n" +
+                "\n" +
+                "    @Override\n" +
+                "    public void initEvent() {\n" +
+                "        btnOk.setOnClickListener(new View.OnClickListener() {\n" +
+                "            @Override\n" +
+                "            public void onClick(View v) {\n");
+        if (activityEntity.getTargetActId() != null) {
+            /*点击确定按钮跳转*/
+            sbJava.append("                Intent intent = new Intent(GuideActivity.this, " + activityEntity.getTargetActName() + ".class);\n" +
+                    "                startActWithIntent(intent);\n" +
+                    "                closeAct();\n");
+        }
+        sbJava.append("            }\n" +
+                "        });\n" +
+                "\n" +
+                "        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {\n" +
+                "            @Override\n" +
+                "            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {\n" +
+                "\n" +
+                "            }\n" +
+                "\n" +
+                "            @Override\n" +
+                "            public void onPageSelected(int position) {\n" +
+                "                if (position == imgs.size() - 1) {\n" +
+                "                    btnOk.setVisibility(View.VISIBLE);\n" +
+                "                } else {\n" +
+                "                    btnOk.setVisibility(View.GONE);\n" +
+                "                }\n" +
+                "            }\n" +
+                "\n" +
+                "            @Override\n" +
+                "            public void onPageScrollStateChanged(int state) {\n" +
+                "\n" +
+                "            }\n" +
+                "        });\n" +
+                "    }\n" +
+                "\n" +
+                "    public class ZoomOutPageTransformer implements ViewPager.PageTransformer {\n" +
+                "        private static final float MIN_SCALE = 0.85f;\n" +
+                "        private static final float MIN_ALPHA = 0.5f;\n" +
+                "\n" +
+                "        @SuppressLint(\"NewApi\")\n" +
+                "        public void transformPage(View view, float position) {\n" +
+                "            int pageWidth = view.getWidth();\n" +
+                "            int pageHeight = view.getHeight();\n" +
+                "\n" +
+                "            if (position < -1) { // [-Infinity,-1)\n" +
+                "                // This page is way off-screen to the left.\n" +
+                "                view.setAlpha(0);\n" +
+                "\n" +
+                "            } else if (position <= 1) //a页滑动至b页 ； a页从 0.0 -1 ；b页从1 ~ 0.0\n" +
+                "            { // [-1,1]\n" +
+                "                // Modify the default slide transition to shrink the page as well\n" +
+                "                float scaleFactor = Math.max(MIN_SCALE, 1 - Math.abs(position));\n" +
+                "                float vertMargin = pageHeight * (1 - scaleFactor) / 2;\n" +
+                "                float horzMargin = pageWidth * (1 - scaleFactor) / 2;\n" +
+                "                if (position < 0) {\n" +
+                "                    view.setTranslationX(horzMargin - vertMargin / 2);\n" +
+                "                } else {\n" +
+                "                    view.setTranslationX(-horzMargin + vertMargin / 2);\n" +
+                "                }\n" +
+                "\n" +
+                "                // Scale the page down (between MIN_SCALE and 1)\n" +
+                "                view.setScaleX(scaleFactor);\n" +
+                "                view.setScaleY(scaleFactor);\n" +
+                "\n" +
+                "                // Fade the page relative to its size.\n" +
+                "                view.setAlpha(MIN_ALPHA + (scaleFactor - MIN_SCALE)\n" +
+                "                        / (1 - MIN_SCALE) * (1 - MIN_ALPHA));\n" +
+                "\n" +
+                "            } else { // (1,+Infinity]\n" +
+                "                // This page is way off-screen to the right.\n" +
+                "                view.setAlpha(0);\n" +
+                "            }\n" +
+                "        }\n" +
+                "    }\n" +
+                "\n" +
+                "\n" +
+                "    @Override\n" +
+                "    public boolean defaultBack() {\n" +
+                "        return false;\n" +
+                "    }\n" +
+                "\n" +
+                "    @Override\n" +
+                "    public void resume() {\n" +
+                "\n" +
+                "    }\n" +
+                "\n" +
+                "    @Override\n" +
+                "    public void pause() {\n" +
+                "\n" +
+                "    }\n" +
+                "\n" +
+                "    @Override\n" +
+                "    public void destroy() {\n" +
+                "\n" +
+                "    }\n" +
+                "\n" +
+                "    @Override\n" +
+                "    public void saveState(Bundle bundle) {\n" +
+                "\n" +
+                "    }\n" +
+                "\n" +
+                "    @Override\n" +
+                "    public void restoreState(@Nullable Bundle bundle) {\n" +
+                "\n" +
+                "    }\n" +
+                "}");
+        // TODO: 2018/1/2 添加布局和java
+
+
+        FileUtils.saveFileToPathWithName(sbLayout.toString(), layoutPath, realLayoutName + ".xml");
+        FileUtils.saveFileToPathWithName(sbJava.toString(), javaPath + File.separator + "ui" + File.separator + "act", activityEntity.getName() + ".java");
     }
 
     private void generateTopFgmActJavaAndLayout(String logoName, String layoutPath, String javaPath, ActivityEntity activityEntity, ApplicationEntity app, StringBuilder sbStrings, StringBuilder sbArrays) throws IOException {
@@ -3369,6 +3698,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         "import android.content.Intent;\n" +
                         "import android.view.View;\n" +
                         "import android.view.ViewGroup;\n" +
+                        "import android.view.WindowManager;\n" +
                         "import android.widget.Button;\n" +
                         "import android.widget.CheckBox;\n" +
                         "import android.widget.EditText;\n" +
@@ -3408,9 +3738,12 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         "public class " + activityEntity.getName() + " extends BaseActivity {\n")
                 .append(sbDef.toString())
                 .append("\n\n    @Override\n" +
-                        "    public int getLayoutId() {\n" +
-                        "        return R.layout." + realLayoutName + ";\n" +
-                        "    }\n")
+                        "    public int getLayoutId() {\n");
+        if (activityEntity.getFullScreen() != null && activityEntity.getFullScreen()) {
+            sbJava.append("        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN); // 隐藏android系统的状态栏\n");
+        }
+        sbJava.append("        return R.layout." + realLayoutName + ";\n" +
+                "    }\n")
                 .append("    @Override\n" +
                         "    public void initView() {\n")
                 .append(sbInit.toString())
@@ -3512,7 +3845,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         heightString = height + "px";
                         break;
                 }
-                String actions = genearteActions(widgetEntity.getId(), "0", true, app.getPackageName(),"", sbStrings, sbImp, sbData);
+                String actions = genearteActions(widgetEntity.getId(), "0", true, app.getPackageName(), "", sbStrings, sbImp, sbData);
                 switch (widgetEntity.getType()) {
                     case WidgetEntity.TYPE_TITLE_BAR:
                         sbDef.append("\n    private TitleBar titleBar;");
@@ -3592,10 +3925,10 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "                android:layout_width=\"match_parent\"\n" +
                                 "                android:layout_height=\"1px\"\n" +
                                 "                android:layout_marginLeft=\"40px\" />\n");
-                        sbEvent.append("\n        "+varName+".setOnClickListener(new View.OnClickListener() {\n" +
+                        sbEvent.append("\n        " + varName + ".setOnClickListener(new View.OnClickListener() {\n" +
                                 "            @Override\n" +
                                 "            public void onClick(View v) {\n" +
-                                "                \n" +actions+
+                                "                \n" + actions +
                                 "\n            }\n" +
                                 "        });");
                         break;
@@ -3770,11 +4103,11 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 .append("\n        rv.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager." + widgetEntity.getOrientation().toUpperCase() + ", false));")
                                 .append("\n        tvNoData = (TextView) rootView.findViewById(R.id.tv_no_data);");
                         sbEvent.append("        refresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {\n" +
-                                        "            @Override\n" +
-                                        "            public void onRefresh() {\n" +
-                                        "                getData();\n" +
-                                        "            }\n" +
-                                        "        });");
+                                "            @Override\n" +
+                                "            public void onRefresh() {\n" +
+                                "                getData();\n" +
+                                "            }\n" +
+                                "        });");
                         sbMethods.append("\n" +
                                 "    private void getData() {\n" +
                                 "\n" +
@@ -4141,7 +4474,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "                swipeRightMenu.addMenuItem(callItem);\n" +
                                 "\n" +
                                 "            }\n" +
-                                "        });\n"+
+                                "        });\n" +
                                 "\n" +
                                 "        lv.setSwipeItemClickListener(new SwipeItemClickListener() {\n" +
                                 "            @Override\n" +
@@ -4503,10 +4836,10 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "                android:layout_width=\"match_parent\"\n" +
                                 "                android:layout_height=\"1px\"\n" +
                                 "                android:layout_marginLeft=\"40px\" />\n");
-                        sbEvent.append("\n        "+siName+".setOnClickListener(new View.OnClickListener() {\n" +
+                        sbEvent.append("\n        " + siName + ".setOnClickListener(new View.OnClickListener() {\n" +
                                 "            @Override\n" +
                                 "            public void onClick(View v) {\n" +
-                                "                \n" +actions+
+                                "                \n" + actions +
                                 "\n            }\n" +
                                 "        });");
                         break;
@@ -4680,11 +5013,11 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 .append("\n        rv.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager." + widgetEntity.getOrientation().toUpperCase() + ", false));")
                                 .append("\n        tvNoData = (TextView) findViewById(R.id.tv_no_data);");
                         sbEvent.append("        refresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {\n" +
-                                        "            @Override\n" +
-                                        "            public void onRefresh() {\n" +
-                                        "                getData();\n" +
-                                        "            }\n" +
-                                        "        });");
+                                "            @Override\n" +
+                                "            public void onRefresh() {\n" +
+                                "                getData();\n" +
+                                "            }\n" +
+                                "        });");
                         sbMethods.append("\n" +
                                 "    private void getData() {\n" +
                                 "\n" +
@@ -5281,7 +5614,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
 
     }
 
-    private String genearteActions(String widgetId, String pid, boolean fgm,String packageName, String actName, StringBuilder sbStrings, StringBuilder sbImp, StringBuilder sbData) {
+    private String genearteActions(String widgetId, String pid, boolean fgm, String packageName, String actName, StringBuilder sbStrings, StringBuilder sbImp, StringBuilder sbData) {
         List<ActionEntity> actions = mActionService.executeCriteria(new Criterion[]{
                 Restrictions.eq("deleteFlag", BaseEntity.DELETE_FLAG_NO),
                 Restrictions.eq("pid", pid),
@@ -5661,7 +5994,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                             if (activityEntity != null) {
                                 sbActions.append("\n                Intent intent = new Intent(getActivity(), " + activityEntity.getName() + ".class);\n" +
                                         "                startActWithIntent(intent);");
-                                sbImp.append("\nimport "+packageName+".ui.act."+activityEntity.getName()+";");
+                                sbImp.append("\nimport " + packageName + ".ui.act." + activityEntity.getName() + ";");
                             }
                         } else {
                             //activity
