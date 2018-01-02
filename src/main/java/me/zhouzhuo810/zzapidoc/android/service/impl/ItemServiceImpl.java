@@ -44,7 +44,7 @@ public class ItemServiceImpl extends BaseServiceImpl<ItemEntity> implements Item
     }
 
     @Override
-    public BaseResult addItem(int type, String name, String resId, String widgetId, String widgetPid, String userId) {
+    public BaseResult addItem(int type, String name, String resId, String widgetId, String userId) {
         UserEntity user = mUserService.get(userId);
         if (user == null) {
             return new BaseResult(0, "用户不合法！");
@@ -54,7 +54,6 @@ public class ItemServiceImpl extends BaseServiceImpl<ItemEntity> implements Item
         entity.setName(name);
         entity.setResId(resId);
         entity.setWidgetId(widgetId);
-        entity.setWidgetPid(widgetPid);
         entity.setCreateUserID(user.getId());
         entity.setCreateUserName(user.getName());
         try {
@@ -90,7 +89,7 @@ public class ItemServiceImpl extends BaseServiceImpl<ItemEntity> implements Item
     }
 
     @Override
-    public BaseResult updateItem(String itemId, int type, String name, String resId, String widgetId, String widgetPid, String userId) {
+    public BaseResult updateItem(String itemId, int type, String name, String resId, String widgetId, String userId) {
         UserEntity user = mUserService.get(userId);
         if (user == null) {
             return new BaseResult(0, "用户不合法！");
@@ -103,7 +102,6 @@ public class ItemServiceImpl extends BaseServiceImpl<ItemEntity> implements Item
         entity.setName(name);
         entity.setResId(resId);
         entity.setWidgetId(widgetId);
-        entity.setWidgetPid(widgetPid);
         entity.setModifyUserID(user.getId());
         entity.setModifyUserName(user.getName());
         entity.setModifyTime(new Date());
@@ -135,8 +133,8 @@ public class ItemServiceImpl extends BaseServiceImpl<ItemEntity> implements Item
                     map.put("type", item.getType());
                     map.put("name", item.getName());
                     map.put("resId", item.getResId());
+                    map.put("widgetId", item.getWidgetId());
                     map.put("widgetName", item.getWidgetName());
-                    map.put("parentWidgetName", item.getParentWidgetName());
                     map.put("createTime", DataUtils.formatDate(item.getCreateTime()));
                     map.put("createPerson", item.getCreateUserName());
                     result.add(map.build());

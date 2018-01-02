@@ -28,10 +28,6 @@ public class ItemEntity extends BaseEntity {
     private String widgetId;
     @Formula("(SELECT w.Name FROM widget w WHERE w.ID = widgetId)")
     private String widgetName;
-    @Column(name = "widgetPid")
-    private String widgetPid;
-    @Formula("(SELECT w.Name FROM widget w WHERE w.ID = widgetPid)")
-    private String parentWidgetName;
 
     public Integer getType() {
         return type;
@@ -73,19 +69,4 @@ public class ItemEntity extends BaseEntity {
         this.widgetName = widgetName;
     }
 
-    public String getWidgetPid() {
-        return widgetPid;
-    }
-
-    public void setWidgetPid(String widgetPid) {
-        this.widgetPid = widgetPid;
-    }
-
-    public String getParentWidgetName() {
-        return parentWidgetName;
-    }
-
-    public void setParentWidgetName(String parentWidgetName) {
-        this.parentWidgetName = parentWidgetName;
-    }
 }

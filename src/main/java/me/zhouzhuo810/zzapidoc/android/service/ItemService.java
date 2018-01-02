@@ -9,11 +9,12 @@ import me.zhouzhuo810.zzapidoc.common.service.BaseService;
  */
 public interface ItemService extends BaseService<ItemEntity> {
 
-    BaseResult addItem(int type, String name, String resId, String widgetId, String widgetPid, String userId);
+    BaseResult addItem(int type, String name, String resId, String widgetId, String userId);
 
     BaseResult deleteItem(String id, String userId);
 
-    BaseResult updateItem(String itemId, int type, String name, String resId,  String widgetId, String widgetPid, String userId);
+    BaseResult updateItem(String itemId, int type, String name, String resId,
+                          String widgetId, String userId);
 
     BaseResult getAllItems(String widgetId, String userId);
 }

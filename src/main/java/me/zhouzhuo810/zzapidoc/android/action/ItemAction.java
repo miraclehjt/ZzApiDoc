@@ -38,10 +38,9 @@ public class ItemAction extends BaseController<ItemEntity> {
             @RequestParam(value = "name") String name,
             @RequestParam(value = "resId") String resId,
             @RequestParam(value = "widgetId") String widgetId,
-            @RequestParam(value = "widgetPid") String widgetPid,
             @RequestParam(value = "userId") String userId
     ) {
-        return getBaseService().addItem(type, name, resId, widgetId, widgetPid, userId);
+        return getBaseService().addItem(type, name, resId, widgetId, userId);
     }
 
     @ResponseBody
@@ -52,10 +51,9 @@ public class ItemAction extends BaseController<ItemEntity> {
             @RequestParam(value = "name") String name,
             @RequestParam(value = "resId") String resId,
             @RequestParam(value = "widgetId") String widgetId,
-            @RequestParam(value = "widgetPid") String widgetPid,
             @RequestParam(value = "userId") String userId
     ) {
-        return getBaseService().updateItem(itemId, type, name, resId, widgetId, widgetPid, userId);
+        return getBaseService().updateItem(itemId, type, name, resId, widgetId, userId);
     }
 
     @ResponseBody

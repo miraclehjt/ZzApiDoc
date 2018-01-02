@@ -23,10 +23,6 @@ import me.zhouzhuo810.zzapidoc.user.entity.UserEntity;
 import me.zhouzhuo810.zzapidoc.user.service.UserService;
 import org.apache.log4j.Logger;
 import org.aspectj.util.FileUtil;
-import org.dom4j.Document;
-import org.dom4j.DocumentException;
-import org.dom4j.Element;
-import org.dom4j.io.SAXReader;
 import org.gradle.tooling.*;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
@@ -49,7 +45,6 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -84,6 +79,9 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
 
     @Resource(name = "actionServiceImpl")
     ActionService mActionService;
+
+    @Resource(name = "itemServiceImpl")
+    ItemService mItemService;
 
     @Resource(name = "requestArgServiceImpl")
     RequestArgService mRequestArgService;
@@ -1846,6 +1844,18 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 Restrictions.ne("type", ActivityEntity.TYPE_SPLASH)
         });
         if (activityEntities1 != null) {
+            //empty entity for rv
+            String entityPath = javaPath + File.separator + "common" + File.separator + "api" + File.separator + "entity";
+            String adapterPath = javaPath + File.separator + "ui" + File.separator + "adapter";
+            FileUtils.saveFileToPathWithName("package " + app.getPackageName() + ".common.api.entity;\n" +
+                    "\n" +
+                    "/**\n" +
+                    " * Created by admin on 2018/1/2.\n" +
+                    " */\n" +
+                    "\n" +
+                    "public class RvTestEntity {\n" +
+                    "\n" +
+                    "}\n", entityPath, "RvTestEntity.java");
             for (ActivityEntity activityEntity : activityEntities1) {
                 if (activityEntity.getFirst()) {
                     sbManifest.append("        <activity\n" +
@@ -1868,16 +1878,16 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 }
                 switch (activityEntity.getType()) {
                     case ActivityEntity.TYPE_EMPTY_ACT:
-                        generateEmptyActJavaAndLayout(logoName, layoutPath, javaPath, activityEntity, app, sbStrings);
+                        generateEmptyActJavaAndLayout(entityPath, adapterPath, logoName, layoutPath, javaPath, activityEntity, app, sbStrings);
                         break;
                     case ActivityEntity.TYPE_GUIDE:
                         generateGuideActJavaAndLayout(drawablePath, logoName, layoutPath, javaPath, activityEntity, app, sbStrings);
                         break;
                     case ActivityEntity.TYPE_BOTTOM_FRAGMENT:
-                        generateBottomFgmActJavaAndLayout(logoName, layoutPath, javaPath, activityEntity, app, sbStrings, sbArrays);
+                        generateBottomFgmActJavaAndLayout(entityPath, adapterPath, logoName, layoutPath, javaPath, activityEntity, app, sbStrings, sbArrays);
                         break;
                     case ActivityEntity.TYPE_TOP_FRAGMENT:
-                        generateTopFgmActJavaAndLayout(logoName, layoutPath, javaPath, activityEntity, app, sbStrings, sbArrays);
+                        generateTopFgmActJavaAndLayout(entityPath, adapterPath, logoName, layoutPath, javaPath, activityEntity, app, sbStrings, sbArrays);
                         break;
                 }
             }
@@ -2225,7 +2235,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
         FileUtils.saveFileToPathWithName(sbJava.toString(), javaPath + File.separator + "ui" + File.separator + "act", activityEntity.getName() + ".java");
     }
 
-    private void generateTopFgmActJavaAndLayout(String logoName, String layoutPath, String javaPath, ActivityEntity activityEntity, ApplicationEntity app, StringBuilder sbStrings, StringBuilder sbArrays) throws IOException {
+    private void generateTopFgmActJavaAndLayout(String entityPath, String adapterPath, String logoName, String layoutPath, String javaPath, ActivityEntity activityEntity, ApplicationEntity app, StringBuilder sbStrings, StringBuilder sbArrays) throws IOException {
         String layoutName = "";
         boolean isNotFirst = false;
         for (int i = 0; i < activityEntity.getName().length(); i++) {
@@ -2335,7 +2345,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
 
         String arrayName = "tab_names_" + layoutName;
         sbArrays.append("\n    <string-array name=\"" + arrayName + "\">");
-        fillTopFragment(arrayName, logoName, app, activityEntity, layoutPath, javaPath, sbData, sbStrings, sbImp, sbJava, sbDef, sbInit, sbEvent, sbMethods, sbArrays);
+        fillTopFragment(entityPath, adapterPath, arrayName, logoName, app, activityEntity, layoutPath, javaPath, sbData, sbStrings, sbImp, sbJava, sbDef, sbInit, sbEvent, sbMethods, sbArrays);
 
         sbJava.append("package " + app.getPackageName() + ".ui.act;\n" +
                 "\n")
@@ -2407,7 +2417,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
     }
 
 
-    private void fillTopFragment(String arrayName, String logoName, ApplicationEntity app, ActivityEntity activityEntity, String layoutPath, String javaPath,
+    private void fillTopFragment(String entityPath, String adapterPath, String arrayName, String logoName, ApplicationEntity app, ActivityEntity activityEntity, String layoutPath, String javaPath,
                                  StringBuilder sbData, StringBuilder sbStrings,
                                  StringBuilder sbImp, StringBuilder sbJava, StringBuilder sbDef, StringBuilder sbInit, StringBuilder sbEvent,
                                  StringBuilder sbMethods, StringBuilder sbArrays) throws IOException {
@@ -2506,12 +2516,12 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "import zhouzhuo810.me.zzandframe.ui.widget.TitleBar;\n"
                 );
 
-                fillFgmWidget(logoName, app, activityEntity, fragment, layoutName, layoutPath, javaPath, "0", sbStrings, sbLayout1, sbImp1, sbJava1, sbDef1, sbInit1, sbData1, sbEvent1, sbEditInfo1, sbMethods1);
+                fillFgmWidget(adapterPath, logoName, app, activityEntity, fragment, layoutName, layoutPath, javaPath, "0", sbStrings, sbLayout1, sbImp1, sbJava1, sbDef1, sbInit1, sbData1, sbEvent1, sbEditInfo1, sbMethods1);
 
                 if (fragment.getChildCount() > 0) {
                     String arrayName1 = "child_tab_names_" + layoutName;
                     sbArray2.append("\n    <string-array name=\"" + arrayName1 + "\">");
-                    fillChildTopFragment(layoutName, sbLayout1, arrayName1, logoName, app, activityEntity, layoutPath, javaPath, sbData1, sbStrings, sbImp1, sbJava1, sbDef1, sbInit1, sbEvent1, sbMethods1, sbArray2, fragment.getId());
+                    fillChildTopFragment(entityPath, adapterPath, layoutName, sbLayout1, arrayName1, logoName, app, activityEntity, layoutPath, javaPath, sbData1, sbStrings, sbImp1, sbJava1, sbDef1, sbInit1, sbEvent1, sbMethods1, sbArray2, fragment.getId());
                     sbArray2.append("\n    </string-array>");
                 }
 
@@ -2586,7 +2596,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
         }
     }
 
-    private void fillChildTopFragment(String layoutName1, StringBuilder sbLayout, String arrayName, String logoName, ApplicationEntity app, ActivityEntity activityEntity, String layoutPath, String javaPath,
+    private void fillChildTopFragment(String entityPath, String adapterPath, String layoutName1, StringBuilder sbLayout, String arrayName, String logoName, ApplicationEntity app, ActivityEntity activityEntity, String layoutPath, String javaPath,
                                       StringBuilder sbData, StringBuilder sbStrings,
                                       StringBuilder sbImp, StringBuilder sbJava, StringBuilder sbDef, StringBuilder sbInit, StringBuilder sbEvent,
                                       StringBuilder sbMethods, StringBuilder sbArrays, String pid) throws IOException {
@@ -2717,7 +2727,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "import zhouzhuo810.me.zzandframe.ui.widget.TitleBar;\n"
                 );
 
-                fillFgmWidget(logoName, app, activityEntity, fragment, layoutName, layoutPath, javaPath, "0", sbStrings, sbLayout1, sbImp1, sbJava1, sbDef1, sbInit1, sbData1, sbEvent1, sbEditInfo1, sbMethods1);
+                fillFgmWidget(adapterPath, logoName, app, activityEntity, fragment, layoutName, layoutPath, javaPath, "0", sbStrings, sbLayout1, sbImp1, sbJava1, sbDef1, sbInit1, sbData1, sbEvent1, sbEditInfo1, sbMethods1);
 
                 sbJava1.append("package " + app.getPackageName() + ".ui.fgm;\n" +
                         "\n")
@@ -2789,7 +2799,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
         }
     }
 
-    private void generateBottomFgmActJavaAndLayout(String logoName, String layoutPath, String javaPath, ActivityEntity activityEntity, ApplicationEntity app, StringBuilder sbStrings, StringBuilder sbArrays) throws IOException {
+    private void generateBottomFgmActJavaAndLayout(String entityPath, String adapterPath, String logoName, String layoutPath, String javaPath, ActivityEntity activityEntity, ApplicationEntity app, StringBuilder sbStrings, StringBuilder sbArrays) throws IOException {
         String layoutName = "";
         boolean isNotFirst = false;
         for (int i = 0; i < activityEntity.getName().length(); i++) {
@@ -2876,7 +2886,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 "        super.onAttachFragment(fragment);");
         String arrayName = "tan_names_" + layoutName;
         sbArrays.append("\n    <string-array name=\"" + arrayName + "\">");
-        fillBottomFragment(arrayName, logoName, app, activityEntity, layoutPath, javaPath, sbAttach, sbStrings, sbLayout, sbImp, sbJava, sbDef, sbInit, sbEvent, sbMethods, sbArrays);
+        fillBottomFragment(entityPath, adapterPath, arrayName, logoName, app, activityEntity, layoutPath, javaPath, sbAttach, sbStrings, sbLayout, sbImp, sbJava, sbDef, sbInit, sbEvent, sbMethods, sbArrays);
         sbAttach.append("\n    }\n");
 
         sbJava.append("package " + app.getPackageName() + ".ui.act;\n" +
@@ -2950,7 +2960,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
 
     }
 
-    private void fillBottomFragment(String arrayName, String logoName, ApplicationEntity app, ActivityEntity activityEntity, String layoutPath, String javaPath, StringBuilder sbAttach, StringBuilder sbStrings,
+    private void fillBottomFragment(String entityPath, String adapterPath, String arrayName, String logoName, ApplicationEntity app, ActivityEntity activityEntity, String layoutPath, String javaPath, StringBuilder sbAttach, StringBuilder sbStrings,
                                     StringBuilder sbLayout, StringBuilder sbImp, StringBuilder sbJava, StringBuilder sbDef, StringBuilder sbInit, StringBuilder sbEvent,
                                     StringBuilder sbMethods, StringBuilder sbArrays) throws IOException {
         sbDef.append("\n    private TabBar tabBar;\n\n");
@@ -3088,13 +3098,13 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "import zhouzhuo810.me.zzandframe.ui.widget.MarkView;\n" +
                                 "import zhouzhuo810.me.zzandframe.ui.widget.TitleBar;\n");
 
-                fillFgmWidget(logoName, app, activityEntity, fragment, layoutName, layoutPath, javaPath, "0", sbStrings, sbLayout1, sbImp1, sbJava1, sbDef1, sbInit1, sbData1, sbEvent1, sbEditInfo1, sbMethods1);
+                fillFgmWidget(adapterPath, logoName, app, activityEntity, fragment, layoutName, layoutPath, javaPath, "0", sbStrings, sbLayout1, sbImp1, sbJava1, sbDef1, sbInit1, sbData1, sbEvent1, sbEditInfo1, sbMethods1);
 
                 // TODO: 2017/12/29 添加子Fragment
                 if (fragment.getChildCount() > 0) {
                     String arrayName1 = "child_tab_names_" + layoutName;
                     sbArray2.append("\n    <string-array name=\"" + arrayName1 + "\">");
-                    fillChildTopFragment(layoutName, sbLayout1, arrayName1, logoName, app, activityEntity, layoutPath, javaPath, sbData1, sbStrings, sbImp1, sbJava1, sbDef1, sbInit1, sbEvent1, sbMethods1, sbArray2, fragment.getId());
+                    fillChildTopFragment(entityPath, adapterPath, layoutName, sbLayout1, arrayName1, logoName, app, activityEntity, layoutPath, javaPath, sbData1, sbStrings, sbImp1, sbJava1, sbDef1, sbInit1, sbEvent1, sbMethods1, sbArray2, fragment.getId());
                     sbArray2.append("\n    </string-array>");
                 }
 
@@ -3663,7 +3673,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
 
     }
 
-    private void generateEmptyActJavaAndLayout(String logoName, String layoutPath, String javaPath, ActivityEntity activityEntity, ApplicationEntity app, StringBuilder sbStrings) throws IOException {
+    private void generateEmptyActJavaAndLayout(String entityPath, String adapterPath, String logoName, String layoutPath, String javaPath, ActivityEntity activityEntity, ApplicationEntity app, StringBuilder sbStrings) throws IOException {
         String layoutName = "";
         boolean isNotFirst = false;
         for (int i = 0; i < activityEntity.getName().length(); i++) {
@@ -3718,6 +3728,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         "import zhouzhuo810.me.zzandframe.ui.widget.MarkView;\n" +
                         "import zhouzhuo810.me.zzandframe.ui.widget.TitleBar;\n");
 
+
         StringBuilder sbDef = new StringBuilder();
         StringBuilder sbInit = new StringBuilder();
         StringBuilder sbEvent = new StringBuilder();
@@ -3725,7 +3736,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
         StringBuilder sbMethods = new StringBuilder();
         StringBuilder sbData = new StringBuilder();
 
-        fillWidget(logoName, app, activityEntity, layoutName, layoutPath, javaPath, "0", sbStrings, sbLayout, sbImp, sbJava, sbDef, sbInit, sbData, sbEvent, sbEditInfo, sbMethods);
+        fillWidget(adapterPath, logoName, app, activityEntity, layoutName, layoutPath, javaPath, "0", sbStrings, sbLayout, sbImp, sbJava, sbDef, sbInit, sbData, sbEvent, sbEditInfo, sbMethods);
 
         sbJava.append("package " + app.getPackageName() + ".ui.act;\n" +
                 "\n")
@@ -3804,7 +3815,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
     }
 
 
-    private void fillFgmWidget(String logoName, ApplicationEntity app, ActivityEntity activityEntity, FragmentEntity fragmentEntity, String layoutName, String layoutPath, String javaPath,
+    private void fillFgmWidget(String adapterPath, String logoName, ApplicationEntity app, ActivityEntity activityEntity, FragmentEntity fragmentEntity, String layoutName, String layoutPath, String javaPath,
                                String pid, StringBuilder sbStrings, StringBuilder sbLayout, StringBuilder sbImp, StringBuilder sbJava,
                                StringBuilder sbDef, StringBuilder sbInit, StringBuilder sbData, StringBuilder sbEvent, StringBuilder sbEditInfo, StringBuilder sbMethods) throws IOException {
 
@@ -4091,10 +4102,13 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "        });");
                         break;
                     case WidgetEntity.TYPE_RV:
+                        //fgm rv
+                        String adapterName = generateVarName("", widgetEntity.getResId()) + "RvAdapter";
                         sbImp.append("\nimport android.support.v4.widget.SwipeRefreshLayout;")
                                 .append("\nimport android.support.v7.widget.RecyclerView;")
                                 .append("\nimport android.support.v7.widget.LinearLayoutManager;")
-                                .append("\nimport android.support.v4.widget.SwipeRefreshLayout;");
+                                .append("\nimport android.support.v4.widget.SwipeRefreshLayout;")
+                                .append("\nimport " + app.getPackageName() + ".ui.adapter." + adapterName + ";");
                         sbDef.append("\n    private SwipeRefreshLayout refresh;")
                                 .append("\n    private RecyclerView rv;")
                                 .append("\n    private TextView tvNoData;");
@@ -4113,6 +4127,12 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "\n" +
                                 "        stopRefresh(refresh);\n" +
                                 "    }\n");
+                        sbData.append("        List<RvTestEntity> list = new ArrayList<>();\n" +
+                                "        for (int i = 0; i < 10; i++) {\n" +
+                                "            list.add(new RvTestEntity());\n" +
+                                "        }\n" +
+                                "        " + adapterName + " adapter = new " + adapterName + "(getActivity(), list);\n" +
+                                "        rv.setAdapter(adapter);\n");
                         sbData.append("\n        startRefresh(refresh);\n" +
                                 "        getData();\n");
                         sbLayout.append("\n    <RelativeLayout\n" +
@@ -4140,13 +4160,15 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "            android:textSize=\"40px\"\n" +
                                 "            android:visibility=\"gone\" />\n" +
                                 "    </RelativeLayout>\n");
-
+                        generateItem(app, adapterPath, adapterName, logoName, widgetEntity.getId(), layoutPath, sbStrings);
                         break;
                     case WidgetEntity.TYPE_LV:
+                        String adapterNameLv = generateVarName("", widgetEntity.getResId()) + "LvAdapter";
                         sbImp.append("\nimport android.support.v4.widget.SwipeRefreshLayout;")
                                 .append("\nimport android.widget.ListView;")
                                 .append("\nimport android.support.v7.widget.RecyclerView;")
-                                .append("\nimport zhouzhuo810.me.zzandframe.ui.widget.ZzLvRefreshLayout;");
+                                .append("\nimport zhouzhuo810.me.zzandframe.ui.widget.ZzLvRefreshLayout;")
+                                .append("\nimport " + app.getPackageName() + ".ui.adapter." + adapterNameLv + ";");
                         sbDef.append("\n    private ZzLvRefreshLayout refresh")
                                 .append("\n    private ListView lv;")
                                 .append("\n    private TextView tvNoData;");
@@ -4180,6 +4202,12 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "\n" +
                                 "        stopRefresh(refresh);\n" +
                                 "    }\n");
+                        sbData.append("        List<RvTestEntity> list = new ArrayList<>();\n" +
+                                "        for (int i = 0; i < 10; i++) {\n" +
+                                "            list.add(new RvTestEntity());\n" +
+                                "        }\n" +
+                                "        " + adapterNameLv + " adapter = new " + adapterNameLv + "(getActivity(), list);\n" +
+                                "        rv.setAdapter(adapter);\n");
                         sbData.append("\n        startRefresh(refresh);\n" +
                                 "        getData();\n");
                         sbLayout.append("\n    <RelativeLayout\n" +
@@ -4210,8 +4238,10 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "            android:textSize=\"40px\"\n" +
                                 "            android:visibility=\"gone\" />\n" +
                                 "    </RelativeLayout>\n");
+                        generateItem(app, adapterPath, adapterNameLv, logoName, widgetEntity.getId(), layoutPath, sbStrings);
                         break;
                     case WidgetEntity.TYPE_SCROLLABLE_LV:
+                        String adapterNameSlv = generateVarName("", widgetEntity.getResId()) + "ScrollLvAdapter";
                         String scrollLvName = generateVarName("lv", widgetEntity.getResId());
                         sbImp.append("\nimport " + app.getPackageName() + ".ui.widget.ScrollableListView;");
                         sbDef.append("\n    private ScrollableListView " + scrollLvName + ";");
@@ -4223,6 +4253,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "                android:divider=\"@null\"\n" +
                                 "                android:dividerHeight=\"0dp\"\n" +
                                 "                android:listSelector=\"@color/colorTransparent\" />\n");
+                        generateItem(app, adapterPath, adapterNameSlv, logoName, widgetEntity.getId(), layoutPath, sbStrings);
                         break;
                     case WidgetEntity.TYPE_EDIT_TEXT:
                         String etName = generateVarName("et", widgetEntity.getResId());
@@ -4602,7 +4633,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "            android:layout_width=\"match_parent\"\n" +
                                 "            android:layout_height=\"wrap_content\"\n" +
                                 "            android:orientation=\"vertical\">");
-                        fillFgmWidget(logoName, app, activityEntity, fragmentEntity, layoutName, layoutPath, javaPath, widgetEntity.getId(), sbStrings, sbLayout, sbImp, sbJava, sbDef, sbInit, sbData, sbEvent, sbEditInfo, sbMethods);
+                        fillFgmWidget(adapterPath, logoName, app, activityEntity, fragmentEntity, layoutName, layoutPath, javaPath, widgetEntity.getId(), sbStrings, sbLayout, sbImp, sbJava, sbDef, sbInit, sbData, sbEvent, sbEditInfo, sbMethods);
                         sbLayout.append("        </LinearLayout>\n" +
                                 "    </ScrollView>");
                         break;
@@ -4622,7 +4653,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 (widgetEntity.getWeight() > 0 ? "        android:layout_weight=\"" + widgetEntity.getWeight() + "\"\n" : "") +
                                 "        android:gravity=\"" + (widgetEntity.getGravity() == null ? "center" : widgetEntity.getGravity()) + "\"\n" +
                                 "        android:orientation=\"" + (widgetEntity.getOrientation() == null ? "horizontal" : widgetEntity.getOrientation()) + "\">");
-                        fillFgmWidget(logoName, app, activityEntity, fragmentEntity, layoutName, layoutPath, javaPath, widgetEntity.getId(), sbStrings, sbLayout, sbImp, sbJava, sbDef, sbInit, sbData, sbEvent, sbEditInfo, sbMethods);
+                        fillFgmWidget(adapterPath, logoName, app, activityEntity, fragmentEntity, layoutName, layoutPath, javaPath, widgetEntity.getId(), sbStrings, sbLayout, sbImp, sbJava, sbDef, sbInit, sbData, sbEvent, sbEditInfo, sbMethods);
                         sbLayout.append("\n   </LinearLayout>");
                         break;
                     case WidgetEntity.TYPE_RELATIVE_LAYOUT:
@@ -4638,7 +4669,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "        android:background=\"" + (widgetEntity.getBackground().length() == 0 ? "@color/colorTransparent" : widgetEntity.getBackground()) + "\"\n" +
                                 "        android:layout_width=\"" + widthString + "\"\n" +
                                 "        android:layout_height=\"" + heightString + "\">");
-                        fillFgmWidget(logoName, app, activityEntity, fragmentEntity, layoutName, layoutPath, javaPath, widgetEntity.getId(), sbStrings, sbLayout, sbImp, sbJava, sbDef, sbInit, sbData, sbEvent, sbEditInfo, sbMethods);
+                        fillFgmWidget(adapterPath, logoName, app, activityEntity, fragmentEntity, layoutName, layoutPath, javaPath, widgetEntity.getId(), sbStrings, sbLayout, sbImp, sbJava, sbDef, sbInit, sbData, sbEvent, sbEditInfo, sbMethods);
                         sbLayout.append("    </RelativeLayout>\n");
                         break;
                     case WidgetEntity.TYPE_IMAGE_VIEW:
@@ -4678,6 +4709,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "        android:hint=\"@string/" + widgetEntity.getResId() + "_tv_hint_text\"\n" +
                                 "        android:text=\"@string/" + widgetEntity.getResId() + "_tv_text\"\n" +
                                 "        android:textColor=\"" + widgetEntity.getTextColor() + "\"\n" +
+                                (widgetEntity.getWeight() > 0 ? "        android:layout_weight=\"" + widgetEntity.getWeight() + "\"\n" : "") +
                                 (widgetEntity.getMarginLeft() == 0 ? "" : "        android:layout_marginLeft=\"" + widgetEntity.getMarginLeft() + "px\"\n") +
                                 (widgetEntity.getMarginRight() == 0 ? "" : "        android:layout_marginRight=\"" + widgetEntity.getMarginRight() + "px\"\n") +
                                 (widgetEntity.getMarginTop() == 0 ? "" : "        android:layout_marginTop=\"" + widgetEntity.getMarginTop() + "px\"\n") +
@@ -4704,11 +4736,273 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 }
             }
         }
+    }
 
+    private void generateItem(ApplicationEntity app, String adapterPath, String adapterName, String logoName, String widgetId, String layoutPath, StringBuilder sbStrings) throws IOException {
+        List<ItemEntity> itemEntities = mItemService.executeCriteria(
+                new Criterion[]{
+                        Restrictions.eq("deleteFlag", BaseEntity.DELETE_FLAG_NO),
+                        Restrictions.eq("widgetId", widgetId)
+                }, Order.asc("createTime")
+        );
+        if (itemEntities != null && itemEntities.size() > 0) {
+            for (ItemEntity itemEntity : itemEntities) {
+                String layoutName = itemEntity.getResId() + ".xml";
+                FileUtils.saveFileToPathWithName("package " + app.getPackageName() + ".ui.adapter;\n" +
+                        "\n" +
+                        "import android.content.Context;\n" +
+                        "\n" +
+                        "import java.util.List;\n" +
+                        "\n" +
+                        "import " + app.getPackageName() + ".R;\n" +
+                        "import " + app.getPackageName() + ".common.api.entity.RvTestEntity;\n" +
+                        "import zhouzhuo810.me.zzandframe.ui.adapter.RvAutoBaseAdapter;\n" +
+                        "\n" +
+                        "/**\n" +
+                        " * Created by admin on 2018/1/2.\n" +
+                        " */\n" +
+                        "\n" +
+                        "public class " + adapterName + " extends RvAutoBaseAdapter<RvTestEntity> {\n" +
+                        "\n" +
+                        "    public " + adapterName + "(Context context, List<RvTestEntity> data) {\n" +
+                        "        super(context, data);\n" +
+                        "    }\n" +
+                        "\n" +
+                        "    @Override\n" +
+                        "    protected int getLayoutId(int i) {\n" +
+                        "        return R.layout." + itemEntity.getResId() + ";\n" +
+                        "    }\n" +
+                        "\n" +
+                        "    @Override\n" +
+                        "    protected void fillData(ViewHolder viewHolder, RvTestEntity rvTestEntity, int i) {\n" +
+                        "\n" +
+                        "    }\n" +
+                        "}\n", adapterPath, adapterName + ".java");
+                StringBuilder sbLayout = new StringBuilder();
+                sbLayout.append("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
+                        "<com.zhy.autolayout.AutoLinearLayout xmlns:android=\"http://schemas.android.com/apk/res/android\"\n" +
+                        "    android:layout_width=\"match_parent\"\n" +
+                        "    android:layout_height=\"wrap_content\"\n" +
+                        "    android:background=\"@drawable/setting_item_bg_selector\"\n" +
+                        "    android:orientation=\"vertical\">\n");
+                generateItemWidgets(logoName, itemEntity.getWidgetId(), sbLayout, sbStrings);
+                sbLayout.append("\n    <View\n" +
+                        "        android:layout_width=\"match_parent\"\n" +
+                        "        android:layout_height=\"1px\"\n" +
+                        "        android:background=\"@color/colorGrayBg\" />\n" +
+                        "</com.zhy.autolayout.AutoLinearLayout>");
+                FileUtils.saveFileToPathWithName(sbLayout.toString(), layoutPath, layoutName);
+            }
+        }
+    }
+
+    private void generateItemWidgets(String logoName, String widgetId, StringBuilder sbLayout, StringBuilder sbStrings) {
+        List<WidgetEntity> widgetEntities = mWidgetService.executeCriteria(
+                new Criterion[]{
+                        Restrictions.eq("deleteFlag", BaseEntity.DELETE_FLAG_NO),
+                        Restrictions.eq("pid", widgetId)
+                }, Order.asc("createTime")
+        );
+
+        if (widgetEntities != null && widgetEntities.size() > 0) {
+            for (WidgetEntity widgetEntity : widgetEntities) {
+                int width = widgetEntity.getWidth();
+                int height = widgetEntity.getHeight();
+                String widthString = "wrap_content";
+                switch (width) {
+                    case -2:
+                        widthString = "wrap_content";
+                        break;
+                    case -1:
+                        widthString = "match_parent";
+                        break;
+                    default:
+                        widthString = width + "px";
+                        break;
+                }
+                String heightString = "wrap_content";
+                switch (height) {
+                    case -2:
+                        heightString = "wrap_content";
+                        break;
+                    case -1:
+                        heightString = "match_parent";
+                        break;
+                    default:
+                        heightString = height + "px";
+                        break;
+                }
+                switch (widgetEntity.getType()) {
+                    case WidgetEntity.TYPE_SETTING_ITEM:
+                        String siName = generateVarName("si", widgetEntity.getResId());
+                        sbStrings.append("\n    <string name=\"si_" + widgetEntity.getResId() + "_text\">" + widgetEntity.getTitle() + "</string>");
+                        sbLayout.append("\n            <com.zhy.autolayout.AutoLinearLayout\n" +
+                                "                android:id=\"@+id/ll_" + widgetEntity.getResId() + "\"\n" +
+                                "                android:layout_width=\"match_parent\"\n" +
+                                (widgetEntity.getMarginTop() == 0 ? "" : "        android:layout_marginTop=\"" + widgetEntity.getMarginTop() + "px\"\n") +
+                                (widgetEntity.getMarginBottom() == 0 ? "" : "        android:layout_marginBottom=\"" + widgetEntity.getMarginBottom() + "px\"\n") +
+                                "                android:layout_height=\"@dimen/setting_item_height\"\n" +
+                                "                android:background=\"@drawable/setting_item_bg_selector\"\n" +
+                                "                android:clickable=\"true\"\n" +
+                                "                android:gravity=\"center_vertical\"\n" +
+                                "                android:orientation=\"horizontal\">\n" +
+                                "\n" +
+                                "                <ImageView\n" +
+                                "                    android:layout_width=\"70px\"\n" +
+                                "                    android:layout_height=\"70px\"\n" +
+                                "                    android:layout_marginLeft=\"40px\"\n" +
+                                "                    android:visibility=\"" + (widgetEntity.getShowLeftTitleImg() ? "visible" : "gone") + "\"\n" +
+                                "                    android:src=\"@mipmap/" + logoName + "\" />\n" +
+                                "\n" +
+                                "                <TextView\n" +
+                                "                    android:layout_width=\"0dp\"\n" +
+                                "                    android:layout_height=\"wrap_content\"\n" +
+                                "                    android:layout_weight=\"1\"\n" +
+                                "                    android:layout_marginLeft=\"40px\"\n" +
+                                "                    android:text=\"@string/si_" + widgetEntity.getResId() + "_text\"\n" +
+                                "                    android:textColor=\"@color/colorText\"\n" +
+                                "                    android:textSize=\"40px\" />\n" +
+                                "\n" +
+                                "                <ImageView\n" +
+                                "                    android:layout_width=\"40px\"\n" +
+                                "                    android:layout_height=\"40px\"\n" +
+                                "                    android:layout_marginRight=\"40px\"\n" +
+                                "                    android:src=\"@drawable/more\" />\n" +
+                                "            </com.zhy.autolayout.AutoLinearLayout>\n" +
+                                "\n" +
+                                "            <View\n" +
+                                "                android:layout_width=\"match_parent\"\n" +
+                                "                android:layout_height=\"1px\"\n" +
+                                "                android:layout_marginLeft=\"40px\" />\n");
+                        break;
+                    case WidgetEntity.TYPE_SUBMIT_BTN_ITEM:
+                        String submitBtnName = generateVarName("btn", widgetEntity.getResId());
+                        sbLayout.append("\n    <Button\n" +
+                                "        android:id=\"@+id/btn_" + widgetEntity.getResId() + "\"\n" +
+                                "        android:layout_width=\"match_parent\"\n" +
+                                "        android:layout_height=\"120px\"\n" +
+                                (widgetEntity.getMarginLeft() == 0 ? "" : "        android:layout_marginLeft=\"" + widgetEntity.getMarginLeft() + "px\"\n") +
+                                (widgetEntity.getMarginRight() == 0 ? "" : "        android:layout_marginRight=\"" + widgetEntity.getMarginRight() + "px\"\n") +
+                                (widgetEntity.getMarginTop() == 0 ? "" : "        android:layout_marginTop=\"" + widgetEntity.getMarginTop() + "px\"\n") +
+                                (widgetEntity.getMarginBottom() == 0 ? "" : "        android:layout_marginBottom=\"" + widgetEntity.getMarginBottom() + "px\"\n") +
+                                "        android:background=\"@drawable/btn_save_selector\"\n" +
+                                "        android:text=\"@string/" + widgetEntity.getResId() + "_btn_text\"\n" +
+                                "        android:textColor=\"#fff\"\n" +
+                                "        android:textSize=\"@dimen/submit_btn_text_size\" />");
+                        break;
+                    case WidgetEntity.TYPE_EDIT_TEXT:
+                        String etName = generateVarName("et", widgetEntity.getResId());
+                        sbLayout.append("\n    <EditText\n" +
+                                "        android:id=\"@+id/et_" + widgetEntity.getResId() + "\"\n" +
+                                "        android:layout_width=\"" + widthString + "\"\n" +
+                                "        android:layout_height=\"" + heightString + "\"\n" +
+                                (widgetEntity.getWeight() > 0 ? "        android:layout_weight=\"" + widgetEntity.getWeight() + "\"\n" : "") +
+                                (widgetEntity.getMarginLeft() == 0 ? "" : "        android:layout_marginLeft=\"" + widgetEntity.getMarginLeft() + "px\"\n") +
+                                (widgetEntity.getMarginRight() == 0 ? "" : "        android:layout_marginRight=\"" + widgetEntity.getMarginRight() + "px\"\n") +
+                                (widgetEntity.getMarginTop() == 0 ? "" : "        android:layout_marginTop=\"" + widgetEntity.getMarginTop() + "px\"\n") +
+                                (widgetEntity.getMarginBottom() == 0 ? "" : "        android:layout_marginBottom=\"" + widgetEntity.getMarginBottom() + "px\"\n") +
+                                "        android:background=\"@drawable/et_round_white_bg\"\n" +
+                                "        android:hint=\"@string/search_text\"\n" +
+                                (widgetEntity.getPaddingLeft() == 0 ? "" : "        android:paddingLeft=\"" + widgetEntity.getPaddingLeft() + "px\"\n") +
+                                (widgetEntity.getPaddingRight() == 0 ? "" : "        android:paddingRight=\"" + widgetEntity.getPaddingRight() + "px\"\n") +
+                                (widgetEntity.getPaddingTop() == 0 ? "" : "        android:paddingTop=\"" + widgetEntity.getPaddingTop() + "px\"\n") +
+                                (widgetEntity.getPaddingBottom() == 0 ? "" : "        android:paddingBottom=\"" + widgetEntity.getPaddingBottom() + "px\"\n") +
+                                "        android:gravity=\"" + widgetEntity.getGravity() + "\"\n" +
+                                "        android:textColor=\"@color/colorBlack\"\n" +
+                                "        android:textColorHint=\"@color/colorGrayB\"\n" +
+                                "        android:textSize=\"40px\" />\n");
+                        break;
+                    case WidgetEntity.TYPE_LINEAR_LAYOUT:
+                        sbLayout.append("\n    <com.zhy.autolayout.AutoLinearLayout\n" +
+                                "        android:layout_width=\"" + widthString + "\"\n" +
+                                "        android:layout_height=\"" + heightString + "\"\n" +
+                                (widgetEntity.getMarginLeft() == 0 ? "" : "        android:layout_marginLeft=\"" + widgetEntity.getMarginLeft() + "px\"\n") +
+                                (widgetEntity.getMarginRight() == 0 ? "" : "        android:layout_marginRight=\"" + widgetEntity.getMarginRight() + "px\"\n") +
+                                (widgetEntity.getMarginTop() == 0 ? "" : "        android:layout_marginTop=\"" + widgetEntity.getMarginTop() + "px\"\n") +
+                                (widgetEntity.getMarginBottom() == 0 ? "" : "        android:layout_marginBottom=\"" + widgetEntity.getMarginBottom() + "px\"\n") +
+                                (widgetEntity.getPaddingLeft() == 0 ? "" : "        android:paddingLeft=\"" + widgetEntity.getPaddingLeft() + "px\"\n") +
+                                (widgetEntity.getPaddingRight() == 0 ? "" : "        android:paddingRight=\"" + widgetEntity.getPaddingRight() + "px\"\n") +
+                                (widgetEntity.getPaddingTop() == 0 ? "" : "        android:paddingTop=\"" + widgetEntity.getPaddingTop() + "px\"\n") +
+                                (widgetEntity.getPaddingBottom() == 0 ? "" : "        android:paddingBottom=\"" + widgetEntity.getPaddingBottom() + "px\"\n") +
+                                "        android:background=\"" + (widgetEntity.getBackground().length() == 0 ? "@color/colorTransparent" : widgetEntity.getBackground()) + "\"\n" +
+                                (widgetEntity.getWeight() > 0 ? "        android:layout_weight=\"" + widgetEntity.getWeight() + "\"\n" : "") +
+                                "        android:gravity=\"" + (widgetEntity.getGravity() == null ? "center" : widgetEntity.getGravity()) + "\"\n" +
+                                "        android:orientation=\"" + (widgetEntity.getOrientation() == null ? "horizontal" : widgetEntity.getOrientation()) + "\">");
+                        generateItemWidgets(logoName, widgetEntity.getId(), sbLayout, sbStrings);
+                        sbLayout.append("\n   </com.zhy.autolayout.AutoLinearLayout>");
+                        break;
+                    case WidgetEntity.TYPE_RELATIVE_LAYOUT:
+                        sbLayout.append("\n    <com.zhy.autolayout.AutoRelativeLayout\n" +
+                                (widgetEntity.getMarginLeft() == 0 ? "" : "        android:layout_marginLeft=\"" + widgetEntity.getMarginLeft() + "px\"\n") +
+                                (widgetEntity.getMarginRight() == 0 ? "" : "        android:layout_marginRight=\"" + widgetEntity.getMarginRight() + "px\"\n") +
+                                (widgetEntity.getMarginTop() == 0 ? "" : "        android:layout_marginTop=\"" + widgetEntity.getMarginTop() + "px\"\n") +
+                                (widgetEntity.getMarginBottom() == 0 ? "" : "        android:layout_marginBottom=\"" + widgetEntity.getMarginBottom() + "px\"\n") +
+                                (widgetEntity.getPaddingLeft() == 0 ? "" : "        android:paddingLeft=\"" + widgetEntity.getPaddingLeft() + "px\"\n") +
+                                (widgetEntity.getPaddingRight() == 0 ? "" : "        android:paddingRight=\"" + widgetEntity.getPaddingRight() + "px\"\n") +
+                                (widgetEntity.getPaddingTop() == 0 ? "" : "        android:paddingTop=\"" + widgetEntity.getPaddingTop() + "px\"\n") +
+                                (widgetEntity.getPaddingBottom() == 0 ? "" : "        android:paddingBottom=\"" + widgetEntity.getPaddingBottom() + "px\"\n") +
+                                "        android:background=\"" + (widgetEntity.getBackground().length() == 0 ? "@color/colorTransparent" : widgetEntity.getBackground()) + "\"\n" +
+                                "        android:layout_width=\"" + widthString + "\"\n" +
+                                "        android:layout_height=\"" + heightString + "\">");
+                        generateItemWidgets(logoName, widgetEntity.getId(), sbLayout, sbStrings);
+                        sbLayout.append("    </com.zhy.autolayout.AutoRelativeLayout>\n");
+                        break;
+                    case WidgetEntity.TYPE_IMAGE_VIEW:
+                        String ivName = generateVarName("iv", widgetEntity.getResId());
+                        sbLayout.append("\n    <ImageView\n" +
+                                "        android:id=\"@+id/iv_" + widgetEntity.getResId() + "\"\n" +
+                                "        android:layout_width=\"" + widthString + "\"\n" +
+                                "        android:layout_height=\"" + heightString + "\"\n" +
+                                (widgetEntity.getMarginLeft() == 0 ? "" : "        android:layout_marginLeft=\"" + widgetEntity.getMarginLeft() + "px\"\n") +
+                                (widgetEntity.getMarginRight() == 0 ? "" : "        android:layout_marginRight=\"" + widgetEntity.getMarginRight() + "px\"\n") +
+                                (widgetEntity.getMarginTop() == 0 ? "" : "        android:layout_marginTop=\"" + widgetEntity.getMarginTop() + "px\"\n") +
+                                (widgetEntity.getMarginBottom() == 0 ? "" : "        android:layout_marginBottom=\"" + widgetEntity.getMarginBottom() + "px\"\n") +
+                                "        android:src=\"@mipmap/" + logoName + "\" />");
+                        break;
+                    case WidgetEntity.TYPE_TEXT_VIEW:
+                        String tvName = generateVarName("tv", widgetEntity.getResId());
+                        if (!sbStrings.toString().contains("\"" + widgetEntity.getResId() + "_tv_text\"")) {
+                            sbStrings.append("    <string name=\"" + widgetEntity.getResId() + "_tv_text\">" + widgetEntity.getTitle() + "</string>\n");
+                        }
+                        if (!sbStrings.toString().contains("\"" + widgetEntity.getResId() + "_tv_hint_text\"")) {
+                            sbStrings.append("    <string name=\"" + widgetEntity.getResId() + "_tv_hint_text\">" + widgetEntity.getHint() + "</string>\n");
+                        }
+                        sbLayout.append("\n    <TextView\n" +
+                                "        android:id=\"@+id/tv_" + widgetEntity.getResId() + "\"\n" +
+                                "        android:layout_width=\"" + widthString + "\"\n" +
+                                "        android:layout_height=\"" + heightString + "\"\n" +
+                                "        android:hint=\"@string/" + widgetEntity.getResId() + "_tv_hint_text\"\n" +
+                                "        android:text=\"@string/" + widgetEntity.getResId() + "_tv_text\"\n" +
+                                (widgetEntity.getWeight() > 0 ? "        android:layout_weight=\"" + widgetEntity.getWeight() + "\"\n" : "") +
+                                (widgetEntity.getMarginLeft() == 0 ? "" : "        android:layout_marginLeft=\"" + widgetEntity.getMarginLeft() + "px\"\n") +
+                                (widgetEntity.getMarginRight() == 0 ? "" : "        android:layout_marginRight=\"" + widgetEntity.getMarginRight() + "px\"\n") +
+                                (widgetEntity.getMarginTop() == 0 ? "" : "        android:layout_marginTop=\"" + widgetEntity.getMarginTop() + "px\"\n") +
+                                (widgetEntity.getMarginBottom() == 0 ? "" : "        android:layout_marginBottom=\"" + widgetEntity.getMarginBottom() + "px\"\n") +
+                                (widgetEntity.getPaddingLeft() == 0 ? "" : "        android:paddingLeft=\"" + widgetEntity.getPaddingLeft() + "px\"\n") +
+                                (widgetEntity.getPaddingRight() == 0 ? "" : "        android:paddingRight=\"" + widgetEntity.getPaddingRight() + "px\"\n") +
+                                (widgetEntity.getPaddingTop() == 0 ? "" : "        android:paddingTop=\"" + widgetEntity.getPaddingTop() + "px\"\n") +
+                                (widgetEntity.getPaddingBottom() == 0 ? "" : "        android:paddingBottom=\"" + widgetEntity.getPaddingBottom() + "px\"\n") +
+                                "        android:textColor=\"" + widgetEntity.getTextColor() + "\"\n" +
+                                "        android:textSize=\"" + widgetEntity.getTextSize() + "px\" />");
+                        break;
+                    case WidgetEntity.TYPE_CHECK_BOX:
+                        String cbName = generateVarName("cb", widgetEntity.getResId());
+                        sbLayout.append("\n    <CheckBox\n" +
+                                "        android:id=\"@+id/cb_" + widgetEntity.getResId() + "\"\n" +
+                                "        android:layout_width=\"99px\"\n" +
+                                "        android:layout_height=\"75px\"\n" +
+                                "        android:background=\"@drawable/cb_selector\"\n" +
+                                "        android:button=\"@null\"\n" +
+                                "        app:layout_auto_baseheight=\"width\" />");
+                        break;
+
+                }
+            }
+        }
     }
 
 
-    private void fillWidget(String logoName, ApplicationEntity app, ActivityEntity activityEntity, String layoutName, String layoutPath, String javaPath,
+    private void fillWidget(String adapterPath, String logoName, ApplicationEntity app, ActivityEntity activityEntity, String layoutName, String layoutPath, String javaPath,
                             String pid, StringBuilder sbStrings, StringBuilder sbLayout, StringBuilder sbImp, StringBuilder sbJava,
                             StringBuilder sbDef, StringBuilder sbInit, StringBuilder sbData, StringBuilder sbEvent, StringBuilder sbEditInfo, StringBuilder sbMethods) throws IOException {
 
@@ -5001,10 +5295,13 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "        });");
                         break;
                     case WidgetEntity.TYPE_RV:
+                        //act rv
+                        String adapterName = generateVarName("", widgetEntity.getResId()) + "RvAdapter";
                         sbImp.append("\nimport android.support.v4.widget.SwipeRefreshLayout;")
                                 .append("\nimport android.support.v7.widget.LinearLayoutManager;")
                                 .append("\nimport android.support.v7.widget.RecyclerView;")
-                                .append("\nimport android.support.v4.widget.SwipeRefreshLayout;");
+                                .append("\nimport android.support.v4.widget.SwipeRefreshLayout;")
+                                .append("\nimport " + app.getPackageName() + ".ui.adapter." + adapterName + ";");
                         sbDef.append("\n    private SwipeRefreshLayout refresh;")
                                 .append("\n    private RecyclerView rv;")
                                 .append("\n    private TextView tvNoData;");
@@ -5023,6 +5320,12 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "\n" +
                                 "        stopRefresh(refresh);\n" +
                                 "    }\n");
+                        sbData.append("        List<RvTestEntity> list = new ArrayList<>();\n" +
+                                "        for (int i = 0; i < 10; i++) {\n" +
+                                "            list.add(new RvTestEntity());\n" +
+                                "        }\n" +
+                                "        " + adapterName + " adapter = new " + adapterName + "(getActivity(), list);\n" +
+                                "        rv.setAdapter(adapter);\n");
                         sbData.append("\n        startRefresh(refresh);\n" +
                                 "        getData();\n");
                         sbLayout.append("\n    <RelativeLayout\n" +
@@ -5050,9 +5353,40 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "            android:textSize=\"40px\"\n" +
                                 "            android:visibility=\"gone\" />\n" +
                                 "    </RelativeLayout>\n");
-
+                        FileUtils.saveFileToPathWithName("package " + app.getPackageName() + ".ui.adapter;\n" +
+                                "\n" +
+                                "import android.content.Context;\n" +
+                                "\n" +
+                                "import java.util.List;\n" +
+                                "\n" +
+                                "import " + app.getPackageName() + ".R;\n" +
+                                "import " + app.getPackageName() + ".common.api.entity.RvTestEntity;\n" +
+                                "import zhouzhuo810.me.zzandframe.ui.adapter.RvAutoBaseAdapter;\n" +
+                                "\n" +
+                                "/**\n" +
+                                " * Created by admin on 2018/1/2.\n" +
+                                " */\n" +
+                                "\n" +
+                                "public class " + adapterName + " extends RvAutoBaseAdapter<RvTestEntity> {\n" +
+                                "\n" +
+                                "    public " + adapterName + "(Context context, List<RvTestEntity> data) {\n" +
+                                "        super(context, data);\n" +
+                                "    }\n" +
+                                "\n" +
+                                "    @Override\n" +
+                                "    protected int getLayoutId(int i) {\n" +
+                                "        return R.layout.rv_item_project;\n" +
+                                "    }\n" +
+                                "\n" +
+                                "    @Override\n" +
+                                "    protected void fillData(ViewHolder viewHolder, RvTestEntity rvTestEntity, int i) {\n" +
+                                "\n" +
+                                "    }\n" +
+                                "}\n", adapterPath, adapterName + ".java");
+                        generateItem(app, adapterPath, adapterName, logoName, widgetEntity.getId(), layoutPath, sbStrings);
                         break;
                     case WidgetEntity.TYPE_LV:
+                        String adapterNameLv = generateVarName("", widgetEntity.getResId()) + "LvAdapter";
                         sbImp.append("\nimport android.support.v4.widget.SwipeRefreshLayout;")
                                 .append("\nimport android.widget.ListView;")
                                 .append("\nimport android.support.v7.widget.RecyclerView;")
@@ -5120,8 +5454,10 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "            android:textSize=\"40px\"\n" +
                                 "            android:visibility=\"gone\" />\n" +
                                 "    </RelativeLayout>\n");
+                        generateItem(app, adapterPath, adapterNameLv, logoName, widgetEntity.getId(), layoutPath, sbStrings);
                         break;
                     case WidgetEntity.TYPE_SCROLLABLE_LV:
+                        String adapterNameSlv = generateVarName("", widgetEntity.getResId()) + "ScrollLvAdapter";
                         String srollLvName = generateVarName("lv", widgetEntity.getResId());
                         sbImp.append("\nimport " + app.getPackageName() + ".ui.widget.ScrollableListView;");
                         sbDef.append("\n    private ScrollableListView " + srollLvName + ";");
@@ -5133,6 +5469,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "                android:divider=\"@null\"\n" +
                                 "                android:dividerHeight=\"0dp\"\n" +
                                 "                android:listSelector=\"@color/colorTransparent\" />\n");
+                        generateItem(app, adapterPath, adapterNameSlv, logoName, widgetEntity.getId(), layoutPath, sbStrings);
                         break;
                     case WidgetEntity.TYPE_EDIT_TEXT:
                         String etName = generateVarName("et", widgetEntity.getResId());
@@ -5508,7 +5845,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "            android:layout_width=\"match_parent\"\n" +
                                 "            android:layout_height=\"wrap_content\"\n" +
                                 "            android:orientation=\"vertical\">");
-                        fillWidget(logoName, app, activityEntity, layoutName, layoutPath, javaPath, widgetEntity.getId(), sbStrings, sbLayout, sbImp, sbJava, sbDef, sbInit, sbData, sbEvent, sbEditInfo, sbMethods);
+                        fillWidget(adapterPath, logoName, app, activityEntity, layoutName, layoutPath, javaPath, widgetEntity.getId(), sbStrings, sbLayout, sbImp, sbJava, sbDef, sbInit, sbData, sbEvent, sbEditInfo, sbMethods);
                         sbLayout.append("        </LinearLayout>\n" +
                                 "    </ScrollView>");
                         break;
@@ -5528,7 +5865,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 (widgetEntity.getWeight() > 0 ? "        android:layout_weight=\"" + widgetEntity.getWeight() + "\"\n" : "") +
                                 "        android:gravity=\"" + (widgetEntity.getGravity() == null ? "center" : widgetEntity.getGravity()) + "\"\n" +
                                 "        android:orientation=\"" + (widgetEntity.getOrientation() == null ? "horizontal" : widgetEntity.getOrientation()) + "\">");
-                        fillWidget(logoName, app, activityEntity, layoutName, layoutPath, javaPath, widgetEntity.getId(), sbStrings, sbLayout, sbImp, sbJava, sbDef, sbInit, sbData, sbEvent, sbEditInfo, sbMethods);
+                        fillWidget(adapterPath, logoName, app, activityEntity, layoutName, layoutPath, javaPath, widgetEntity.getId(), sbStrings, sbLayout, sbImp, sbJava, sbDef, sbInit, sbData, sbEvent, sbEditInfo, sbMethods);
                         sbLayout.append("\n   </LinearLayout>");
                         break;
                     case WidgetEntity.TYPE_RELATIVE_LAYOUT:
@@ -5544,7 +5881,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "        android:background=\"" + (widgetEntity.getBackground().length() == 0 ? "@color/colorTransparent" : widgetEntity.getBackground()) + "\"\n" +
                                 "        android:layout_width=\"" + widthString + "\"\n" +
                                 "        android:layout_height=\"" + heightString + "\">");
-                        fillWidget(logoName, app, activityEntity, layoutName, layoutPath, javaPath, widgetEntity.getId(), sbStrings, sbLayout, sbImp, sbJava, sbDef, sbInit, sbData, sbEvent, sbEditInfo, sbMethods);
+                        fillWidget(adapterPath, logoName, app, activityEntity, layoutName, layoutPath, javaPath, widgetEntity.getId(), sbStrings, sbLayout, sbImp, sbJava, sbDef, sbInit, sbData, sbEvent, sbEditInfo, sbMethods);
                         sbLayout.append("    </RelativeLayout>\n");
                         break;
                     case WidgetEntity.TYPE_IMAGE_VIEW:
@@ -5584,6 +5921,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "        android:layout_height=\"" + heightString + "\"\n" +
                                 "        android:hint=\"@string/" + widgetEntity.getResId() + "_tv_hint_text\"\n" +
                                 "        android:text=\"@string/" + widgetEntity.getResId() + "_tv_text\"\n" +
+                                (widgetEntity.getWeight() > 0 ? "        android:layout_weight=\"" + widgetEntity.getWeight() + "\"\n" : "") +
                                 (widgetEntity.getMarginLeft() == 0 ? "" : "        android:layout_marginLeft=\"" + widgetEntity.getMarginLeft() + "px\"\n") +
                                 (widgetEntity.getMarginRight() == 0 ? "" : "        android:layout_marginRight=\"" + widgetEntity.getMarginRight() + "px\"\n") +
                                 (widgetEntity.getMarginTop() == 0 ? "" : "        android:layout_marginTop=\"" + widgetEntity.getMarginTop() + "px\"\n") +
