@@ -15,6 +15,7 @@ import me.zhouzhuo810.zzapidoc.project.utils.DictionaryUtils;
 import me.zhouzhuo810.zzapidoc.user.entity.UserEntity;
 import me.zhouzhuo810.zzapidoc.user.service.UserService;
 import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Service;
 
@@ -81,18 +82,18 @@ public class ErrorCodeServiceImpl extends BaseServiceImpl<ErrorCodeEntity> imple
                     Restrictions.eq("deleteFlag", BaseEntity.DELETE_FLAG_NO),
                     Restrictions.eq("projectId", projectId),
                     Restrictions.eq("isGlobal", true)
-            });
+            }, Order.asc("createTime"));
         } else if (group) {
             list = getBaseDao().executeCriteria(new Criterion[]{
                     Restrictions.eq("deleteFlag", BaseEntity.DELETE_FLAG_NO),
                     Restrictions.eq("groupId", groupId),
                     Restrictions.eq("isGroup", true)
-            });
+            }, Order.asc("createTime"));
         } else {
             list = getBaseDao().executeCriteria(new Criterion[]{
                     Restrictions.eq("deleteFlag", BaseEntity.DELETE_FLAG_NO),
                     Restrictions.eq("interfaceId", interfaceId)
-            });
+            }, Order.asc("createTime"));
         }
         if (list == null) {
             return new BaseResult(0, "暂无数据");

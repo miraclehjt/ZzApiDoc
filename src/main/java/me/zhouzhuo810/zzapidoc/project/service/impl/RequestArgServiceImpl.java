@@ -19,6 +19,7 @@ import me.zhouzhuo810.zzapidoc.project.utils.ProjectUtils;
 import me.zhouzhuo810.zzapidoc.project.utils.ResponseArgUtils;
 import me.zhouzhuo810.zzapidoc.user.entity.UserEntity;
 import me.zhouzhuo810.zzapidoc.user.service.UserService;
+import org.hibernate.criterion.Order;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -146,9 +147,9 @@ public class RequestArgServiceImpl extends BaseServiceImpl<RequestArgEntity> imp
             return new BaseResult(0, "接口不存在或已被删除！");
         }
         String projectId = entity.getProjectId();
-        List<RequestArgEntity> globals = getBaseDao().executeCriteria(ResponseArgUtils.getGlobal(projectId));
+        List<RequestArgEntity> globals = getBaseDao().executeCriteria(ResponseArgUtils.getGlobal(projectId), Order.asc("createTime"));
 
-        List<RequestArgEntity> args = getBaseDao().executeCriteria(ResponseArgUtils.getArgByInterfaceIdAndPid(interfaceId, pid));
+        List<RequestArgEntity> args = getBaseDao().executeCriteria(ResponseArgUtils.getArgByInterfaceIdAndPid(interfaceId, pid), Order.asc("createTime"));
         if (args == null) {
             if (pid != null && pid.equals("0") && globals == null) {
                 return new BaseResult(0, "暂无数据");

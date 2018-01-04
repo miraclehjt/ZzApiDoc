@@ -964,7 +964,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                 .key("permission").value(project.getProperty())
                 .key("createTime").value(DataUtils.formatDate(project.getCreateTime()))
                 .endObject();
-        List<InterfaceGroupEntity> groups = mInterfaceGroupService.executeCriteria(InterfaceUtils.getInterfaceByProjectId(project.getId()));
+        List<InterfaceGroupEntity> groups = mInterfaceGroupService.executeCriteria(InterfaceUtils.getInterfaceByProjectId(project.getId()), Order.asc("createTime"));
         /*模块数组开始*/
         stringer
                 .key("modules").array();
@@ -986,7 +986,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                         .key("ip").value(interfaceGroupEntity.getIp())
                         .key("createTime").value(DataUtils.formatDate(interfaceGroupEntity.getCreateTime()))
                         .key("createUser").value(interfaceGroupEntity.getCreateUserName());
-                List<InterfaceEntity> list = getBaseDao().executeCriteria(InterfaceUtils.getInterfaceByGroupId(interfaceGroupEntity.getId()));
+                List<InterfaceEntity> list = getBaseDao().executeCriteria(InterfaceUtils.getInterfaceByGroupId(interfaceGroupEntity.getId()), Order.asc("createTime"));
                 if (list == null) {
                     continue;
                 }
@@ -1100,7 +1100,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
 
     private String headersToJson(String interfaceId) {
         JSONStringer stringer = new JSONStringer();
-        List<RequestHeaderEntity> headers = mRequestHeaderService.executeCriteria(ResponseArgUtils.getArgByInterfaceId(interfaceId));
+        List<RequestHeaderEntity> headers = mRequestHeaderService.executeCriteria(ResponseArgUtils.getArgByInterfaceId(interfaceId), Order.asc("createTime"));
         stringer.array();
         if (headers != null) {
             for (RequestHeaderEntity req : headers) {
@@ -1121,7 +1121,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
 
     private String requestToJson(String interfaceId, String pid) {
         JSONStringer stringer = new JSONStringer();
-        List<RequestArgEntity> requestArgEntities = mRequestArgService.executeCriteria(ResponseArgUtils.getArgByInterfaceIdAndPid(interfaceId, pid));
+        List<RequestArgEntity> requestArgEntities = mRequestArgService.executeCriteria(ResponseArgUtils.getArgByInterfaceIdAndPid(interfaceId, pid), Order.asc("createTime"));
         stringer.array();
         if (requestArgEntities != null) {
             for (RequestArgEntity requestArgEntity : requestArgEntities) {
@@ -1179,10 +1179,10 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
 
     private String responseAndGlobalToJson(String projectId, String interfaceId, String pid) {
         JSONStringer stringer = new JSONStringer();
-        List<ResponseArgEntity> responseArgEntities = mResponseArgService.executeCriteria(ResponseArgUtils.getArgByInterfaceIdAndPid(interfaceId, pid));
+        List<ResponseArgEntity> responseArgEntities = mResponseArgService.executeCriteria(ResponseArgUtils.getArgByInterfaceIdAndPid(interfaceId, pid), Order.asc("createTime"));
         stringer.array();
 
-        List<ResponseArgEntity> globals = mResponseArgService.executeCriteria(ResponseArgUtils.getGlobal(projectId));
+        List<ResponseArgEntity> globals = mResponseArgService.executeCriteria(ResponseArgUtils.getGlobal(projectId), Order.asc("createTime"));
         if (globals != null) {
             for (ResponseArgEntity responseArgEntity : globals) {
                 stringer.object()
@@ -1372,7 +1372,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
 
     private String globalHeaderToJson(String projectId) {
         JSONStringer stringer = new JSONStringer();
-        List<RequestHeaderEntity> headers = mRequestHeaderService.executeCriteria(ResponseArgUtils.getGlobal(projectId));
+        List<RequestHeaderEntity> headers = mRequestHeaderService.executeCriteria(ResponseArgUtils.getGlobal(projectId), Order.asc("createTime"));
         stringer.array();
         if (headers != null) {
             for (RequestHeaderEntity req : headers) {
@@ -1393,7 +1393,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
 
     private String globalRequestToJson(String projectId) {
         JSONStringer stringer = new JSONStringer();
-        List<RequestArgEntity> requestArgEntities = mRequestArgService.executeCriteria(ResponseArgUtils.getGlobal(projectId));
+        List<RequestArgEntity> requestArgEntities = mRequestArgService.executeCriteria(ResponseArgUtils.getGlobal(projectId), Order.asc("createTime"));
         stringer.array();
         if (requestArgEntities != null) {
             for (RequestArgEntity req : requestArgEntities) {
@@ -1447,7 +1447,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
 
     private String globalResponseToJson(String projectId) {
         JSONStringer stringer = new JSONStringer();
-        List<ResponseArgEntity> responseArgEntities = mResponseArgService.executeCriteria(ResponseArgUtils.getGlobal(projectId));
+        List<ResponseArgEntity> responseArgEntities = mResponseArgService.executeCriteria(ResponseArgUtils.getGlobal(projectId), Order.asc("createTime"));
         stringer.array();
         if (responseArgEntities != null) {
             for (ResponseArgEntity responseArgEntity : responseArgEntities) {
@@ -1499,7 +1499,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
     }
 
     private void responseToChildJson(JSONStringer stringer, String interfaceId, String pid) {
-        List<ResponseArgEntity> responseArgEntities = mResponseArgService.executeCriteria(ResponseArgUtils.getArgByInterfaceIdAndPid(interfaceId, pid));
+        List<ResponseArgEntity> responseArgEntities = mResponseArgService.executeCriteria(ResponseArgUtils.getArgByInterfaceIdAndPid(interfaceId, pid), Order.asc("createTime"));
         stringer.key("children").array();
         if (responseArgEntities != null) {
             for (ResponseArgEntity responseArgEntity : responseArgEntities) {
@@ -1651,7 +1651,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                         addTable(document, "全局错误码说明", new String[]{"错误码", "说明"}, columnWidths, values, null, fontChinese);
                     }
 
-                    List<InterfaceGroupEntity> groups = mInterfaceGroupService.executeCriteria(InterfaceUtils.getInterfaceByProjectId(projectId));
+                    List<InterfaceGroupEntity> groups = mInterfaceGroupService.executeCriteria(InterfaceUtils.getInterfaceByProjectId(projectId), Order.asc("createTime"));
                         /*模块数组开始*/
                     if (groups != null) {
 

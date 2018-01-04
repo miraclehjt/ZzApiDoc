@@ -10,6 +10,7 @@ import me.zhouzhuo810.zzapidoc.project.service.DictionaryService;
 import me.zhouzhuo810.zzapidoc.project.utils.DictionaryUtils;
 import me.zhouzhuo810.zzapidoc.user.entity.UserEntity;
 import me.zhouzhuo810.zzapidoc.user.service.UserService;
+import org.hibernate.criterion.Order;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -65,7 +66,7 @@ public class DictionaryServiceImpl extends BaseServiceImpl<DictionaryEntity> imp
 
     @Override
     public BaseResult getDictionaryByType(String type) {
-        List<DictionaryEntity> list = getBaseDao().executeCriteria(DictionaryUtils.getDicByType(type));
+        List<DictionaryEntity> list = getBaseDao().executeCriteria(DictionaryUtils.getDicByType(type), Order.asc("createTime"));
         if (list == null) {
             return new BaseResult(0, "暂无数据");
         }

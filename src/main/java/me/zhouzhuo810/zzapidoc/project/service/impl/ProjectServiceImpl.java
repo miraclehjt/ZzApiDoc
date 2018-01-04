@@ -16,6 +16,7 @@ import me.zhouzhuo810.zzapidoc.project.utils.ProjectUtils;
 import me.zhouzhuo810.zzapidoc.user.entity.UserEntity;
 import me.zhouzhuo810.zzapidoc.user.service.UserService;
 import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
@@ -142,7 +143,7 @@ public class ProjectServiceImpl extends BaseServiceImpl<ProjectEntity> implement
         if (user == null) {
             return new BaseResult(0, "用户不合法");
         }
-        List<ProjectEntity> list = getBaseDao().executeCriteria(ProjectUtils.getProjectByUserId(userId));
+        List<ProjectEntity> list = getBaseDao().executeCriteria(ProjectUtils.getProjectByUserId(userId), Order.asc("createTime"));
         if (list == null) {
             return new BaseResult(0, "暂无数据");
         }
@@ -167,7 +168,7 @@ public class ProjectServiceImpl extends BaseServiceImpl<ProjectEntity> implement
         if (user == null) {
             return new WebResult(0);
         }
-        List<ProjectEntity> list = getBaseDao().executeCriteria(ProjectUtils.getProjectByUserId(userId));
+        List<ProjectEntity> list = getBaseDao().executeCriteria(ProjectUtils.getProjectByUserId(userId), Order.asc("createTime"));
         if (list == null) {
             return new WebResult(0);
         }

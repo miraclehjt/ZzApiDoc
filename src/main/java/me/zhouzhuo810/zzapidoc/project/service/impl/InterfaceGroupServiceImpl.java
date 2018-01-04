@@ -21,6 +21,7 @@ import me.zhouzhuo810.zzapidoc.user.service.UserService;
 import org.apache.log4j.Logger;
 import org.aspectj.util.FileUtil;
 import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.json.JSONStringer;
 import org.springframework.http.HttpHeaders;
@@ -157,7 +158,7 @@ public class InterfaceGroupServiceImpl extends BaseServiceImpl<InterfaceGroupEnt
         if (user == null) {
             return new BaseResult(0, "用户不合法！");
         }
-        List<InterfaceGroupEntity> groups = getBaseDao().executeCriteria(InterfaceUtils.getInterfaceByProjectId(projectId));
+        List<InterfaceGroupEntity> groups = getBaseDao().executeCriteria(InterfaceUtils.getInterfaceByProjectId(projectId), Order.asc("createTime"));
         if (groups == null) {
             return new BaseResult(0, "暂无数据！");
         }
@@ -182,7 +183,7 @@ public class InterfaceGroupServiceImpl extends BaseServiceImpl<InterfaceGroupEnt
         if (user == null) {
             return new WebResult(0);
         }
-        List<InterfaceGroupEntity> groups = getBaseDao().executeCriteria(InterfaceUtils.getInterfaceByProjectId(projectId));
+        List<InterfaceGroupEntity> groups = getBaseDao().executeCriteria(InterfaceUtils.getInterfaceByProjectId(projectId), Order.asc("createTime"));
         if (groups == null) {
             return new WebResult(0);
         }
