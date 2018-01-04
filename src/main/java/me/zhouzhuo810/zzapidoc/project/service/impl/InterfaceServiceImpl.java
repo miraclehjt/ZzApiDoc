@@ -28,6 +28,7 @@ import org.apache.commons.lang.*;
 import org.apache.log4j.Logger;
 import org.aspectj.util.FileUtil;
 import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -340,7 +341,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
         if (group == null) {
             return new BaseResult(0, "分组不存在或已被删除");
         }
-        List<InterfaceEntity> list = getBaseDao().executeCriteria(InterfaceUtils.getInterfaceByGroupId(groupId));
+        List<InterfaceEntity> list = getBaseDao().executeCriteria(InterfaceUtils.getInterfaceByGroupId(groupId), Order.asc("createTime"));
         List<RequestHeaderEntity> globalRequestHeaders = mRequestHeaderService.getGlobalRequestHeaders(projectId);
         int globalHeadSize = globalRequestHeaders == null ? 0 : globalRequestHeaders.size();
         List<RequestArgEntity> globalRequestArgs = mRequestArgService.getGlobalRequestArgs(projectId);
@@ -1686,7 +1687,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                             }
                             addTextLine(document, "", fontChinese);
 
-                            List<InterfaceEntity> list = getBaseDao().executeCriteria(InterfaceUtils.getInterfaceByGroupId(interfaceGroupEntity.getId()));
+                            List<InterfaceEntity> list = getBaseDao().executeCriteria(InterfaceUtils.getInterfaceByGroupId(interfaceGroupEntity.getId()),Order.asc("createTime"));
                             if (list == null) {
                                 continue;
                             }
