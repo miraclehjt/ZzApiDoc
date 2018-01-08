@@ -12,6 +12,7 @@ import me.zhouzhuo810.zzapidoc.version.dao.VersionDao;
 import me.zhouzhuo810.zzapidoc.version.entity.VersionEntity;
 import me.zhouzhuo810.zzapidoc.version.service.VersionService;
 import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Service;
 
@@ -118,7 +119,7 @@ public class VersionServiceImpl extends BaseServiceImpl<VersionEntity> implement
         List<VersionEntity> versions = executeCriteria(new Criterion[]{
                 Restrictions.eq("deleteFlag", BaseEntity.DELETE_FLAG_NO),
                 Restrictions.eq("projectId", projectId)
-        });
+        }, Order.desc("createTime"));
         if (versions == null) {
             return new BaseResult(0, "暂无数据！");
         }
