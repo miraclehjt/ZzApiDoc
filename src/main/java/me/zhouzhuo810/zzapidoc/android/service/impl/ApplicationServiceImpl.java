@@ -1395,7 +1395,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 "    //bugly\n" +
                 "    compile 'com.tencent.bugly:crashreport:latest.release'\n" +
                 "    //zzandframe\n" +
-                "    compile 'com.github.zhouzhuo810:ZzAndFrame:1.1.5'\n" +
+                "    compile 'com.github.zhouzhuo810:ZzAndFrame:1.1.8'\n" +
                 "    //xutils\n" +
                 "    compile 'org.xutils:xutils:3.3.38'\n" +
                 "    //RxPermissions\n" +
@@ -3943,6 +3943,53 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "\n            }\n" +
                                 "        });");
                         break;
+                    case WidgetEntity.TYPE_INFO_ITEM:
+                        String varNameInfo = generateVarName("tv", widgetEntity.getResId());
+                        sbDef.append("\n    private TextView " + varNameInfo + ";");
+                        sbInit.append("\n        " + varNameInfo + " = (TextView) rootView.findViewById(R.id.tv_" + widgetEntity.getResId() + ");");
+                        if (!sbStrings.toString().contains("\"" + widgetEntity.getResId() + "_text\"")) {
+                            sbStrings.append("    <string name=\"" + widgetEntity.getResId() + "_text\">" + widgetEntity.getTitle() + "</string>\n");
+                        }
+                        sbLayout.append("\n    <LinearLayout\n" +
+                                "        android:layout_width=\"match_parent\"\n" +
+                                "        android:layout_height=\"wrap_content\"\n" +
+                                "        android:background=\"@color/colorWhite\"\n" +
+                                (widgetEntity.getMarginLeft() == 0 ? "" : "        android:layout_marginLeft=\"" + widgetEntity.getMarginLeft() + "px\"\n") +
+                                (widgetEntity.getMarginRight() == 0 ? "" : "        android:layout_marginRight=\"" + widgetEntity.getMarginRight() + "px\"\n") +
+                                (widgetEntity.getMarginTop() == 0 ? "" : "        android:layout_marginTop=\"" + widgetEntity.getMarginTop() + "px\"\n") +
+                                (widgetEntity.getMarginBottom() == 0 ? "" : "        android:layout_marginBottom=\"" + widgetEntity.getMarginBottom() + "px\"\n") +
+                                "        android:gravity=\"center_vertical\"\n" +
+                                "        android:minHeight=\"130px\"\n" +
+                                "        android:orientation=\"horizontal\">\n" +
+                                "\n" +
+                                "        <TextView\n" +
+                                "            android:layout_width=\"280px\"\n" +
+                                "            android:layout_height=\"wrap_content\"\n" +
+                                "            android:layout_marginLeft=\"40px\"\n" +
+                                "            android:gravity=\"center|left\"\n" +
+                                "            android:text=\"@string/" + widgetEntity.getResId() + "_text\"\n" +
+                                "            android:textColor=\"#415868\"\n" +
+                                "            android:textSize=\"44px\" />\n" +
+                                "\n" +
+                                "        <TextView\n" +
+                                "            android:id=\"@+id/tv_" + widgetEntity.getResId() + "\"\n" +
+                                "            android:layout_width=\"0dp\"\n" +
+                                "            android:layout_height=\"wrap_content\"\n" +
+                                "            android:layout_marginLeft=\"30px\"\n" +
+                                "            android:layout_marginRight=\"30px\"\n" +
+                                "            android:layout_weight=\"1\"\n" +
+                                "            android:background=\"@null\"\n" +
+                                "            android:gravity=\"right|center_vertical\"\n" +
+                                "            android:textColor=\"@color/colorBlack\"\n" +
+                                "            android:textSize=\"44px\" />\n" +
+                                "    </LinearLayout>\n" +
+                                "\n" +
+                                "    <View\n" +
+                                "        android:layout_width=\"match_parent\"\n" +
+                                "        android:layout_height=\"1px\"\n" +
+                                "        android:layout_marginLeft=\"30px\"\n" +
+                                "        android:background=\"@color/colorGrayBg\" />");
+                        break;
                     case WidgetEntity.TYPE_TITLE_EDIT_ITEM:
                         String varNameEt = generateVarName("et", widgetEntity.getResId());
                         String varNameIvClear = generateVarName("ivClear", widgetEntity.getResId());
@@ -5137,6 +5184,53 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "\n            }\n" +
                                 "        });");
                         break;
+                    case WidgetEntity.TYPE_INFO_ITEM:
+                        String varNameInfo = generateVarName("tv", widgetEntity.getResId());
+                        sbDef.append("\n    private TextView " + varNameInfo + ";");
+                        sbInit.append("\n        " + varNameInfo + " = (TextView) findViewById(R.id.tv_" + widgetEntity.getResId() + ");");
+                        if (!sbStrings.toString().contains("\"" + widgetEntity.getResId() + "_text\"")) {
+                            sbStrings.append("    <string name=\"" + widgetEntity.getResId() + "_text\">" + widgetEntity.getTitle() + "</string>\n");
+                        }
+                        sbLayout.append("\n    <LinearLayout\n" +
+                                "        android:layout_width=\"match_parent\"\n" +
+                                "        android:layout_height=\"wrap_content\"\n" +
+                                "        android:background=\"@color/colorWhite\"\n" +
+                                (widgetEntity.getMarginLeft() == 0 ? "" : "        android:layout_marginLeft=\"" + widgetEntity.getMarginLeft() + "px\"\n") +
+                                (widgetEntity.getMarginRight() == 0 ? "" : "        android:layout_marginRight=\"" + widgetEntity.getMarginRight() + "px\"\n") +
+                                (widgetEntity.getMarginTop() == 0 ? "" : "        android:layout_marginTop=\"" + widgetEntity.getMarginTop() + "px\"\n") +
+                                (widgetEntity.getMarginBottom() == 0 ? "" : "        android:layout_marginBottom=\"" + widgetEntity.getMarginBottom() + "px\"\n") +
+                                "        android:gravity=\"center_vertical\"\n" +
+                                "        android:minHeight=\"130px\"\n" +
+                                "        android:orientation=\"horizontal\">\n" +
+                                "\n" +
+                                "        <TextView\n" +
+                                "            android:layout_width=\"280px\"\n" +
+                                "            android:layout_height=\"wrap_content\"\n" +
+                                "            android:layout_marginLeft=\"40px\"\n" +
+                                "            android:gravity=\"center|left\"\n" +
+                                "            android:text=\"@string/" + widgetEntity.getResId() + "_text\"\n" +
+                                "            android:textColor=\"#415868\"\n" +
+                                "            android:textSize=\"44px\" />\n" +
+                                "\n" +
+                                "        <TextView\n" +
+                                "            android:id=\"@+id/tv_" + widgetEntity.getResId() + "\"\n" +
+                                "            android:layout_width=\"0dp\"\n" +
+                                "            android:layout_height=\"wrap_content\"\n" +
+                                "            android:layout_marginLeft=\"30px\"\n" +
+                                "            android:layout_marginRight=\"30px\"\n" +
+                                "            android:layout_weight=\"1\"\n" +
+                                "            android:background=\"@null\"\n" +
+                                "            android:gravity=\"right|center_vertical\"\n" +
+                                "            android:textColor=\"@color/colorBlack\"\n" +
+                                "            android:textSize=\"44px\" />\n" +
+                                "    </LinearLayout>\n" +
+                                "\n" +
+                                "    <View\n" +
+                                "        android:layout_width=\"match_parent\"\n" +
+                                "        android:layout_height=\"1px\"\n" +
+                                "        android:layout_marginLeft=\"30px\"\n" +
+                                "        android:background=\"@color/colorGrayBg\" />");
+                        break;
                     case WidgetEntity.TYPE_TITLE_EDIT_ITEM:
                         String titleEtName = generateVarName("et", widgetEntity.getResId());
                         String titleIvName = generateVarName("ivClear", widgetEntity.getResId());
@@ -5324,7 +5418,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "        for (int i = 0; i < 10; i++) {\n" +
                                 "            list.add(new RvTestEntity());\n" +
                                 "        }\n" +
-                                "        " + adapterName + " adapter = new " + adapterName + "(getActivity(), list);\n" +
+                                "        " + adapterName + " adapter = new " + adapterName + "(this, list);\n" +
                                 "        rv.setAdapter(adapter);\n");
                         sbData.append("\n        startRefresh(refresh);\n" +
                                 "        getData();\n");
