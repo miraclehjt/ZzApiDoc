@@ -133,20 +133,23 @@ public class ResponseArgServiceImpl extends BaseServiceImpl<ResponseArgEntity> i
     }
 
     @Override
-    public BaseResult getResponseArgByInterfaceIdAndPid(String interfaceId, String pid, String userId) {
+    public BaseResult getResponseArgByInterfaceIdAndPid(String interfaceId, String projectId, String pid, boolean global, String userId) {
         UserEntity user = mUserService.get(userId);
         if (user == null) {
             return new BaseResult(0, "用户不合法");
         }
-
-        InterfaceEntity entity = mInterfaceService.get(interfaceId);
-        if (entity == null) {
-            return new BaseResult(0, "接口不存在或已被删除！");
+        if (projectId == null) {
+            InterfaceEntity entity = mInterfaceService.get(interfaceId);
+            if (entity == null) {
+                return new BaseResult(0, "接口不存在或已被删除！");
+            }
+            projectId = entity.getProjectId();
         }
-        String projectId = entity.getProjectId();
-        List<ResponseArgEntity> globals = getBaseDao().executeCriteria(ResponseArgUtils.getGlobal(projectId), Order.asc("createTime"));
 
-        List<ResponseArgEntity> args = getBaseDao().executeCriteria(ResponseArgUtils.getArgByInterfaceIdAndPid(interfaceId, pid), Order.asc("createTime"));
+        List<ResponseArgEntity> globals = getBaseDao().executeCriteria(ResponseArgUtils.getGlobalWithProjectIdAndPid(projectId, pid), Order.asc("createTime"));
+
+        List<ResponseArgEntity> args = getBaseDao().executeCriteria(ResponseArgUtils.getArgByInterfaceIdAndPid(interfaceId, pid),
+                Order.asc("createTime"));
         if (args == null) {
             if (pid != null && pid.equals("0") && globals == null) {
                 return new BaseResult(0, "暂无数据");
@@ -170,7 +173,7 @@ public class ResponseArgServiceImpl extends BaseServiceImpl<ResponseArgEntity> i
                 result.add(map.build());
             }
         }
-        if (args != null) {
+        if (args != null && !global) {
             for (ResponseArgEntity arg : args) {
                 MapUtils map = new MapUtils();
                 map.put("id", arg.getId());

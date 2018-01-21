@@ -20,6 +20,7 @@ public class ResponseArgUtils {
         return new Criterion[]{
                 Restrictions.eq("deleteFlag", BaseEntity.DELETE_FLAG_NO),
                 Restrictions.eq("interfaceId", interfaceId),
+                Restrictions.eq("isGlobal", false),
                 Restrictions.eq("pid", pid)
         };
     }
@@ -29,6 +30,15 @@ public class ResponseArgUtils {
         return new Criterion[] {
                 Restrictions.eq("deleteFlag", BaseEntity.DELETE_FLAG_NO),
                 Restrictions.eq("projectId", projectId),
+                Restrictions.eq("isGlobal", true)
+        };
+    }
+
+    public static Criterion[] getGlobalWithProjectIdAndPid(String projectId, String pid) {
+        return new Criterion[] {
+                Restrictions.eq("deleteFlag", BaseEntity.DELETE_FLAG_NO),
+                Restrictions.eq("projectId", projectId),
+                Restrictions.eq("pid", pid),
                 Restrictions.eq("isGlobal", true)
         };
     }

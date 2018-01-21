@@ -84,10 +84,10 @@
         android:layout_height="@dimen/title_height"
         android:layout_alignParentTop="true"
         android:background="@color/colorMain"
-        zz:leftImg="@drawable/back"
-        zz:showRightLayout="false"
-        zz:showTitle="true"
-        zz:textSizeTitle="50px"
-        zz:titleText="二维码扫码" />
+        zz:ttb_leftImg="@drawable/back"
+        zz:ttb_showRightLayout="false"
+        zz:ttb_showTitle="true"
+        zz:ttb_textSizeTitle="50px"
+        zz:ttb_titleText="二维码扫码" />
 
 </RelativeLayout>

@@ -1395,7 +1395,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 "    //bugly\n" +
                 "    compile 'com.tencent.bugly:crashreport:latest.release'\n" +
                 "    //zzandframe\n" +
-                "    compile 'com.github.zhouzhuo810:ZzAndFrame:1.1.8'\n" +
+                "    compile 'com.github.zhouzhuo810:ZzAndFrame:1.1.9'\n" +
                 "    //xutils\n" +
                 "    compile 'org.xutils:xutils:3.3.38'\n" +
                 "    //RxPermissions\n" +

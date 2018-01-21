@@ -20,7 +20,7 @@ public interface RequestArgService extends BaseService<RequestArgEntity> {
 
     BaseResult deleteRequestArg(String id, String userId);
 
-    BaseResult getRequestArgByInterfaceIdAndPid(String interfaceId, String pid, String userId);
+    BaseResult getRequestArgByInterfaceIdAndPid(String interfaceId, String projectId, String pid, String userId);
 
     BaseResult getRequestArgDetails(String id, String userId);
 

@@ -21,7 +21,7 @@ public interface ResponseArgService extends BaseService<ResponseArgEntity> {
 
     BaseResult deleteResponseArg(String id, String userId);
 
-    BaseResult getResponseArgByInterfaceIdAndPid(String interfaceId, String pid, String userId);
+    BaseResult getResponseArgByInterfaceIdAndPid(String interfaceId, String projectId, String pid, boolean global, String userId);
 
     BaseResult getResponseArgDetails(String id, String userId);
 

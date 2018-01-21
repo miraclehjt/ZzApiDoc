@@ -136,17 +136,18 @@ public class RequestArgServiceImpl extends BaseServiceImpl<RequestArgEntity> imp
     }
 
     @Override
-    public BaseResult getRequestArgByInterfaceIdAndPid(String interfaceId, String pid, String userId) {
+    public BaseResult getRequestArgByInterfaceIdAndPid(String interfaceId, String projectId, String pid, String userId) {
         UserEntity user = mUserService.get(userId);
         if (user == null) {
             return new BaseResult(0, "用户不合法");
         }
-
-        InterfaceEntity entity = mInterfaceService.get(interfaceId);
-        if (entity == null) {
-            return new BaseResult(0, "接口不存在或已被删除！");
+        if (interfaceId == null) {
+            InterfaceEntity entity = mInterfaceService.get(interfaceId);
+            if (entity == null) {
+                return new BaseResult(0, "接口不存在或已被删除！");
+            }
+            projectId = entity.getProjectId();
         }
-        String projectId = entity.getProjectId();
         List<RequestArgEntity> globals = getBaseDao().executeCriteria(ResponseArgUtils.getGlobal(projectId), Order.asc("createTime"));
 
         List<RequestArgEntity> args = getBaseDao().executeCriteria(ResponseArgUtils.getArgByInterfaceIdAndPid(interfaceId, pid), Order.asc("createTime"));
@@ -156,7 +157,6 @@ public class RequestArgServiceImpl extends BaseServiceImpl<RequestArgEntity> imp
             }
         }
         List<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
-
         if (pid != null && pid.equals("0") && globals != null) {
             for (RequestArgEntity arg : globals) {
                 MapUtils map = new MapUtils();
