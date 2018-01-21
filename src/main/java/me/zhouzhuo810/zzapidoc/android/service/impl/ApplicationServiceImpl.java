@@ -4154,21 +4154,30 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         sbImp.append("\nimport android.support.v4.widget.SwipeRefreshLayout;")
                                 .append("\nimport android.support.v7.widget.RecyclerView;")
                                 .append("\nimport android.support.v7.widget.LinearLayoutManager;")
+                                .append("\nimport zhouzhuo810.me.zzandframe.ui.adapter.RvAutoBaseAdapter;")
                                 .append("\nimport android.support.v4.widget.SwipeRefreshLayout;")
                                 .append("\nimport " + app.getPackageName() + ".ui.adapter." + adapterName + ";");
                         sbDef.append("\n    private SwipeRefreshLayout refresh;")
                                 .append("\n    private RecyclerView rv;")
+                                .append("\n    private "+adapterName+" adapter;")
                                 .append("\n    private TextView tvNoData;");
                         sbInit.append("\n        refresh = (SwipeRefreshLayout) rootView.findViewById(R.id.refresh);")
                                 .append("\n        rv = (RecyclerView) rootView.findViewById(R.id.rv);")
                                 .append("\n        rv.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager." + widgetEntity.getOrientation().toUpperCase() + ", false));")
                                 .append("\n        tvNoData = (TextView) rootView.findViewById(R.id.tv_no_data);");
-                        sbEvent.append("        refresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {\n" +
+                        sbEvent.append("\n        refresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {\n" +
                                 "            @Override\n" +
                                 "            public void onRefresh() {\n" +
                                 "                getData();\n" +
                                 "            }\n" +
-                                "        });");
+                                "        });\n");
+                        sbEvent.append("\n        adapter.setOnItemLongClickListener(new RvAutoBaseAdapter.OnItemLongClickListener() {\n" +
+                                "            @Override\n" +
+                                "            public boolean onItemLongClick(View view, int position) {\n" +
+                                "\n" +
+                                "                return false;\n" +
+                                "            }\n" +
+                                "        });\n");
                         sbMethods.append("\n" +
                                 "    private void getData() {\n" +
                                 "\n" +
@@ -4178,7 +4187,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "        for (int i = 0; i < 10; i++) {\n" +
                                 "            list.add(new RvTestEntity());\n" +
                                 "        }\n" +
-                                "        " + adapterName + " adapter = new " + adapterName + "(getActivity(), list);\n" +
+                                "        adapter = new " + adapterName + "(getActivity(), list);\n" +
                                 "        rv.setAdapter(adapter);\n");
                         sbData.append("\n        startRefresh(refresh);\n" +
                                 "        getData();\n");
@@ -4737,7 +4746,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "            public void onClick(View v) {\n" +
                                 actions + "\n"
                                 + "            }\n" +
-                                "        });");
+                                "        });\n");
                         break;
                     case WidgetEntity.TYPE_TEXT_VIEW:
                         String tvName = generateVarName("tv", widgetEntity.getResId());
@@ -5394,21 +5403,30 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                         sbImp.append("\nimport android.support.v4.widget.SwipeRefreshLayout;")
                                 .append("\nimport android.support.v7.widget.LinearLayoutManager;")
                                 .append("\nimport android.support.v7.widget.RecyclerView;")
+                                .append("\nimport zhouzhuo810.me.zzandframe.ui.adapter.RvAutoBaseAdapter;")
                                 .append("\nimport android.support.v4.widget.SwipeRefreshLayout;")
                                 .append("\nimport " + app.getPackageName() + ".ui.adapter." + adapterName + ";");
                         sbDef.append("\n    private SwipeRefreshLayout refresh;")
                                 .append("\n    private RecyclerView rv;")
+                                .append("\n    private "+adapterName+" adapter;")
                                 .append("\n    private TextView tvNoData;");
                         sbInit.append("\n        refresh = (SwipeRefreshLayout) findViewById(R.id.refresh);")
                                 .append("\n        rv = (RecyclerView) findViewById(R.id.rv);")
                                 .append("\n        rv.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager." + widgetEntity.getOrientation().toUpperCase() + ", false));")
                                 .append("\n        tvNoData = (TextView) findViewById(R.id.tv_no_data);");
-                        sbEvent.append("        refresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {\n" +
+                        sbEvent.append("\n        refresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {\n" +
                                 "            @Override\n" +
                                 "            public void onRefresh() {\n" +
                                 "                getData();\n" +
                                 "            }\n" +
-                                "        });");
+                                "        });\n");
+                        sbEvent.append("\n        adapter.setOnItemLongClickListener(new RvAutoBaseAdapter.OnItemLongClickListener() {\n" +
+                                "            @Override\n" +
+                                "            public boolean onItemLongClick(View view, int position) {\n" +
+                                "\n" +
+                                "                return false;\n" +
+                                "            }\n" +
+                                "        });\n");
                         sbMethods.append("\n" +
                                 "    private void getData() {\n" +
                                 "\n" +
@@ -5418,7 +5436,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "        for (int i = 0; i < 10; i++) {\n" +
                                 "            list.add(new RvTestEntity());\n" +
                                 "        }\n" +
-                                "        " + adapterName + " adapter = new " + adapterName + "(this, list);\n" +
+                                "        adapter = new " + adapterName + "(this, list);\n" +
                                 "        rv.setAdapter(adapter);\n");
                         sbData.append("\n        startRefresh(refresh);\n" +
                                 "        getData();\n");
@@ -5997,7 +6015,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 "            public void onClick(View v) {\n" +
                                 actions + "\n");
                         sbEvent.append("            }\n" +
-                                "        });");
+                                "        });\n");
                         break;
                     case WidgetEntity.TYPE_TEXT_VIEW:
                         String tvName = generateVarName("tv", widgetEntity.getResId());
