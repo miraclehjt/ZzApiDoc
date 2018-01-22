@@ -717,7 +717,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
         try {
             BuildLauncher build = connection.newBuild();
 //            build.forTasks("assembleDebug");
-            build.forTasks("assembleRelease");
+            build.forTasks("clean assembleRelease");
             ByteArrayOutputStream baoStream = new ByteArrayOutputStream(1024);
             PrintStream cacheStream = new PrintStream(baoStream);
             //PrintStream oldStream = System.out;
