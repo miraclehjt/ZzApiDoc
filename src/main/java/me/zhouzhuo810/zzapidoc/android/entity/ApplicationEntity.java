@@ -12,7 +12,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "application")
-public class ApplicationEntity extends BaseEntity{
+public class ApplicationEntity extends BaseEntity {
     @Column(name = "chName")
     private String chName;
     @Column(name = "AppName")
@@ -39,12 +39,22 @@ public class ApplicationEntity extends BaseEntity{
     private Boolean minifyEnabled;
     @Column(name = "ApiId")
     private String apiId;
+    @Formula("(SELECT p.Name FROM project p WHERE p.ID = ApiId AND p.DelFlag = 0)")
+    private String apiName;
     @Formula("(SELECT count(*) FROM fragment f WHERE f.ApplicationId = ID AND f.DelFlag = 0)")
     private Integer fgmCount = 0;
     @Formula("(SELECT count(*) FROM activity a WHERE a.ApplicationId = ID AND a.DelFlag = 0)")
     private Integer actCount = 0;
     @Column(name = "EnableQrCode")
     private Boolean enableQrCode = false;
+
+    public String getApiName() {
+        return apiName;
+    }
+
+    public void setApiName(String apiName) {
+        this.apiName = apiName;
+    }
 
     public Boolean getEnableQrCode() {
         return enableQrCode;

@@ -30,4 +30,13 @@ public interface ApplicationService extends BaseService<ApplicationEntity> {
     ResponseEntity<byte[]> downloadApplication(String appId, String userId);
 
     ResponseEntity<byte[]> downloadAppJson(String appId, String userId);
+
+    BaseResult updateApplication(String appId, String chName, String appName,
+                                 String versionName, String packageName,
+                                 MultipartFile logo, String colorMain, int minSDK,
+                                 int compileSDK, int targetSDK, int versionCode,
+                                 boolean enableQrCode, boolean multiDex,
+                                 boolean minifyEnabled, String apiId, String userId);
+
+    BaseResult getApplicationDetail(String userId, String appId);
 }

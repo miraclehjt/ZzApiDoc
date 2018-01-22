@@ -29,4 +29,13 @@ public interface ActivityService extends BaseService<ActivityEntity> {
     BaseResult previewUI(String id, String userId);
 
     BaseResult getAllMyActivity(String appId, String userId);
+
+    BaseResult updateActivity(String actId, String name, String title,
+                              boolean isFirst, MultipartFile splashImg, int splashSecond,
+                              int type, String appId, String targetActId, boolean isLandscape,
+                              boolean isFullScreen, int guideImgCount, MultipartFile guideImgOne,
+                              MultipartFile guideImgTwo, MultipartFile guideImgThree, MultipartFile guideImgFour,
+                              MultipartFile guideImgFive, String userId);
+
+    BaseResult getActivityDetail(String actId, String userId);
 }

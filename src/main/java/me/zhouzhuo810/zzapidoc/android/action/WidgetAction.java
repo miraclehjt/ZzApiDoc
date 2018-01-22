@@ -79,6 +79,54 @@ public class WidgetAction extends BaseController<WidgetEntity> {
     }
 
     @ResponseBody
+    @RequestMapping(value = "/updateWidget", method = RequestMethod.POST)
+    public BaseResult updateWidget(
+            @RequestParam(value = "widgetId") String widgetId,
+            @RequestParam(value = "name") String name,
+            @RequestParam(value = "title") String title,
+            @RequestParam(value = "resId") String resId,
+            @RequestParam(value = "type") int type,
+            @RequestParam(value = "defValue") String defValue,
+            @RequestParam(value = "hint", required = false) String hint,
+            @RequestParam(value = "leftTitleText", required = false) String leftTitleText,
+            @RequestParam(value = "rightTitleText", required = false) String rightTitleText,
+            @RequestBody(required = false) MultipartFile leftTitleImg,
+            @RequestBody(required = false) MultipartFile rightTitleImg,
+            @RequestParam(value = "showLeftTitleImg", required = false) boolean showLeftTitleImg,
+            @RequestParam(value = "showRightTitleImg", required = false) boolean showRightTitleImg,
+            @RequestParam(value = "showLeftTitleText", required = false) boolean showLeftTitleText,
+            @RequestParam(value = "showRightTitleText", required = false) boolean showRightTitleText,
+            @RequestParam(value = "showLeftTitleLayout", required = false) boolean showLeftTitleLayout,
+            @RequestParam(value = "showRightTitleLayout", required = false) boolean showRightTitleLayout,
+            @RequestParam(value = "pid", required = false) String pid,
+            @RequestParam(value = "background", required = false) String background,
+            @RequestParam(value = "width", required = false) int width,
+            @RequestParam(value = "height", required = false) int height,
+            @RequestParam(value = "weight", required = false) double weight,
+            @RequestParam(value = "marginLeft", required = false) int marginLeft,
+            @RequestParam(value = "marginRight", required = false) int marginRight,
+            @RequestParam(value = "marginTop", required = false) int marginTop,
+            @RequestParam(value = "marginBottom", required = false) int marginBottom,
+            @RequestParam(value = "paddingLeft", required = false) int paddingLeft,
+            @RequestParam(value = "paddingRight", required = false) int paddingRight,
+            @RequestParam(value = "paddingTop", required = false) int paddingTop,
+            @RequestParam(value = "paddingBottom", required = false) int paddingBottom,
+            @RequestParam(value = "gravity", required = false) String gravity,
+            @RequestParam(value = "orientation", required = false) String orientation,
+            @RequestParam(value = "relativeId") String relativeId,
+            @RequestParam(value = "appId", required = false) String appId,
+            @RequestParam(value = "textColor", required = false) String textColor,
+            @RequestParam(value = "textSize", required = false) int textSize,
+            @RequestParam(value = "userId") String userId
+    ) {
+        return getBaseService().updateWidget(widgetId, name, title, resId, type, defValue, hint,
+                leftTitleText, rightTitleText, leftTitleImg, rightTitleImg, showLeftTitleImg,
+                showRightTitleImg, showLeftTitleText, showRightTitleText, showLeftTitleLayout, showRightTitleLayout,
+                pid, background, width, height, weight, marginLeft, marginRight, marginTop, marginBottom, paddingLeft,
+                paddingRight, paddingTop, paddingBottom, gravity, orientation, relativeId, appId, textColor, textSize, userId);
+    }
+
+    @ResponseBody
     @RequestMapping(value = "/getAllMyWidget", method = RequestMethod.GET)
     public BaseResult getAllMyWidget(
             @RequestParam(value = "userId") String userId,
@@ -86,6 +134,15 @@ public class WidgetAction extends BaseController<WidgetEntity> {
             @RequestParam(value = "relativeId") String relativeId
     ) {
         return getBaseService().getAllMyWidget(relativeId, pid, userId);
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/getWidgetDetail", method = RequestMethod.GET)
+    public BaseResult getWidgetDetail(
+            @RequestParam(value = "userId") String userId,
+            @RequestParam(value = "widgetId") String widgetId
+    ) {
+        return getBaseService().getWidgetDetail(widgetId, userId);
     }
 
 

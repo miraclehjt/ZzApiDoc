@@ -24,9 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by admin on 2017/8/17.
@@ -68,11 +66,11 @@ public class WidgetServiceImpl extends BaseServiceImpl<WidgetEntity> implements 
         entity.setResId(resId);
         entity.setHint(hint);
         entity.setRelativeId(relativeId);
-        entity.setPid(pid==null?"0":pid);
-        entity.setBackground(background==null?"@android:color/transparent":background);
+        entity.setPid(pid == null ? "0" : pid);
+        entity.setBackground(background == null ? "@android:color/transparent" : background);
         entity.setWidth(width);
         entity.setHeight(height);
-        entity.setTextColor(textColor==null?"000":textColor);
+        entity.setTextColor(textColor == null ? "000" : textColor);
         entity.setTextSize(textSize);
         entity.setGravity(gravity);
         entity.setOrientation(orientation);
@@ -140,6 +138,126 @@ public class WidgetServiceImpl extends BaseServiceImpl<WidgetEntity> implements 
             e.printStackTrace();
             return new BaseResult(0, "删除失败");
         }
+    }
+
+    @Override
+    public BaseResult updateWidget(String widgetId, String name, String title, String resId, int type, String defValue, String hint, String leftTitleText, String rightTitleText, MultipartFile leftTitleImg, MultipartFile rightTitleImg, boolean showLeftTitleImg, boolean showRightTitleImg, boolean showLeftTitleText, boolean showRightTitleText, boolean showLeftTitleLayout, boolean showRightTitleLayout, String pid, String background, int width, int height, double weight, int marginLeft, int marginRight, int marginTop, int marginBottom, int paddingLeft, int paddingRight, int paddingTop, int paddingBottom, String gravity, String orientation, String relativeId, String appId, String textColor, int textSize, String userId) {
+        UserEntity user = mUserService.get(userId);
+        if (user == null) {
+            return new BaseResult(0, "用户不合法");
+        }
+        WidgetEntity entity = getBaseDao().get(widgetId);
+        if (entity == null) {
+            return new BaseResult(0, "控件不存在或已被删除");
+        }
+        entity.setModifyUserID(user.getId());
+        entity.setModifyUserName(user.getName());
+        entity.setModifyTime(new Date());
+        entity.setName(name);
+        entity.setResId(resId);
+        entity.setHint(hint);
+        entity.setRelativeId(relativeId);
+        entity.setPid(pid == null ? "0" : pid);
+        entity.setBackground(background == null ? "@android:color/transparent" : background);
+        entity.setWidth(width);
+        entity.setHeight(height);
+        entity.setTextColor(textColor == null ? "000" : textColor);
+        entity.setTextSize(textSize);
+        entity.setGravity(gravity);
+        entity.setOrientation(orientation);
+        entity.setWeight(weight);
+        entity.setMarginLeft(marginLeft);
+        entity.setMarginRight(marginRight);
+        entity.setMarginTop(marginTop);
+        entity.setMarginBottom(marginBottom);
+        entity.setPaddingLeft(paddingLeft);
+        entity.setPaddingRight(paddingRight);
+        entity.setPaddingTop(paddingTop);
+        entity.setPaddingBottom(paddingBottom);
+        entity.setTitle(title);
+        entity.setDefValue(defValue);
+        entity.setApplicationId(appId);
+        if (leftTitleImg != null) {
+            try {
+                String path = FileUtils.saveFile(leftTitleImg.getBytes(), "image", leftTitleImg.getOriginalFilename());
+                entity.setLeftTitleImg(path);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        if (rightTitleImg != null) {
+            try {
+                String path = FileUtils.saveFile(rightTitleImg.getBytes(), "image", rightTitleImg.getOriginalFilename());
+                entity.setRightTitleImg(path);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        entity.setLeftTitleText(leftTitleText);
+        entity.setRightTitleText(rightTitleText);
+        entity.setShowLeftTitleImg(showLeftTitleImg);
+        entity.setShowRightTitleImg(showRightTitleImg);
+        entity.setShowLeftTitleText(showLeftTitleText);
+        entity.setShowRightTitleText(showRightTitleText);
+        entity.setShowLeftTitleLayout(showLeftTitleLayout);
+        entity.setShowRightTitleLayout(showRightTitleLayout);
+        entity.setType(type);
+        try {
+            getBaseDao().update(entity);
+            return new BaseResult(1, "修改成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new BaseResult(0, "修改失败");
+        }
+    }
+
+    @Override
+    public BaseResult getWidgetDetail(String widgetId, String userId) {
+        UserEntity user = mUserService.get(userId);
+        if (user == null) {
+            return new BaseResult(0, "用户不合法", new HashMap<String, String>());
+        }
+        WidgetEntity entity = get(widgetId);
+        if (entity == null) {
+            return new BaseResult(0, "控件不存在或已被删除", new HashMap<String, String>());
+        }
+        MapUtils map = new MapUtils();
+        map.put("id", entity.getId());
+        map.put("name", entity.getName());
+        map.put("title", entity.getTitle());
+        map.put("resId", entity.getResId());
+        map.put("defValue", entity.getDefValue());
+        map.put("type", entity.getType());
+        map.put("hint", entity.getHint());
+        map.put("leftTitleText", entity.getLeftTitleText());
+        map.put("rightTitleText", entity.getRightTitleText());
+        map.put("showLeftTitleImg", entity.getShowLeftTitleImg() == null ? false : entity.getShowLeftTitleImg());
+        map.put("showRightTitleImg", entity.getShowRightTitleImg() == null ? false : entity.getShowRightTitleImg());
+        map.put("showLeftTitleText", entity.getShowLeftTitleText() == null ? false : entity.getShowLeftTitleText());
+        map.put("showRightTitleText", entity.getShowRightTitleText() == null ? false : entity.getShowRightTitleText());
+        map.put("showLeftTitleLayout", entity.getShowLeftTitleLayout() == null ? false : entity.getShowLeftTitleLayout());
+        map.put("showRightTitleLayout", entity.getShowRightTitleLayout() == null ? false : entity.getShowRightTitleLayout());
+        map.put("pid", entity.getPid());
+        map.put("background", entity.getBackground());
+        map.put("width", entity.getWidth());
+        map.put("height", entity.getHeight());
+        map.put("weight", entity.getWeight() == null ? 0 : entity.getWeight());
+        map.put("marginLeft", entity.getMarginLeft());
+        map.put("marginRight", entity.getMarginRight());
+        map.put("marginTop", entity.getMarginTop());
+        map.put("marginBottom", entity.getMarginBottom());
+        map.put("paddingLeft", entity.getPaddingLeft());
+        map.put("paddingRight", entity.getPaddingRight());
+        map.put("paddingTop", entity.getPaddingTop());
+        map.put("paddingBottom", entity.getPaddingBottom());
+        map.put("gravity", entity.getGravity());
+        map.put("orientation", entity.getOrientation());
+        map.put("relativeId", entity.getRelativeId());
+        map.put("appId", entity.getApplicationId());
+        map.put("textColor", entity.getTextColor());
+        map.put("textSize", entity.getTextSize() == null ? 40 : entity.getTextSize());
+        map.put("modifyTime", DataUtils.formatDate(entity.getModifyTime()));
+        return new BaseResult(1, "ok", map.build());
     }
 
     @Override

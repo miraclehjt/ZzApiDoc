@@ -56,6 +56,41 @@ public class ApplicationAction extends BaseController<ApplicationEntity> {
                 versionCode, enableQrCode, multiDex, minifyEnabled,
                 apiId, userId);
     }
+    @ResponseBody
+    @RequestMapping(value = "/updateApplication", method = RequestMethod.POST)
+    public BaseResult updateApplication(
+            @RequestParam(value = "appId") String appId,
+            @RequestParam(value = "chName") String chName,
+            @RequestParam(value = "appName") String appName,
+            @RequestParam(value = "versionName") String versionName,
+            @RequestParam(value = "packageName") String packageName,
+            @RequestParam(value = "colorMain", required = false) String colorMain,
+            @RequestParam(value = "minSDK") int minSDK,
+            @RequestParam(value = "compileSDK") int compileSDK,
+            @RequestParam(value = "targetSDK") int targetSDK,
+            @RequestParam(value = "versionCode") int versionCode,
+            @RequestParam(value = "enableQrCode", required = false) boolean enableQrCode,
+            @RequestParam(value = "multiDex", required = false) boolean multiDex,
+            @RequestParam(value = "minifyEnabled", required = false) boolean minifyEnabled,
+            @RequestParam(value = "apiId", required = false) String apiId,
+            @RequestBody(required = false) MultipartFile logo,
+            @RequestParam(value = "userId") String userId
+    ) {
+        return getBaseService().updateApplication(appId, chName, appName, versionName, packageName,
+                logo, colorMain, minSDK, compileSDK, targetSDK,
+                versionCode, enableQrCode, multiDex, minifyEnabled,
+                apiId, userId);
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/getApplicationDetail", method = RequestMethod.GET)
+    public BaseResult getApplicationDetail(
+            @RequestParam(value = "userId") String userId,
+            @RequestParam(value = "appId") String appId
+    ) {
+        return getBaseService().getApplicationDetail(userId, appId);
+    }
+
 
     @ResponseBody
     @RequestMapping(value = "/getAllMyApplication", method = RequestMethod.GET)

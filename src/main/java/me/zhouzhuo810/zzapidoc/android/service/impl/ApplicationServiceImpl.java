@@ -44,9 +44,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by admin on 2017/8/17.
@@ -450,6 +448,79 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
             e.printStackTrace();
         }
         return null;
+    }
+
+    @Override
+    public BaseResult updateApplication(String appId, String chName, String appName, String versionName, String packageName, MultipartFile logo, String colorMain, int minSDK, int compileSDK, int targetSDK, int versionCode, boolean enableQrCode, boolean multiDex, boolean minifyEnabled, String apiId, String userId) {
+        UserEntity user = mUserService.get(userId);
+        if (user == null) {
+            return new BaseResult(0, "用户不合法");
+        }
+        ApplicationEntity entity = getBaseDao().get(appId);
+        if (entity == null) {
+            return new BaseResult(0, "应用不存在或已被删除");
+        }
+        entity.setChName(chName);
+        entity.setModifyUserID(user.getId());
+        entity.setModifyUserName(user.getName());
+        entity.setModifyTime(new Date());
+        entity.setApiId(apiId);
+        entity.setAppName(appName);
+        entity.setMinifyEnabled(minifyEnabled);
+        entity.setColorMain(colorMain == null ? "#438cff" : "#" + colorMain);
+        if (logo != null) {
+            try {
+                String path = FileUtils.saveFile(logo.getBytes(), "image", logo.getOriginalFilename());
+                entity.setLogo(path);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        entity.setEnableQrCode(enableQrCode);
+        entity.setPackageName(packageName);
+        entity.setVersionCode(versionCode);
+        entity.setVersionName(versionName);
+        entity.setTargetSDK(targetSDK);
+        entity.setMultiDex(multiDex);
+        entity.setCompileSDK(compileSDK);
+        entity.setMinSDK(minSDK);
+        try {
+            getBaseDao().update(entity);
+            return new BaseResult(1, "修改成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new BaseResult(0, "修改失败");
+        }
+    }
+
+    @Override
+    public BaseResult getApplicationDetail(String userId, String appId) {
+        UserEntity user = mUserService.get(userId);
+        if (user == null) {
+            return new BaseResult(0, "用户不合法", new HashMap<String,String>());
+        }
+        ApplicationEntity entity = get(appId);
+        if (entity == null) {
+            return new BaseResult(0, "应用不存在或已被删除", new HashMap<String,String>());
+        }
+        MapUtils map = new MapUtils();
+        map.put("id", entity.getId());
+        map.put("chName", entity.getChName());
+        map.put("appName", entity.getAppName());
+        map.put("versionName", entity.getVersionName());
+        map.put("packageName", entity.getPackageName());
+        map.put("colorMain", entity.getColorMain());
+        map.put("minSDK", entity.getMinSDK());
+        map.put("compileSDK", entity.getCompileSDK());
+        map.put("targetSDK", entity.getTargetSDK());
+        map.put("versionCode", entity.getVersionCode());
+        map.put("enableQrCode", entity.getEnableQrCode() == null ? false : entity.getEnableQrCode());
+        map.put("multiDex", entity.getMultiDex() == null ? false : entity.getMultiDex());
+        map.put("minifyEnabled", entity.getMinifyEnabled() == null ? false : entity.getMinifyEnabled());
+        map.put("apiId", entity.getApiId());
+        map.put("apiName", entity.getApiName());
+        map.put("modifyTime", DataUtils.formatDate(entity.getModifyTime()));
+        return new BaseResult(1, "ok", map.build());
     }
 
     private String convertToJson(ApplicationEntity app) {
@@ -1395,7 +1466,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 "    //bugly\n" +
                 "    compile 'com.tencent.bugly:crashreport:latest.release'\n" +
                 "    //zzandframe\n" +
-                "    compile 'com.github.zhouzhuo810:ZzAndFrame:1.1.9'\n" +
+                "    compile 'com.github.zhouzhuo810:ZzAndFrame:1.2.0'\n" +
                 "    //xutils\n" +
                 "    compile 'org.xutils:xutils:3.3.38'\n" +
                 "    //RxPermissions\n" +
@@ -2096,6 +2167,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 "            iv.setScaleType(ImageView.ScaleType.FIT_CENTER);\n" +
                 "            imgs.add(iv);\n" +
                 "        }\n" +
+                "        viewPager.setOffscreenPageLimit("+ (activityEntity.getGuideImgCount() == null ? 0 : activityEntity.getGuideImgCount())+");\n"+
                 "        viewPager.setPageTransformer(false, new ZoomOutPageTransformer());\n" +
                 "        viewPager.setAdapter(new ZzBasePagerAdapter<ImageView, Integer>(this, imgs, ids) {\n" +
                 "            @Override\n" +
@@ -4159,7 +4231,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 .append("\nimport " + app.getPackageName() + ".ui.adapter." + adapterName + ";");
                         sbDef.append("\n    private SwipeRefreshLayout refresh;")
                                 .append("\n    private RecyclerView rv;")
-                                .append("\n    private "+adapterName+" adapter;")
+                                .append("\n    private " + adapterName + " adapter;")
                                 .append("\n    private TextView tvNoData;");
                         sbInit.append("\n        refresh = (SwipeRefreshLayout) rootView.findViewById(R.id.refresh);")
                                 .append("\n        rv = (RecyclerView) rootView.findViewById(R.id.rv);")
@@ -5408,7 +5480,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                                 .append("\nimport " + app.getPackageName() + ".ui.adapter." + adapterName + ";");
                         sbDef.append("\n    private SwipeRefreshLayout refresh;")
                                 .append("\n    private RecyclerView rv;")
-                                .append("\n    private "+adapterName+" adapter;")
+                                .append("\n    private " + adapterName + " adapter;")
                                 .append("\n    private TextView tvNoData;");
                         sbInit.append("\n        refresh = (SwipeRefreshLayout) findViewById(R.id.refresh);")
                                 .append("\n        rv = (RecyclerView) findViewById(R.id.rv);")

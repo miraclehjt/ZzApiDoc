@@ -24,10 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by admin on 2017/8/17.
@@ -283,6 +280,110 @@ public class ActivityServiceImpl extends BaseServiceImpl<ActivityEntity> impleme
         }
         return new BaseResult(1, "ok", result);
 
+    }
+
+    @Override
+    public BaseResult updateActivity(String actId, String name, String title, boolean isFirst, MultipartFile splashImg, int splashSecond, int type, String appId, String targetActId, boolean isLandscape, boolean isFullScreen, int guideImgCount, MultipartFile guideImgOne, MultipartFile guideImgTwo, MultipartFile guideImgThree, MultipartFile guideImgFour, MultipartFile guideImgFive, String userId) {
+        UserEntity user = mUserService.get(userId);
+        if (user == null) {
+            return new BaseResult(0, "用户不合法");
+        }
+        ActivityEntity entity = getBaseDao().get(actId);
+        entity.setModifyUserID(user.getId());
+        entity.setModifyUserName(user.getName());
+        entity.setModifyTime(new Date());
+        entity.setName(name);
+        entity.setFirst(isFirst);
+        entity.setTargetActId(targetActId);
+        entity.setTitle(title);
+        entity.setFullScreen(isFullScreen);
+        entity.setLandscape(isLandscape);
+        entity.setSplashSecond(splashSecond == 0 ? 5 : splashSecond);
+        entity.setGuideImgCount(guideImgCount);
+        if (splashImg != null) {
+            try {
+                String path = FileUtils.saveFile(splashImg.getBytes(), "image", splashImg.getOriginalFilename());
+                entity.setSplashImg(path);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        if (guideImgOne != null) {
+            try {
+                String path = FileUtils.saveFile(guideImgOne.getBytes(), "image", guideImgOne.getOriginalFilename());
+                entity.setGuideImgOne(path);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        if (guideImgTwo != null) {
+            try {
+                String path = FileUtils.saveFile(guideImgTwo.getBytes(), "image", guideImgTwo.getOriginalFilename());
+                entity.setGuideImgTwo(path);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        if (guideImgThree != null) {
+            try {
+                String path = FileUtils.saveFile(guideImgThree.getBytes(), "image", guideImgThree.getOriginalFilename());
+                entity.setGuideImgThree(path);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        if (guideImgFour != null) {
+            try {
+                String path = FileUtils.saveFile(guideImgFour.getBytes(), "image", guideImgFour.getOriginalFilename());
+                entity.setGuideImgFour(path);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        if (guideImgFive != null) {
+            try {
+                String path = FileUtils.saveFile(guideImgFive.getBytes(), "image", guideImgFive.getOriginalFilename());
+                entity.setGuideImgFive(path);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        entity.setApplicationId(appId);
+        entity.setType(type);
+        try {
+            getBaseDao().update(entity);
+            return new BaseResult(1, "修改成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new BaseResult(0, "修改失败");
+        }
+    }
+
+    @Override
+    public BaseResult getActivityDetail(String actId, String userId) {
+        UserEntity user = mUserService.get(userId);
+        if (user == null) {
+            return new BaseResult(0, "用户不合法", new HashMap<String, String>());
+        }
+        ActivityEntity entity = get(actId);
+        if (entity == null) {
+            return new BaseResult(0, "Activity不存在或已被删除", new HashMap<String, String>());
+        }
+        MapUtils map = new MapUtils();
+        map.put("id", entity.getId());
+        map.put("name", entity.getName());
+        map.put("title", entity.getTitle());
+        map.put("isFirst", entity.getFirst());
+        map.put("type", entity.getType());
+        map.put("appId", entity.getApplicationId());
+        map.put("targetActId", entity.getTargetActId());
+        map.put("isLandscape", entity.getLandscape());
+        map.put("isFullScreen", entity.getFullScreen());
+        map.put("splashSecond", entity.getSplashSecond());
+        map.put("targetActName", entity.getTargetActName());
+        map.put("guideImgCount", entity.getGuideImgCount() == null ? 0 : entity.getGuideImgCount());
+        map.put("modifyTime", DataUtils.formatDate(entity.getModifyTime()));
+        return new BaseResult(1, "ok", map.build());
     }
 
 }
