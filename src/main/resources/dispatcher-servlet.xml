@@ -24,6 +24,7 @@
     <!--<mvc:resources location="/front/" mapping="/front/**"/>-->
     <mvc:resources location="/apk/" mapping="/apk/**"/>
     <mvc:resources location="/font/" mapping="/font/**"/>
+    <mvc:resources location="/fonts/" mapping="/fonts/**"/>
     <mvc:resources location="/PDF/" mapping="/PDF/**"/>
     <mvc:resources location="/JSON/" mapping="/JSON/**"/>
     <mvc:resources location="/APP/" mapping="/APP/**"/>

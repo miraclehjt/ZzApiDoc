@@ -1,0 +1,33 @@
+#left-container {
+  background-color: #dddddd;
+  height: 900px;
+  padding-left: 0px;
+  padding-right: 0px;
+}
+#left-container p {
+  margin-left: 0px;
+  margin-right: 0px;
+  padding: 10px 10px 10px 15px;
+}
+#right-container {
+  background-color: #ffffff;
+}
+#setting {
+  margin-top: 20px;
+}
+.left-table {
+  padding-left: 0px;
+}
+#btn-box {
+  margin-bottom: 20px;
+}
+.pro-title {
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+.progress {
+  margin-top: 10px;
+}
+.badge {
+  float: right;
+}
