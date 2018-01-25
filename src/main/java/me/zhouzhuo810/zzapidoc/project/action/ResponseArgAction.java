@@ -75,9 +75,9 @@ public class ResponseArgAction extends BaseController<ResponseArgEntity> {
     @RequestMapping(value = "/getResponseArgByInterfaceIdAndPid", method = RequestMethod.GET)
     public BaseResult getResponseArgByInterfaceIdAndPid(
             @RequestParam(value = "interfaceId") String interfaceId,
-            @RequestParam(value = "projectId") String projectId,
+            @RequestParam(value = "projectId", required = false) String projectId,
             @RequestParam(value = "pid") String pid,
-            @RequestParam(value = "global") boolean global,
+            @RequestParam(value = "global", required = false) boolean global,
             @RequestParam(value = "userId") String userId
     ) {
         return getService().getResponseArgByInterfaceIdAndPid(interfaceId, projectId, pid, global, userId);

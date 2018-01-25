@@ -3,7 +3,6 @@ $(document).ready(function () {
     var username = localStorage.getItem("username");
     var userId = localStorage.getItem("userId");
     var pic = localStorage.getItem("userPic");
-    var projectId = localStorage.getItem("projectId");
     if (userId === null || userId === "") {
         $("#box-user-info").hide();
         $("#form-login").show();
@@ -11,15 +10,16 @@ $(document).ready(function () {
         $("#tv-user-name").val(username);
         $("#box-user-info").show();
         $("#form-login").hide();
-        getProjectList(projectId, userId, 1);
+        var interfaceId = localStorage.getItem("interfaceId");
+        var pid = localStorage.getItem("pid");
+        getProjectList(interfaceId, userId, pid);
     }
-    //列表按钮事件绑定
-    $(document).on("click",".btn-see-group",function(){
+    //返回参数
+    $(document).on("click",".btn-see-res",function(){
         var colDbId = $(this).parent().parent().find(".db-id");
-        localStorage.setItem("groupId", colDbId.text());
-        location.href ="interfaceList.jsp"
+        localStorage.setItem("pid", colDbId.text());
+        window.location.reload();
     });
-
     //登录按钮点击
     $("#btn-login").click(function () {
         //	$("#tv-user-name").show();
@@ -32,8 +32,9 @@ $(document).ready(function () {
     //刷新按钮点击
     $("#btn-refresh").click(function () {
         var userId = localStorage.getItem("userId");
-        var projectId = localStorage.getItem("projectId");
-        getProjectList(projectId, userId, 1);
+        var interfaceId = localStorage.getItem("interfaceId");
+        var pid = localStorage.getItem("pid");
+        getProjectList(interfaceId, userId, pid);
     });
     //添加按钮点击
     $("#btn-add").click(function () {
@@ -82,8 +83,9 @@ function doLogin() {
                     localStorage.setItem("username", data.data.name);
                     localStorage.setItem("userId", data.data.id);
                     localStorage.setItem("userPic", data.data.pic);
-                    var projectId = localStorage.getItem("projectId");
-                    getProjectList(projectId, data.data.id, 1);
+                    var interfaceId = localStorage.getItem("interfaceId");
+                    var pid = localStorage.getItem("pid");
+                    getProjectList(groupId, data.data.id, pid);
                 }
             }
 
@@ -101,83 +103,38 @@ function doExitLogin() {
     //显示用户名和密码输入框
     $("#form-login").show();
     //清空列表
-    getProjectList("", "", 1);
+    getProjectList("", "", "0");
 }
 
 /*获取项目列表*/
-function getProjectList(projectId, userId, index) {
+function getProjectList(interfaceId, userId, pid) {
     if (userId === null || userId.length === 0) {
         $("#box-user-info").hide();
         $("#form-login").show();
         $("#row-hint").html(getHintContent("登录已过期，请重新登录"));
         return;
     }
-    if (projectId === null || projectId.length === 0) {
-        $("#row-hint").html(getHintContent("请先选择项目"));
+    if (interfaceId === null || interfaceId.length === 0) {
+        $("#row-hint").html(getHintContent("请先选择接口"));
         return;
     }
-
-    $.get("/ZzApiDoc/v1/interfaceGroup/getAllInterfaceGroupWeb?projectId="+projectId+"&userId=" + userId + "&page=" + index,
+    $.get("/ZzApiDoc/v1/responseArg/getResponseArgByInterfaceIdAndPid?interfaceId="+interfaceId+"&userId=" + userId + "&pid=" + pid,
         function (data, status) {
             if (status === 'success') {
-                //填充表格
-                var c = "";
-                $.each(data.rows, function (n, value) {
-                    c += '<tr><td><div class="checkbox"><input type="checkbox" id="checkbox' + n + '" class="styled"><label for="checkbox'
-                        + n + '">选择</label></div></td><td class="db-id hide">' + value.id + '</td><td>'
-                        + value.name + '</td><td>' + value.ip + '</td><td>'
-                        + value.interfaceNo + '</td><td>' + value.createUserName + '</td><td>' + value.createTime + '</td><td><button type="button" class="btn-see-group btn">接口管理</button></td></tr>';
-                });
-                $("#project-list").html(c);
-
-                // if($("#page-indicator").data("twbs-pagination")){
-                //     $("#page-indicator").twbsPagination("destroy");
-                // }
-                $("#page-indicator").twbsPagination("destroy");
-                //分页绑定
-                $('#page-indicator').twbsPagination({
-                    totalPages: data.totalPage,
-                    visiblePages: 10,
-                    onPageClick: function (event, page) {
-                        //全选取消
-                        $("#checkbox-all").prop("checked", false);
-                        //重载数据
-                        var mid = localStorage.getItem("userId");
-                        var projectId = localStorage.getItem("projectId");
-                        justUpdateList(projectId, mid, page);
-                    }
-                });
-            }
-
-        });
-    return false;
-}
-
-/*获取项目列表*/
-function justUpdateList(projectId, userId, index) {
-    if (userId === null || userId.length === 0) {
-        $("#box-user-info").hide();
-        $("#form-login").show();
-        $("#row-hint").html(getHintContent("登录已过期，请重新登录"));
-        return;
-    }
-    if (projectId === null || projectId.length === 0) {
-        $("#row-hint").html(getHintContent("请先选择项目"));
-        return;
-    }
-
-    $.get("/ZzApiDoc/v1/interfaceGroup/getAllInterfaceGroupWeb?projectId="+projectId+"&userId=" + userId + "&page=" + index,
-        function (data, status) {
-            if (status === 'success') {
-                //填充表格
-                var c = "";
-                $.each(data.rows, function (n, value) {
-                    c += '<tr><td><div class="checkbox"><input type="checkbox" id="checkbox' + n + '" class="styled"><label for="checkbox'
-                        + n + '">选择</label></div></td><td class="db-id hide">' + value.id + '</td><td>'
-                        + value.name + '</td><td>' + value.ip + '</td><td>'
-                        + value.interfaceNo + '</td><td>' + value.createUserName + '</td><td>' + value.createTime + '</td><td><button type="button" class="btn-see-group btn">接口管理</button></td></tr>';
-                });
-                $("#project-list").html(c);
+                if (data.code === 0) {
+                    $("#row-hint").html(getHintContent(data.msg));
+                } else {
+                    //填充表格
+                    var c = "";
+                    $.each(data.data, function (n, value) {
+                        c += '<tr><td><div class="checkbox"><input type="checkbox" id="checkbox' + n + '" class="styled"><label for="checkbox'
+                            + n + '">选择</label></div></td><td class="db-id hide">' + value.id + '</td><td>'
+                            + value.type + '</td><td>' + value.name + '</td><td>'
+                            + value.defValue + '</td><td>' + value.note + '</td><td>' + value.isGlobal + '</td><td>'
+                            + value.createUserName + '</td><td>' + value.createTime + '</td><td><button type="button" class="btn-see-res btn">子参数</button></td></tr>';
+                    });
+                    $("#project-list").html(c);
+                }
             }
 
         });
@@ -213,7 +170,7 @@ function getChooseRowsDbIds() {
         }
     }
     if (getChooseRowsCount() > 0) {
-        ids = ids.substr(0, ids.length-1);
+        ids = ids.substr(0, ids.length - 1);
     }
     return ids;
 }
@@ -241,8 +198,9 @@ function doDelete() {
                 } else {
                     $("#row-hint").html(getOkContent(data.msg));
                     //重新加载数据
-                    var projectId = localStorage.getItem("projectId");
-                    getProjectList(projectId, userId, 1);
+                    var interfaceId = localStorage.getItem("interfaceId");
+                    var pid = localStorage.getItem("pid");
+                    getProjectList(interfaceId, userId, pid);
                 }
             }
 

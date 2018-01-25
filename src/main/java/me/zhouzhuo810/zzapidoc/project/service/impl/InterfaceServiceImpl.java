@@ -384,7 +384,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
             return new WebResult(1, 1, 0);
         }
         int rowCount = getBaseDao().executeCriteriaRow(InterfaceUtils.getInterfaceByGroupId(groupId));
-        List<InterfaceEntity> list = getBaseDao().executeCriteria(InterfaceUtils.getInterfaceByGroupId(groupId), indexPage, 10, Order.desc("createTime"));
+        List<InterfaceEntity> list = getBaseDao().executeCriteria(InterfaceUtils.getInterfaceByGroupId(groupId), indexPage-1, 10, Order.desc("createTime"));
         int pageCount = rowCount / 10;
         if (rowCount % 10 > 0) {
             pageCount++;

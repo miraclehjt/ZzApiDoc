@@ -146,7 +146,8 @@ public class ResponseArgServiceImpl extends BaseServiceImpl<ResponseArgEntity> i
             projectId = entity.getProjectId();
         }
 
-        List<ResponseArgEntity> globals = getBaseDao().executeCriteria(ResponseArgUtils.getGlobalWithProjectIdAndPid(projectId, pid), Order.asc("createTime"));
+        List<ResponseArgEntity> globals = getBaseDao().executeCriteria(ResponseArgUtils.getGlobalWithProjectIdAndPid(projectId, pid),
+                Order.asc("createTime"));
 
         List<ResponseArgEntity> args = getBaseDao().executeCriteria(ResponseArgUtils.getArgByInterfaceIdAndPid(interfaceId, pid),
                 Order.asc("createTime"));

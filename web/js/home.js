@@ -12,7 +12,12 @@ $(document).ready(function () {
         $("#form-login").hide();
         getProjectList(userId, 1);
     }
-
+    //列表按钮事件绑定
+    $(document).on("click",".btn-see-group",function(){
+        var colDbId = $(this).parent().parent().find(".db-id");
+        localStorage.setItem("projectId", colDbId.text());
+        location.href ="groupList.jsp"
+    });
     //登录按钮点击
     $("#btn-login").click(function () {
         //	$("#tv-user-name").show();
@@ -112,21 +117,8 @@ function getProjectList(userId, index) {
                     c += '<tr><td><div class="checkbox"><input type="checkbox" id="checkbox' + n + '" class="styled"><label for="checkbox'
                         + n + '">选择</label></div></td><td class="db-id hide">' + value.id + '</td><td>'
                         + value.name + '</td><td>' + value.note + '</td><td>'
-                        + (value.property==="0"?'公有':'私有') + '</td><td>' + value.interfaceNo + '</td><td>'
-                        + value.createUserName + '</td><td>' + value.createTime + '</td><td><button type="button" class="btn btn-see-group" id="btn-see-group'+n+'">分组管理</button></td></tr>';
-                    $("#btn-see-group"+n).click(new function () {
-                        var trs = $("#project-list").find("tr");
-                        for (var i = 0; i < trs.length; i++) {
-                            if (i === n) {
-                                var row = trs.eq(i);
-                                var colDbId = row.find("td.db-id");
-                                localStorage.setItem("projectId", colDbId.text());
-                                $(location).prop('href', '/ZzApiDoc/groupList.jsp');
-                                break;
-                            }
-                        }
-                        // $(location).prop('href', '/ZzApiDoc/groupList.jsp');
-                    });
+                        + (value.property === "0" ? '公有' : '私有') + '</td><td>' + value.interfaceNo + '</td><td>'
+                        + value.createUserName + '</td><td>' + value.createTime + '</td><td><button type="button" class="btn-see-group btn">分组管理</button></td></tr>';
                 });
                 $("#project-list").html(c);
 
@@ -169,20 +161,8 @@ function justUpdateList(userId, index) {
                     c += '<tr><td><div class="checkbox"><input type="checkbox" id="checkbox' + n + '" class="styled"><label for="checkbox'
                         + n + '">选择</label></div></td><td class="db-id hide">' + value.id + '</td><td>'
                         + value.name + '</td><td>' + value.note + '</td><td>'
-                        + (value.property==="0"?'公有':'私有') + '</td><td>' + value.interfaceNo + '</td><td>'
-                        + value.createUserName + '</td><td>' + value.createTime + '</td><td><button type="button" class="btn btn-see-group" id="btn-see-group'+n+'">分组管理</button></td></tr>';
-                    $("#btn-see-group"+n).click(new function () {
-                        var trs = $("#project-list").find("tr");
-                        for (var i = 0; i < trs.length; i++) {
-                            if (i === n) {
-                                var row = trs.eq(i);
-                                var colDbId = row.find("td.db-id");
-                                localStorage.setItem("projectId", colDbId.text());
-                                $(location).prop('href', '/ZzApiDoc/groupList.jsp');
-                                break;
-                            }
-                        }
-                    });
+                        + (value.property === "0" ? '公有' : '私有') + '</td><td>' + value.interfaceNo + '</td><td>'
+                        + value.createUserName + '</td><td>' + value.createTime + '</td><td><button type="button" class="btn-see-group btn">分组管理</button></td></tr>';
                 });
                 $("#project-list").html(c);
             }
@@ -220,7 +200,7 @@ function getChooseRowsDbIds() {
         }
     }
     if (getChooseRowsCount() > 0) {
-        ids = ids.substr(0, ids.length-1);
+        ids = ids.substr(0, ids.length - 1);
     }
     return ids;
 }

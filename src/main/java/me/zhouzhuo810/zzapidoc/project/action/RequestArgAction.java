@@ -81,7 +81,7 @@ public class RequestArgAction extends BaseController<RequestArgEntity> {
     @RequestMapping(value = "/getRequestArgByInterfaceIdAndPid", method = RequestMethod.GET)
     public BaseResult getRequestArgByInterfaceIdAndPid(
             @RequestParam(value = "interfaceId") String interfaceId,
-            @RequestParam(value = "projectId") String projectId,
+            @RequestParam(value = "projectId", required = false) String projectId,
             @RequestParam(value = "pid") String pid,
             @RequestParam(value = "userId") String userId
     ) {
