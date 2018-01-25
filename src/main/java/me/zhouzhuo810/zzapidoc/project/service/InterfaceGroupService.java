@@ -20,7 +20,7 @@ public interface InterfaceGroupService extends BaseService<InterfaceGroupEntity>
 
     BaseResult getAllInterfaceGroup(String projectId, String userId);
 
-    WebResult getAllInterfaceGroupWeb(String projectId, String userId);
+    WebResult getAllInterfaceGroupWeb(String projectId, int indexPage, String userId);
 
     ResponseEntity<byte[]> downloadApi(String groupId, String userId);
 

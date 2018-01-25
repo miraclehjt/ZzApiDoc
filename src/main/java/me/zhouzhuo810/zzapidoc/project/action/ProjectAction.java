@@ -64,6 +64,14 @@ public class ProjectAction extends BaseController<ProjectEntity> {
     ) {
         return getService().deleteProject(id, userId);
     }
+    @ResponseBody
+    @RequestMapping(value = "/deleteProjectWeb", method = RequestMethod.POST)
+    public BaseResult deleteProjectWeb(
+            @RequestParam(value = "ids") String ids,
+            @RequestParam(value = "userId") String userId
+    ) {
+        return getService().deleteProjectWeb(ids, userId);
+    }
 
     @ResponseBody
     @RequestMapping(value = "/getAllProject", method = RequestMethod.GET)
@@ -76,9 +84,10 @@ public class ProjectAction extends BaseController<ProjectEntity> {
     @ResponseBody
     @RequestMapping(value = "/getAllProjectWeb", method = RequestMethod.GET)
     public WebResult getAllProjectWeb(
-            @RequestParam(value = "userId") String userId
+            @RequestParam(value = "userId") String userId,
+            @RequestParam(value = "page") int page
     ) {
-        return getService().getAllProjectWeb(userId);
+        return getService().getAllProjectWeb(userId, page);
     }
 
     @ResponseBody

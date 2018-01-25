@@ -16,6 +16,7 @@ import me.zhouzhuo810.zzapidoc.project.utils.ProjectUtils;
 import me.zhouzhuo810.zzapidoc.user.entity.UserEntity;
 import me.zhouzhuo810.zzapidoc.user.service.UserService;
 import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.json.JSONObject;
@@ -99,7 +100,7 @@ public class ProjectServiceImpl extends BaseServiceImpl<ProjectEntity> implement
         }
         ProjectEntity entity = getBaseDao().get(id);
         if (entity == null) {
-            return new BaseResult(0, "该项目不存在或已被删除！");
+            return new BaseResult(0, "该项目不存在或已被删除！", new HashMap<String, String>());
         }
         entity.setModifyUserID(user.getId());
         entity.setModifyUserName(user.getName());
@@ -111,6 +112,44 @@ public class ProjectServiceImpl extends BaseServiceImpl<ProjectEntity> implement
             e.printStackTrace();
             return new BaseResult(0, "刪除失败！");
         }
+    }
+
+    @Override
+    public BaseResult deleteProjectWeb(String ids, String userId) {
+        UserEntity user = mUserService.get(userId);
+        if (user == null) {
+            return new BaseResult(0, "用户不合法！", new HashMap<String, String>());
+        }
+        if (ids != null && ids.length() > 0) {
+            if (ids.contains(",")) {
+                String [] id = ids.split(",");
+                for (String s : id) {
+                    ProjectEntity entity = getBaseDao().get(s);
+                    if (entity == null) {
+                        continue;
+                    }
+                    entity.setModifyUserID(user.getId());
+                    entity.setModifyUserName(user.getName());
+                    entity.setDeleteFlag(BaseEntity.DELETE_FLAG_YES);
+                    try {
+                        update(entity);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            } else {
+                ProjectEntity entity = getBaseDao().get(ids);
+                entity.setModifyUserID(user.getId());
+                entity.setModifyUserName(user.getName());
+                entity.setDeleteFlag(BaseEntity.DELETE_FLAG_YES);
+                try {
+                    update(entity);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return new BaseResult(1, "刪除成功！", new HashMap<String, String>());
     }
 
     @Override
@@ -163,14 +202,20 @@ public class ProjectServiceImpl extends BaseServiceImpl<ProjectEntity> implement
     }
 
     @Override
-    public WebResult getAllProjectWeb(String userId) {
+    public WebResult getAllProjectWeb(String userId, int page) {
         UserEntity user = mUserService.get(userId);
         if (user == null) {
-            return new WebResult(0);
+            return new WebResult(1, 1, 0);
         }
-        List<ProjectEntity> list = getBaseDao().executeCriteria(ProjectUtils.getProjectByUserId(userId), Order.asc("createTime"));
+        int rows = getBaseDao().executeCriteriaRow(ProjectUtils.getProjectByUserId(userId));
+        int totalPage = rows / 10;
+        if (rows % 10 > 0) {
+            totalPage++;
+        }
+        List<ProjectEntity> list = getBaseDao().executeCriteria(ProjectUtils.getProjectByUserId(userId), page-1, 10, Order.asc("createTime"));
+
         if (list == null) {
-            return new WebResult(0);
+            return new WebResult(1, 1, 0);
         }
         List<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
         for (ProjectEntity entity : list) {
@@ -184,7 +229,7 @@ public class ProjectServiceImpl extends BaseServiceImpl<ProjectEntity> implement
             map.put("createTime", DataUtils.formatDate(entity.getCreateTime()));
             result.add(map.build());
         }
-        return new WebResult(list.size(), result);
+        return new WebResult(page, totalPage, rows, result);
     }
 
     @Override

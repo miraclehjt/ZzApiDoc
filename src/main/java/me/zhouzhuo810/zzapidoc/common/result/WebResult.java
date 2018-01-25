@@ -7,26 +7,46 @@ import java.util.ArrayList;
  */
 public class WebResult {
 
-    private int total;
+    private int indexPage;
+    private int totalPage;
+    private int totalRow;
+
     private Object rows;
 
-
-    public WebResult(int total) {
-        this(0, new ArrayList<String>());
+    public WebResult(int indexPage, int totalPage, int totalRow) {
+        this(indexPage,totalPage, totalRow, new ArrayList<String>());
     }
 
 
-    public WebResult(int total, Object rows) {
-        this.total = total;
+    public WebResult(int indexPage, int totalPage, int totalRow, Object rows) {
+        this.indexPage = indexPage;
+        this.totalPage = totalPage;
+        this.totalRow = totalRow;
         this.rows = rows;
     }
 
-    public int getTotal() {
-        return total;
+    public int getIndexPage() {
+        return indexPage;
     }
 
-    public void setTotal(int total) {
-        this.total = total;
+    public void setIndexPage(int indexPage) {
+        this.indexPage = indexPage;
+    }
+
+    public int getTotalRow() {
+        return totalRow;
+    }
+
+    public void setTotalRow(int totalRow) {
+        this.totalRow = totalRow;
+    }
+
+    public int getTotalPage() {
+        return totalPage;
+    }
+
+    public void setTotalPage(int totalPage) {
+        this.totalPage = totalPage;
     }
 
     public Object getRows() {

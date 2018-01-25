@@ -59,7 +59,7 @@
     </div>
     <div class="row">
         <div class="col-md-12" id="right-container">
-            <h2 id="tv-content-title">项目管理</h2>
+            <h2 id="tv-content-title">分组管理</h2>
             <hr/>
             <div id="btn-box">
                 <!-- Standard button -->
@@ -74,7 +74,7 @@
             <div class="col-md-12 left-table">
                 <div class="panel panel-primary">
                     <div class="panel-heading">
-                        <h3 class="panel-title" id="table-title">项目管理</h3>
+                        <h3 class="panel-title" id="table-title">分组管理</h3>
                     </div>
                     <div class="panel-body">
                         <table class="table table-striped">
@@ -90,12 +90,10 @@
                                 </th>
                                 <th class="hide">ID</th>
                                 <th>名称</th>
-                                <th>备注</th>
-                                <th>属性</th>
+                                <th>IP地址</th>
                                 <th>接口数量</th>
                                 <th>创建人</th>
                                 <th>创建时间</th>
-                                <th>分组管理</th>
                             </tr>
                             </thead>
                             <tbody id="project-list">
@@ -112,7 +110,7 @@
 <script src="js/jquery.min.js"></script>
 <script src="js/bootstrap.min.js"></script>
 <script src="js/jquery.twbsPagination.min.js"></script>
-<script src="js/home.js" type="text/javascript" charset="utf-8"></script>
+<script src="js/group.js" type="text/javascript" charset="utf-8"></script>
 
 <!-- 编辑对话框 -->
 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">

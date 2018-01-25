@@ -18,11 +18,13 @@ public interface ProjectService extends BaseService<ProjectEntity> {
 
     BaseResult deleteProject(String id, String userId);
 
+    BaseResult deleteProjectWeb(String ids, String userId);
+
     BaseResult updateProject(String projectId, String name, String note, String property,String packageName, String userId);
 
     BaseResult getAllProject(String userId);
 
-    WebResult getAllProjectWeb(String userId);
+    WebResult getAllProjectWeb(String userId, int page);
 
     BaseResult getProjectDetails(String projectId, String userId);
 

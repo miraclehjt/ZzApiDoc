@@ -57,9 +57,10 @@ public class InterfaceGroupAction extends BaseController<InterfaceGroupEntity> {
     @RequestMapping(value = "/getAllInterfaceGroupWeb", method = RequestMethod.GET)
     public WebResult getAllInterfaceGroupWeb(
             @RequestParam(value = "projectId") String projectId,
+            @RequestParam(value = "page") int page,
             @RequestParam(value = "userId") String userId
     ) {
-        return getService().getAllInterfaceGroupWeb(projectId, userId);
+        return getService().getAllInterfaceGroupWeb(projectId, page, userId);
     }
 
     @ResponseBody

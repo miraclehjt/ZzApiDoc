@@ -3,6 +3,7 @@ $(document).ready(function () {
     var username = localStorage.getItem("username");
     var userId = localStorage.getItem("userId");
     var pic = localStorage.getItem("userPic");
+    var projectId = localStorage.getItem("projectId");
     if (userId === null || userId === "") {
         $("#box-user-info").hide();
         $("#form-login").show();
@@ -10,7 +11,7 @@ $(document).ready(function () {
         $("#tv-user-name").val(username);
         $("#box-user-info").show();
         $("#form-login").hide();
-        getProjectList(userId, 1);
+        getProjectList(projectId, userId, 1);
     }
 
     //登录按钮点击
@@ -25,7 +26,8 @@ $(document).ready(function () {
     //刷新按钮点击
     $("#btn-refresh").click(function () {
         var userId = localStorage.getItem("userId");
-        getProjectList(userId, 1);
+        var projectId = localStorage.getItem("projectId");
+        getProjectList(projectId, userId, 1);
     });
     //添加按钮点击
     $("#btn-add").click(function () {
@@ -74,7 +76,8 @@ function doLogin() {
                     localStorage.setItem("username", data.data.name);
                     localStorage.setItem("userId", data.data.id);
                     localStorage.setItem("userPic", data.data.pic);
-                    getProjectList(data.data.id, 1);
+                    var projectId = localStorage.getItem("projectId");
+                    getProjectList(projectId, data.data.id, 1);
                 }
             }
 
@@ -92,18 +95,23 @@ function doExitLogin() {
     //显示用户名和密码输入框
     $("#form-login").show();
     //清空列表
-    getProjectList("", 1);
+    getProjectList("", "", 1);
 }
 
 /*获取项目列表*/
-function getProjectList(userId, index) {
+function getProjectList(projectId, userId, index) {
     if (userId === null || userId.length === 0) {
         $("#box-user-info").hide();
         $("#form-login").show();
         $("#row-hint").html(getHintContent("登录已过期，请重新登录"));
         return;
     }
-    $.get("/ZzApiDoc/v1/project/getAllProjectWeb?userId=" + userId + "&page=" + index,
+    if (projectId === null || projectId.length === 0) {
+        $("#row-hint").html(getHintContent("请先选择项目"));
+        return;
+    }
+
+    $.get("/ZzApiDoc/v1/interfaceGroup/getAllInterfaceGroupWeb?projectId="+projectId+"&userId=" + userId + "&page=" + index,
         function (data, status) {
             if (status === 'success') {
                 //填充表格
@@ -111,22 +119,8 @@ function getProjectList(userId, index) {
                 $.each(data.rows, function (n, value) {
                     c += '<tr><td><div class="checkbox"><input type="checkbox" id="checkbox' + n + '" class="styled"><label for="checkbox'
                         + n + '">选择</label></div></td><td class="db-id hide">' + value.id + '</td><td>'
-                        + value.name + '</td><td>' + value.note + '</td><td>'
-                        + (value.property==="0"?'公有':'私有') + '</td><td>' + value.interfaceNo + '</td><td>'
-                        + value.createUserName + '</td><td>' + value.createTime + '</td><td><button type="button" class="btn btn-see-group" id="btn-see-group'+n+'">分组管理</button></td></tr>';
-                    $("#btn-see-group"+n).click(new function () {
-                        var trs = $("#project-list").find("tr");
-                        for (var i = 0; i < trs.length; i++) {
-                            if (i === n) {
-                                var row = trs.eq(i);
-                                var colDbId = row.find("td.db-id");
-                                localStorage.setItem("projectId", colDbId.text());
-                                $(location).prop('href', '/ZzApiDoc/groupList.jsp');
-                                break;
-                            }
-                        }
-                        // $(location).prop('href', '/ZzApiDoc/groupList.jsp');
-                    });
+                        + value.name + '</td><td>' + value.ip + '</td><td>'
+                        + value.interfaceNo + '</td><td>' + value.createUserName + '</td><td>' + value.createTime + '</td></tr>';
                 });
                 $("#project-list").html(c);
 
@@ -143,7 +137,8 @@ function getProjectList(userId, index) {
                         $("#checkbox-all").prop("checked", false);
                         //重载数据
                         var mid = localStorage.getItem("userId");
-                        justUpdateList(mid, page);
+                        var projectId = localStorage.getItem("projectId");
+                        justUpdateList(projectId, mid, page);
                     }
                 });
             }
@@ -153,14 +148,19 @@ function getProjectList(userId, index) {
 }
 
 /*获取项目列表*/
-function justUpdateList(userId, index) {
+function justUpdateList(projectId, userId, index) {
     if (userId === null || userId.length === 0) {
         $("#box-user-info").hide();
         $("#form-login").show();
         $("#row-hint").html(getHintContent("登录已过期，请重新登录"));
         return;
     }
-    $.get("/ZzApiDoc/v1/project/getAllProjectWeb?userId=" + userId + "&page=" + index,
+    if (projectId === null || projectId.length === 0) {
+        $("#row-hint").html(getHintContent("请先选择项目"));
+        return;
+    }
+
+    $.get("/ZzApiDoc/v1/interfaceGroup/getAllInterfaceGroupWeb?projectId="+projectId+"&userId=" + userId + "&page=" + index,
         function (data, status) {
             if (status === 'success') {
                 //填充表格
@@ -168,21 +168,8 @@ function justUpdateList(userId, index) {
                 $.each(data.rows, function (n, value) {
                     c += '<tr><td><div class="checkbox"><input type="checkbox" id="checkbox' + n + '" class="styled"><label for="checkbox'
                         + n + '">选择</label></div></td><td class="db-id hide">' + value.id + '</td><td>'
-                        + value.name + '</td><td>' + value.note + '</td><td>'
-                        + (value.property==="0"?'公有':'私有') + '</td><td>' + value.interfaceNo + '</td><td>'
-                        + value.createUserName + '</td><td>' + value.createTime + '</td><td><button type="button" class="btn btn-see-group" id="btn-see-group'+n+'">分组管理</button></td></tr>';
-                    $("#btn-see-group"+n).click(new function () {
-                        var trs = $("#project-list").find("tr");
-                        for (var i = 0; i < trs.length; i++) {
-                            if (i === n) {
-                                var row = trs.eq(i);
-                                var colDbId = row.find("td.db-id");
-                                localStorage.setItem("projectId", colDbId.text());
-                                $(location).prop('href', '/ZzApiDoc/groupList.jsp');
-                                break;
-                            }
-                        }
-                    });
+                        + value.name + '</td><td>' + value.ip + '</td><td>'
+                        + value.interfaceNo + '</td><td>' + value.createUserName + '</td><td>' + value.createTime + '</td></tr>';
                 });
                 $("#project-list").html(c);
             }
@@ -248,7 +235,8 @@ function doDelete() {
                 } else {
                     $("#row-hint").html(getOkContent(data.msg));
                     //重新加载数据
-                    getProjectList(userId, 1);
+                    var projectId = localStorage.getItem("projectId");
+                    getProjectList(projectId, userId, 1);
                 }
             }
 

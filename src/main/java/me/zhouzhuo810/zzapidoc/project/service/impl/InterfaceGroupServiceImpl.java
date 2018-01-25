@@ -178,14 +178,19 @@ public class InterfaceGroupServiceImpl extends BaseServiceImpl<InterfaceGroupEnt
     }
 
     @Override
-    public WebResult getAllInterfaceGroupWeb(String projectId, String userId) {
+    public WebResult getAllInterfaceGroupWeb(String projectId, int indexPage, String userId) {
         UserEntity user = mUserService.get(userId);
         if (user == null) {
-            return new WebResult(0);
+            return new WebResult(1, 1, 0);
         }
-        List<InterfaceGroupEntity> groups = getBaseDao().executeCriteria(InterfaceUtils.getInterfaceByProjectId(projectId), Order.asc("createTime"));
+        int rowCount = getBaseDao().executeCriteriaRow(InterfaceUtils.getInterfaceByProjectId(projectId));
+        List<InterfaceGroupEntity> groups = getBaseDao().executeCriteria(InterfaceUtils.getInterfaceByProjectId(projectId), indexPage-1, 10, Order.asc("createTime"));
+        int pageCount = rowCount / 10;
+        if (rowCount % 10 > 0) {
+            pageCount++;
+        }
         if (groups == null) {
-            return new WebResult(0);
+            return new WebResult(1, 1, 0);
         }
         List<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
         for (InterfaceGroupEntity group : groups) {
@@ -199,7 +204,7 @@ public class InterfaceGroupServiceImpl extends BaseServiceImpl<InterfaceGroupEnt
             map.put("createUserId", group.getCreateUserID());
             result.add(map.build());
         }
-        return new WebResult(groups.size(), result);
+        return new WebResult(indexPage, pageCount, rowCount, result);
     }
 
 

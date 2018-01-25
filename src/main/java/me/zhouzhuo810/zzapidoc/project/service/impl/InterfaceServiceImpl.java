@@ -374,24 +374,23 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
     }
 
     @Override
-    public WebResult getInterfaceByGroupIdWeb(String projectId, String groupId, String userId) {
+    public WebResult getInterfaceByGroupIdWeb(String groupId, int indexPage, String userId) {
         UserEntity user = mUserService.get(userId);
         if (user == null) {
-            return new WebResult(0);
+            return new WebResult(1, 1,  0);
         }
         InterfaceGroupEntity group = mInterfaceGroupService.get(groupId);
         if (group == null) {
-            return new WebResult(0);
+            return new WebResult(1, 1, 0);
         }
-        List<InterfaceEntity> list = getBaseDao().executeCriteria(InterfaceUtils.getInterfaceByGroupId(groupId));
-        List<RequestHeaderEntity> globalRequestHeaders = mRequestHeaderService.getGlobalRequestHeaders(projectId);
-        int globalHeadSize = globalRequestHeaders == null ? 0 : globalRequestHeaders.size();
-        List<RequestArgEntity> globalRequestArgs = mRequestArgService.getGlobalRequestArgs(projectId);
-        int globalReqSize = globalRequestArgs == null ? 0 : globalRequestArgs.size();
-        List<ResponseArgEntity> globalResponseArgs = mResponseArgService.getGlobalResponseArgs(projectId);
-        int globalResSize = globalResponseArgs == null ? 0 : globalResponseArgs.size();
+        int rowCount = getBaseDao().executeCriteriaRow(InterfaceUtils.getInterfaceByGroupId(groupId));
+        List<InterfaceEntity> list = getBaseDao().executeCriteria(InterfaceUtils.getInterfaceByGroupId(groupId), indexPage, 10, Order.desc("createTime"));
+        int pageCount = rowCount / 10;
+        if (rowCount % 10 > 0) {
+            pageCount++;
+        }
         if (list == null) {
-            return new WebResult(0);
+            return new WebResult(1, 1, 0);
         }
         List<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
         for (InterfaceEntity entity : list) {
@@ -407,12 +406,9 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
             map.put("note", entity.getNote() == null ? "" : entity.getNote());
             map.put("createTime", DataUtils.formatDate(entity.getCreateTime()));
             map.put("createUserName", entity.getCreateUserName());
-            map.put("requestHeadersNo", entity.getRequestHeadersNo() + globalHeadSize);
-            map.put("requestParamsNo", entity.getRequestParamsNo() + globalReqSize);
-            map.put("responseParamsNo", entity.getResponseParamsNo() + globalResSize);
             result.add(map.build());
         }
-        return new WebResult(list.size(), result);
+        return new WebResult(indexPage, pageCount, rowCount, result);
     }
 
     @Override
