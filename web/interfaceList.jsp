@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="css/common.css"/>
     <link rel="stylesheet" href="css/awesome-bootstrap-checkbox.css">
     <link rel="stylesheet" href="css/font-awesome.min.css">
+    <link rel="stylesheet" href="css/bootstrap-select.min.css">
 
     <!--[if lt IE 9]>
     <script src="js/html5shiv.js"></script>
@@ -65,9 +66,9 @@
                 <!-- Standard button -->
                 <button type="button" class="btn btn-primary" id="btn-refresh">刷新</button>
                 <!-- Standard button -->
-                <button type="button" class="btn btn-primary" id="btn-add">新增</button>
-                <!-- Provides extra visual weight and identifies the primary action in a set of buttons -->
-                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">编辑</button>
+                <button type="button" class="btn btn-primary" id="btn-add-interface" data-toggle="modal"
+                        data-target="#addModel">新增
+                </button>
                 <!-- Indicates a dangerous or potentially negative action -->
                 <button type="button" class="btn btn-danger" id="btn-delete">删除</button>
             </div>
@@ -77,32 +78,36 @@
                         <h3 class="panel-title" id="table-title">接口管理</h3>
                     </div>
                     <div class="panel-body">
-                        <table class="table table-striped">
-                            <thead>
-                            <tr>
-                                <th>
-                                    <div class="checkbox">
-                                        <input type="checkbox" id="checkbox-all" class="styled">
-                                        <label for="checkbox-all">
-                                            全选
-                                        </label>
-                                    </div>
-                                </th>
-                                <th class="hide">ID</th>
-                                <th>名称</th>
-                                <th>请求方式</th>
-                                <th>请求路径</th>
-                                <th>备注</th>
-                                <th>创建人</th>
-                                <th>创建时间</th>
-                                <th>请求参数</th>
-                                <th>返回参数</th>
-                            </tr>
-                            </thead>
-                            <tbody id="project-list">
-                            <%--js add content--%>
-                            </tbody>
-                        </table>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                <tr>
+                                    <th>
+                                        <div class="checkbox">
+                                            <input type="checkbox" id="checkbox-all" class="styled">
+                                            <label for="checkbox-all">
+                                                全选
+                                            </label>
+                                        </div>
+                                    </th>
+                                    <th class="hide">ID</th>
+                                    <th class="hide">methodId</th>
+                                    <th>名称</th>
+                                    <th>请求方式</th>
+                                    <th>请求路径</th>
+                                    <th>备注</th>
+                                    <th>创建人</th>
+                                    <th>创建时间</th>
+                                    <th>请求参数</th>
+                                    <th>返回参数</th>
+                                    <th>操作</th>
+                                </tr>
+                                </thead>
+                                <tbody id="project-list">
+                                <%--js add content--%>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                     <ul class="pagination" id="page-indicator"></ul>
                 </div>
@@ -114,26 +119,117 @@
 <script src="js/bootstrap.min.js"></script>
 <script src="js/jquery.twbsPagination.min.js"></script>
 <script src="js/interf.js" type="text/javascript" charset="utf-8"></script>
+<script src="js/bootstrap-select.min.js" type="text/javascript" charset="utf-8"></script>
+
 
 <!-- 编辑对话框 -->
-<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+<div class="modal fade" id="editModel" tabindex="-1" role="dialog" aria-labelledby="editTitle">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
                 </button>
-                <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+                <h4 class="modal-title" id="editTitle">编辑接口</h4>
             </div>
             <div class="modal-body">
-                ...
+                <form class="form-horizontal" id="form-edit">
+                    <div class="form-group form-group-sm">
+                        <label class="col-sm-2 control-label" for="select-interface-type-edit">参数类型</label>
+                        <div class="col-sm-10">
+                            <select class="selectpicker" id="select-interface-type-edit">
+                                <option value="0">GET</option>
+                                <option value="1">POST</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group form-group-sm">
+                        <label class="col-sm-2 control-label" for="et-interface-name-edit">名称</label>
+                        <div class="col-sm-10">
+                            <input class="form-control" type="text" id="et-interface-name-edit" placeholder="名称">
+                        </div>
+                    </div>
+                    <div class="form-group form-group-sm">
+                        <label class="col-sm-2 control-label" for="et-interface-version-edit">版本号</label>
+                        <div class="col-sm-10">
+                            <input class="form-control" type="text" id="et-interface-version-edit" placeholder="版本号">
+                        </div>
+                    </div>
+                    <div class="form-group form-group-sm">
+                        <label class="col-sm-2 control-label" for="et-interface-path-edit">请求路径</label>
+                        <div class="col-sm-10">
+                            <input class="form-control" type="text" id="et-interface-path-edit" placeholder="请求路径">
+                        </div>
+                    </div>
+                    <div class="form-group form-group-sm">
+                        <label class="col-sm-2 control-label" for="et-interface-note-edit">备注</label>
+                        <div class="col-sm-10">
+                            <input class="form-control" type="text" id="et-interface-note-edit" placeholder="备注">
+                        </div>
+                    </div>
+                </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                <button type="button" class="btn btn-primary">保存</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="btn-edit-save">保存</button>
             </div>
         </div>
     </div>
 </div>
+
+<!-- 新增对话框 -->
+<div class="modal fade" id="addModel" tabindex="-1" role="dialog" aria-labelledby="addTitle">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="addTitle">新增接口</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" id="form-add">
+                    <div class="form-group form-group-sm">
+                        <label class="col-sm-2 control-label" for="select-interface-type">参数类型</label>
+                        <div class="col-sm-10">
+                            <select class="selectpicker" id="select-interface-type">
+                                <option value="0">GET</option>
+                                <option value="1">POST</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group form-group-sm">
+                        <label class="col-sm-2 control-label" for="et-interface-name">名称</label>
+                        <div class="col-sm-10">
+                            <input class="form-control" type="text" id="et-interface-name" placeholder="名称">
+                        </div>
+                    </div>
+                    <div class="form-group form-group-sm">
+                        <label class="col-sm-2 control-label" for="et-interface-version">版本号</label>
+                        <div class="col-sm-10">
+                            <input class="form-control" type="text" id="et-interface-version" placeholder="版本号">
+                        </div>
+                    </div>
+                    <div class="form-group form-group-sm">
+                        <label class="col-sm-2 control-label" for="et-interface-path">请求路径</label>
+                        <div class="col-sm-10">
+                            <input class="form-control" type="text" id="et-interface-path" placeholder="请求路径">
+                        </div>
+                    </div>
+                    <div class="form-group form-group-sm">
+                        <label class="col-sm-2 control-label" for="et-interface-note">备注</label>
+                        <div class="col-sm-10">
+                            <input class="form-control" type="text" id="et-interface-note" placeholder="备注">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="btn-add-save">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 </body>
 

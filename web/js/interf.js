@@ -18,15 +18,32 @@ $(document).ready(function () {
         var colDbId = $(this).parent().parent().find(".db-id");
         localStorage.setItem("interfaceId", colDbId.text());
         localStorage.setItem("pid", "0");
-        location.href ="reqArgList.jsp"
+        location.href ="reqArgList.jsp";
     });
     //返回参数
     $(document).on("click",".btn-see-res",function(){
         var colDbId = $(this).parent().parent().find(".db-id");
         localStorage.setItem("interfaceId", colDbId.text());
         localStorage.setItem("pid", "0");
-        location.href ="resArgList.jsp"
+        location.href ="resArgList.jsp";
     });
+    //编辑按钮
+    $(document).on("click", ".btn-edit-interface", function () {
+        var colDbId = $(this).parent().parent().find(".db-id");
+        localStorage.setItem("edit-interface-id", colDbId.text());
+        var methodId = $(this).parent().parent().find(".method-id").text();
+        var name = $(this).parent().parent().find(".name").text();
+        var note = $(this).parent().parent().find(".note").text();
+        var path = $(this).parent().parent().find(".path").text();
+        var version = localStorage.getItem("version");
+        $("#et-interface-name-edit").val(name);
+        $("#et-interface-version-edit").val(version);
+        $("#et-interface-path-edit").val(path);
+        $("#et-interface-note-edit").val(note);
+        getHttpMethodsEdit(methodId);
+    });
+
+
     //登录按钮点击
     $("#btn-login").click(function () {
         //	$("#tv-user-name").show();
@@ -42,11 +59,6 @@ $(document).ready(function () {
         var groupId = localStorage.getItem("groupId");
         getProjectList(groupId, userId, 1);
     });
-    //添加按钮点击
-    $("#btn-add").click(function () {
-        var count = getChooseRowsCount();
-        alert(count);
-    });
     //删除按钮点击
     $("#btn-delete").click(function () {
         doDelete();
@@ -57,7 +69,96 @@ $(document).ready(function () {
         $(".styled").prop("checked", isCheck);
     });
 
+    //添加按钮点击
+    $("#btn-add-interface").click(function () {
+        $("#et-interface-note").val("");
+        $("#et-interface-name").val("");
+        $("#et-interface-path").val("");
+        var version = localStorage.getItem("version");
+        $("#et-interface-version").val(version);
+        getHttpMethods("");
+    });
+    //添加对话框保存按钮
+    $("#btn-add-save").click(function () {
+        addResParam();
+    });
+    //编辑对话框保存按钮
+    $("#btn-edit-save").click(function () {
+        var interfaceId = localStorage.getItem("edit-interface-id");
+        editResParam(interfaceId);
+    });
+
 });
+
+function getHttpMethods(defValue) {
+    $.get("/ZzApiDoc/v1/dictionary/getDictionary?type=method",
+        function (data, status) {
+            if (status === 'success') {
+                if (data.code === 0) {
+                    showHintMsg(data.msg);
+                } else {
+                    //填充选项
+                    var sel = $("#select-interface-type");
+                    sel.empty();
+                    var firstOne = "";
+                    var sameOne = "";
+                    $.each(data.data, function (n, value) {
+                        sel.append(
+                            "<option value='"+value.id+"'>"+value.name+"</option>"
+                        );
+                        if(n === 0) {
+                            firstOne = value.id;
+                        }
+                        if (defValue === value.id) {
+                            sameOne = value.id;
+                        }
+                    });
+                    sel.selectpicker('refresh');
+                    if (sameOne === null || sameOne === "") {
+                        sel.selectpicker('val', firstOne);
+                    } else {
+                        sel.selectpicker('val', sameOne);
+                    }
+                    sel.selectpicker('refresh');
+                }
+            }
+        });
+
+}
+function getHttpMethodsEdit(defValue) {
+    $.get("/ZzApiDoc/v1/dictionary/getDictionary?type=method",
+        function (data, status) {
+            if (status === 'success') {
+                if (data.code === 0) {
+                    showHintMsg(data.msg);
+                } else {
+                    //填充选项
+                    var sel = $("#select-interface-type-edit");
+                    sel.empty();
+                    var firstOne = "";
+                    var sameOne = "";
+                    $.each(data.data, function (n, value) {
+                        sel.append(
+                            "<option value='"+value.id+"'>"+value.name+"</option>"
+                        );
+                        if(n === 0) {
+                            firstOne = value.id;
+                        }
+                        if (defValue === value.id) {
+                            sameOne = value.id;
+                        }
+                    });
+                    if (sameOne === null || sameOne === "") {
+                        sel.selectpicker('val', firstOne);
+                    } else {
+                        sel.selectpicker('val', sameOne);
+                    }
+                    sel.selectpicker('refresh');
+                }
+            }
+        });
+
+}
 
 /*用户登录*/
 function doLogin() {
@@ -65,7 +166,7 @@ function doLogin() {
     var password = $("#et-password").val();
     if (username === "" || password === "") {
         //error msg
-        $("#row-hint").html(getHintContent("用户名或密码不能为空"));
+        showHintMsg("用户名或密码不能为空");
         return;
     }
     $.post("/ZzApiDoc/v1/user/userLogin", {
@@ -76,7 +177,7 @@ function doLogin() {
             if (status === 'success') {
                 if (data.code === 0) {
                     //error msg
-                    $("#row-hint").html(getHintContent(data.msg));
+                    showHintMsg(data.msg);
                 } else {
                     $("#row-hint").html("");
                     //fill data
@@ -116,11 +217,11 @@ function getProjectList(groupId, userId, index) {
     if (userId === null || userId.length === 0) {
         $("#box-user-info").hide();
         $("#form-login").show();
-        $("#row-hint").html(getHintContent("登录已过期，请重新登录"));
+        showHintMsg("登录已过期，请重新登录");
         return;
     }
     if (groupId === null || groupId.length === 0) {
-        $("#row-hint").html(getHintContent("请先选择分组"));
+        showHintMsg("请先选择分组");
         return;
     }
     $.get("/ZzApiDoc/v1/interface/getInterfaceByGroupIdWeb?groupId="+groupId+"&userId=" + userId + "&page=" + index,
@@ -129,11 +230,19 @@ function getProjectList(groupId, userId, index) {
                 //填充表格
                 var c = "";
                 $.each(data.rows, function (n, value) {
-                    c += '<tr><td><div class="checkbox"><input type="checkbox" id="checkbox' + n + '" class="styled"><label for="checkbox'
-                        + n + '">选择</label></div></td><td class="db-id hide">' + value.id + '</td><td>'
-                        + value.name + '</td><td>' + value.method + '</td><td>'
-                        + value.path + '</td><td>' + value.note + '</td><td>'
-                        + value.createUserName + '</td><td>' + value.createTime + '</td><td><button type="button" class="btn-see-req btn">请求参数</button></td><td><button type="button" class="btn-see-res btn">返回参数</button></td></tr>';
+                    c += '<tr>' +
+                        '<td><div class="checkbox"><input type="checkbox" id="checkbox' + n + '" class="styled"><label for="checkbox' + n + '">选择</label></div></td>' +
+                        '<td class="db-id hide">' + value.id + '</td>' +
+                        '<td class="method-id hide">' + value.methodId + '</td>' +
+                        '<td class="name">' + value.name + '</td>' +
+                        '<td>' + value.methodName + '</td>' +
+                        '<td class="path">' + value.path + '</td>' +
+                        '<td class="note">' + value.note + '</td>' +
+                        '<td>' + value.createUserName + '</td>' +
+                        '<td>' + value.createTime + '</td>' +
+                        '<td><button type="button" class="btn-see-req btn">请求参数</button></td>' +
+                        '<td><button type="button" class="btn-see-res btn">返回参数</button></td>' +
+                        '<td><button type="button" class="btn-edit-interface btn btn-primary"  data-toggle="modal" data-target="#editModel">编辑</button></td></tr>';
                 });
                 $("#project-list").html(c);
 
@@ -164,11 +273,11 @@ function justUpdateList(groupId, userId, index) {
     if (userId === null || userId.length === 0) {
         $("#box-user-info").hide();
         $("#form-login").show();
-        $("#row-hint").html(getHintContent("登录已过期，请重新登录"));
+        showHintMsg("登录已过期，请重新登录");
         return;
     }
     if (groupId === null || groupId.length === 0) {
-        $("#row-hint").html(getHintContent("请先选择分组"));
+        showHintMsg("请先选择分组");
         return;
     }
     $.get("/ZzApiDoc/v1/interface/getInterfaceByGroupIdWeb?groupId="+groupId+"&userId=" + userId + "&page=" + index,
@@ -177,11 +286,19 @@ function justUpdateList(groupId, userId, index) {
                 //填充表格
                 var c = "";
                 $.each(data.rows, function (n, value) {
-                    c += '<tr><td><div class="checkbox"><input type="checkbox" id="checkbox' + n + '" class="styled"><label for="checkbox'
-                        + n + '">选择</label></div></td><td class="db-id hide">' + value.id + '</td><td>'
-                        + value.name + '</td><td>' + value.method + '</td><td>'
-                        + value.path + '</td><td>' + value.note + '</td><td>'
-                        + value.createUserName + '</td><td>' + value.createTime + '</td><td><button type="button" class="btn-see-group btn">请求参数</button></td><td><button type="button" class="btn-see-group btn">返回参数</button></td></tr>';
+                    c += '<tr>' +
+                        '<td><div class="checkbox"><input type="checkbox" id="checkbox' + n + '" class="styled"><label for="checkbox' + n + '">选择</label></div></td>' +
+                        '<td class="db-id hide">' + value.id + '</td>' +
+                        '<td class="method-id hide">' + value.methodId + '</td>' +
+                        '<td class="name">' + value.name + '</td>' +
+                        '<td>' + value.methodName + '</td>' +
+                        '<td class="path">' + value.path + '</td>' +
+                        '<td class="note">' + value.note + '</td>' +
+                        '<td>' + value.createUserName + '</td>' +
+                        '<td>' + value.createTime + '</td>' +
+                        '<td><button type="button" class="btn-see-req btn">请求参数</button></td>' +
+                        '<td><button type="button" class="btn-see-res btn">返回参数</button></td>' +
+                        '<td><button type="button" class="btn-edit-interface btn btn-primary"  data-toggle="modal" data-target="#editModel">编辑</button></td></tr>';
                 });
                 $("#project-list").html(c);
             }
@@ -232,10 +349,10 @@ function doDelete() {
     if (userId === null || userId.length === 0) {
         $("#box-user-info").hide();
         $("#form-login").show();
-        $("#row-hint").html(getHintContent("登录已过期，请重新登录"));
+        showHintMsg("登录已过期，请重新登录");
         return;
     }
-    $.post("/ZzApiDoc/v1/project/deleteProjectWeb", {
+    $.post("/ZzApiDoc/v1/interface/deleteInterfaceWeb", {
             userId: userId,
             ids: getChooseRowsDbIds()
         },
@@ -243,9 +360,9 @@ function doDelete() {
             if (status === 'success') {
                 if (data.code === 0) {
                     //error msg
-                    $("#row-hint").html(getHintContent(data.msg));
+                    showHintMsg(data.msg);
                 } else {
-                    $("#row-hint").html(getOkContent(data.msg));
+                    showOkMsg(data.msg);
                     //重新加载数据
                     var groupId = localStorage.getItem("groupId");
                     getProjectList(groupId, userId, 1);
@@ -256,18 +373,103 @@ function doDelete() {
 }
 
 /**
+ * 编辑接口
+ */
+function editResParam(interfaceId) {
+    //暂存版本号
+    var version = $("#et-interface-version-edit").val();
+    localStorage.setItem("version", version);
+
+    var note = $("#et-interface-note-edit").val();
+    var name = $("#et-interface-name-edit").val();
+    var path = $("#et-interface-path-edit").val();
+    var httpMethodId = $("#select-interface-type-edit").val();
+    var userId = localStorage.getItem("userId");
+    var groupId = localStorage.getItem("groupId");
+    var projectId = localStorage.getItem("projectId");
+    $.post("/ZzApiDoc/v1/interface/updateInterface", {
+            userId: userId,
+            name: name,
+            path: path,
+            note: note,
+            httpMethodId: httpMethodId,
+            groupId: groupId,
+            projectId: projectId,
+            interfaceId: interfaceId
+        },
+        function (data, status) {
+            if (status === 'success') {
+                if (data.code === 0) {
+                    //error msg
+                    showHintMsg(data.msg);
+                } else {
+                    showOkMsg(data.msg);
+                    //重新加载数据
+                    var groupId = localStorage.getItem("groupId");
+                    getProjectList(groupId, userId, 1);
+                }
+            }
+
+        });
+}
+
+/**
+ * 添加接口
+ */
+function addResParam() {
+    var note = $("#et-interface-note").val();
+    var name = $("#et-interface-name").val();
+    var path = $("#et-interface-path").val();
+    var httpMethodId = $("#select-interface-type").val();
+    var userId = localStorage.getItem("userId");
+    var groupId = localStorage.getItem("groupId");
+    var projectId = localStorage.getItem("projectId");
+    $.post("/ZzApiDoc/v1/interface/addInterface", {
+            userId: userId,
+            name: name,
+            path: path,
+            note: note,
+            httpMethodId: httpMethodId,
+            groupId: groupId,
+            projectId: projectId
+        },
+        function (data, status) {
+            if (status === 'success') {
+                if (data.code === 0) {
+                    //error msg
+                    showHintMsg(data.msg);
+                } else {
+                    showOkMsg(data.msg);
+                    //重新加载数据
+                    var groupId = localStorage.getItem("groupId");
+                    getProjectList(groupId, userId, 1);
+                }
+            }
+
+        });
+}
+/**
  * 拼接提示html
  * @param msg
  * @returns {string}
  */
-function getHintContent(msg) {
-    return '<div class="alert alert-warning" id="tv-hint"> <a href="#" class="close" data-dismiss="alert"> &times;</a><label id="tv-hint-content">' + msg + '</label></div>'
+function showHintMsg(msg) {
+    $("#row-hint").html('<div class="alert alert-warning" id="tv-hint"> <a href="#" class="close" data-dismiss="alert"> &times;</a><label id="tv-hint-content">' + msg + '</label></div>');
+    window.setTimeout("clearHint()",1500);//使用字符串执行方法
 }
 /**
  * 拼接成功html
  * @param msg
  * @returns {string}
  */
-function getOkContent(msg) {
-    return '<div class="alert alert-success" id="tv-hint"> <a href="#" class="close" data-dismiss="alert"> &times;</a><label id="tv-hint-content">' + msg + '</label></div>'
+function showOkMsg(msg) {
+    $("#row-hint").html('<div class="alert alert-success" id="tv-hint"> <a href="#" class="close" data-dismiss="alert"> &times;</a><label id="tv-hint-content">' + msg + '</label></div>');
+    window.setTimeout("clearHint()",1500);//使用字符串执行方法
+}
+
+/**
+ * 清空hint
+ */
+function clearHint() {
+    $("#row-hint").html("");
 }

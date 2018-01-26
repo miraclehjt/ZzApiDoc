@@ -65,7 +65,9 @@
                 <!-- Standard button -->
                 <button type="button" class="btn btn-primary" id="btn-refresh">刷新</button>
                 <!-- Standard button -->
-                <button type="button" class="btn btn-primary" id="btn-add-group" data-toggle="modal" data-target="#addModel">新增</button>
+                <button type="button" class="btn btn-primary" id="btn-add-group" data-toggle="modal"
+                        data-target="#addModel">新增
+                </button>
                 <!-- Indicates a dangerous or potentially negative action -->
                 <button type="button" class="btn btn-danger" id="btn-delete">删除</button>
             </div>
@@ -75,31 +77,33 @@
                         <h3 class="panel-title" id="table-title">分组管理</h3>
                     </div>
                     <div class="panel-body">
-                        <table class="table table-striped">
-                            <thead>
-                            <tr>
-                                <th>
-                                    <div class="checkbox">
-                                        <input type="checkbox" id="checkbox-all" class="styled">
-                                        <label for="checkbox-all">
-                                            全选
-                                        </label>
-                                    </div>
-                                </th>
-                                <th class="hide">ID</th>
-                                <th>名称</th>
-                                <th>IP地址</th>
-                                <th>接口数量</th>
-                                <th>创建人</th>
-                                <th>创建时间</th>
-                                <th>接口管理</th>
-                                <th>操作</th>
-                            </tr>
-                            </thead>
-                            <tbody id="project-list">
-                            <%--js add content--%>
-                            </tbody>
-                        </table>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                <tr>
+                                    <th>
+                                        <div class="checkbox">
+                                            <input type="checkbox" id="checkbox-all" class="styled">
+                                            <label for="checkbox-all">
+                                                全选
+                                            </label>
+                                        </div>
+                                    </th>
+                                    <th class="hide">ID</th>
+                                    <th>名称</th>
+                                    <th>IP地址</th>
+                                    <th>接口数量</th>
+                                    <th>创建人</th>
+                                    <th>创建时间</th>
+                                    <th>接口管理</th>
+                                    <th>操作</th>
+                                </tr>
+                                </thead>
+                                <tbody id="project-list">
+                                <%--js add content--%>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                     <ul class="pagination" id="page-indicator"></ul>
                 </div>

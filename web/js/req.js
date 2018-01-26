@@ -80,7 +80,7 @@ function doLogin() {
     var password = $("#et-password").val();
     if (username === "" || password === "") {
         //error msg
-        $("#row-hint").html(getHintContent("用户名或密码不能为空"));
+        showHintMsg("用户名或密码不能为空");
         return;
     }
     $.post("/ZzApiDoc/v1/user/userLogin", {
@@ -91,7 +91,7 @@ function doLogin() {
             if (status === 'success') {
                 if (data.code === 0) {
                     //error msg
-                    $("#row-hint").html(getHintContent(data.msg));
+                    showHintMsg(data.msg);
                 } else {
                     $("#row-hint").html("");
                     //fill data
@@ -131,18 +131,18 @@ function getProjectList(interfaceId, userId, pid) {
     if (userId === null || userId.length === 0) {
         $("#box-user-info").hide();
         $("#form-login").show();
-        $("#row-hint").html(getHintContent("登录已过期，请重新登录"));
+        showHintMsg("登录已过期，请重新登录");
         return;
     }
     if (interfaceId === null || interfaceId.length === 0) {
-        $("#row-hint").html(getHintContent("请先选择接口"));
+        showHintMsg("请先选择接口");
         return;
     }
     $.get("/ZzApiDoc/v1/requestArg/getRequestArgByInterfaceIdAndPid?interfaceId=" + interfaceId + "&userId=" + userId + "&pid=" + pid,
         function (data, status) {
             if (status === 'success') {
                 if (data.code === 0) {
-                    $("#row-hint").html(getHintContent(data.msg));
+                    showHintMsg(data.msg);
                 } else {
                     //填充表格
                     var c = "";
@@ -297,7 +297,7 @@ function doDelete() {
     if (userId === null || userId.length === 0) {
         $("#box-user-info").hide();
         $("#form-login").show();
-        $("#row-hint").html(getHintContent("登录已过期，请重新登录"));
+        showHintMsg("登录已过期，请重新登录");
         return;
     }
     var ids = getChooseRowsDbIds();
@@ -309,9 +309,9 @@ function doDelete() {
             if (status === 'success') {
                 if (data.code === 0) {
                     //error msg
-                    $("#row-hint").html(getHintContent(data.msg));
+                    showHintMsg(data.msg);
                 } else {
-                    $("#row-hint").html(getOkContent(data.msg));
+                    showOkMsg(data.msg);
                     //重新加载数据
                     var interfaceId = localStorage.getItem("interfaceId");
                     getProjectList(interfaceId, userId, "0");
@@ -319,23 +319,6 @@ function doDelete() {
             }
 
         });
-}
-
-/**
- * 拼接提示html
- * @param msg
- * @returns {string}
- */
-function getHintContent(msg) {
-    return '<div class="alert alert-warning" id="tv-hint"> <a href="#" class="close" data-dismiss="alert"> &times;</a><label id="tv-hint-content">' + msg + '</label></div>'
-}
-/**
- * 拼接成功html
- * @param msg
- * @returns {string}
- */
-function getOkContent(msg) {
-    return '<div class="alert alert-success" id="tv-hint"> <a href="#" class="close" data-dismiss="alert"> &times;</a><label id="tv-hint-content">' + msg + '</label></div>'
 }
 
 
@@ -370,9 +353,9 @@ function editResParam(requestArgId) {
             if (status === 'success') {
                 if (data.code === 0) {
                     //error msg
-                    $("#row-hint").html(getHintContent(data.msg));
+                    showHintMsg(data.msg);
                 } else {
-                    $("#row-hint").html(getOkContent(data.msg));
+                    showOkMsg(data.msg);
                     //重新加载数据
                     var interfaceId = localStorage.getItem("interfaceId");
                     getProjectList(interfaceId, userId, '0');
@@ -412,9 +395,9 @@ function addResParam() {
             if (status === 'success') {
                 if (data.code === 0) {
                     //error msg
-                    $("#row-hint").html(getHintContent(data.msg));
+                    showHintMsg(data.msg);
                 } else {
-                    $("#row-hint").html(getOkContent(data.msg));
+                    showOkMsg(data.msg);
                     //重新加载数据
                     var interfaceId = localStorage.getItem("interfaceId");
                     var pid = localStorage.getItem("pid");
@@ -423,4 +406,30 @@ function addResParam() {
             }
 
         });
+}
+
+/**
+ * 拼接提示html
+ * @param msg
+ * @returns {string}
+ */
+function showHintMsg(msg) {
+    $("#row-hint").html('<div class="alert alert-warning" id="tv-hint"> <a href="#" class="close" data-dismiss="alert"> &times;</a><label id="tv-hint-content">' + msg + '</label></div>');
+    window.setTimeout("clearHint()",1500);//使用字符串执行方法
+}
+/**
+ * 拼接成功html
+ * @param msg
+ * @returns {string}
+ */
+function showOkMsg(msg) {
+    $("#row-hint").html('<div class="alert alert-success" id="tv-hint"> <a href="#" class="close" data-dismiss="alert"> &times;</a><label id="tv-hint-content">' + msg + '</label></div>');
+    window.setTimeout("clearHint()",1500);//使用字符串执行方法
+}
+
+/**
+ * 清空hint
+ */
+function clearHint() {
+    $("#row-hint").html("");
 }

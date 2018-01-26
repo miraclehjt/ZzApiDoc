@@ -79,34 +79,36 @@
                         <h3 class="panel-title" id="table-title">返回参数管理</h3>
                     </div>
                     <div class="panel-body">
-                        <table class="table table-striped">
-                            <thead>
-                            <tr>
-                                <th>
-                                    <div class="checkbox">
-                                        <input type="checkbox" id="checkbox-all" class="styled">
-                                        <label for="checkbox-all">
-                                            全选
-                                        </label>
-                                    </div>
-                                </th>
-                                <th class="hide">ID</th>
-                                <th class="hide">intType</th>
-                                <th>类型</th>
-                                <th>名称</th>
-                                <th>是否全局</th>
-                                <th>是否必填</th>
-                                <th>默认值</th>
-                                <th>备注</th>
-                                <th>创建人</th>
-                                <th>创建时间</th>
-                                <th>操作</th>
-                            </tr>
-                            </thead>
-                            <tbody id="project-list">
-                            <%--js add content--%>
-                            </tbody>
-                        </table>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                <tr>
+                                    <th>
+                                        <div class="checkbox">
+                                            <input type="checkbox" id="checkbox-all" class="styled">
+                                            <label for="checkbox-all">
+                                                全选
+                                            </label>
+                                        </div>
+                                    </th>
+                                    <th class="hide">ID</th>
+                                    <th class="hide">intType</th>
+                                    <th>类型</th>
+                                    <th>名称</th>
+                                    <th>是否全局</th>
+                                    <th>是否必填</th>
+                                    <th>默认值</th>
+                                    <th>备注</th>
+                                    <th>创建人</th>
+                                    <th>创建时间</th>
+                                    <th>操作</th>
+                                </tr>
+                                </thead>
+                                <tbody id="project-list">
+                                <%--js add content--%>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>

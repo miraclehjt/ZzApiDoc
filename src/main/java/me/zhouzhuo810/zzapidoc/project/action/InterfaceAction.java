@@ -114,6 +114,15 @@ public class InterfaceAction extends BaseController<InterfaceEntity> {
     }
 
     @ResponseBody
+    @RequestMapping(value = "/deleteInterfaceWeb", method = RequestMethod.POST)
+    public BaseResult deleteInterfaceWeb(
+            @RequestParam(value = "ids") String ids,
+            @RequestParam(value = "userId") String userId
+    ) {
+        return getService().deleteInterfaceWeb(ids, userId);
+    }
+
+    @ResponseBody
     @RequestMapping(value = "/getAllInterface", method = RequestMethod.GET)
     public BaseResult getInterfaceAll(
             @RequestParam(value = "projectId") String projectId,

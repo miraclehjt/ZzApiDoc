@@ -78,7 +78,7 @@ function doLogin() {
     var password = $("#et-password").val();
     if (username === "" || password === "") {
         //error msg
-        $("#row-hint").html(getHintContent("用户名或密码不能为空"));
+        showHintMsg("用户名或密码不能为空");
         return;
     }
     $.post("/ZzApiDoc/v1/user/userLogin", {
@@ -89,9 +89,9 @@ function doLogin() {
             if (status === 'success') {
                 if (data.code === 0) {
                     //error msg
-                    $("#row-hint").html(getHintContent(data.msg));
+                    showHintMsg(data.msg);
                 } else {
-                    $("#row-hint").html("");
+                    clearHint();
                     //fill data
                     //隐藏登录框
                     $("#form-login").hide();
@@ -129,11 +129,11 @@ function getProjectList(projectId, userId, index) {
     if (userId === null || userId.length === 0) {
         $("#box-user-info").hide();
         $("#form-login").show();
-        $("#row-hint").html(getHintContent("登录已过期，请重新登录"));
+        showHintMsg("登录已过期，请重新登录");
         return;
     }
     if (projectId === null || projectId.length === 0) {
-        $("#row-hint").html(getHintContent("请先选择项目"));
+        showHintMsg("请先选择项目");
         return;
     }
 
@@ -155,9 +155,10 @@ function getProjectList(projectId, userId, index) {
                 // if($("#page-indicator").data("twbs-pagination")){
                 //     $("#page-indicator").twbsPagination("destroy");
                 // }
-                $("#page-indicator").twbsPagination("destroy");
+                var sel =$("#page-indicator");
+                sel.twbsPagination("destroy");
                 //分页绑定
-                $('#page-indicator').twbsPagination({
+                sel.twbsPagination({
                     totalPages: data.totalPage,
                     visiblePages: 10,
                     onPageClick: function (event, page) {
@@ -180,11 +181,11 @@ function justUpdateList(projectId, userId, index) {
     if (userId === null || userId.length === 0) {
         $("#box-user-info").hide();
         $("#form-login").show();
-        $("#row-hint").html(getHintContent("登录已过期，请重新登录"));
+        showHintMsg("登录已过期，请重新登录");
         return;
     }
     if (projectId === null || projectId.length === 0) {
-        $("#row-hint").html(getHintContent("请先选择项目"));
+        showHintMsg("请先选择项目");
         return;
     }
 
@@ -250,7 +251,7 @@ function doDelete() {
     if (userId === null || userId.length === 0) {
         $("#box-user-info").hide();
         $("#form-login").show();
-        $("#row-hint").html(getHintContent("登录已过期，请重新登录"));
+        showHintMsg("登录已过期，请重新登录");
         return;
     }
     $.post("/ZzApiDoc/v1/interfaceGroup/deleteInterfaceGroupWeb", {
@@ -261,9 +262,9 @@ function doDelete() {
             if (status === 'success') {
                 if (data.code === 0) {
                     //error msg
-                    $("#row-hint").html(getHintContent(data.msg));
+                    showHintMsg(data.msg);
                 } else {
-                    $("#row-hint").html(getOkContent(data.msg));
+                    showOkMsg(data.msg);
                     //重新加载数据
                     var projectId = localStorage.getItem("projectId");
                     getProjectList(projectId, userId, 1);
@@ -292,9 +293,9 @@ function editResParam(interfaceGroupId) {
             if (status === 'success') {
                 if (data.code === 0) {
                     //error msg
-                    $("#row-hint").html(getHintContent(data.msg));
+                    showHintMsg(data.msg);
                 } else {
-                    $("#row-hint").html(getOkContent(data.msg));
+                    showOkMsg(data.msg);
                     //重新加载数据
                     var projectId = localStorage.getItem("projectId");
                     getProjectList(projectId, userId, 1);
@@ -322,9 +323,9 @@ function addResParam() {
             if (status === 'success') {
                 if (data.code === 0) {
                     //error msg
-                    $("#row-hint").html(getHintContent(data.msg));
+                    showHintMsg(data.msg);
                 } else {
-                    $("#row-hint").html(getOkContent(data.msg));
+                    showOkMsg(data.msg);
                     //重新加载数据
                     var projectId = localStorage.getItem("projectId");
                     getProjectList(projectId, userId, 1);
@@ -339,15 +340,23 @@ function addResParam() {
  * @param msg
  * @returns {string}
  */
-function getHintContent(msg) {
-    return '<div class="alert alert-warning" id="tv-hint"> <a href="#" class="close" data-dismiss="alert"> &times;</a><label id="tv-hint-content">' + msg + '</label></div>'
+function showHintMsg(msg) {
+    $("#row-hint").html('<div class="alert alert-warning" id="tv-hint"> <a href="#" class="close" data-dismiss="alert"> &times;</a><label id="tv-hint-content">' + msg + '</label></div>');
+    window.setTimeout("clearHint()",1500);//使用字符串执行方法
 }
 /**
  * 拼接成功html
  * @param msg
  * @returns {string}
  */
-function getOkContent(msg) {
-    return '<div class="alert alert-success" id="tv-hint"> <a href="#" class="close" data-dismiss="alert"> &times;</a><label id="tv-hint-content">' + msg + '</label></div>'
+function showOkMsg(msg) {
+    $("#row-hint").html('<div class="alert alert-success" id="tv-hint"> <a href="#" class="close" data-dismiss="alert"> &times;</a><label id="tv-hint-content">' + msg + '</label></div>');
+    window.setTimeout("clearHint()",1500);//使用字符串执行方法
 }
 
+/**
+ * 清空hint
+ */
+function clearHint() {
+    $("#row-hint").html("");
+}
