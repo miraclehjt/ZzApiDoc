@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="css/common.css"/>
     <link rel="stylesheet" href="css/awesome-bootstrap-checkbox.css">
     <link rel="stylesheet" href="css/font-awesome.min.css">
+    <link rel="stylesheet" href="css/bootstrap-select.css">
 
     <!--[if lt IE 9]>
     <script src="js/html5shiv.js"></script>
@@ -65,9 +66,7 @@
                 <!-- Standard button -->
                 <button type="button" class="btn btn-primary" id="btn-refresh">刷新</button>
                 <!-- Standard button -->
-                <button type="button" class="btn btn-primary" id="btn-add">新增</button>
-                <!-- Provides extra visual weight and identifies the primary action in a set of buttons -->
-                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">编辑</button>
+                <button type="button" class="btn btn-primary" id="btn-add-project" data-toggle="modal" data-target="#addModel">新增</button>
                 <!-- Indicates a dangerous or potentially negative action -->
                 <button type="button" class="btn btn-danger" id="btn-delete">删除</button>
             </div>
@@ -89,13 +88,17 @@
                                     </div>
                                 </th>
                                 <th class="hide">ID</th>
+                                <th class="hide">Property</th>
                                 <th>名称</th>
                                 <th>备注</th>
+                                <th class="hide">包名</th>
                                 <th>属性</th>
                                 <th>接口数量</th>
                                 <th>创建人</th>
                                 <th>创建时间</th>
                                 <th>分组管理</th>
+                                <th>操作</th>
+                                <th>PDF下载</th>
                             </tr>
                             </thead>
                             <tbody id="project-list">
@@ -113,27 +116,103 @@
 <script src="js/bootstrap.min.js"></script>
 <script src="js/jquery.twbsPagination.min.js"></script>
 <script src="js/home.js" type="text/javascript" charset="utf-8"></script>
+<script src="js/bootstrap-select.min.js"></script>
 
 <!-- 编辑对话框 -->
-<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+<div class="modal fade" id="editModel" tabindex="-1" role="dialog" aria-labelledby="editTitle">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
                 </button>
-                <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+                <h4 class="modal-title" id="editTitle">编辑项目</h4>
             </div>
             <div class="modal-body">
-                ...
+                <form class="form-horizontal" id="form-edit">
+                    <div class="form-group form-group-sm">
+                        <label class="col-sm-2 control-label" for="select-project-type-edit">项目属性</label>
+                        <div class="col-sm-10">
+                            <select class="selectpicker" id="select-project-type-edit">
+                                <option value="0">公有</option>
+                                <option value="1">私有</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group form-group-sm">
+                        <label class="col-sm-2 control-label" for="et-project-name-edit">名称</label>
+                        <div class="col-sm-10">
+                            <input class="form-control" type="text" id="et-project-name-edit" placeholder="名称">
+                        </div>
+                    </div>
+                    <div class="form-group form-group-sm">
+                        <label class="col-sm-2 control-label" for="et-note-edit">备注</label>
+                        <div class="col-sm-10">
+                            <input class="form-control" type="text" id="et-note-edit" placeholder="备注">
+                        </div>
+                    </div>
+                    <div class="form-group form-group-sm">
+                        <label class="col-sm-2 control-label" for="et-package-name-edit">包名</label>
+                        <div class="col-sm-10">
+                            <input class="form-control" type="text" id="et-package-name-edit" placeholder="包名">
+                        </div>
+                    </div>
+                </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                <button type="button" class="btn btn-primary">保存</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="btn-edit-save">保存</button>
             </div>
         </div>
     </div>
 </div>
 
+<!-- 新增对话框 -->
+<div class="modal fade" id="addModel" tabindex="-1" role="dialog" aria-labelledby="addTitle">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="addTitle">新增项目</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" id="form-add">
+                    <div class="form-group form-group-sm">
+                        <label class="col-sm-2 control-label" for="select-project-type">项目属性</label>
+                        <div class="col-sm-10">
+                            <select class="selectpicker" id="select-project-type">
+                                <option value="0">公有</option>
+                                <option value="1">私有</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group form-group-sm">
+                        <label class="col-sm-2 control-label" for="et-project-name">名称</label>
+                        <div class="col-sm-10">
+                            <input class="form-control" type="text" id="et-project-name" placeholder="名称">
+                        </div>
+                    </div>
+                    <div class="form-group form-group-sm">
+                        <label class="col-sm-2 control-label" for="et-note">备注</label>
+                        <div class="col-sm-10">
+                            <input class="form-control" type="text" id="et-note" placeholder="备注">
+                        </div>
+                    </div>
+                    <div class="form-group form-group-sm">
+                        <label class="col-sm-2 control-label" for="et-package-name">包名</label>
+                        <div class="col-sm-10">
+                            <input class="form-control" type="text" id="et-package-name" placeholder="包名">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="btn-add-save">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
 
 </html>

@@ -65,9 +65,7 @@
                 <!-- Standard button -->
                 <button type="button" class="btn btn-primary" id="btn-refresh">刷新</button>
                 <!-- Standard button -->
-                <button type="button" class="btn btn-primary" id="btn-add">新增</button>
-                <!-- Provides extra visual weight and identifies the primary action in a set of buttons -->
-                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">编辑</button>
+                <button type="button" class="btn btn-primary" id="btn-add-group" data-toggle="modal" data-target="#addModel">新增</button>
                 <!-- Indicates a dangerous or potentially negative action -->
                 <button type="button" class="btn btn-danger" id="btn-delete">删除</button>
             </div>
@@ -95,6 +93,7 @@
                                 <th>创建人</th>
                                 <th>创建时间</th>
                                 <th>接口管理</th>
+                                <th>操作</th>
                             </tr>
                             </thead>
                             <tbody id="project-list">
@@ -114,20 +113,67 @@
 <script src="js/group.js" type="text/javascript" charset="utf-8"></script>
 
 <!-- 编辑对话框 -->
-<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+<div class="modal fade" id="editModel" tabindex="-1" role="dialog" aria-labelledby="editTitle">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
                 </button>
-                <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+                <h4 class="modal-title" id="editTitle">编辑分组</h4>
             </div>
             <div class="modal-body">
-                ...
+                <form class="form-horizontal" id="form-edit">
+                    <div class="form-group form-group-sm">
+                        <label class="col-sm-2 control-label" for="et-group-name-edit">名称</label>
+                        <div class="col-sm-10">
+                            <input class="form-control" type="text" id="et-group-name-edit" placeholder="名称">
+                        </div>
+                    </div>
+                    <div class="form-group form-group-sm">
+                        <label class="col-sm-2 control-label" for="et-ip-addr-edit">IP地址</label>
+                        <div class="col-sm-10">
+                            <input class="form-control" type="text" id="et-ip-addr-edit" placeholder="IP地址">
+                        </div>
+                    </div>
+                </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                <button type="button" class="btn btn-primary">保存</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="btn-edit-save">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 新增对话框 -->
+<div class="modal fade" id="addModel" tabindex="-1" role="dialog" aria-labelledby="addTitle">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="addTitle">新增分组</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" id="form-add">
+
+                    <div class="form-group form-group-sm">
+                        <label class="col-sm-2 control-label" for="et-group-name">名称</label>
+                        <div class="col-sm-10">
+                            <input class="form-control" type="text" id="et-group-name" placeholder="名称">
+                        </div>
+                    </div>
+                    <div class="form-group form-group-sm">
+                        <label class="col-sm-2 control-label" for="et-ip-addr">IP地址</label>
+                        <div class="col-sm-10">
+                            <input class="form-control" type="text" id="et-ip-addr" placeholder="IP地址">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="btn-add-save">保存</button>
             </div>
         </div>
     </div>

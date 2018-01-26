@@ -18,6 +18,20 @@ $(document).ready(function () {
         localStorage.setItem("projectId", colDbId.text());
         location.href ="groupList.jsp"
     });
+    //编辑按钮
+    $(document).on("click", ".btn-edit-project", function () {
+        var colDbId = $(this).parent().parent().find(".db-id");
+        localStorage.setItem("edit-project-id", colDbId.text());
+        var name = $(this).parent().parent().find(".name").text();
+        var note = $(this).parent().parent().find(".note").text();
+        var packageName = $(this).parent().parent().find(".package-name").text();
+        var type = $(this).parent().parent().find(".int-type").text();
+        $("#select-project-type-edit").selectpicker('val', type);
+        $("#et-project-name-edit").val(name);
+        $("#et-note-edit").val(note);
+        $("#et-package-name-edit").val(packageName);
+    });
+
     //登录按钮点击
     $("#btn-login").click(function () {
         //	$("#tv-user-name").show();
@@ -32,11 +46,6 @@ $(document).ready(function () {
         var userId = localStorage.getItem("userId");
         getProjectList(userId, 1);
     });
-    //添加按钮点击
-    $("#btn-add").click(function () {
-        var count = getChooseRowsCount();
-        alert(count);
-    });
     //删除按钮点击
     $("#btn-delete").click(function () {
         doDelete();
@@ -46,6 +55,24 @@ $(document).ready(function () {
         var isCheck = $(this).is(':checked');
         $(".styled").prop("checked", isCheck);
     });
+
+    //添加按钮点击
+    $("#btn-add-project").click(function () {
+        $("#select-project-type").selectpicker('val', '0');
+        $("#et-project-name").val("");
+        $("#et-note").val("");
+        $("#et-package-name").val("");
+    });
+    //添加对话框保存按钮
+    $("#btn-add-save").click(function () {
+        addResParam();
+    });
+    //编辑对话框保存按钮
+    $("#btn-edit-save").click(function () {
+        var projectId = localStorage.getItem("edit-project-id");
+        editResParam(projectId);
+    });
+
 
 });
 
@@ -115,19 +142,22 @@ function getProjectList(userId, index) {
                 var c = "";
                 $.each(data.rows, function (n, value) {
                     c += '<tr><td><div class="checkbox"><input type="checkbox" id="checkbox' + n + '" class="styled"><label for="checkbox'
-                        + n + '">选择</label></div></td><td class="db-id hide">' + value.id + '</td><td>'
-                        + value.name + '</td><td>' + value.note + '</td><td>'
+                        + n + '">选择</label></div></td><td class="db-id hide">' + value.id + '</td><td class="int-type hide">' + value.property + '</td><td class="name">'
+                        + value.name + '</td><td class="note">' + value.note + '</td><td class="package-name hide">' + value.packageName + '</td><td>'
                         + (value.property === "0" ? '公有' : '私有') + '</td><td>' + value.interfaceNo + '</td><td>'
-                        + value.createUserName + '</td><td>' + value.createTime + '</td><td><button type="button" class="btn-see-group btn">分组管理</button></td></tr>';
+                        + value.createUserName + '</td><td>' + value.createTime + '</td><td><button type="button" class="btn-see-group btn">分组管理</button></td>' +
+                        '<td><button type="button" class="btn-edit-project btn btn-primary"  data-toggle="modal" data-target="#editModel">编辑</button></td>' +
+                        '<td><a href="v1/interface/downloadPdf?userId='+userId+'&projectId='+value.id+'" target="_blank" class="btn-edit-project btn btn-primary">点击下载</a></td></tr>';
                 });
                 $("#project-list").html(c);
 
                 // if($("#page-indicator").data("twbs-pagination")){
                 //     $("#page-indicator").twbsPagination("destroy");
                 // }
-                $("#page-indicator").twbsPagination("destroy");
+                var indicator = $("#page-indicator");
+                indicator.twbsPagination("destroy");
                 //分页绑定
-                $('#page-indicator').twbsPagination({
+                indicator.twbsPagination({
                     totalPages: data.totalPage,
                     visiblePages: 10,
                     onPageClick: function (event, page) {
@@ -159,10 +189,12 @@ function justUpdateList(userId, index) {
                 var c = "";
                 $.each(data.rows, function (n, value) {
                     c += '<tr><td><div class="checkbox"><input type="checkbox" id="checkbox' + n + '" class="styled"><label for="checkbox'
-                        + n + '">选择</label></div></td><td class="db-id hide">' + value.id + '</td><td>'
-                        + value.name + '</td><td>' + value.note + '</td><td>'
+                        + n + '">选择</label></div></td><td class="db-id hide">' + value.id + '</td><td class="int-type hide">' + value.property + '</td><td class="name">'
+                        + value.name + '</td><td class="note">' + value.note + '</td><td class="package-name hide">' + value.packageName + '</td><td>'
                         + (value.property === "0" ? '公有' : '私有') + '</td><td>' + value.interfaceNo + '</td><td>'
-                        + value.createUserName + '</td><td>' + value.createTime + '</td><td><button type="button" class="btn-see-group btn">分组管理</button></td></tr>';
+                        + value.createUserName + '</td><td>' + value.createTime + '</td><td><button type="button" class="btn-see-group btn">分组管理</button></td>' +
+                        '<td><button type="button" class="btn-edit-project btn btn-primary"  data-toggle="modal" data-target="#editModel">编辑</button></td>' +
+                        '<td><a href="v1/interface/downloadPdf?userId='+userId+'&projectId='+value.id+'" target="_blank" class="btn-edit-project btn btn-primary">点击下载</a></td></tr>';
                 });
                 $("#project-list").html(c);
             }
@@ -234,6 +266,70 @@ function doDelete() {
 
         });
 }
+
+/**
+ * 编辑项目
+ */
+function editResParam(projectId) {
+    var type = $("#select-project-type-edit").val();
+    var note = $("#et-note-edit").val();
+    var name = $("#et-project-name-edit").val();
+    var packageName = $("#et-package-name-edit").val();
+    var userId = localStorage.getItem("userId");
+    $.post("/ZzApiDoc/v1/project/updateProject", {
+            userId: userId,
+            name: name,
+            property: type,
+            note: note,
+            packageName: packageName,
+            projectId: projectId
+        },
+        function (data, status) {
+            if (status === 'success') {
+                if (data.code === 0) {
+                    //error msg
+                    $("#row-hint").html(getHintContent(data.msg));
+                } else {
+                    $("#row-hint").html(getOkContent(data.msg));
+                    //重新加载数据
+                    getProjectList(userId, 1);
+                }
+            }
+
+        });
+}
+
+/**
+ * 添加项目
+ */
+function addResParam() {
+    var type = $("#select-project-type").val();
+    var note = $("#et-note").val();
+    var name = $("#et-project-name").val();
+    var packageName = $("#et-package-name").val();
+    var userId = localStorage.getItem("userId");
+    $.post("/ZzApiDoc/v1/project/addProject", {
+            userId: userId,
+            name: name,
+            property: type,
+            note: note,
+            packageName: packageName
+        },
+        function (data, status) {
+            if (status === 'success') {
+                if (data.code === 0) {
+                    //error msg
+                    $("#row-hint").html(getHintContent(data.msg));
+                } else {
+                    $("#row-hint").html(getOkContent(data.msg));
+                    //重新加载数据
+                    getProjectList(userId, 1);
+                }
+            }
+
+        });
+}
+
 
 /**
  * 拼接提示html

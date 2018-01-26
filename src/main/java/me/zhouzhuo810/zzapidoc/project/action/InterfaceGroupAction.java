@@ -84,6 +84,15 @@ public class InterfaceGroupAction extends BaseController<InterfaceGroupEntity> {
         return getService().deleteInterfaceGroup(id, userId);
     }
 
+    @ResponseBody
+    @RequestMapping(value = "/deleteInterfaceGroupWeb", method = RequestMethod.POST)
+    public BaseResult deleteInterfaceGroupWeb(
+            @RequestParam(value = "ids") String ids,
+            @RequestParam(value = "userId") String userId
+    ) {
+        return getService().deleteInterfaceGroupWeb(ids, userId);
+    }
+
 
     @ResponseBody
     @RequestMapping(value = "/downloadApi", method = RequestMethod.GET)

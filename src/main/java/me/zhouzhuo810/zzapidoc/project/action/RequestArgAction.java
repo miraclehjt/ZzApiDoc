@@ -78,6 +78,15 @@ public class RequestArgAction extends BaseController<RequestArgEntity> {
     }
 
     @ResponseBody
+    @RequestMapping(value = "/deleteRequestArgWeb", method = RequestMethod.POST)
+    public BaseResult deleteRequestArgWeb(
+            @RequestParam(value = "ids") String ids,
+            @RequestParam(value = "userId") String userId
+    ) {
+        return getService().deleteRequestArgWeb(ids, userId);
+    }
+
+    @ResponseBody
     @RequestMapping(value = "/getRequestArgByInterfaceIdAndPid", method = RequestMethod.GET)
     public BaseResult getRequestArgByInterfaceIdAndPid(
             @RequestParam(value = "interfaceId") String interfaceId,

@@ -122,7 +122,7 @@ public class ProjectServiceImpl extends BaseServiceImpl<ProjectEntity> implement
         }
         if (ids != null && ids.length() > 0) {
             if (ids.contains(",")) {
-                String [] id = ids.split(",");
+                String[] id = ids.split(",");
                 for (String s : id) {
                     ProjectEntity entity = getBaseDao().get(s);
                     if (entity == null) {
@@ -212,7 +212,7 @@ public class ProjectServiceImpl extends BaseServiceImpl<ProjectEntity> implement
         if (rows % 10 > 0) {
             totalPage++;
         }
-        List<ProjectEntity> list = getBaseDao().executeCriteria(ProjectUtils.getProjectByUserId(userId), page-1, 10, Order.asc("createTime"));
+        List<ProjectEntity> list = getBaseDao().executeCriteria(ProjectUtils.getProjectByUserId(userId), page - 1, 10, Order.asc("createTime"));
 
         if (list == null) {
             return new WebResult(1, 1, 0);
@@ -224,6 +224,7 @@ public class ProjectServiceImpl extends BaseServiceImpl<ProjectEntity> implement
             map.put("name", entity.getName());
             map.put("note", entity.getNote());
             map.put("property", entity.getProperty());
+            map.put("packageName", entity.getPackageName() == null ? "" : entity.getPackageName());
             map.put("interfaceNo", entity.getInterfaceNo());
             map.put("createUserName", entity.getCreateUserName());
             map.put("createTime", DataUtils.formatDate(entity.getCreateTime()));

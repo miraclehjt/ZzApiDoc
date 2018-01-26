@@ -26,4 +26,5 @@ public interface RequestArgService extends BaseService<RequestArgEntity> {
 
     List<RequestArgEntity> getGlobalRequestArgs(String projectId);
 
+    BaseResult deleteRequestArgWeb(String ids, String userId);
 }

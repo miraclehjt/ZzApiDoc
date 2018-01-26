@@ -25,4 +25,6 @@ public interface InterfaceGroupService extends BaseService<InterfaceGroupEntity>
     ResponseEntity<byte[]> downloadApi(String groupId, String userId);
 
     String convertToJson(ProjectEntity project, InterfaceGroupEntity group);
+
+    BaseResult deleteInterfaceGroupWeb(String ids, String userId);
 }

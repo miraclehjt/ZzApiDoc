@@ -12,7 +12,9 @@
     <link rel="stylesheet" href="css/common.css"/>
     <link rel="stylesheet" href="css/awesome-bootstrap-checkbox.css">
     <link rel="stylesheet" href="css/font-awesome.min.css">
-
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="css/bootstrap-select.css">
+    <link rel="stylesheet" href="css/bootstrap-switch.min.css">
     <!--[if lt IE 9]>
     <script src="js/html5shiv.js"></script>
     <script src="js/respond.min.js"></script>
@@ -59,22 +61,22 @@
     </div>
     <div class="row">
         <div class="col-md-12" id="right-container">
-            <h2 id="tv-content-title">请求参数管理</h2>
+            <h2 id="tv-content-title">返回参数管理</h2>
             <hr/>
             <div id="btn-box">
                 <!-- Standard button -->
                 <button type="button" class="btn btn-primary" id="btn-refresh">刷新</button>
                 <!-- Standard button -->
-                <button type="button" class="btn btn-primary" id="btn-add">新增</button>
-                <!-- Provides extra visual weight and identifies the primary action in a set of buttons -->
-                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">编辑</button>
+                <button type="button" class="btn btn-primary" id="btn-add" data-toggle="modal" data-target="#addModel">
+                    新增
+                </button>
                 <!-- Indicates a dangerous or potentially negative action -->
                 <button type="button" class="btn btn-danger" id="btn-delete">删除</button>
             </div>
             <div class="col-md-12 left-table">
                 <div class="panel panel-primary">
                     <div class="panel-heading">
-                        <h3 class="panel-title" id="table-title">请求参数管理</h3>
+                        <h3 class="panel-title" id="table-title">返回参数管理</h3>
                     </div>
                     <div class="panel-body">
                         <table class="table table-striped">
@@ -89,15 +91,16 @@
                                     </div>
                                 </th>
                                 <th class="hide">ID</th>
+                                <th class="hide">intType</th>
                                 <th>类型</th>
                                 <th>名称</th>
+                                <th>是否全局</th>
+                                <th>是否必填</th>
                                 <th>默认值</th>
                                 <th>备注</th>
-                                <th>是否必填</th>
-                                <th>是否全局</th>
                                 <th>创建人</th>
                                 <th>创建时间</th>
-                                <th>子参数</th>
+                                <th>操作</th>
                             </tr>
                             </thead>
                             <tbody id="project-list">
@@ -114,22 +117,164 @@
 <script src="js/bootstrap.min.js"></script>
 <script src="js/jquery.twbsPagination.min.js"></script>
 <script src="js/req.js" type="text/javascript" charset="utf-8"></script>
+<!-- Latest compiled and minified JavaScript -->
+<script src="js/bootstrap-select.min.js"></script>
+<script src="js/bootstrap-switch.js"></script>
 
 <!-- 编辑对话框 -->
-<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+<div class="modal fade" id="editModel" tabindex="-1" role="dialog" aria-labelledby="editTitle">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
                 </button>
-                <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+                <h4 class="modal-title" id="editTitle">编辑请求参数</h4>
             </div>
             <div class="modal-body">
-                ...
+                <form class="form-horizontal" id="form-edit">
+                    <div class="form-group form-group-sm">
+                        <label class="col-sm-2 control-label" for="select-param-type-edit">参数类型</label>
+                        <div class="col-sm-10">
+                            <select class="selectpicker" id="select-param-type-edit">
+                                <option value="0">string</option>
+                                <option value="1">int</option>
+                                <option value="2">object</option>
+                                <option value="3">array[object]</option>
+                                <option value="4">array[string]</option>
+                                <option value="5">array</option>
+                                <option value="6">file</option>
+                                <option value="7">unknown</option>
+                                <option value="8">array[int]</option>
+                                <option value="9">float</option>
+                                <option value="10">array[float]</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group form-group-sm">
+                        <label class="col-sm-2 control-label" for="cb-global-edit">是否全局</label>
+                        <div class="col-sm-10">
+                            <div class="checkbox">
+                                <input type="checkbox" id="cb-global-edit">
+                                <label for="cb-global-edit">
+                                    是否全局
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group form-group-sm">
+                        <label class="col-sm-2 control-label" for="cb-require-edit">是否必填</label>
+                        <div class="col-sm-10">
+                            <div class="checkbox">
+                                <input type="checkbox" id="cb-require-edit">
+                                <label for="cb-require-edit">
+                                    是否必填
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group form-group-sm">
+                        <label class="col-sm-2 control-label" for="et-param-note-edit">参数说明</label>
+                        <div class="col-sm-10">
+                            <input class="form-control" type="text" id="et-param-note-edit" placeholder="参数说明">
+                        </div>
+                    </div>
+                    <div class="form-group form-group-sm">
+                        <label class="col-sm-2 control-label" for="et-param-name-edit">参数名称</label>
+                        <div class="col-sm-10">
+                            <input class="form-control" type="text" id="et-param-name-edit" placeholder="参数名称">
+                        </div>
+                    </div>
+                    <div class="form-group form-group-sm">
+                        <label class="col-sm-2 control-label" for="et-def-value-edit">默认值</label>
+                        <div class="col-sm-10">
+                            <input class="form-control" type="text" id="et-def-value-edit" placeholder="默认值">
+                        </div>
+                    </div>
+                </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                <button type="button" class="btn btn-primary">保存</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="btn-edit-save">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 新增对话框 -->
+<div class="modal fade" id="addModel" tabindex="-1" role="dialog" aria-labelledby="addTitle">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="addTitle">新增请求参数</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" id="form-add">
+
+                    <div class="form-group form-group-sm">
+                        <label class="col-sm-2 control-label" for="select-param-type">参数类型</label>
+                        <div class="col-sm-10">
+                            <select class="selectpicker" id="select-param-type">
+                                <option value="0">string</option>
+                                <option value="1">int</option>
+                                <option value="2">object</option>
+                                <option value="3">array[object]</option>
+                                <option value="4">array[string]</option>
+                                <option value="5">array</option>
+                                <option value="6">file</option>
+                                <option value="7">unknown</option>
+                                <option value="8">array[int]</option>
+                                <option value="9">float</option>
+                                <option value="10">array[float]</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group form-group-sm">
+                        <label class="col-sm-2 control-label" for="cb-global">是否全局</label>
+                        <div class="col-sm-10">
+                            <div class="checkbox">
+                                <input type="checkbox" id="cb-global">
+                                <label for="cb-global">
+                                    是否全局
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group form-group-sm">
+                        <label class="col-sm-2 control-label" for="cb-require">是否必填</label>
+                        <div class="col-sm-10">
+                            <div class="checkbox">
+                                <input type="checkbox" id="cb-require">
+                                <label for="cb-require">
+                                    是否必填
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group form-group-sm">
+                        <label class="col-sm-2 control-label" for="et-param-note">参数说明</label>
+                        <div class="col-sm-10">
+                            <input class="form-control" type="text" id="et-param-note" placeholder="参数说明">
+                        </div>
+                    </div>
+                    <div class="form-group form-group-sm">
+                        <label class="col-sm-2 control-label" for="et-param-name">参数名称</label>
+                        <div class="col-sm-10">
+                            <input class="form-control" type="text" id="et-param-name" placeholder="参数名称">
+                        </div>
+                    </div>
+                    <div class="form-group form-group-sm">
+                        <label class="col-sm-2 control-label" for="et-def-value">默认值</label>
+                        <div class="col-sm-10">
+                            <input class="form-control" type="text" id="et-def-value" placeholder="默认值">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="btn-add-save">保存</button>
             </div>
         </div>
     </div>

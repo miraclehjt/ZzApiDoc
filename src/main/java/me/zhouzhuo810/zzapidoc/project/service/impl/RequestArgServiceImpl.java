@@ -224,4 +224,42 @@ public class RequestArgServiceImpl extends BaseServiceImpl<RequestArgEntity> imp
         return getBaseDao().executeCriteria(ResponseArgUtils.getGlobal(projectId));
     }
 
+    @Override
+    public BaseResult deleteRequestArgWeb(String ids, String userId) {
+        UserEntity user = mUserService.get(userId);
+        if (user == null) {
+            return new BaseResult(0, "用户不合法！", new HashMap<String, String>());
+        }
+        if (ids != null && ids.length() > 0) {
+            if (ids.contains(",")) {
+                String [] id = ids.split(",");
+                for (String s : id) {
+                    RequestArgEntity entity = getBaseDao().get(s);
+                    if (entity == null) {
+                        continue;
+                    }
+                    entity.setModifyUserID(user.getId());
+                    entity.setModifyUserName(user.getName());
+                    entity.setDeleteFlag(BaseEntity.DELETE_FLAG_YES);
+                    try {
+                        update(entity);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            } else {
+                RequestArgEntity entity = getBaseDao().get(ids);
+                entity.setModifyUserID(user.getId());
+                entity.setModifyUserName(user.getName());
+                entity.setDeleteFlag(BaseEntity.DELETE_FLAG_YES);
+                try {
+                    update(entity);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return new BaseResult(1, "刪除成功！", new HashMap<String, String>());
+    }
+
 }

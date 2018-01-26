@@ -131,6 +131,43 @@ public class ResponseArgServiceImpl extends BaseServiceImpl<ResponseArgEntity> i
             return new BaseResult(0, "删除失败");
         }
     }
+    @Override
+    public BaseResult deleteResponseArgWeb(String ids, String userId) {
+        UserEntity user = mUserService.get(userId);
+        if (user == null) {
+            return new BaseResult(0, "用户不合法！", new HashMap<String, String>());
+        }
+        if (ids != null && ids.length() > 0) {
+            if (ids.contains(",")) {
+                String [] id = ids.split(",");
+                for (String s : id) {
+                    ResponseArgEntity entity = getBaseDao().get(s);
+                    if (entity == null) {
+                        continue;
+                    }
+                    entity.setModifyUserID(user.getId());
+                    entity.setModifyUserName(user.getName());
+                    entity.setDeleteFlag(BaseEntity.DELETE_FLAG_YES);
+                    try {
+                        update(entity);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            } else {
+                ResponseArgEntity entity = getBaseDao().get(ids);
+                entity.setModifyUserID(user.getId());
+                entity.setModifyUserName(user.getName());
+                entity.setDeleteFlag(BaseEntity.DELETE_FLAG_YES);
+                try {
+                    update(entity);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return new BaseResult(1, "刪除成功！", new HashMap<String, String>());
+    }
 
     @Override
     public BaseResult getResponseArgByInterfaceIdAndPid(String interfaceId, String projectId, String pid, boolean global, String userId) {
