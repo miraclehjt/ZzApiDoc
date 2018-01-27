@@ -8,7 +8,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>小周接口文档管理系统</title>
     <link href="css/bootstrap.min.css" rel="stylesheet">
-    <link href="css/home.css" rel="stylesheet">
     <link rel="stylesheet" href="css/common.css"/>
     <link rel="stylesheet" href="css/awesome-bootstrap-checkbox.css">
     <link rel="stylesheet" href="css/font-awesome.min.css">
@@ -61,7 +60,7 @@
     </div>
     <div class="row">
         <div class="col-md-12" id="right-container">
-            <h2 id="tv-content-title">返回参数管理</h2>
+            <h2 id="tv-content-title">请求参数管理</h2>
             <hr/>
             <div id="btn-box">
                 <!-- Standard button -->
@@ -76,7 +75,7 @@
             <div class="col-md-12 left-table">
                 <div class="panel panel-primary">
                     <div class="panel-heading">
-                        <h3 class="panel-title" id="table-title">返回参数管理</h3>
+                        <h3 class="panel-title" id="table-title">请求参数管理</h3>
                     </div>
                     <div class="panel-body">
                         <div class="table-responsive">

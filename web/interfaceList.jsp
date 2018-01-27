@@ -8,7 +8,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>小周接口文档管理系统</title>
     <link href="css/bootstrap.min.css" rel="stylesheet">
-    <link href="css/home.css" rel="stylesheet">
     <link rel="stylesheet" href="css/common.css"/>
     <link rel="stylesheet" href="css/awesome-bootstrap-checkbox.css">
     <link rel="stylesheet" href="css/font-awesome.min.css">

@@ -5,8 +5,7 @@ $(document).ready(function () {
     var pic = localStorage.getItem("userPic");
     var projectId = localStorage.getItem("projectId");
     if (userId === null || userId === "") {
-        $("#box-user-info").hide();
-        $("#form-login").show();
+        doExitLogin();
     } else {
         $("#tv-user-name").val(username);
         $("#box-user-info").show();
@@ -17,7 +16,7 @@ $(document).ready(function () {
     $(document).on("click",".btn-see-group",function(){
         var colDbId = $(this).parent().parent().find(".db-id");
         localStorage.setItem("groupId", colDbId.text());
-        location.href ="interfaceList.jsp"
+        location.href ="interface";
     });
     //编辑按钮
     $(document).on("click", ".btn-edit-group", function () {
@@ -113,15 +112,8 @@ function doLogin() {
 /*注销*/
 function doExitLogin() {
     //清空缓存
-    localStorage.removeItem("username");
-    localStorage.removeItem("userId");
-    localStorage.removeItem("userPic");
-    //用户信息隐藏
-    $("#box-user-info").hide();
-    //显示用户名和密码输入框
-    $("#form-login").show();
-    //清空列表
-    getProjectList("", "", 1);
+    localStorage.clear();
+    location.href ="home";
 }
 
 /*获取项目列表*/

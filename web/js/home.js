@@ -4,8 +4,7 @@ $(document).ready(function () {
     var userId = localStorage.getItem("userId");
     var pic = localStorage.getItem("userPic");
     if (userId === null || userId === "") {
-        $("#box-user-info").hide();
-        $("#form-login").show();
+        doExitLogin();
     } else {
         $("#tv-user-name").val(username);
         $("#box-user-info").show();
@@ -16,7 +15,7 @@ $(document).ready(function () {
     $(document).on("click",".btn-see-group",function(){
         var colDbId = $(this).parent().parent().find(".db-id");
         localStorage.setItem("projectId", colDbId.text());
-        location.href ="groupList.jsp"
+        location.href ="group";
     });
     //编辑按钮
     $(document).on("click", ".btn-edit-project", function () {
@@ -95,6 +94,7 @@ function doLogin() {
                     //error msg
                     showHintMsg(data.msg);
                 } else {
+                    showOkMsg(data.msg);
                     $("#row-hint").html("");
                     //fill data
                     //隐藏登录框
@@ -116,15 +116,13 @@ function doLogin() {
 /*注销*/
 function doExitLogin() {
     //清空缓存
-    localStorage.removeItem("username");
-    localStorage.removeItem("userId");
-    localStorage.removeItem("userPic");
+    localStorage.clear();
     //用户信息隐藏
     $("#box-user-info").hide();
     //显示用户名和密码输入框
     $("#form-login").show();
     //清空列表
-    getProjectList("", 1);
+    $("#project-list").html("");
 }
 
 /*获取项目列表*/

@@ -4,14 +4,14 @@ $(document).ready(function () {
     var userId = localStorage.getItem("userId");
     var pic = localStorage.getItem("userPic");
     if (userId === null || userId === "") {
-        $("#box-user-info").hide();
-        $("#form-login").show();
+        doExitLogin();
     } else {
         $("#tv-user-name").val(username);
         $("#box-user-info").show();
         $("#form-login").hide();
         var interfaceId = localStorage.getItem("interfaceId");
-        getProjectList(interfaceId, userId, '0');
+        var projectId = localStorage.getItem("projectId");
+        getProjectList(projectId, interfaceId, userId, '0');
     }
     //编辑按钮
     $(document).on("click", ".btn-edit-res", function () {
@@ -43,7 +43,8 @@ $(document).ready(function () {
     $("#btn-refresh").click(function () {
         var userId = localStorage.getItem("userId");
         var interfaceId = localStorage.getItem("interfaceId");
-        getProjectList(interfaceId, userId, "0");
+        var projectId = localStorage.getItem("projectId");
+        getProjectList(projectId, interfaceId, userId, "0");
     });
     //删除按钮点击
     $("#btn-delete").click(function () {
@@ -104,41 +105,41 @@ function doLogin() {
                     localStorage.setItem("username", data.data.name);
                     localStorage.setItem("userId", data.data.id);
                     localStorage.setItem("userPic", data.data.pic);
+                    var projectId = localStorage.getItem("projectId");
                     var interfaceId = localStorage.getItem("interfaceId");
-                    getProjectList(groupId, data.data.id, "0");
+                    getProjectList(projectId, groupId, data.data.id, "0");
                 }
             }
 
         });
 }
 
+
 /*注销*/
 function doExitLogin() {
     //清空缓存
-    localStorage.removeItem("username");
-    localStorage.removeItem("userId");
-    localStorage.removeItem("userPic");
-    //用户信息隐藏
-    $("#box-user-info").hide();
-    //显示用户名和密码输入框
-    $("#form-login").show();
-    //清空列表
-    getProjectList("", "", "0");
+    localStorage.clear();
+    location.href ="home";
 }
 
 /*获取项目列表*/
-function getProjectList(interfaceId, userId, pid) {
+function getProjectList(projectId, interfaceId, userId, pid) {
     if (userId === null || userId.length === 0) {
         $("#box-user-info").hide();
         $("#form-login").show();
         showHintMsg("登录已过期，请重新登录");
         return;
     }
+    if (projectId === null || projectId.length === 0) {
+        showHintMsg("请先选择项目");
+        return;
+    }
     if (interfaceId === null || interfaceId.length === 0) {
         showHintMsg("请先选择接口");
         return;
     }
-    $.get("/ZzApiDoc/v1/requestArg/getRequestArgByInterfaceIdAndPid?interfaceId=" + interfaceId + "&userId=" + userId + "&pid=" + pid,
+
+    $.get("/ZzApiDoc/v1/requestArg/getRequestArgByInterfaceIdAndPid?projectId="+projectId+"&interfaceId=" + interfaceId + "&userId=" + userId + "&pid=" + pid,
         function (data, status) {
             if (status === 'success') {
                 if (data.code === 0) {
@@ -314,7 +315,8 @@ function doDelete() {
                     showOkMsg(data.msg);
                     //重新加载数据
                     var interfaceId = localStorage.getItem("interfaceId");
-                    getProjectList(interfaceId, userId, "0");
+                    var projectId = localStorage.getItem("projectId");
+                    getProjectList(projectId, interfaceId, userId, "0");
                 }
             }
 
@@ -358,7 +360,8 @@ function editResParam(requestArgId) {
                     showOkMsg(data.msg);
                     //重新加载数据
                     var interfaceId = localStorage.getItem("interfaceId");
-                    getProjectList(interfaceId, userId, '0');
+                    var projectId = localStorage.getItem("projectId");
+                    getProjectList(projectId, interfaceId, userId, '0');
                 }
             }
 
@@ -400,8 +403,8 @@ function addResParam() {
                     showOkMsg(data.msg);
                     //重新加载数据
                     var interfaceId = localStorage.getItem("interfaceId");
-                    var pid = localStorage.getItem("pid");
-                    getProjectList(interfaceId, userId, pid);
+                    var projectId = localStorage.getItem("projectId");
+                    getProjectList(projectId, interfaceId, userId, '0');
                 }
             }
 

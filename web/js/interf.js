@@ -4,8 +4,7 @@ $(document).ready(function () {
     var userId = localStorage.getItem("userId");
     var pic = localStorage.getItem("userPic");
     if (userId === null || userId === "") {
-        $("#box-user-info").hide();
-        $("#form-login").show();
+        doExitLogin();
     } else {
         $("#tv-user-name").val(username);
         $("#box-user-info").show();
@@ -18,14 +17,14 @@ $(document).ready(function () {
         var colDbId = $(this).parent().parent().find(".db-id");
         localStorage.setItem("interfaceId", colDbId.text());
         localStorage.setItem("pid", "0");
-        location.href ="reqArgList.jsp";
+        location.href ="reqArg";
     });
     //返回参数
     $(document).on("click",".btn-see-res",function(){
         var colDbId = $(this).parent().parent().find(".db-id");
         localStorage.setItem("interfaceId", colDbId.text());
         localStorage.setItem("pid", "0");
-        location.href ="resArgList.jsp";
+        location.href ="respArg";
     });
     //编辑按钮
     $(document).on("click", ".btn-edit-interface", function () {
@@ -198,20 +197,13 @@ function doLogin() {
         });
 }
 
+
 /*注销*/
 function doExitLogin() {
     //清空缓存
-    localStorage.removeItem("username");
-    localStorage.removeItem("userId");
-    localStorage.removeItem("userPic");
-    //用户信息隐藏
-    $("#box-user-info").hide();
-    //显示用户名和密码输入框
-    $("#form-login").show();
-    //清空列表
-    getProjectList("", "", 1);
+    localStorage.clear();
+    location.href ="home";
 }
-
 /*获取项目列表*/
 function getProjectList(groupId, userId, index) {
     if (userId === null || userId.length === 0) {
