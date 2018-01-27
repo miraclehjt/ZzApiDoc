@@ -15,6 +15,7 @@ import me.zhouzhuo810.zzapidoc.project.dao.InterfaceGroupDao;
 import me.zhouzhuo810.zzapidoc.project.entity.*;
 import me.zhouzhuo810.zzapidoc.project.service.*;
 import me.zhouzhuo810.zzapidoc.project.utils.InterfaceUtils;
+import me.zhouzhuo810.zzapidoc.project.utils.JSONTool;
 import me.zhouzhuo810.zzapidoc.project.utils.ResponseArgUtils;
 import me.zhouzhuo810.zzapidoc.user.entity.UserEntity;
 import me.zhouzhuo810.zzapidoc.user.service.UserService;
@@ -184,7 +185,7 @@ public class InterfaceGroupServiceImpl extends BaseServiceImpl<InterfaceGroupEnt
             return new WebResult(1, 1, 0);
         }
         int rowCount = getBaseDao().executeCriteriaRow(InterfaceUtils.getInterfaceByProjectId(projectId));
-        List<InterfaceGroupEntity> groups = getBaseDao().executeCriteria(InterfaceUtils.getInterfaceByProjectId(projectId), indexPage-1, 10, Order.asc("createTime"));
+        List<InterfaceGroupEntity> groups = getBaseDao().executeCriteria(InterfaceUtils.getInterfaceByProjectId(projectId), indexPage - 1, 10, Order.asc("createTime"));
         int pageCount = rowCount / 10;
         if (rowCount % 10 > 0) {
             pageCount++;
@@ -374,7 +375,7 @@ public class InterfaceGroupServiceImpl extends BaseServiceImpl<InterfaceGroupEnt
         }
         if (ids != null && ids.length() > 0) {
             if (ids.contains(",")) {
-                String [] id = ids.split(",");
+                String[] id = ids.split(",");
                 for (String s : id) {
                     InterfaceGroupEntity entity = getBaseDao().get(s);
                     if (entity == null) {
@@ -402,6 +403,333 @@ public class InterfaceGroupServiceImpl extends BaseServiceImpl<InterfaceGroupEnt
             }
         }
         return new BaseResult(1, "刪除成功！", new HashMap<String, String>());
+    }
+
+    @Override
+    public BaseResult generateExample(String groupId, String userId) {
+        UserEntity user = mUserService.get(userId);
+        if (user == null) {
+            return new BaseResult(0, "用户不合法", new HashMap<String, String>());
+        }
+        InterfaceGroupEntity interfaceGroupEntity = getBaseDao().get(groupId);
+        if (interfaceGroupEntity == null) {
+            return new BaseResult(0, "接口分组不存在或已被删除！", new HashMap<String, String>());
+        }
+        List<InterfaceEntity> list = mInterfaceService.executeCriteria(InterfaceUtils.getInterfaceByGroupId(groupId), Order.asc("createTime"));
+        if (list == null || list.size() == 0) {
+            return new BaseResult(0, "该分组没有接口！", new HashMap<String, String>());
+        }
+        for (InterfaceEntity entity : list) {
+
+            List<ResponseArgEntity> globalResponseArgs = mResponseArgService.getGlobalResponseArgs(entity.getProjectId());
+            JSONStringer stringer = new JSONStringer();
+            stringer.object();
+            if (globalResponseArgs != null) {
+                for (ResponseArgEntity resG : globalResponseArgs) {
+                    if (resG.getTypeId() == null) {
+                        resG.setTypeId(7);
+                    }
+                    switch (resG.getTypeId()) {
+                        case ResponseArgEntity.TYPE_STRING:
+                            try {
+                                stringer.key(resG.getName()).value(resG.getNote() == null ? "" : resG.getNote());
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            break;
+                        case ResponseArgEntity.TYPE_INT:
+                            try {
+                                stringer.key(resG.getName()).value(0);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            break;
+                        case ResponseArgEntity.TYPE_FLOAT:
+                            try {
+                                stringer.key(resG.getName()).value(0.1);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            break;
+                        case ResponseArgEntity.TYPE_ARRAY:
+                            try {
+                                stringer.key(resG.getName()).array().endArray();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            break;
+                        case ResponseArgEntity.TYPE_ARRAY_INT:
+                            try {
+                                stringer.key(resG.getName());
+                                stringer.array();
+                                stringer.value(0);
+                                stringer.value(1);
+                                stringer.endArray();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            break;
+                        case ResponseArgEntity.TYPE_ARRAY_FLOAT:
+                            try {
+                                stringer.key(resG.getName());
+                                stringer.array();
+                                stringer.value(0.1);
+                                stringer.value(0.2);
+                                stringer.endArray();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            break;
+                        case ResponseArgEntity.TYPE_ARRAY_STRING:
+                            try {
+                                stringer.key(resG.getName());
+                                stringer.array();
+                                stringer.value("string1");
+                                stringer.value("string2");
+                                stringer.endArray();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            break;
+                        case ResponseArgEntity.TYPE_FILE:
+                            try {
+                                stringer.key(resG.getName()).value("");
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            break;
+                        default:
+                            try {
+                                stringer.key(resG.getName()).value("");
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            break;
+                    }
+                }
+            }
+            List<ResponseArgEntity> responseArgEntities = mResponseArgService.executeCriteria(ResponseArgUtils.getArgByInterfaceIdAndPid(entity.getId(), "0"));
+            for (ResponseArgEntity res : responseArgEntities) {
+                if (res.getTypeId() == null) {
+                    res.setTypeId(7);
+                }
+                switch (res.getTypeId()) {
+                    case ResponseArgEntity.TYPE_STRING:
+                        try {
+                            stringer.key(res.getName()).value(res.getNote() == null ? "" : res.getNote());
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        break;
+                    case ResponseArgEntity.TYPE_INT:
+                        try {
+                            stringer.key(res.getName()).value(0);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        break;
+                    case ResponseArgEntity.TYPE_FLOAT:
+                        try {
+                            stringer.key(res.getName()).value(0.0);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        break;
+                    case ResponseArgEntity.TYPE_OBJECT:
+                        try {
+                            stringer.key(res.getName());
+                            stringer.object();
+                            generateChildExeample(stringer, entity.getId(), res.getId());
+                            stringer.endObject();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        break;
+                    case ResponseArgEntity.TYPE_ARRAY_OBJECT:
+                        try {
+                            stringer.key(res.getName());
+                            stringer.array();
+                            stringer.object();
+                            generateChildExeample(stringer, entity.getId(), res.getId());
+                            stringer.endObject();
+                            stringer.endArray();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        break;
+                    case ResponseArgEntity.TYPE_ARRAY_INT:
+                        try {
+                            stringer.key(res.getName());
+                            stringer.array();
+                            stringer.value(0);
+                            stringer.value(1);
+                            stringer.endArray();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        break;
+                    case ResponseArgEntity.TYPE_ARRAY_FLOAT:
+                        try {
+                            stringer.key(res.getName());
+                            stringer.array();
+                            stringer.value(0.1);
+                            stringer.value(0.2);
+                            stringer.endArray();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        break;
+                    case ResponseArgEntity.TYPE_ARRAY_STRING:
+                        try {
+                            stringer.key(res.getName());
+                            stringer.array();
+                            stringer.value("string1");
+                            stringer.value("string2");
+                            stringer.endArray();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        break;
+                    case ResponseArgEntity.TYPE_ARRAY:
+                        try {
+                            stringer.key(res.getName()).array().endArray();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        break;
+                    case ResponseArgEntity.TYPE_FILE:
+                        try {
+                            stringer.key(res.getName()).value("");
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        break;
+                    default:
+                        try {
+                            stringer.key(res.getName()).value("");
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        break;
+
+                }
+            }
+            stringer.endObject();
+            String result = stringer.toString();
+            String formatJson = new JSONTool().stringToJSON(result);
+            entity.setExample(formatJson);
+            try {
+                mInterfaceService.update(entity);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return new BaseResult(1, "生成成功！", new HashMap<String, String>());
+    }
+
+    private void generateChildExeample(JSONStringer stringer, String interfaceId, String pid) {
+        List<ResponseArgEntity> responseArgEntities = mResponseArgService.executeCriteria(ResponseArgUtils.getArgByInterfaceIdAndPid(interfaceId, pid));
+        for (ResponseArgEntity res : responseArgEntities) {
+            switch (res.getTypeId()) {
+                case ResponseArgEntity.TYPE_STRING:
+                    try {
+                        stringer.key(res.getName()).value(res.getNote() == null ? "" : res.getNote());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case ResponseArgEntity.TYPE_INT:
+                    try {
+                        stringer.key(res.getName()).value(0);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case ResponseArgEntity.TYPE_FLOAT:
+                    try {
+                        stringer.key(res.getName()).value(0.0);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case ResponseArgEntity.TYPE_OBJECT:
+                    try {
+                        stringer.key(res.getName());
+                        stringer.object();
+                        generateChildExeample(stringer, interfaceId, res.getId());
+                        stringer.endObject();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case ResponseArgEntity.TYPE_ARRAY_OBJECT:
+                    try {
+                        stringer.key(res.getName());
+                        stringer.array();
+                        stringer.object();
+                        generateChildExeample(stringer, interfaceId, res.getId());
+                        stringer.endObject();
+                        stringer.endArray();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case ResponseArgEntity.TYPE_ARRAY_INT:
+                    try {
+                        stringer.key(res.getName());
+                        stringer.array();
+                        stringer.value(0);
+                        stringer.value(1);
+                        stringer.endArray();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case ResponseArgEntity.TYPE_ARRAY_FLOAT:
+                    try {
+                        stringer.key(res.getName());
+                        stringer.array();
+                        stringer.value(0.1);
+                        stringer.value(0.2);
+                        stringer.endArray();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case ResponseArgEntity.TYPE_ARRAY_STRING:
+                    try {
+                        stringer.key(res.getName());
+                        stringer.array();
+                        stringer.value("string1");
+                        stringer.value("string2");
+                        stringer.endArray();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case ResponseArgEntity.TYPE_ARRAY:
+                    try {
+                        stringer.key(res.getName()).array().endArray();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case ResponseArgEntity.TYPE_FILE:
+                    try {
+                        stringer.key(res.getName()).value("");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                default:
+                    try {
+                        stringer.key(res.getName()).value("");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
+            }
+        }
     }
 
 

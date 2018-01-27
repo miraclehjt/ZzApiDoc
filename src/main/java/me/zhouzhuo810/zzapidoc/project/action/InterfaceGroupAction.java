@@ -103,4 +103,13 @@ public class InterfaceGroupAction extends BaseController<InterfaceGroupEntity> {
         return getService().downloadApi(groupId, userId);
     }
 
+    @ResponseBody
+    @RequestMapping(value = "/generateExample", method = RequestMethod.POST)
+    public BaseResult generateExample(
+            @RequestParam(value = "groupId") String groupId,
+            @RequestParam(value = "userId") String userId
+    ) throws IOException {
+        return getService().generateExample(groupId, userId);
+    }
+
 }

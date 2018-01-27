@@ -6,7 +6,7 @@ $(document).ready(function () {
     if (userId === null || userId === "") {
         doExitLogin();
     } else {
-        $("#tv-user-name").val(username);
+        $("#tv-user-name").text(username);
         $("#box-user-info").show();
         $("#form-login").hide();
         var interfaceId = localStorage.getItem("interfaceId");
@@ -76,8 +76,61 @@ $(document).ready(function () {
         editResParam(responseArgId);
     });
 
+    //用户名点击
+    $("#tv-user-name").click(function () {
+        var username = localStorage.getItem("username");
+        var userId = localStorage.getItem("userId");
+        var phone = localStorage.getItem("phone");
+        var email = localStorage.getItem("email");
+        var sex = localStorage.getItem("sex");
+
+        $("#et-user-name-edit").val(username);
+        $("#et-phone-edit").val(phone);
+        $("#et-pswd-edit").val("");
+        $("#et-new-pswd-edit").val("");
+        $("#et-email-edit").val(email);
+        $("#select-sex-edit").selectpicker('val', sex);
+    });
+
+    //修改用户信息
+    $("#btn-user-ok").click(function () {
+        updateUserInfo();
+    });
+
 });
 
+function updateUserInfo() {
+    var userId = localStorage.getItem("userId");
+    var username = $("#et-user-name-edit").val();
+    var phone = $("#et-phone-edit").val();
+    var pswd = $("#et-pswd-edit").val();
+    var pswdNew = $("#et-new-pswd-edit").val();
+    var email = $("#et-email-edit").val();
+    var sex = $("#select-sex-edit").val();
+    $.post("/ZzApiDoc/v1/user/updateUserInfo", {
+            userId: userId,
+            phone: phone,
+            oldPassword: pswd,
+            password: pswdNew,
+            name: username,
+            sex: sex,
+            email: email
+        },
+        function (data, status) {
+            if (status === 'success') {
+                if (data.code === 0) {
+                    //error msg
+                    showHintMsg(data.msg);
+                } else {
+                    showOkMsg(data.msg);
+                    //fill data
+                    doExitLogin();
+                    $("#et-username").val(phone);
+                }
+            }
+
+        });
+}
 /*用户登录*/
 function doLogin() {
     var username = $("#et-username").val();
@@ -102,12 +155,15 @@ function doLogin() {
                     //隐藏登录框
                     $("#form-login").hide();
                     //显示用户名
-                    $("#tv-user-name").val(data.data.name);
+                    $("#tv-user-name").text(data.data.name);
                     $("#box-user-info").show();
                     //保存用户信息
                     localStorage.setItem("username", data.data.name);
                     localStorage.setItem("userId", data.data.id);
                     localStorage.setItem("userPic", data.data.pic);
+                    localStorage.setItem("phone", data.data.phone);
+                    localStorage.setItem("email", data.data.email);
+                    localStorage.setItem("sex", data.data.sex);
                     var interfaceId = localStorage.getItem("interfaceId");
                     var pid = localStorage.getItem("pid");
                     getProjectList(groupId, data.data.id, pid);

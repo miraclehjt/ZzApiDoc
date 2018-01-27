@@ -52,6 +52,9 @@ public class UserServiceImpl extends BaseServiceImpl<UserEntity> implements User
         map.put("id", userEntity.getId());
         map.put("pic", userEntity.getPic());
         map.put("name", userEntity.getName());
+        map.put("phone", userEntity.getPhone());
+        map.put("email", userEntity.getEmail());
+        map.put("sex", userEntity.getSex());
         return new BaseResult(1, "登录成功！", map.build());
     }
 
@@ -83,10 +86,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserEntity> implements User
     public BaseResult revisePswd(String userId, String oldPswd, String newPswd) {
         UserEntity userEntity = getDAO().get(userId);
         if (userEntity == null) {
-            return new BaseResult(0, "用户名或密码错误！");
-        }
-        if (oldPswd==null) {
-
+            return new BaseResult(0, "手机号或密码错误！");
         }
         if (!userEntity.getPassword().equals(oldPswd)) {
             return new BaseResult(0, "原密码错误！");
@@ -101,6 +101,46 @@ public class UserServiceImpl extends BaseServiceImpl<UserEntity> implements User
         } catch (Exception e) {
             e.printStackTrace();
             return new BaseResult(0, "修改失败！"+e.toString());
+        }
+    }
+
+    @Override
+    public BaseResult updateUserInfo(String userId, String phone, String oldPassword, String password, String name, String sex, String email) {
+        UserEntity userEntity = getDAO().get(userId);
+        if (userEntity == null) {
+            return new BaseResult(0, "手机号或密码错误！");
+        }
+        if (!userEntity.getPassword().equals(oldPassword)) {
+            return new BaseResult(0, "原密码错误！");
+        }
+        if (password.length() == 0) {
+            return new BaseResult(0, "新密码不能为空！");
+        }
+        if (name != null) {
+            if (name.length() == 0) {
+                return new BaseResult(0, "昵称不能为空！");
+            }
+            userEntity.setName(name);
+        }
+        userEntity.setPassword(password);
+        if (phone != null) {
+            userEntity.setPhone(phone);
+        }
+        if (sex != null) {
+            userEntity.setSex(sex);
+        }
+        if (email != null) {
+            userEntity.setEmail(email);
+        }
+        userEntity.setModifyTime(new Date());
+        userEntity.setModifyUserID(userEntity.getId());
+        userEntity.setModifyUserName(userEntity.getName());
+        try {
+            getDAO().update(userEntity);
+            return new BaseResult(1, "修改成功！");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new BaseResult(0, "修改失败！");
         }
     }
 }

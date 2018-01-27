@@ -36,7 +36,7 @@
         <!-- Collect the nav links, forms, and other content for toggling -->
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <div id="box-user-info" class="navbar-right">
-                <label id="tv-user-name" class="tv-white">周卓</label>
+                <a id="tv-user-name" class="tv-white" data-toggle="modal" data-target="#userModel"></a>
                 <button id="btn-unregister" type="button" class="btn btn-danger">注销</button>
             </div>
             <form id="form-login" class="navbar-form navbar-right">
@@ -228,7 +228,65 @@
         </div>
     </div>
 </div>
-
+<!-- 用户信息对话框 -->
+<div class="modal fade" id="userModel" tabindex="-1" role="dialog" aria-labelledby="userTitle">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="userTitle">用户信息编辑</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" id="form-edit-user">
+                    <div class="form-group form-group-sm">
+                        <label class="col-sm-2 control-label" for="et-phone-edit">手机号</label>
+                        <div class="col-sm-10">
+                            <input class="form-control" type="text" id="et-phone-edit" placeholder="手机号">
+                        </div>
+                    </div>
+                    <div class="form-group form-group-sm">
+                        <label class="col-sm-2 control-label" for="et-pswd-edit">原密码</label>
+                        <div class="col-sm-10">
+                            <input class="form-control" type="text" id="et-pswd-edit" placeholder="原密码">
+                        </div>
+                    </div>
+                    <div class="form-group form-group-sm">
+                        <label class="col-sm-2 control-label" for="et-new-pswd-edit">新密码</label>
+                        <div class="col-sm-10">
+                            <input class="form-control" type="text" id="et-new-pswd-edit" placeholder="新密码">
+                        </div>
+                    </div>
+                    <div class="form-group form-group-sm">
+                        <label class="col-sm-2 control-label" for="et-user-name-edit">姓名</label>
+                        <div class="col-sm-10">
+                            <input class="form-control" type="text" id="et-user-name-edit" placeholder="姓名">
+                        </div>
+                    </div>
+                    <div class="form-group form-group-sm">
+                        <label class="col-sm-2 control-label" for="et-email-edit">邮箱</label>
+                        <div class="col-sm-10">
+                            <input class="form-control" type="text" id="et-email-edit" placeholder="邮箱">
+                        </div>
+                    </div>
+                    <div class="form-group form-group-sm">
+                        <label class="col-sm-2 control-label" for="select-sex-edit">性别</label>
+                        <div class="col-sm-10">
+                            <select class="selectpicker" id="select-sex-edit">
+                                <option value="男">男</option>
+                                <option value="女">女</option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="btn-user-ok">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 </body>
 

@@ -7,16 +7,16 @@ $(document).ready(function () {
     if (userId === null || userId === "") {
         doExitLogin();
     } else {
-        $("#tv-user-name").val(username);
+        $("#tv-user-name").text(username);
         $("#box-user-info").show();
         $("#form-login").hide();
         getProjectList(projectId, userId, 1);
     }
     //列表按钮事件绑定
-    $(document).on("click",".btn-see-group",function(){
+    $(document).on("click", ".btn-see-group", function () {
         var colDbId = $(this).parent().parent().find(".db-id");
         localStorage.setItem("groupId", colDbId.text());
-        location.href ="interface";
+        location.href = "interface";
     });
     //编辑按钮
     $(document).on("click", ".btn-edit-group", function () {
@@ -26,6 +26,11 @@ $(document).ready(function () {
         var ipAddr = $(this).parent().parent().find(".ip-addr").text();
         $("#et-group-name-edit").val(name);
         $("#et-ip-addr-edit").val(ipAddr);
+    });
+    //生成示例
+    $(document).on("click", ".btn-generate-code", function () {
+        var colDbId = $(this).parent().parent().find(".db-id");
+        generateCode(colDbId.text());
     });
 
     //登录按钮点击
@@ -67,10 +72,83 @@ $(document).ready(function () {
         var responseArgId = localStorage.getItem("edit-group-id");
         editResParam(responseArgId);
     });
+    //用户名点击
+    $("#tv-user-name").click(function () {
+        var username = localStorage.getItem("username");
+        var userId = localStorage.getItem("userId");
+        var phone = localStorage.getItem("phone");
+        var email = localStorage.getItem("email");
+        var sex = localStorage.getItem("sex");
 
+        $("#et-user-name-edit").val(username);
+        $("#et-phone-edit").val(phone);
+        $("#et-pswd-edit").val("");
+        $("#et-new-pswd-edit").val("");
+        $("#et-email-edit").val(email);
+        $("#select-sex-edit").selectpicker('val', sex);
+    });
+
+    //修改用户信息
+    $("#btn-user-ok").click(function () {
+        updateUserInfo();
+    });
 
 });
 
+/**
+ * 生成返回空示例
+ */
+function generateCode(groupId) {
+    var userId = localStorage.getItem("userId");
+    $.post("/ZzApiDoc/v1/interfaceGroup/generateExample", {
+            userId: userId,
+            groupId: groupId
+        },
+        function (data, status) {
+            if (status === 'success') {
+                if (data.code === 0) {
+                    //error msg
+                    showHintMsg(data.msg);
+                } else {
+                    showOkMsg(data.msg);
+                }
+            }
+
+        });
+}
+
+function updateUserInfo() {
+    var userId = localStorage.getItem("userId");
+    var username = $("#et-user-name-edit").val();
+    var phone = $("#et-phone-edit").val();
+    var pswd = $("#et-pswd-edit").val();
+    var pswdNew = $("#et-new-pswd-edit").val();
+    var email = $("#et-email-edit").val();
+    var sex = $("#select-sex-edit").val();
+    $.post("/ZzApiDoc/v1/user/updateUserInfo", {
+            userId: userId,
+            phone: phone,
+            oldPassword: pswd,
+            password: pswdNew,
+            name: username,
+            sex: sex,
+            email: email
+        },
+        function (data, status) {
+            if (status === 'success') {
+                if (data.code === 0) {
+                    //error msg
+                    showHintMsg(data.msg);
+                } else {
+                    showOkMsg(data.msg);
+                    //fill data
+                    doExitLogin();
+                    $("#et-username").val(phone);
+                }
+            }
+
+        });
+}
 /*用户登录*/
 function doLogin() {
     var username = $("#et-username").val();
@@ -95,12 +173,15 @@ function doLogin() {
                     //隐藏登录框
                     $("#form-login").hide();
                     //显示用户名
-                    $("#tv-user-name").val(data.data.name);
+                    $("#tv-user-name").text(data.data.name);
                     $("#box-user-info").show();
                     //保存用户信息
                     localStorage.setItem("username", data.data.name);
                     localStorage.setItem("userId", data.data.id);
                     localStorage.setItem("userPic", data.data.pic);
+                    localStorage.setItem("phone", data.data.phone);
+                    localStorage.setItem("email", data.data.email);
+                    localStorage.setItem("sex", data.data.sex);
                     var projectId = localStorage.getItem("projectId");
                     getProjectList(projectId, data.data.id, 1);
                 }
@@ -113,7 +194,7 @@ function doLogin() {
 function doExitLogin() {
     //清空缓存
     localStorage.clear();
-    location.href ="home";
+    location.href = "home";
 }
 
 /*获取项目列表*/
@@ -129,7 +210,7 @@ function getProjectList(projectId, userId, index) {
         return;
     }
 
-    $.get("/ZzApiDoc/v1/interfaceGroup/getAllInterfaceGroupWeb?projectId="+projectId+"&userId=" + userId + "&page=" + index,
+    $.get("/ZzApiDoc/v1/interfaceGroup/getAllInterfaceGroupWeb?projectId=" + projectId + "&userId=" + userId + "&page=" + index,
         function (data, status) {
             if (status === 'success') {
                 //填充表格
@@ -140,14 +221,15 @@ function getProjectList(projectId, userId, index) {
                         + value.name + '</td><td class="ip-addr">' + value.ip + '</td><td>'
                         + value.interfaceNo + '</td><td>' + value.createUserName + '</td><td>' + value.createTime + '</td>' +
                         '<td><button type="button" class="btn-see-group btn">接口管理</button></td>' +
-                        '<td><button type="button" class="btn-edit-group btn btn-primary"  data-toggle="modal" data-target="#editModel">编辑</button></td></tr>';
+                        '<td><button type="button" class="btn-edit-group btn btn-primary"  data-toggle="modal" data-target="#editModel">编辑</button></td>' +
+                        '<td><button type="button" class="btn-generate-code btn btn-primary">一键生成</button></td></tr>';
                 });
                 $("#project-list").html(c);
 
                 // if($("#page-indicator").data("twbs-pagination")){
                 //     $("#page-indicator").twbsPagination("destroy");
                 // }
-                var sel =$("#page-indicator");
+                var sel = $("#page-indicator");
                 sel.twbsPagination("destroy");
                 //分页绑定
                 sel.twbsPagination({
@@ -181,7 +263,7 @@ function justUpdateList(projectId, userId, index) {
         return;
     }
 
-    $.get("/ZzApiDoc/v1/interfaceGroup/getAllInterfaceGroupWeb?projectId="+projectId+"&userId=" + userId + "&page=" + index,
+    $.get("/ZzApiDoc/v1/interfaceGroup/getAllInterfaceGroupWeb?projectId=" + projectId + "&userId=" + userId + "&page=" + index,
         function (data, status) {
             if (status === 'success') {
                 //填充表格
@@ -192,7 +274,8 @@ function justUpdateList(projectId, userId, index) {
                         + value.name + '</td><td class="ip-addr">' + value.ip + '</td><td>'
                         + value.interfaceNo + '</td><td>' + value.createUserName + '</td><td>' + value.createTime + '</td>' +
                         '<td><button type="button" class="btn-see-group btn">接口管理</button></td>' +
-                        '<td><button type="button" class="btn-edit-group btn btn-primary"  data-toggle="modal" data-target="#editModel">编辑</button></td></tr>';
+                        '<td><button type="button" class="btn-edit-group btn btn-primary"  data-toggle="modal" data-target="#editModel">编辑</button></td>' +
+                        '<td><button type="button" class="btn-generate-code btn btn-primary">一键生成</button></td></tr>';
                 });
                 $("#project-list").html(c);
             }
@@ -230,7 +313,7 @@ function getChooseRowsDbIds() {
         }
     }
     if (getChooseRowsCount() > 0) {
-        ids = ids.substr(0, ids.length-1);
+        ids = ids.substr(0, ids.length - 1);
     }
     return ids;
 }
@@ -323,7 +406,6 @@ function addResParam() {
                     getProjectList(projectId, userId, 1);
                 }
             }
-
         });
 }
 
@@ -334,7 +416,7 @@ function addResParam() {
  */
 function showHintMsg(msg) {
     $("#row-hint").html('<div class="alert alert-warning" id="tv-hint"> <a href="#" class="close" data-dismiss="alert"> &times;</a><label id="tv-hint-content">' + msg + '</label></div>');
-    window.setTimeout("clearHint()",1500);//使用字符串执行方法
+    window.setTimeout("clearHint()", 1500);//使用字符串执行方法
 }
 /**
  * 拼接成功html
@@ -343,7 +425,7 @@ function showHintMsg(msg) {
  */
 function showOkMsg(msg) {
     $("#row-hint").html('<div class="alert alert-success" id="tv-hint"> <a href="#" class="close" data-dismiss="alert"> &times;</a><label id="tv-hint-content">' + msg + '</label></div>');
-    window.setTimeout("clearHint()",1500);//使用字符串执行方法
+    window.setTimeout("clearHint()", 1500);//使用字符串执行方法
 }
 
 /**

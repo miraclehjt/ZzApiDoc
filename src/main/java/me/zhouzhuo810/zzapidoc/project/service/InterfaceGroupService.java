@@ -27,4 +27,6 @@ public interface InterfaceGroupService extends BaseService<InterfaceGroupEntity>
     String convertToJson(ProjectEntity project, InterfaceGroupEntity group);
 
     BaseResult deleteInterfaceGroupWeb(String ids, String userId);
+
+    BaseResult generateExample(String groupId, String userId);
 }
