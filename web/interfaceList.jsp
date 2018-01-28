@@ -7,7 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>小周接口文档管理系统</title>
-    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
     <link rel="stylesheet" href="css/common.css"/>
     <link rel="stylesheet" href="css/awesome-bootstrap-checkbox.css">
     <link rel="stylesheet" href="css/font-awesome.min.css">
@@ -31,13 +31,15 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="#">小周接口文档管理系统</a>
+            <a class="navbar-brand" href="home">小周接口文档管理系统
+                <img class="logo pull-left" src="img/web_logo.png">
+            </a>
         </div>
         <!-- Collect the nav links, forms, and other content for toggling -->
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <form id="form-search" class="navbar-form col-md-5">
                 <div class="input-group">
-                    <input id="et-search" type="text" class="form-control" placeholder="输入接口名称搜索...">
+                    <input id="et-search" type="text" class="form-control" placeholder="名称,路径,备注...">
                     <span class="input-group-btn">
                         <button id="btn-search" class="btn btn-primary" type="button">搜索</button>
                     </span>
@@ -45,8 +47,10 @@
             </form>
 
             <div id="box-user-info" class="navbar-right">
-                <a id="tv-user-name" class="tv-white" data-toggle="modal" data-target="#userModel"></a>
-                <button id="btn-unregister" type="button" class="btn btn-danger">注销</button>
+                <a id="tv-user-name" class="tv-white btn-link" data-toggle="modal" data-target="#userModel"></a>
+                <button id="btn-unregister" type="button" class="btn btn-danger">
+                    <span class="glyphicon glyphicon-off" aria-hidden="true"></span> 注销
+                </button>
             </div>
             <form id="form-login" class="navbar-form navbar-right">
                 <div class="form-group">
@@ -82,13 +86,18 @@
             <hr/>
             <div id="btn-box">
                 <!-- Standard button -->
-                <button type="button" class="btn btn-primary" id="btn-refresh">刷新</button>
+                <button type="button" class="btn btn-primary" id="btn-refresh">
+                    <span class="glyphicon glyphicon-repeat" aria-hidden="true"></span> 刷新
+                </button>
                 <!-- Standard button -->
                 <button type="button" class="btn btn-primary" id="btn-add-interface" data-toggle="modal"
-                        data-target="#addModel">新增
+                        data-target="#addModel">
+                    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> 新增
                 </button>
                 <!-- Indicates a dangerous or potentially negative action -->
-                <button type="button" class="btn btn-danger" id="btn-delete">删除</button>
+                <button type="button" class="btn btn-danger" id="btn-delete">
+                    <span class="glyphicon glyphicon-trash" aria-hidden="true"></span> 删除
+                </button>
             </div>
             <div class="col-md-12 left-table">
                 <div class="panel panel-primary">
@@ -133,12 +142,13 @@
         </div>
     </div>
 </div>
-<script src="js/jquery.min.js"></script>
-<script src="js/bootstrap.min.js"></script>
-<script src="js/jquery.twbsPagination.min.js"></script>
+<script src="js/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="js/bootstrap.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="js/jquery.twbsPagination.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="js/interf.js" type="text/javascript" charset="utf-8"></script>
 <script src="js/bootstrap-select.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="js/bootstrap-show-password.min.js"></script>
+<script src="js/bootstrap-show-password.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="js/md5.js" type="text/javascript" charset="utf-8"></script>
 
 <!-- 编辑对话框 -->
 <div class="modal fade" id="editModel" tabindex="-1" role="dialog" aria-labelledby="editTitle">
@@ -229,7 +239,12 @@
                     <div class="form-group form-group-sm">
                         <label class="col-sm-2 control-label" for="et-interface-path">请求路径</label>
                         <div class="col-sm-10">
-                            <input class="form-control" type="text" id="et-interface-path" placeholder="请求路径">
+                            <div class="input-group">
+                                <input class="form-control" type="text" id="et-interface-path" placeholder="请求路径">
+                                <span class="input-group-btn">
+                                    <button id="btn-translate" class="btn btn-primary btn-sm" type="button">自动生成</button>
+                                </span>
+                            </div>
                         </div>
                     </div>
                     <div class="form-group form-group-sm">

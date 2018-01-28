@@ -222,11 +222,21 @@ function getProjectList(projectId, interfaceId, userId, pid) {
                     //填充表格
                     var c = "";
                     $.each(data.data, function (n, value) {
-                        c += '<tr><td><div class="checkbox"><input type="checkbox" id="checkbox' + n + '" class="styled"><label for="checkbox'
-                            + n + '">选择</label></div></td><td class="db-id hide">' + value.id + '</td><td class="int-type hide">' + value.type + '</td><td class="type">'
-                            + getTypeName(value.type) + '</td><td  class="name">' + value.name + '</td><td class="isGlobal">' + value.global + '</td><td class="require">' + value.require + '</td><td class="defValue">' + value.defValue
-                            + '</td><td class="note">' + value.note + '</td><td class="person">' + value.createUserName + '</td><td class="createTime">'
-                            + value.createTime + '</td><td><button type="button" class="btn-edit-res btn btn-primary"  data-toggle="modal" data-target="#editModel">编辑</button></td></tr>';
+                        c += '<tr>' +
+                            '<td><div class="checkbox"><input type="checkbox" id="checkbox' + n + '" class="styled"><label for="checkbox' + n + '">选择</label></div></td>' +
+                            '<td class="db-id hide">' + value.id + '</td>' +
+                            '<td class="int-type hide">' + value.type + '</td>' +
+                            '<td class="type">' + getTypeName(value.type) + '</td>' +
+                            '<td  class="name">' + value.name + '</td>' +
+                            '<td class="isGlobal">' + value.global + '</td>' +
+                            '<td class="require">' + value.require + '</td>' +
+                            '<td class="defValue">' + value.defValue + '</td>' +
+                            '<td class="note">' + value.note + '</td>' +
+                            '<td class="person">' + value.createUserName + '</td>' +
+                            '<td class="createTime">' + value.createTime + '</td>' +
+                            '<td><button type="button" class="btn-edit-res btn btn-primary"  data-toggle="modal" data-target="#editModel">' +
+                            '<span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> 编辑</button></td>' +
+                            '</tr>';
                     });
                     $("#project-list").html(c);
                 }

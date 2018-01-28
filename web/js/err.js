@@ -212,7 +212,8 @@ function getProjectList(projectId, userId) {
                             '<td class="note">' + value.note + '</td>' +
                             '<td>' + value.createMan + '</td>' +
                             '<td>' + value.createTime + '</td>' +
-                            '<td><button type="button" class="btn-edit-err btn btn-primary"  data-toggle="modal" data-target="#editModel">编辑</button></td>' +
+                            '<td><button type="button" class="btn-edit-err btn btn-primary"  data-toggle="modal" data-target="#editModel">' +
+                            '<span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> 编辑</button></td>' +
                             '</tr>';
                     });
                     $("#project-list").html(c);

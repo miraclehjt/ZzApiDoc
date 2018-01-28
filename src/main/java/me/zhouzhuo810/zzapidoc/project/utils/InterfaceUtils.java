@@ -26,10 +26,20 @@ public class InterfaceUtils {
     }
 
     public static Criterion[] getInterfaceByGroupId(String groupIds, String search) {
+        String result = "";
+        try {
+            result = new String(search.getBytes("ISO8859-1"), "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
         return new Criterion[]{
                 Restrictions.eq("deleteFlag", BaseEntity.DELETE_FLAG_NO),
                 Restrictions.eq("groupId", groupIds),
-                Restrictions.like("path", "%"+search+"%")
+                Restrictions.or(
+                        Restrictions.like("name", "%" + result + "%"),
+                        Restrictions.like("note", "%" + result + "%"),
+                        Restrictions.like("path", "%" + result + "%")
+                )
         };
     }
 }

@@ -7,50 +7,88 @@
 	vertical-align: middle;
 	display: inline-block;
 	margin-right: 20px;
-	text-decoration:underline;
+	text-decoration: underline;
 }
+
 /*去除导航栏圆角*/
 .navbar {
 	-webkit-border-radius: 0 !important;
 	-moz-border-radius: 0 !important;
 	border-radius: 0 !important;
 }
-#btn-unregister{
+
+#btn-unregister {
 	margin-right: 20px;
 }
+
 #left-container {
 	background-color: #dddddd;
 	height: 900px;
 	padding-left: 0px;
 	padding-right: 0px;
 }
+
 #left-container p {
 	margin-left: 0px;
 	margin-right: 0px;
 	padding: 10px 10px 10px 15px;
 }
+
 #right-container {
 	background-color: #ffffff;
 }
+
 #setting {
 	margin-top: 20px;
 }
+
 .left-table {
 	padding-left: 0px;
 }
+
 #btn-box {
 	margin-bottom: 20px;
 }
+
 .pro-title {
 	padding-top: 5px;
 	padding-bottom: 5px;
 }
+
 .progress {
 	margin-top: 10px;
 }
+
 .badge {
 	float: right;
 }
+
 .pagination {
 	margin-left: 25px;
+}
+
+.btn-circle {
+	width: 30px;
+	height: 30px;
+	text-align: center;
+	padding: 6px 0;
+	font-size: 12px;
+	line-height: 1.428571429;
+	border-radius: 15px;
+}
+
+.btn-circle.btn-lg {
+	width: 50px;
+	height: 50px;
+	padding: 10px 16px;
+	font-size: 18px;
+	line-height: 1.33;
+	border-radius: 25px;
+}
+
+.logo {
+	width: 36px;
+	height: 36px;
+	margin-right: 9px;
+	margin-top: -9px;
 }

@@ -31,13 +31,16 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="#">小周接口文档管理系统</a>
+            <a class="navbar-brand" href="home">小周接口文档管理系统
+                <img class="logo pull-left" src="img/web_logo.png">
+            </a>
         </div>
         <!-- Collect the nav links, forms, and other content for toggling -->
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <div id="box-user-info" class="navbar-right">
-                <a id="tv-user-name" class="tv-white" data-toggle="modal" data-target="#userModel"></a>
-                <button id="btn-unregister" type="button" class="btn btn-danger">注销</button>
+                <a id="tv-user-name" class="tv-white btn-link" data-toggle="modal" data-target="#userModel"></a>
+                <button id="btn-unregister" type="button" class="btn btn-danger">
+                    <span class="glyphicon glyphicon-off" aria-hidden="true"></span> 注销</button>
             </div>
             <form id="form-login" class="navbar-form navbar-right">
                 <div class="form-group">
@@ -76,13 +79,14 @@
             <hr/>
             <div id="btn-box">
                 <!-- Standard button -->
-                <button type="button" class="btn btn-primary" id="btn-refresh">刷新</button>
+                <button type="button" class="btn btn-primary" id="btn-refresh">
+                    <span class="glyphicon glyphicon-repeat" aria-hidden="true"></span> 刷新</button>
                 <!-- Standard button -->
                 <button type="button" class="btn btn-primary" id="btn-add" data-toggle="modal" data-target="#addModel">
-                    新增
-                </button>
+                    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> 新增</button>
                 <!-- Indicates a dangerous or potentially negative action -->
-                <button type="button" class="btn btn-danger" id="btn-delete">删除</button>
+                <button type="button" class="btn btn-danger" id="btn-delete">
+                    <span class="glyphicon glyphicon-trash" aria-hidden="true"></span> 删除</button>
             </div>
             <div class="col-md-12 left-table">
                 <div class="panel panel-primary">

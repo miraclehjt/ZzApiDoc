@@ -111,6 +111,12 @@ $(document).ready(function () {
     $("#btn-user-ok").click(function () {
         updateUserInfo();
     });
+
+    $("#btn-translate").click(function () {
+        var ch = $("#et-interface-name").val();
+        translate(ch);
+    });
+
     //密码框隐藏与显示
     $('#et-pswd-edit').password()
         .password('focus')
@@ -317,7 +323,8 @@ function getProjectList(groupId, userId, index) {
                     '<td>' + value.createTime + '</td>' +
                     '<td><button type="button" class="btn-see-req btn">请求参数</button></td>' +
                     '<td><button type="button" class="btn-see-res btn">返回参数</button></td>' +
-                    '<td><button type="button" class="btn-edit-interface btn btn-primary"  data-toggle="modal" data-target="#editModel">编辑</button></td></tr>';
+                    '<td><button type="button" class="btn-edit-interface btn btn-primary"  data-toggle="modal" data-target="#editModel">' +
+                    '<span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> 编辑</button></td></tr>';
             });
             $("#project-list").html(c);
 
@@ -379,7 +386,8 @@ function justUpdateList(groupId, userId, index) {
                         '<td>' + value.createTime + '</td>' +
                         '<td><button type="button" class="btn-see-req btn">请求参数</button></td>' +
                         '<td><button type="button" class="btn-see-res btn">返回参数</button></td>' +
-                        '<td><button type="button" class="btn-edit-interface btn btn-primary"  data-toggle="modal" data-target="#editModel">编辑</button></td></tr>';
+                        '<td><button type="button" class="btn-edit-interface btn btn-primary"  data-toggle="modal" data-target="#editModel">' +
+                        '<span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> 编辑</button></td></tr>';
                 });
                 $("#project-list").html(c);
             }
@@ -498,6 +506,8 @@ function editResParam(interfaceId) {
  * 添加接口
  */
 function addResParam() {
+    var version = $("#et-interface-version").val();
+    localStorage.setItem("version", version);
     var note = $("#et-interface-note").val();
     var name = $("#et-interface-name").val();
     var path = $("#et-interface-path").val();
@@ -553,4 +563,59 @@ function showOkMsg(msg) {
  */
 function clearHint() {
     $("#row-hint").html("");
+}
+
+function translate(query) {
+    var appid = '2015063000000001';
+    var key = '12345678';
+    var salt = (new Date).getTime();
+// 多个query可以用\n连接  如 query='apple\norange\nbanana\npear'
+    var from = 'zh';
+    var to = 'en';
+    var str1 = appid + query + salt +key;
+    var sign = MD5(str1);
+    $.ajax({
+        url: 'http://api.fanyi.baidu.com/api/trans/vip/translate',
+        type: 'get',
+        dataType: 'jsonp',
+        data: {
+            q: query,
+            appid: appid,
+            salt: salt,
+            from: from,
+            to: to,
+            sign: sign
+        },
+        success: function (data) {
+            // alert(JSON.stringify(data));
+            var list= data.trans_result;
+            if (list !== null && list.length > 0) {
+                var obj = list[0];
+                var en = obj.dst;
+                if (en.indexOf(" ") === -1) {
+                    var result = en.toLowerCase();
+                    var version = $("#et-interface-version").val();
+                    var method = $("#select-interface-type").find("option:selected").text();
+                    $("#et-interface-path").val("v"+version+"/"+method.toUpperCase()+"/"+result);
+                } else {
+                    var words = en.split(' ')
+                    var result = "";
+                    for (var i = 0; i < words.length; i++) {
+                        var word = words[i];
+                        if (i === 0) {
+                            result += (word.substring(0, 1).toLowerCase()+word.substring(1).toLowerCase());
+                        } else {
+                            result += (word.substring(0, 1).toUpperCase()+word.substring(1).toLowerCase());
+                        }
+                    }
+                    result = result.replace("'", "");
+                    var version = $("#et-interface-version").val();
+                    var method = $("#select-interface-type").find("option:selected").text();
+                    $("#et-interface-path").val("v"+version+"/"+method.toUpperCase()+"/"+result);
+                }
+            } else {
+                alert("翻译失败");
+            }
+        }
+    });
 }

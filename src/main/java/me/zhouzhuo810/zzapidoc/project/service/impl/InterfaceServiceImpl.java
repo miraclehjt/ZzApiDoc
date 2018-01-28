@@ -1635,6 +1635,8 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                             Restrictions.eq("isGlobal", true)
                     });
                     if (globalErrorCodes != null && globalErrorCodes.size() > 0) {
+                        Chapter chapter = addGroup(document, "全局错误码", 0, fontChinese);
+                        addTextLine(document, "", fontChinese);
                         //设置列宽
                         float[] columnWidths = {3f, 6f};
                         String[][] values = new String[globalErrorCodes.size()][2];
@@ -1643,7 +1645,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                             values[i][0] = entity.getCode()+"";
                             values[i][1] = entity.getNote() == null ? "" : entity.getNote();
                         }
-                        addTable(document, "全局错误码说明", new String[]{"错误码", "说明"}, columnWidths, values, null, fontChinese);
+                        addTable(document, "全局错误码说明", new String[]{"错误码", "说明"}, columnWidths, values, null, false, fontChinese);
                     }
 
                     List<InterfaceGroupEntity> groups = mInterfaceGroupService.executeCriteria(InterfaceUtils.getInterfaceByProjectId(projectId), Order.asc("createTime"));
@@ -1678,7 +1680,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                                     values[j][0] = entity.getCode()+"";
                                     values[j][1] = entity.getNote() == null ? "" : entity.getNote();
                                 }
-                                addTable(document, "错误码说明", new String[]{"错误码", "说明"}, columnWidths, values, null, fontChinese);
+                                addTable(document, "错误码说明", new String[]{"错误码", "说明"}, columnWidths, values, null, true, fontChinese);
                             }
                             addTextLine(document, "", fontChinese);
 
@@ -1720,7 +1722,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                                         values[j][0] = err.getCode()+"";
                                         values[j][1] = err.getNote() == null ? "" : err.getNote();
                                     }
-                                    addTable(document, "错误码说明", new String[]{"错误码", "说明"}, columnWidths, values, null, fontChinese);
+                                    addTable(document, "错误码说明", new String[]{"错误码", "说明"}, columnWidths, values, null, true, fontChinese);
                                 }
 
                                 pdfAddRequestHeaders(document, projectId, entity.getId(), fontChinese);
@@ -1768,7 +1770,6 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
         return null;
     }
 
-
     /**
      * PDF添加请求头
      *
@@ -1792,7 +1793,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                 values[i][1] = entity.getValue() == null ? "" : entity.getValue();
                 values[i][2] = entity.getNote() == null ? "" : entity.getNote();
             }
-            addTable(document, "全局请求头", new String[]{"名称", "默认值", "说明"}, columnWidths, values, null, font);
+            addTable(document, "全局请求头", new String[]{"名称", "默认值", "说明"}, columnWidths, values, null, true, font);
         }
 
         if (args != null && args.size() > 0) {
@@ -1805,7 +1806,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                 values[i][1] = entity.getValue() == null ? "" : entity.getValue();
                 values[i][2] = entity.getNote() == null ? "" : entity.getNote();
             }
-            addTable(document, "其他请求头", new String[]{"名称", "默认值", "说明"}, columnWidths, values, null, font);
+            addTable(document, "其他请求头", new String[]{"名称", "默认值", "说明"}, columnWidths, values, null, true, font);
         }
     }
 
@@ -1822,16 +1823,18 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
      * @param font         字体
      * @throws DocumentException 异常
      */
-    private List<PdfPRow> addTable(Document document, String tableTitle, String[] titles, float[] widthRatio, String[][] values, BaseColor titleBgColor, Font font) throws DocumentException {
+    private List<PdfPRow> addTable(Document document, String tableTitle, String[] titles, float[] widthRatio, String[][] values, BaseColor titleBgColor, boolean addTitle, Font font) throws DocumentException {
         //添加表格标题
-        font.setSize(14f);
-        font.setStyle(Font.BOLD);
-        Chunk paragraph = new Chunk(tableTitle == null ? "" : tableTitle, font);
-        try {
-            document.add(paragraph);
-        } catch (DocumentException e) {
-            e.printStackTrace();
-            LOGGER.error("PDF ERROR", e);
+        if (addTitle) {
+            font.setSize(14f);
+            font.setStyle(Font.BOLD);
+            Chunk paragraph = new Chunk(tableTitle == null ? "" : tableTitle, font);
+            try {
+                document.add(paragraph);
+            } catch (DocumentException e) {
+                e.printStackTrace();
+                LOGGER.error("PDF ERROR", e);
+            }
         }
         font.setSize(12f);
         font.setStyle(Font.NORMAL);
@@ -1933,7 +1936,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                 values[i][3] = entity.getDefaultValue() == null ? "" : entity.getDefaultValue();
                 values[i][4] = entity.getNote() == null ? "" : entity.getNote();
             }
-            addTable(document, "全局请求参数", new String[]{"名称", "必选", "类型", "默认值", "说明"}, columnWidths, values, null, font);
+            addTable(document, "全局请求参数", new String[]{"名称", "必选", "类型", "默认值", "说明"}, columnWidths, values, null,true,  font);
         }
 
         List<RequestArgEntity> args = mRequestArgService.getBaseDao().executeCriteria(ResponseArgUtils.getArgByInterfaceIdAndPid(id, "0"));
@@ -1987,7 +1990,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                 values[i][3] = entity.getDefaultValue() == null ? "" : entity.getDefaultValue();
                 values[i][4] = entity.getNote() == null ? "" : entity.getNote();
             }
-            addTable(document, "其他请求参数", new String[]{"名称", "必选", "类型", "默认值", "说明"}, columnWidths, values, null, font);
+            addTable(document, "其他请求参数", new String[]{"名称", "必选", "类型", "默认值", "说明"}, columnWidths, values, null, true, font);
 
         }
     }
@@ -2044,7 +2047,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                 values[i][2] = entity.getDefaultValue() == null ? "" : entity.getDefaultValue();
                 values[i][3] = entity.getNote() == null ? "" : entity.getNote();
             }
-            addTable(document, "全局响应数据", new String[]{"名称", "类型", "默认值", "说明"}, columnWidths, values, null, font);
+            addTable(document, "全局响应数据", new String[]{"名称", "类型", "默认值", "说明"}, columnWidths, values, null, true, font);
         }
         List<ResponseArgEntity> args = mResponseArgService.getBaseDao().executeCriteria(ResponseArgUtils.getArgByInterfaceIdAndPid(id, "0"));
         if (args != null && args.size() > 0) {
