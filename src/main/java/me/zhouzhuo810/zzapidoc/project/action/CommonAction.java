@@ -46,4 +46,9 @@ public class CommonAction extends BaseController<DictionaryEntity> {
     public void actionRespArg(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         req.getRequestDispatcher("resArgList.jsp").forward(req,resp);
     }
+
+    @RequestMapping("/errorCode")
+    public void actionErrorCode(HttpServletRequest req, HttpServletResponse resp) throws Exception {
+        req.getRequestDispatcher("errorCodeList.jsp").forward(req,resp);
+    }
 }

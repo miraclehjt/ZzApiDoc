@@ -41,12 +41,13 @@
             </div>
             <form id="form-login" class="navbar-form navbar-right">
                 <div class="form-group">
-                    <input id="et-username" type="text" class="form-control" placeholder="用户名...">
-                    <input id="et-password" class="form-control" placeholder="密码...">
+                    <input id="et-username" type="text" class="form-control" placeholder="手机号...">
+                    <input id="et-password" type="password" class="form-control" placeholder="密码...">
                 </div>
                 <button id="btn-login" type="button" class="btn btn-default">登录</button>
                 <button id="btn-register" type="button" class="btn btn-danger" data-toggle="modal"
-                        data-target="#registerModel">注册</button>
+                        data-target="#registerModel">注册
+                </button>
             </form>
 
         </div>
@@ -61,7 +62,11 @@
     </div>
     <div class="row">
         <div class="col-md-12" id="right-container">
-            <h2 id="tv-content-title">项目管理</h2>
+            <div class="span6">
+                <ul class="breadcrumb">
+                    <li class="active">项目管理</li>
+                </ul>
+            </div>
             <hr/>
             <div id="btn-box">
                 <!-- Standard button -->
@@ -101,6 +106,7 @@
                                     <th>创建人</th>
                                     <th>创建时间</th>
                                     <th>分组管理</th>
+                                    <th>错误码管理</th>
                                     <th>操作</th>
                                     <th>PDF下载</th>
                                 </tr>
@@ -122,6 +128,7 @@
 <script src="js/jquery.twbsPagination.min.js"></script>
 <script src="js/home.js" type="text/javascript" charset="utf-8"></script>
 <script src="js/bootstrap-select.min.js"></script>
+<script src="js/bootstrap-show-password.min.js"></script>
 
 <!-- 编辑对话框 -->
 <div class="modal fade" id="editModel" tabindex="-1" role="dialog" aria-labelledby="editTitle">
@@ -239,7 +246,7 @@
                     <div class="form-group form-group-sm">
                         <label class="col-sm-2 control-label" for="et-pswd">密码</label>
                         <div class="col-sm-10">
-                            <input class="form-control" type="text" id="et-pswd" placeholder="密码">
+                            <input class="form-control" type="password" id="et-pswd" placeholder="密码">
                         </div>
                     </div>
                     <div class="form-group form-group-sm">
@@ -251,7 +258,7 @@
                     <div class="form-group form-group-sm">
                         <label class="col-sm-2 control-label" for="et-email">邮箱</label>
                         <div class="col-sm-10">
-                            <input class="form-control" type="text" id="et-email" placeholder="邮箱">
+                            <input class="form-control" type="email" id="et-email" placeholder="邮箱">
                         </div>
                     </div>
                     <div class="form-group form-group-sm">
@@ -293,13 +300,13 @@
                     <div class="form-group form-group-sm">
                         <label class="col-sm-2 control-label" for="et-pswd-edit">原密码</label>
                         <div class="col-sm-10">
-                            <input class="form-control" type="text" id="et-pswd-edit" placeholder="原密码">
+                            <input class="form-control" type="password" id="et-pswd-edit" placeholder="原密码">
                         </div>
                     </div>
                     <div class="form-group form-group-sm">
                         <label class="col-sm-2 control-label" for="et-new-pswd-edit">新密码</label>
                         <div class="col-sm-10">
-                            <input class="form-control" type="text" id="et-new-pswd-edit" placeholder="新密码">
+                            <input class="form-control" type="password" id="et-new-pswd-edit" placeholder="新密码">
                         </div>
                     </div>
                     <div class="form-group form-group-sm">
@@ -311,7 +318,7 @@
                     <div class="form-group form-group-sm">
                         <label class="col-sm-2 control-label" for="et-email-edit">邮箱</label>
                         <div class="col-sm-10">
-                            <input class="form-control" type="text" id="et-email-edit" placeholder="邮箱">
+                            <input class="form-control" type="email" id="et-email-edit" placeholder="邮箱">
                         </div>
                     </div>
                     <div class="form-group form-group-sm">

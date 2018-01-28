@@ -9,6 +9,7 @@ import me.zhouzhuo810.zzapidoc.common.utils.MapUtils;
 import me.zhouzhuo810.zzapidoc.project.dao.ErrorCodeDao;
 import me.zhouzhuo810.zzapidoc.project.entity.DictionaryEntity;
 import me.zhouzhuo810.zzapidoc.project.entity.ErrorCodeEntity;
+import me.zhouzhuo810.zzapidoc.project.entity.InterfaceGroupEntity;
 import me.zhouzhuo810.zzapidoc.project.entity.RequestHeaderEntity;
 import me.zhouzhuo810.zzapidoc.project.service.ErrorCodeService;
 import me.zhouzhuo810.zzapidoc.project.utils.DictionaryUtils;
@@ -124,7 +125,7 @@ public class ErrorCodeServiceImpl extends BaseServiceImpl<ErrorCodeEntity> imple
         }
         ErrorCodeEntity entity = getBaseDao().get(id);
         if (entity == null) {
-            return new BaseResult(0, "请求头不存在或已被删除！");
+            return new BaseResult(0, "错误码不存在或已被删除！");
         }
         entity.setModifyUserID(user.getId());
         entity.setModifyUserName(user.getName());
@@ -136,6 +137,69 @@ public class ErrorCodeServiceImpl extends BaseServiceImpl<ErrorCodeEntity> imple
         } catch (Exception e) {
             e.printStackTrace();
             return new BaseResult(0, "删除失败");
+        }
+    }
+    @Override
+    public BaseResult deleteErrorCodeWeb(String ids, String userId) {
+        UserEntity user = mUserService.get(userId);
+        if (user == null) {
+            return new BaseResult(0, "用户不合法！", new HashMap<String, String>());
+        }
+        if (ids != null && ids.length() > 0) {
+            if (ids.contains(",")) {
+                String[] id = ids.split(",");
+                for (String s : id) {
+                    ErrorCodeEntity entity = getBaseDao().get(s);
+                    if (entity == null) {
+                        continue;
+                    }
+                    entity.setModifyUserID(user.getId());
+                    entity.setModifyUserName(user.getName());
+                    entity.setDeleteFlag(BaseEntity.DELETE_FLAG_YES);
+                    try {
+                        update(entity);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            } else {
+                ErrorCodeEntity entity = getBaseDao().get(ids);
+                entity.setModifyUserID(user.getId());
+                entity.setModifyUserName(user.getName());
+                entity.setDeleteFlag(BaseEntity.DELETE_FLAG_YES);
+                try {
+                    update(entity);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        } else {
+            return new BaseResult(0, "请先选择要删除的行！", new HashMap<String, String>());
+        }
+        return new BaseResult(1, "刪除成功！", new HashMap<String, String>());
+    }
+
+    @Override
+    public BaseResult updateErrorCode(String codeId, int code, String note, String userId) {
+        UserEntity user = mUserService.get(userId);
+        if (user == null) {
+            return new BaseResult(0, "用户不合法");
+        }
+        ErrorCodeEntity entity = getBaseDao().get(codeId);
+        if (entity == null) {
+            return new BaseResult(0, "错误码不存在或已被删除！");
+        }
+        entity.setCode(code);
+        entity.setNote(note);
+        entity.setModifyUserID(user.getId());
+        entity.setModifyUserName(user.getName());
+        entity.setModifyTime(new Date());
+        try {
+            getBaseDao().update(entity);
+            return new BaseResult(1, "修改成功！");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new BaseResult(0, "修改失败");
         }
     }
 }

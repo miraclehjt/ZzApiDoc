@@ -11,11 +11,44 @@ $(document).ready(function () {
         $("#form-login").hide();
         getProjectList(userId, 1);
     }
+    $('#et-pswd-edit').password()
+        .password('focus')
+        .on('show.bs.password', function(e) {
+            $('#eventLog').text('On show event');
+            $('#methods').prop('checked', true);
+        }).on('hide.bs.password', function(e) {
+        $('#eventLog').text('On hide event');
+        $('#methods').prop('checked', false);
+    });
+    $('#et-new-pswd-edit').password()
+        .password('focus')
+        .on('show.bs.password', function(e) {
+            $('#eventLog').text('On show event');
+            $('#methods').prop('checked', true);
+        }).on('hide.bs.password', function(e) {
+        $('#eventLog').text('On hide event');
+        $('#methods').prop('checked', false);
+    });
+    $('#et-pswd').password()
+        .password('focus')
+        .on('show.bs.password', function(e) {
+            $('#eventLog').text('On show event');
+            $('#methods').prop('checked', true);
+        }).on('hide.bs.password', function(e) {
+        $('#eventLog').text('On hide event');
+        $('#methods').prop('checked', false);
+    });
     //列表按钮事件绑定
     $(document).on("click",".btn-see-group",function(){
         var colDbId = $(this).parent().parent().find(".db-id");
         localStorage.setItem("projectId", colDbId.text());
         location.href ="group";
+    });
+    //列表按钮事件绑定
+    $(document).on("click",".btn-see-err",function(){
+        var colDbId = $(this).parent().parent().find(".db-id");
+        localStorage.setItem("projectId", colDbId.text());
+        location.href ="errorCode";
     });
     //编辑按钮
     $(document).on("click", ".btn-edit-project", function () {
@@ -236,13 +269,22 @@ function getProjectList(userId, index) {
                 //填充表格
                 var c = "";
                 $.each(data.rows, function (n, value) {
-                    c += '<tr><td><div class="checkbox"><input type="checkbox" id="checkbox' + n + '" class="styled"><label for="checkbox'
-                        + n + '">选择</label></div></td><td class="db-id hide">' + value.id + '</td><td class="int-type hide">' + value.property + '</td><td class="name">'
-                        + value.name + '</td><td class="note">' + value.note + '</td><td class="package-name hide">' + value.packageName + '</td><td>'
-                        + (value.property === "0" ? '公有' : '私有') + '</td><td>' + value.interfaceNo + '</td><td>'
-                        + value.createUserName + '</td><td>' + value.createTime + '</td><td><button type="button" class="btn-see-group btn">分组管理</button></td>' +
+                    c += '<tr>' +
+                        '<td><div class="checkbox"><input type="checkbox" id="checkbox' + n + '" class="styled"><label for="checkbox' + n + '">选择</label></div></td>' +
+                        '<td class="db-id hide">' + value.id + '</td>' +
+                        '<td class="int-type hide">' + value.property + '</td>' +
+                        '<td class="name">' + value.name + '</td>' +
+                        '<td class="note">' + value.note + '</td>' +
+                        '<td class="package-name hide">' + value.packageName + '</td>' +
+                        '<td>' + (value.property === "0" ? '公有' : '私有') + '</td>' +
+                        '<td>' + value.interfaceNo + '</td>' +
+                        '<td>' + value.createUserName + '</td>' +
+                        '<td>' + value.createTime + '</td>' +
+                        '<td><button type="button" class="btn-see-group btn">分组管理</button></td>' +
+                        '<td><button type="button" class="btn-see-err btn">错误码管理</button></td>' +
                         '<td><button type="button" class="btn-edit-project btn btn-primary"  data-toggle="modal" data-target="#editModel">编辑</button></td>' +
-                        '<td><a href="v1/interface/downloadPdf?userId='+userId+'&projectId='+value.id+'" target="_blank" class="btn-edit-project btn btn-primary">点击下载</a></td></tr>';
+                        '<td><a href="v1/interface/downloadPdf?userId='+userId+'&projectId='+value.id+'" target="_blank" class="btn-edit-project btn btn-primary">点击下载</a></td>' +
+                        '</tr>';
                 });
                 $("#project-list").html(c);
 
@@ -283,13 +325,22 @@ function justUpdateList(userId, index) {
                 //填充表格
                 var c = "";
                 $.each(data.rows, function (n, value) {
-                    c += '<tr><td><div class="checkbox"><input type="checkbox" id="checkbox' + n + '" class="styled"><label for="checkbox'
-                        + n + '">选择</label></div></td><td class="db-id hide">' + value.id + '</td><td class="int-type hide">' + value.property + '</td><td class="name">'
-                        + value.name + '</td><td class="note">' + value.note + '</td><td class="package-name hide">' + value.packageName + '</td><td>'
-                        + (value.property === "0" ? '公有' : '私有') + '</td><td>' + value.interfaceNo + '</td><td>'
-                        + value.createUserName + '</td><td>' + value.createTime + '</td><td><button type="button" class="btn-see-group btn">分组管理</button></td>' +
+                    c += '<tr>' +
+                        '<td><div class="checkbox"><input type="checkbox" id="checkbox' + n + '" class="styled"><label for="checkbox' + n + '">选择</label></div></td>' +
+                        '<td class="db-id hide">' + value.id + '</td>' +
+                        '<td class="int-type hide">' + value.property + '</td>' +
+                        '<td class="name">' + value.name + '</td>' +
+                        '<td class="note">' + value.note + '</td>' +
+                        '<td class="package-name hide">' + value.packageName + '</td>' +
+                        '<td>' + (value.property === "0" ? '公有' : '私有') + '</td>' +
+                        '<td>' + value.interfaceNo + '</td>' +
+                        '<td>' + value.createUserName + '</td>' +
+                        '<td>' + value.createTime + '</td>' +
+                        '<td><button type="button" class="btn-see-group btn">分组管理</button></td>' +
+                        '<td><button type="button" class="btn-see-err btn">错误码管理</button></td>' +
                         '<td><button type="button" class="btn-edit-project btn btn-primary"  data-toggle="modal" data-target="#editModel">编辑</button></td>' +
-                        '<td><a href="v1/interface/downloadPdf?userId='+userId+'&projectId='+value.id+'" target="_blank" class="btn-edit-project btn btn-primary">点击下载</a></td></tr>';
+                        '<td><a href="v1/interface/downloadPdf?userId='+userId+'&projectId='+value.id+'" target="_blank" class="btn-edit-project btn btn-primary">点击下载</a></td>' +
+                        '</tr>';
                 });
                 $("#project-list").html(c);
             }

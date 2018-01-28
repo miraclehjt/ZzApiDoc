@@ -48,6 +48,18 @@ public class ErrorCodeAction extends BaseController<ErrorCodeEntity> {
     }
 
     @ResponseBody
+    @RequestMapping(value = "/updateErrorCode", method = RequestMethod.POST)
+    public BaseResult updateErrorCode(
+            @RequestParam(value = "codeId") String codeId,
+            @RequestParam(value = "code") int code,
+            @RequestParam(value = "note") String note,
+            @RequestParam(value = "userId") String userId
+    ) {
+
+        return getBaseService().updateErrorCode(codeId, code, note, userId);
+    }
+
+    @ResponseBody
     @RequestMapping(value = "/getAllErrorCode", method = RequestMethod.GET)
     public BaseResult getAllErrorCode(
             @RequestParam(value = "projectId") String projectId,
@@ -69,6 +81,15 @@ public class ErrorCodeAction extends BaseController<ErrorCodeEntity> {
             @RequestParam(value = "userId") String userId
     ) {
         return getBaseService().deleteErrorCode(id, userId);
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/deleteErrorCodeWeb", method = RequestMethod.POST)
+    public BaseResult deleteErrorCodeWeb(
+            @RequestParam(value = "ids") String ids,
+            @RequestParam(value = "userId") String userId
+    ) {
+        return getBaseService().deleteErrorCodeWeb(ids, userId);
     }
 
 }

@@ -12,6 +12,25 @@ $(document).ready(function () {
         $("#form-login").hide();
         getProjectList(projectId, userId, 1);
     }
+    //密码框隐藏与显示
+    $('#et-pswd-edit').password()
+        .password('focus')
+        .on('show.bs.password', function(e) {
+            $('#eventLog').text('On show event');
+            $('#methods').prop('checked', true);
+        }).on('hide.bs.password', function(e) {
+        $('#eventLog').text('On hide event');
+        $('#methods').prop('checked', false);
+    });
+    $('#et-new-pswd-edit').password()
+        .password('focus')
+        .on('show.bs.password', function(e) {
+            $('#eventLog').text('On show event');
+            $('#methods').prop('checked', true);
+        }).on('hide.bs.password', function(e) {
+        $('#eventLog').text('On hide event');
+        $('#methods').prop('checked', false);
+    });
     //列表按钮事件绑定
     $(document).on("click", ".btn-see-group", function () {
         var colDbId = $(this).parent().parent().find(".db-id");

@@ -147,9 +147,10 @@ public class InterfaceAction extends BaseController<InterfaceEntity> {
     public WebResult getInterfaceByGroupIdWeb(
             @RequestParam(value = "groupId") String groupId,
             @RequestParam(value = "page") int page,
+            @RequestParam(value = "search", required = false) String search,
             @RequestParam(value = "userId") String userId
     ) {
-        return getService().getInterfaceByGroupIdWeb(groupId, page, userId);
+        return getService().getInterfaceByGroupIdWeb(groupId, page, search, userId);
     }
 
 

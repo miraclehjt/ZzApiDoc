@@ -2,7 +2,6 @@ package me.zhouzhuo810.zzapidoc.project.service.impl;
 
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
-import com.itextpdf.text.pdf.StringUtils;
 import me.zhouzhuo810.zzapidoc.android.utils.ZipUtils;
 import me.zhouzhuo810.zzapidoc.android.widget.apicreator.ApiTool;
 import me.zhouzhuo810.zzapidoc.cache.entity.CacheEntity;
@@ -12,8 +11,7 @@ import me.zhouzhuo810.zzapidoc.common.entity.BaseEntity;
 import me.zhouzhuo810.zzapidoc.common.result.BaseResult;
 import me.zhouzhuo810.zzapidoc.common.result.WebResult;
 import me.zhouzhuo810.zzapidoc.common.service.impl.BaseServiceImpl;
-import me.zhouzhuo810.zzapidoc.common.utils.DataUtils;
-import me.zhouzhuo810.zzapidoc.common.utils.MapUtils;
+import me.zhouzhuo810.zzapidoc.common.utils.*;
 import me.zhouzhuo810.zzapidoc.project.dao.InterfaceDao;
 import me.zhouzhuo810.zzapidoc.project.entity.*;
 import me.zhouzhuo810.zzapidoc.project.service.*;
@@ -24,7 +22,6 @@ import me.zhouzhuo810.zzapidoc.project.utils.ResponseArgUtils;
 import me.zhouzhuo810.zzapidoc.user.entity.UserEntity;
 import me.zhouzhuo810.zzapidoc.user.service.UserService;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.*;
 import org.apache.log4j.Logger;
 import org.aspectj.util.FileUtil;
 import org.hibernate.criterion.Criterion;
@@ -375,7 +372,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
     }
 
     @Override
-    public WebResult getInterfaceByGroupIdWeb(String groupId, int indexPage, String userId) {
+    public WebResult getInterfaceByGroupIdWeb(String groupId, int indexPage, String search, String userId) {
         UserEntity user = mUserService.get(userId);
         if (user == null) {
             return new WebResult(1, 1,  0);
@@ -384,8 +381,8 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
         if (group == null) {
             return new WebResult(1, 1, 0);
         }
-        int rowCount = getBaseDao().executeCriteriaRow(InterfaceUtils.getInterfaceByGroupId(groupId));
-        List<InterfaceEntity> list = getBaseDao().executeCriteria(InterfaceUtils.getInterfaceByGroupId(groupId), indexPage-1, 10, Order.desc("createTime"));
+        int rowCount = getBaseDao().executeCriteriaRow(me.zhouzhuo810.zzapidoc.common.utils.StringUtils.isEmpty(search)?InterfaceUtils.getInterfaceByGroupId(groupId):InterfaceUtils.getInterfaceByGroupId(groupId, search));
+        List<InterfaceEntity> list = getBaseDao().executeCriteria(me.zhouzhuo810.zzapidoc.common.utils.StringUtils.isEmpty(search)?InterfaceUtils.getInterfaceByGroupId(groupId):InterfaceUtils.getInterfaceByGroupId(groupId, search), indexPage-1, 10, Order.desc("createTime"));
         int pageCount = rowCount / 10;
         if (rowCount % 10 > 0) {
             pageCount++;
@@ -2660,6 +2657,8 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                     e.printStackTrace();
                 }
             }
+        } else {
+            return new BaseResult(0, "请先选择要删除的行！", new HashMap<String, String>());
         }
         return new BaseResult(1, "刪除成功！", new HashMap<String, String>());
     }

@@ -148,6 +148,8 @@ public class ProjectServiceImpl extends BaseServiceImpl<ProjectEntity> implement
                     e.printStackTrace();
                 }
             }
+        } else {
+            return new BaseResult(0, "请先选择要删除的行！", new HashMap<String, String>());
         }
         return new BaseResult(1, "刪除成功！", new HashMap<String, String>());
     }

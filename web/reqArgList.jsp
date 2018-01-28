@@ -13,7 +13,6 @@
     <link rel="stylesheet" href="css/font-awesome.min.css">
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="css/bootstrap-select.css">
-    <link rel="stylesheet" href="css/bootstrap-switch.min.css">
     <!--[if lt IE 9]>
     <script src="js/html5shiv.js"></script>
     <script src="js/respond.min.js"></script>
@@ -42,8 +41,8 @@
             </div>
             <form id="form-login" class="navbar-form navbar-right">
                 <div class="form-group">
-                    <input id="et-username" type="text" class="form-control" placeholder="用户名...">
-                    <input id="et-password" class="form-control" placeholder="密码...">
+                    <input id="et-username" type="text" class="form-control" placeholder="手机号...">
+                    <input id="et-password" type="password" class="form-control" placeholder="密码...">
                 </div>
                 <button id="btn-login" type="button" class="btn btn-default">登录</button>
             </form>
@@ -60,7 +59,20 @@
     </div>
     <div class="row">
         <div class="col-md-12" id="right-container">
-            <h2 id="tv-content-title">请求参数管理</h2>
+            <div class="span6">
+                <ul class="breadcrumb">
+                    <li>
+                        <a href="home">项目管理</a> <span class="divider"></span>
+                    </li>
+                    <li>
+                        <a href="group">分组管理</a> <span class="divider"></span>
+                    </li>
+                    <li>
+                        <a href="interface">接口管理</a> <span class="divider"></span>
+                    </li>
+                    <li class="active">请求参数管理</li>
+                </ul>
+            </div>
             <hr/>
             <div id="btn-box">
                 <!-- Standard button -->
@@ -120,7 +132,7 @@
 <script src="js/req.js" type="text/javascript" charset="utf-8"></script>
 <!-- Latest compiled and minified JavaScript -->
 <script src="js/bootstrap-select.min.js"></script>
-<script src="js/bootstrap-switch.js"></script>
+<script src="js/bootstrap-show-password.min.js"></script>
 
 <!-- 编辑对话框 -->
 <div class="modal fade" id="editModel" tabindex="-1" role="dialog" aria-labelledby="editTitle">
@@ -300,13 +312,13 @@
                     <div class="form-group form-group-sm">
                         <label class="col-sm-2 control-label" for="et-pswd-edit">原密码</label>
                         <div class="col-sm-10">
-                            <input class="form-control" type="text" id="et-pswd-edit" placeholder="原密码">
+                            <input class="form-control" type="password" id="et-pswd-edit" placeholder="原密码">
                         </div>
                     </div>
                     <div class="form-group form-group-sm">
                         <label class="col-sm-2 control-label" for="et-new-pswd-edit">新密码</label>
                         <div class="col-sm-10">
-                            <input class="form-control" type="text" id="et-new-pswd-edit" placeholder="新密码">
+                            <input class="form-control" type="password" id="et-new-pswd-edit" placeholder="新密码">
                         </div>
                     </div>
                     <div class="form-group form-group-sm">
@@ -318,7 +330,7 @@
                     <div class="form-group form-group-sm">
                         <label class="col-sm-2 control-label" for="et-email-edit">邮箱</label>
                         <div class="col-sm-10">
-                            <input class="form-control" type="text" id="et-email-edit" placeholder="邮箱">
+                            <input class="form-control" type="email" id="et-email-edit" placeholder="邮箱">
                         </div>
                     </div>
                     <div class="form-group form-group-sm">
@@ -339,6 +351,7 @@
         </div>
     </div>
 </div>
+
 </body>
 
 </html>

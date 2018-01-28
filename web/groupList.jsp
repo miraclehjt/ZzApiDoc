@@ -9,6 +9,7 @@
     <title>小周接口文档管理系统</title>
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="css/common.css"/>
+    <link rel="stylesheet" href="css/bootstrap-select.min.css"/>
     <link rel="stylesheet" href="css/awesome-bootstrap-checkbox.css">
     <link rel="stylesheet" href="css/font-awesome.min.css">
 
@@ -40,8 +41,8 @@
             </div>
             <form id="form-login" class="navbar-form navbar-right">
                 <div class="form-group">
-                    <input id="et-username" type="text" class="form-control" placeholder="用户名...">
-                    <input id="et-password" class="form-control" placeholder="密码...">
+                    <input id="et-username" type="text" class="form-control" placeholder="手机号...">
+                    <input id="et-password" type="password" class="form-control" placeholder="密码...">
                 </div>
                 <button id="btn-login" type="button" class="btn btn-default">登录</button>
             </form>
@@ -58,7 +59,14 @@
     </div>
     <div class="row">
         <div class="col-md-12" id="right-container">
-            <h2 id="tv-content-title">分组管理</h2>
+            <div class="span6">
+                <ul class="breadcrumb">
+                    <li>
+                        <a href="home">项目管理</a> <span class="divider"></span>
+                    </li>
+                    <li class="active">分组管理</li>
+                </ul>
+            </div>
             <hr/>
             <div id="btn-box">
                 <!-- Standard button -->
@@ -115,7 +123,8 @@
 <script src="js/bootstrap.min.js"></script>
 <script src="js/jquery.twbsPagination.min.js"></script>
 <script src="js/group.js" type="text/javascript" charset="utf-8"></script>
-
+<script src="js/bootstrap-show-password.min.js"></script>
+<script src="js/bootstrap-select.min.js"></script>
 <!-- 编辑对话框 -->
 <div class="modal fade" id="editModel" tabindex="-1" role="dialog" aria-labelledby="editTitle">
     <div class="modal-dialog" role="document">
@@ -202,13 +211,13 @@
                     <div class="form-group form-group-sm">
                         <label class="col-sm-2 control-label" for="et-pswd-edit">原密码</label>
                         <div class="col-sm-10">
-                            <input class="form-control" type="text" id="et-pswd-edit" placeholder="原密码">
+                            <input class="form-control" type="password" id="et-pswd-edit" placeholder="原密码">
                         </div>
                     </div>
                     <div class="form-group form-group-sm">
                         <label class="col-sm-2 control-label" for="et-new-pswd-edit">新密码</label>
                         <div class="col-sm-10">
-                            <input class="form-control" type="text" id="et-new-pswd-edit" placeholder="新密码">
+                            <input class="form-control" type="password" id="et-new-pswd-edit" placeholder="新密码">
                         </div>
                     </div>
                     <div class="form-group form-group-sm">
@@ -220,7 +229,7 @@
                     <div class="form-group form-group-sm">
                         <label class="col-sm-2 control-label" for="et-email-edit">邮箱</label>
                         <div class="col-sm-10">
-                            <input class="form-control" type="text" id="et-email-edit" placeholder="邮箱">
+                            <input class="form-control" type="email" id="et-email-edit" placeholder="邮箱">
                         </div>
                     </div>
                     <div class="form-group form-group-sm">
@@ -241,6 +250,7 @@
         </div>
     </div>
 </div>
+
 </body>
 
 </html>

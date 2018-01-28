@@ -14,4 +14,8 @@ public interface ErrorCodeService extends BaseService<ErrorCodeEntity> {
     BaseResult getAllErrorCode(boolean global, boolean group, String projectId, String groupId, String interfaceId, String userId);
 
     BaseResult deleteErrorCode(String id, String userId);
+
+    BaseResult deleteErrorCodeWeb(String ids, String userId);
+
+    BaseResult updateErrorCode(String codeId, int code, String note, String userId);
 }

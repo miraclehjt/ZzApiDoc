@@ -24,7 +24,7 @@ public interface InterfaceService extends BaseService<InterfaceEntity> {
 
     BaseResult getInterfaceByGroupId(String projectId, String groupId, String userId);
 
-    WebResult getInterfaceByGroupIdWeb(String groupId, int indexPage, String userId);
+    WebResult getInterfaceByGroupIdWeb(String groupId, int indexPage, String search, String userId);
 
     BaseResult getInterfaceDetails(String interfaceId, String userId);
 

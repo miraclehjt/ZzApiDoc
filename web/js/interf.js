@@ -42,7 +42,12 @@ $(document).ready(function () {
         getHttpMethodsEdit(methodId);
     });
 
-
+    //搜索按钮
+    $("#btn-search").click(function () {
+        var userId = localStorage.getItem("userId");
+        var groupId = localStorage.getItem("groupId");
+        getProjectList(groupId, userId, 1);
+    });
     //登录按钮点击
     $("#btn-login").click(function () {
         //	$("#tv-user-name").show();
@@ -106,7 +111,25 @@ $(document).ready(function () {
     $("#btn-user-ok").click(function () {
         updateUserInfo();
     });
-
+    //密码框隐藏与显示
+    $('#et-pswd-edit').password()
+        .password('focus')
+        .on('show.bs.password', function(e) {
+            $('#eventLog').text('On show event');
+            $('#methods').prop('checked', true);
+        }).on('hide.bs.password', function(e) {
+        $('#eventLog').text('On hide event');
+        $('#methods').prop('checked', false);
+    });
+    $('#et-new-pswd-edit').password()
+        .password('focus')
+        .on('show.bs.password', function(e) {
+            $('#eventLog').text('On show event');
+            $('#methods').prop('checked', true);
+        }).on('hide.bs.password', function(e) {
+        $('#eventLog').text('On hide event');
+        $('#methods').prop('checked', false);
+    });
 });
 
 function updateUserInfo() {
@@ -271,47 +294,52 @@ function getProjectList(groupId, userId, index) {
         showHintMsg("请先选择分组");
         return;
     }
-    $.get("/ZzApiDoc/v1/interface/getInterfaceByGroupIdWeb?groupId="+groupId+"&userId=" + userId + "&page=" + index,
-        function (data, status) {
-            if (status === 'success') {
-                //填充表格
-                var c = "";
-                $.each(data.rows, function (n, value) {
-                    c += '<tr>' +
-                        '<td><div class="checkbox"><input type="checkbox" id="checkbox' + n + '" class="styled"><label for="checkbox' + n + '">选择</label></div></td>' +
-                        '<td class="db-id hide">' + value.id + '</td>' +
-                        '<td class="method-id hide">' + value.methodId + '</td>' +
-                        '<td class="name">' + value.name + '</td>' +
-                        '<td>' + value.methodName + '</td>' +
-                        '<td class="path">' + value.path + '</td>' +
-                        '<td class="note">' + value.note + '</td>' +
-                        '<td>' + value.createUserName + '</td>' +
-                        '<td>' + value.createTime + '</td>' +
-                        '<td><button type="button" class="btn-see-req btn">请求参数</button></td>' +
-                        '<td><button type="button" class="btn-see-res btn">返回参数</button></td>' +
-                        '<td><button type="button" class="btn-edit-interface btn btn-primary"  data-toggle="modal" data-target="#editModel">编辑</button></td></tr>';
-                });
-                $("#project-list").html(c);
+    var url = "/ZzApiDoc/v1/interface/getInterfaceByGroupIdWeb?groupId="+groupId+"&userId=" + userId + "&page=" + index;
+    var search = $("#et-search").val();
+    if (search === null || search.length === 0) {
+    } else {
+        url += ("&search="+search);
+    }
+    $.get(url, function (data, status) {
+        if (status === 'success') {
+            //填充表格
+            var c = "";
+            $.each(data.rows, function (n, value) {
+                c += '<tr>' +
+                    '<td><div class="checkbox"><input type="checkbox" id="checkbox' + n + '" class="styled"><label for="checkbox' + n + '">选择</label></div></td>' +
+                    '<td class="db-id hide">' + value.id + '</td>' +
+                    '<td class="method-id hide">' + value.methodId + '</td>' +
+                    '<td class="name">' + value.name + '</td>' +
+                    '<td>' + value.methodName + '</td>' +
+                    '<td class="path">' + value.path + '</td>' +
+                    '<td class="note">' + value.note + '</td>' +
+                    '<td>' + value.createUserName + '</td>' +
+                    '<td>' + value.createTime + '</td>' +
+                    '<td><button type="button" class="btn-see-req btn">请求参数</button></td>' +
+                    '<td><button type="button" class="btn-see-res btn">返回参数</button></td>' +
+                    '<td><button type="button" class="btn-edit-interface btn btn-primary"  data-toggle="modal" data-target="#editModel">编辑</button></td></tr>';
+            });
+            $("#project-list").html(c);
 
-                // if($("#page-indicator").data("twbs-pagination")){
-                //     $("#page-indicator").twbsPagination("destroy");
-                // }
-                $("#page-indicator").twbsPagination("destroy");
-                //分页绑定
-                $('#page-indicator').twbsPagination({
-                    totalPages: data.totalPage,
-                    visiblePages: 10,
-                    onPageClick: function (event, page) {
-                        //全选取消
-                        $("#checkbox-all").prop("checked", false);
-                        //重载数据
-                        var mid = localStorage.getItem("userId");
-                        justUpdateList(mid, page);
-                    }
-                });
-            }
+            // if($("#page-indicator").data("twbs-pagination")){
+            //     $("#page-indicator").twbsPagination("destroy");
+            // }
+            $("#page-indicator").twbsPagination("destroy");
+            //分页绑定
+            $('#page-indicator').twbsPagination({
+                totalPages: data.totalPage,
+                visiblePages: 10,
+                onPageClick: function (event, page) {
+                    //全选取消
+                    $("#checkbox-all").prop("checked", false);
+                    //重载数据
+                    var mid = localStorage.getItem("userId");
+                    justUpdateList(mid, page);
+                }
+            });
+        }
 
-        });
+    });
     return false;
 }
 
@@ -327,7 +355,13 @@ function justUpdateList(groupId, userId, index) {
         showHintMsg("请先选择分组");
         return;
     }
-    $.get("/ZzApiDoc/v1/interface/getInterfaceByGroupIdWeb?groupId="+groupId+"&userId=" + userId + "&page=" + index,
+    var url = "/ZzApiDoc/v1/interface/getInterfaceByGroupIdWeb?groupId="+groupId+"&userId=" + userId + "&page=" + index;
+    var search = $("#et-search").val();
+    if (search === null || search.length === 0) {
+    } else {
+        url.append("&search="+search);
+    }
+    $.get(url,
         function (data, status) {
             if (status === 'success') {
                 //填充表格

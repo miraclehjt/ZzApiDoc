@@ -9,9 +9,9 @@
     <title>小周接口文档管理系统</title>
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="css/common.css"/>
+    <link rel="stylesheet" href="css/bootstrap-select.min.css"/>
     <link rel="stylesheet" href="css/awesome-bootstrap-checkbox.css">
     <link rel="stylesheet" href="css/font-awesome.min.css">
-    <link rel="stylesheet" href="css/bootstrap-select.min.css">
 
     <!--[if lt IE 9]>
     <script src="js/html5shiv.js"></script>
@@ -35,15 +35,6 @@
         </div>
         <!-- Collect the nav links, forms, and other content for toggling -->
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-            <form id="form-search" class="navbar-form col-md-5">
-                <div class="input-group">
-                    <input id="et-search" type="text" class="form-control" placeholder="输入接口名称搜索...">
-                    <span class="input-group-btn">
-                        <button id="btn-search" class="btn btn-primary" type="button">搜索</button>
-                    </span>
-                </div><!-- /input-group -->
-            </form>
-
             <div id="box-user-info" class="navbar-right">
                 <a id="tv-user-name" class="tv-white" data-toggle="modal" data-target="#userModel"></a>
                 <button id="btn-unregister" type="button" class="btn btn-danger">注销</button>
@@ -73,10 +64,7 @@
                     <li>
                         <a href="home">项目管理</a> <span class="divider"></span>
                     </li>
-                    <li>
-                        <a href="group">分组管理</a> <span class="divider"></span>
-                    </li>
-                    <li class="active">接口管理</li>
+                    <li class="active">错误码管理</li>
                 </ul>
             </div>
             <hr/>
@@ -84,7 +72,7 @@
                 <!-- Standard button -->
                 <button type="button" class="btn btn-primary" id="btn-refresh">刷新</button>
                 <!-- Standard button -->
-                <button type="button" class="btn btn-primary" id="btn-add-interface" data-toggle="modal"
+                <button type="button" class="btn btn-primary" id="btn-add-err" data-toggle="modal"
                         data-target="#addModel">新增
                 </button>
                 <!-- Indicates a dangerous or potentially negative action -->
@@ -93,7 +81,7 @@
             <div class="col-md-12 left-table">
                 <div class="panel panel-primary">
                     <div class="panel-heading">
-                        <h3 class="panel-title" id="table-title">接口管理</h3>
+                        <h3 class="panel-title" id="table-title">错误码管理</h3>
                     </div>
                     <div class="panel-body">
                         <div class="table-responsive">
@@ -109,15 +97,10 @@
                                         </div>
                                     </th>
                                     <th class="hide">ID</th>
-                                    <th class="hide">methodId</th>
-                                    <th>名称</th>
-                                    <th>请求方式</th>
-                                    <th>请求路径</th>
+                                    <th>值</th>
                                     <th>备注</th>
                                     <th>创建人</th>
                                     <th>创建时间</th>
-                                    <th>请求参数</th>
-                                    <th>返回参数</th>
                                     <th>操作</th>
                                 </tr>
                                 </thead>
@@ -127,7 +110,6 @@
                             </table>
                         </div>
                     </div>
-                    <ul class="pagination" id="page-indicator"></ul>
                 </div>
             </div>
         </div>
@@ -136,10 +118,9 @@
 <script src="js/jquery.min.js"></script>
 <script src="js/bootstrap.min.js"></script>
 <script src="js/jquery.twbsPagination.min.js"></script>
-<script src="js/interf.js" type="text/javascript" charset="utf-8"></script>
-<script src="js/bootstrap-select.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="js/err.js" type="text/javascript" charset="utf-8"></script>
 <script src="js/bootstrap-show-password.min.js"></script>
-
+<script src="js/bootstrap-select.min.js"></script>
 <!-- 编辑对话框 -->
 <div class="modal fade" id="editModel" tabindex="-1" role="dialog" aria-labelledby="editTitle">
     <div class="modal-dialog" role="document">
@@ -147,41 +128,20 @@
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
                 </button>
-                <h4 class="modal-title" id="editTitle">编辑接口</h4>
+                <h4 class="modal-title" id="editTitle">编辑错误码</h4>
             </div>
             <div class="modal-body">
                 <form class="form-horizontal" id="form-edit">
                     <div class="form-group form-group-sm">
-                        <label class="col-sm-2 control-label" for="select-interface-type-edit">参数类型</label>
+                        <label class="col-sm-2 control-label" for="et-err-code-edit">值</label>
                         <div class="col-sm-10">
-                            <select class="selectpicker" id="select-interface-type-edit">
-                                <option value="0">GET</option>
-                                <option value="1">POST</option>
-                            </select>
+                            <input class="form-control" type="text" id="et-err-code-edit" placeholder="值">
                         </div>
                     </div>
                     <div class="form-group form-group-sm">
-                        <label class="col-sm-2 control-label" for="et-interface-name-edit">名称</label>
+                        <label class="col-sm-2 control-label" for="et-err-note-edit">说明</label>
                         <div class="col-sm-10">
-                            <input class="form-control" type="text" id="et-interface-name-edit" placeholder="名称">
-                        </div>
-                    </div>
-                    <div class="form-group form-group-sm">
-                        <label class="col-sm-2 control-label" for="et-interface-version-edit">版本号</label>
-                        <div class="col-sm-10">
-                            <input class="form-control" type="text" id="et-interface-version-edit" placeholder="版本号">
-                        </div>
-                    </div>
-                    <div class="form-group form-group-sm">
-                        <label class="col-sm-2 control-label" for="et-interface-path-edit">请求路径</label>
-                        <div class="col-sm-10">
-                            <input class="form-control" type="text" id="et-interface-path-edit" placeholder="请求路径">
-                        </div>
-                    </div>
-                    <div class="form-group form-group-sm">
-                        <label class="col-sm-2 control-label" for="et-interface-note-edit">备注</label>
-                        <div class="col-sm-10">
-                            <input class="form-control" type="text" id="et-interface-note-edit" placeholder="备注">
+                            <input class="form-control" type="text" id="et-err-note-edit" placeholder="说明">
                         </div>
                     </div>
                 </form>
@@ -201,41 +161,21 @@
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
                 </button>
-                <h4 class="modal-title" id="addTitle">新增接口</h4>
+                <h4 class="modal-title" id="addTitle">新增错误码</h4>
             </div>
             <div class="modal-body">
                 <form class="form-horizontal" id="form-add">
+
                     <div class="form-group form-group-sm">
-                        <label class="col-sm-2 control-label" for="select-interface-type">参数类型</label>
+                        <label class="col-sm-2 control-label" for="et-err-code">值</label>
                         <div class="col-sm-10">
-                            <select class="selectpicker" id="select-interface-type">
-                                <option value="0">GET</option>
-                                <option value="1">POST</option>
-                            </select>
+                            <input class="form-control" type="text" id="et-err-code" placeholder="值">
                         </div>
                     </div>
                     <div class="form-group form-group-sm">
-                        <label class="col-sm-2 control-label" for="et-interface-name">名称</label>
+                        <label class="col-sm-2 control-label" for="et-err-note">说明</label>
                         <div class="col-sm-10">
-                            <input class="form-control" type="text" id="et-interface-name" placeholder="名称">
-                        </div>
-                    </div>
-                    <div class="form-group form-group-sm">
-                        <label class="col-sm-2 control-label" for="et-interface-version">版本号</label>
-                        <div class="col-sm-10">
-                            <input class="form-control" type="text" id="et-interface-version" placeholder="版本号">
-                        </div>
-                    </div>
-                    <div class="form-group form-group-sm">
-                        <label class="col-sm-2 control-label" for="et-interface-path">请求路径</label>
-                        <div class="col-sm-10">
-                            <input class="form-control" type="text" id="et-interface-path" placeholder="请求路径">
-                        </div>
-                    </div>
-                    <div class="form-group form-group-sm">
-                        <label class="col-sm-2 control-label" for="et-interface-note">备注</label>
-                        <div class="col-sm-10">
-                            <input class="form-control" type="text" id="et-interface-note" placeholder="备注">
+                            <input class="form-control" type="text" id="et-err-note" placeholder="说明">
                         </div>
                     </div>
                 </form>
