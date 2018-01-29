@@ -3,6 +3,11 @@ $(document).ready(function () {
     var username = localStorage.getItem("username");
     var userId = localStorage.getItem("userId");
     var pic = localStorage.getItem("userPic");
+    var projectName = localStorage.getItem("projectName");
+    var groupName = localStorage.getItem("groupName");
+    var interfName = localStorage.getItem("interfaceName");
+    $("#table-title").text(projectName + " / " + groupName + " / " + interfName + " 的请求参数");
+
     if (userId === null || userId === "") {
         doExitLogin();
     } else {

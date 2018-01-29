@@ -3,6 +3,10 @@ $(document).ready(function () {
     var username = localStorage.getItem("username");
     var userId = localStorage.getItem("userId");
     var pic = localStorage.getItem("userPic");
+    var projectName = localStorage.getItem("projectName");
+    var groupName = localStorage.getItem("groupName");
+    var interfName = localStorage.getItem("interfaceName");
+    $("#table-title").text(projectName + " / " + groupName + " / " + interfName + " 的返回参数");
     if (userId === null || userId === "") {
         doExitLogin();
     } else {
@@ -16,19 +20,19 @@ $(document).ready(function () {
     //密码框隐藏与显示
     $('#et-pswd-edit').password()
         .password('focus')
-        .on('show.bs.password', function(e) {
+        .on('show.bs.password', function (e) {
             $('#eventLog').text('On show event');
             $('#methods').prop('checked', true);
-        }).on('hide.bs.password', function(e) {
+        }).on('hide.bs.password', function (e) {
         $('#eventLog').text('On hide event');
         $('#methods').prop('checked', false);
     });
     $('#et-new-pswd-edit').password()
         .password('focus')
-        .on('show.bs.password', function(e) {
+        .on('show.bs.password', function (e) {
             $('#eventLog').text('On show event');
             $('#methods').prop('checked', true);
-        }).on('hide.bs.password', function(e) {
+        }).on('hide.bs.password', function (e) {
         $('#eventLog').text('On hide event');
         $('#methods').prop('checked', false);
     });
@@ -193,7 +197,7 @@ function doLogin() {
 function doExitLogin() {
     //清空缓存
     localStorage.clear();
-    location.href ="home";
+    location.href = "home";
 }
 
 /*获取项目列表*/
@@ -213,7 +217,7 @@ function getProjectList(projectId, interfaceId, userId, pid) {
         return;
     }
 
-    $.get("/ZzApiDoc/v1/requestArg/getRequestArgByInterfaceIdAndPid?projectId="+projectId+"&interfaceId=" + interfaceId + "&userId=" + userId + "&pid=" + pid,
+    $.get("/ZzApiDoc/v1/requestArg/getRequestArgByInterfaceIdAndPid?projectId=" + projectId + "&interfaceId=" + interfaceId + "&userId=" + userId + "&pid=" + pid,
         function (data, status) {
             if (status === 'success') {
                 if (data.code === 0) {
@@ -502,7 +506,7 @@ function addResParam() {
  */
 function showHintMsg(msg) {
     $("#row-hint").html('<div class="alert alert-warning" id="tv-hint"> <a href="#" class="close" data-dismiss="alert"> &times;</a><label id="tv-hint-content">' + msg + '</label></div>');
-    window.setTimeout("clearHint()",1500);//使用字符串执行方法
+    window.setTimeout("clearHint()", 1500);//使用字符串执行方法
 }
 /**
  * 拼接成功html
@@ -511,7 +515,7 @@ function showHintMsg(msg) {
  */
 function showOkMsg(msg) {
     $("#row-hint").html('<div class="alert alert-success" id="tv-hint"> <a href="#" class="close" data-dismiss="alert"> &times;</a><label id="tv-hint-content">' + msg + '</label></div>');
-    window.setTimeout("clearHint()",1500);//使用字符串执行方法
+    window.setTimeout("clearHint()", 1500);//使用字符串执行方法
 }
 
 /**

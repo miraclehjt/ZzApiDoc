@@ -1,9 +1,12 @@
 $(document).ready(function () {
-    //还原用户信息
+    /*还原用户信息*/
     var username = localStorage.getItem("username");
     var userId = localStorage.getItem("userId");
     var pic = localStorage.getItem("userPic");
     var projectId = localStorage.getItem("projectId");
+    /*表标题改为项目名*/
+    var projectName = localStorage.getItem("projectName");
+    $("#table-title").text(projectName+" 的接口分组");
     if (userId === null || userId === "") {
         doExitLogin();
     } else {
@@ -12,7 +15,7 @@ $(document).ready(function () {
         $("#form-login").hide();
         getProjectList(projectId, userId, 1);
     }
-    //密码框隐藏与显示
+    /*密码框隐藏与显示*/
     $('#et-pswd-edit').password()
         .password('focus')
         .on('show.bs.password', function(e) {
@@ -31,13 +34,15 @@ $(document).ready(function () {
         $('#eventLog').text('On hide event');
         $('#methods').prop('checked', false);
     });
-    //列表按钮事件绑定
+    /*列表按钮事件绑定*/
     $(document).on("click", ".btn-see-group", function () {
         var colDbId = $(this).parent().parent().find(".db-id");
+        var name = $(this).parent().parent().find(".name").text();
+        localStorage.setItem("groupName", name);
         localStorage.setItem("groupId", colDbId.text());
         location.href = "interface";
     });
-    //编辑按钮
+    /*编辑按钮*/
     $(document).on("click", ".btn-edit-group", function () {
         var colDbId = $(this).parent().parent().find(".db-id");
         localStorage.setItem("edit-group-id", colDbId.text());
@@ -46,52 +51,52 @@ $(document).ready(function () {
         $("#et-group-name-edit").val(name);
         $("#et-ip-addr-edit").val(ipAddr);
     });
-    //生成示例
+    /*生成示例*/
     $(document).on("click", ".btn-generate-code", function () {
         var colDbId = $(this).parent().parent().find(".db-id");
         generateCode(colDbId.text());
     });
 
-    //登录按钮点击
+    /*登录按钮点击*/
     $("#btn-login").click(function () {
         //	$("#tv-user-name").show();
         doLogin();
     });
-    //注销按钮点击
+    /*注销按钮点击*/
     $("#btn-unregister").click(function () {
         doExitLogin();
     });
-    //刷新按钮点击
+    /*刷新按钮点击*/
     $("#btn-refresh").click(function () {
         var userId = localStorage.getItem("userId");
         var projectId = localStorage.getItem("projectId");
         getProjectList(projectId, userId, 1);
     });
-    //删除按钮点击
+    /*删除按钮点击*/
     $("#btn-delete").click(function () {
         doDelete();
     });
-    //全选监听
+    /*全选监听*/
     $("#checkbox-all").change(function () {
         var isCheck = $(this).is(':checked');
         $(".styled").prop("checked", isCheck);
     });
 
-    //添加按钮点击
+    /*添加按钮点击*/
     $("#btn-add-group").click(function () {
         $("#et-ip-addr").val("http://");
         $("#et-group-name").val("");
     });
-    //添加对话框保存按钮
+    /*添加对话框保存按钮*/
     $("#btn-add-save").click(function () {
         addResParam();
     });
-    //编辑对话框保存按钮
+    /*编辑对话框保存按钮*/
     $("#btn-edit-save").click(function () {
         var responseArgId = localStorage.getItem("edit-group-id");
         editResParam(responseArgId);
     });
-    //用户名点击
+    /*用户名点击*/
     $("#tv-user-name").click(function () {
         var username = localStorage.getItem("username");
         var userId = localStorage.getItem("userId");
@@ -107,7 +112,7 @@ $(document).ready(function () {
         $("#select-sex-edit").selectpicker('val', sex);
     });
 
-    //修改用户信息
+    /*修改用户信息*/
     $("#btn-user-ok").click(function () {
         updateUserInfo();
     });

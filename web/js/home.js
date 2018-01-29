@@ -41,6 +41,8 @@ $(document).ready(function () {
     //列表按钮事件绑定
     $(document).on("click",".btn-see-group",function(){
         var colDbId = $(this).parent().parent().find(".db-id");
+        var name = $(this).parent().parent().find(".name").text();
+        localStorage.setItem("projectName", name);
         localStorage.setItem("projectId", colDbId.text());
         location.href ="group";
     });

@@ -3,6 +3,9 @@ $(document).ready(function () {
     var username = localStorage.getItem("username");
     var userId = localStorage.getItem("userId");
     var pic = localStorage.getItem("userPic");
+    var projectName = localStorage.getItem("projectName");
+    var groupName = localStorage.getItem("groupName");
+    $("#table-title").text(projectName+" / "+ groupName+" 的接口");
     if (userId === null || userId === "") {
         doExitLogin();
     } else {
@@ -15,12 +18,16 @@ $(document).ready(function () {
     //请求参数
     $(document).on("click",".btn-see-req",function(){
         var colDbId = $(this).parent().parent().find(".db-id");
+        var name = $(this).parent().parent().find(".name").text();
+        localStorage.setItem("interfaceName", name);
         localStorage.setItem("interfaceId", colDbId.text());
         localStorage.setItem("pid", "0");
         location.href ="reqArg";
     });
     //返回参数
     $(document).on("click",".btn-see-res",function(){
+        var name = $(this).parent().parent().find(".name").text();
+        localStorage.setItem("interfaceName", name);
         var colDbId = $(this).parent().parent().find(".db-id");
         localStorage.setItem("interfaceId", colDbId.text());
         localStorage.setItem("pid", "0");

@@ -4,6 +4,9 @@ $(document).ready(function () {
     var userId = localStorage.getItem("userId");
     var pic = localStorage.getItem("userPic");
     var projectId = localStorage.getItem("projectId");
+    /*表标题改为项目名*/
+    var projectName = localStorage.getItem("projectName");
+    $("#table-title").text(projectName+" 的全局错误码");
     if (userId === null || userId === "") {
         doExitLogin();
     } else {
