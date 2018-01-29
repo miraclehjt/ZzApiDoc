@@ -286,7 +286,9 @@ function getProjectList(userId, index) {
                         '<td><button type="button" class="btn-see-err btn">错误码管理</button></td>' +
                         '<td><button type="button" class="btn-edit-project btn btn-primary"  data-toggle="modal" data-target="#editModel">' +
                         '<span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> 编辑</button></td>' +
-                        '<td><a href="v1/interface/downloadPdf?userId='+userId+'&projectId='+value.id+'" target="_blank" class="btn-edit-project btn btn-primary">' +
+                        '<td><a href="v1/interface/downloadPdf?userId='+userId+'&projectId='+value.id+'" target="_blank" class="btn btn-primary">' +
+                        '<span class="glyphicon glyphicon-save" aria-hidden="true"></span> 点击下载</a></td>' +
+                        '<td><a href="v1/interface/downloadApi?userId='+userId+'&projectId='+value.id+'" target="_blank" class="btn btn-primary">' +
                         '<span class="glyphicon glyphicon-save" aria-hidden="true"></span> 点击下载</a></td>' +
                         '</tr>';
                 });
@@ -344,7 +346,9 @@ function justUpdateList(userId, index) {
                         '<td><button type="button" class="btn-see-err btn">错误码管理</button></td>' +
                         '<td><button type="button" class="btn-edit-project btn btn-primary"  data-toggle="modal" data-target="#editModel">' +
                         '<span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> 编辑</button></td>' +
-                        '<td><a href="v1/interface/downloadPdf?userId='+userId+'&projectId='+value.id+'" target="_blank" class="btn-edit-project btn btn-primary">' +
+                        '<td><a href="v1/interface/downloadPdf?userId='+userId+'&projectId='+value.id+'" target="_blank" class="btn btn-primary">' +
+                        '<span class="glyphicon glyphicon-save" aria-hidden="true"></span> 点击下载</a></td>' +
+                        '<td><a href="v1/interface/downloadApi?userId='+userId+'&projectId='+value.id+'" target="_blank" class="btn btn-primary">' +
                         '<span class="glyphicon glyphicon-save" aria-hidden="true"></span> 点击下载</a></td>' +
                         '</tr>';
                 });
