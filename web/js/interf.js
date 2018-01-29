@@ -331,17 +331,20 @@ function getProjectList(groupId, userId, index) {
             // if($("#page-indicator").data("twbs-pagination")){
             //     $("#page-indicator").twbsPagination("destroy");
             // }
-            $("#page-indicator").twbsPagination("destroy");
+            var indicator = $("#page-indicator");
+            indicator.twbsPagination("destroy");
             //分页绑定
-            $('#page-indicator').twbsPagination({
+            indicator.twbsPagination({
                 totalPages: data.totalPage,
                 visiblePages: 10,
                 onPageClick: function (event, page) {
                     //全选取消
                     $("#checkbox-all").prop("checked", false);
+
                     //重载数据
                     var mid = localStorage.getItem("userId");
-                    justUpdateList(mid, page);
+                    var groupId = localStorage.getItem("groupId");
+                    justUpdateList(groupId, mid, page);
                 }
             });
         }
