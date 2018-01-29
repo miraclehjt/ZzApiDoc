@@ -27,22 +27,15 @@
 
 ![home](web/img/home.png)
 
-![group](web/img/group.png)
+### 联系与交流
 
-![interface](web/img/interface.png)
+- 个人邮箱
+ 
+    <admin@zhouzhuo810.me>
 
-![req](web/img/req.png)
-
-![resp](web/img/resp.png)
-
-![err](web/img/err.png)
-
-
->个人邮箱 
-
-<admin@zhouzhuo810.me>
-
->QQ交流群:154107392 
+- QQ交流群:
+    
+    154107392 
 
 ### 打赏支持
 
