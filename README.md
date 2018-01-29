@@ -23,6 +23,57 @@
 
 [点击查看](test.pdf)
 
+
+### 实体类代码示例
+
+
+```java
+package com.example.zzapidoc.common.api.entity;
+
+import java.util.List;
+/**
+ * 用户登录
+ */
+public class UserLoginResult {
+       private String code;  //
+       public void setCode(String code) {
+           this.code = code;
+       }
+       public String getCode() {
+           return code;
+       }
+       private String msg;  //
+       public void setMsg(String msg) {
+           this.msg = msg;
+       }
+       public String getMsg() {
+           return msg;
+       }
+}
+```
+
+```java
+package com.example.zzapidoc.common.api;
+
+import retrofit2.http.*;
+import rx.Observable;
+import com.example.zzapidoc.MyApplication;
+import com.example.zzapidoc.common.api.entity.*;
+
+
+/**
+ * 默认分组
+ */
+public interface Api0 {
+   /*
+    * 用户登录()
+    */
+   @FormUrlEncoded
+   @POST("ZzApiDoc/v1/user/userLogin")
+   Observable<UserLoginResult> userLogin(@Field("phone") String phone,@Field("password") String password);   
+}
+```
+
 ### 界面截图
 
 ![home](web/img/home.png)
