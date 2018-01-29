@@ -17,25 +17,6 @@ $(document).ready(function () {
         var projectId = localStorage.getItem("projectId");
         getProjectList(projectId, interfaceId, userId, '0');
     }
-    //密码框隐藏与显示
-    $('#et-pswd-edit').password()
-        .password('focus')
-        .on('show.bs.password', function (e) {
-            $('#eventLog').text('On show event');
-            $('#methods').prop('checked', true);
-        }).on('hide.bs.password', function (e) {
-        $('#eventLog').text('On hide event');
-        $('#methods').prop('checked', false);
-    });
-    $('#et-new-pswd-edit').password()
-        .password('focus')
-        .on('show.bs.password', function (e) {
-            $('#eventLog').text('On show event');
-            $('#methods').prop('checked', true);
-        }).on('hide.bs.password', function (e) {
-        $('#eventLog').text('On hide event');
-        $('#methods').prop('checked', false);
-    });
     //编辑按钮
     $(document).on("click", ".btn-edit-res", function () {
         var colDbId = $(this).parent().parent().find(".db-id");
@@ -115,7 +96,30 @@ $(document).ready(function () {
     $("#btn-user-ok").click(function () {
         updateUserInfo();
     });
-
+    /*自动生成名字*/
+    $("#btn-translate").click(function () {
+        var ch = $("#et-param-note").val();
+        translate(ch);
+    });
+    //密码框隐藏与显示
+    $('#et-pswd-edit').password()
+        .password('focus')
+        .on('show.bs.password', function (e) {
+            $('#eventLog').text('On show event');
+            $('#methods').prop('checked', true);
+        }).on('hide.bs.password', function (e) {
+        $('#eventLog').text('On hide event');
+        $('#methods').prop('checked', false);
+    });
+    $('#et-new-pswd-edit').password()
+        .password('focus')
+        .on('show.bs.password', function (e) {
+            $('#eventLog').text('On show event');
+            $('#methods').prop('checked', true);
+        }).on('hide.bs.password', function (e) {
+        $('#eventLog').text('On hide event');
+        $('#methods').prop('checked', false);
+    });
 });
 
 function updateUserInfo() {
@@ -523,4 +527,60 @@ function showOkMsg(msg) {
  */
 function clearHint() {
     $("#row-hint").html("");
+}
+
+function translate(query) {
+    var appid = '2015063000000001';
+    var key = '12345678';
+    var salt = (new Date).getTime();
+// 多个query可以用\n连接  如 query='apple\norange\nbanana\npear'
+    var from = 'zh';
+    var to = 'en';
+    var str1 = appid + query + salt +key;
+    var sign = MD5(str1);
+    $.ajax({
+        url: 'http://api.fanyi.baidu.com/api/trans/vip/translate',
+        type: 'get',
+        dataType: 'jsonp',
+        data: {
+            q: query,
+            appid: appid,
+            salt: salt,
+            from: from,
+            to: to,
+            sign: sign
+        },
+        success: function (data) {
+            // alert(JSON.stringify(data));
+            var list= data.trans_result;
+            if (list !== null && list.length > 0) {
+                var obj = list[0];
+                var en = obj.dst;
+                if (en.indexOf(" ") === -1) {
+                    var result = en.toLowerCase();
+                    result = result.replace("'", "");
+                    result = result.replace("-", "");
+                    result = result.replace(",", "");
+                    $("#et-param-name").val(result);
+                } else {
+                    var words = en.split(' ')
+                    var result = "";
+                    for (var i = 0; i < words.length; i++) {
+                        var word = words[i];
+                        if (i === 0) {
+                            result += (word.substring(0, 1).toLowerCase()+word.substring(1).toLowerCase());
+                        } else {
+                            result += (word.substring(0, 1).toUpperCase()+word.substring(1).toLowerCase());
+                        }
+                    }
+                    result = result.replace("'", "");
+                    result = result.replace("-", "");
+                    result = result.replace(",", "");
+                    $("#et-param-name").val(result);
+                }
+            } else {
+                alert("翻译失败");
+            }
+        }
+    });
 }

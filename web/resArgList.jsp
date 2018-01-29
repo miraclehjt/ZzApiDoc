@@ -137,6 +137,7 @@
 <!-- Latest compiled and minified JavaScript -->
 <script src="js/bootstrap-select.min.js"></script>
 <script src="js/bootstrap-show-password.min.js"></script>
+<script src="js/md5.js" type="text/javascript" charset="utf-8"></script>
 
 <!-- 编辑对话框 -->
 <div class="modal fade" id="editModel" tabindex="-1" role="dialog" aria-labelledby="editTitle">
@@ -256,7 +257,12 @@
                     <div class="form-group form-group-sm">
                         <label class="col-sm-2 control-label" for="et-param-name">参数名称</label>
                         <div class="col-sm-10">
-                            <input class="form-control" type="text" id="et-param-name" placeholder="参数名称">
+                            <div class="input-group">
+                                <input class="form-control" type="text" id="et-param-name" placeholder="参数名称">
+                                <span class="input-group-btn">
+                                    <button id="btn-translate" class="btn btn-primary btn-sm" type="button">自动生成</button>
+                                </span>
+                            </div>
                         </div>
                     </div>
                     <div class="form-group form-group-sm">

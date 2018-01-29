@@ -18,32 +18,14 @@ $(document).ready(function () {
         var pid = localStorage.getItem("pid");
         getProjectList(interfaceId, userId, pid);
     }
-    //密码框隐藏与显示
-    $('#et-pswd-edit').password()
-        .password('focus')
-        .on('show.bs.password', function(e) {
-            $('#eventLog').text('On show event');
-            $('#methods').prop('checked', true);
-        }).on('hide.bs.password', function(e) {
-        $('#eventLog').text('On hide event');
-        $('#methods').prop('checked', false);
-    });
-    $('#et-new-pswd-edit').password()
-        .password('focus')
-        .on('show.bs.password', function(e) {
-            $('#eventLog').text('On show event');
-            $('#methods').prop('checked', true);
-        }).on('hide.bs.password', function(e) {
-        $('#eventLog').text('On hide event');
-        $('#methods').prop('checked', false);
-    });
-    //返回参数
+
+    /*返回参数*/
     $(document).on("click", ".btn-see-res", function () {
         var colDbId = $(this).parent().parent().find(".db-id");
         localStorage.setItem("pid", colDbId.text());
         window.location.reload();
     });
-    //编辑按钮
+    /*编辑按钮*/
     $(document).on("click", ".btn-edit-res", function () {
         var colDbId = $(this).parent().parent().find(".db-id");
         localStorage.setItem("edit-res-id", colDbId.text());
@@ -63,44 +45,44 @@ $(document).ready(function () {
         //	$("#tv-user-name").show();
         doLogin();
     });
-    //注销按钮点击
+    /*注销按钮点击*/
     $("#btn-unregister").click(function () {
         doExitLogin();
     });
-    //刷新按钮点击
+    /*刷新按钮点击*/
     $("#btn-refresh").click(function () {
         var userId = localStorage.getItem("userId");
         var interfaceId = localStorage.getItem("interfaceId");
         var pid = localStorage.getItem("pid");
         getProjectList(interfaceId, userId, pid);
     });
-    //删除按钮点击
+    /*删除按钮点击*/
     $("#btn-delete").click(function () {
         doDelete();
     });
-    //全选监听
+    /*全选监听*/
     $("#checkbox-all").change(function () {
         var isCheck = $(this).is(':checked');
         $(".styled").prop("checked", isCheck);
     });
-    //添加按钮点击
+    /*添加按钮点击*/
     $("#btn-add").click(function () {
         $("#select-param-type").selectpicker('val', '0');
         $("#et-param-note").val("");
         $("#et-param-name").val("");
         $("#et-def-value").val("");
     });
-    //添加对话框保存按钮
+    /*添加对话框保存按钮*/
     $("#btn-add-save").click(function () {
         addResParam();
     });
-    //编辑对话框保存按钮
+    /*编辑对话框保存按钮*/
     $("#btn-edit-save").click(function () {
         var responseArgId = localStorage.getItem("edit-res-id");
         editResParam(responseArgId);
     });
 
-    //用户名点击
+    /*用户名点击*/
     $("#tv-user-name").click(function () {
         var username = localStorage.getItem("username");
         var userId = localStorage.getItem("userId");
@@ -116,11 +98,35 @@ $(document).ready(function () {
         $("#select-sex-edit").selectpicker('val', sex);
     });
 
-    //修改用户信息
+    /*修改用户信息*/
     $("#btn-user-ok").click(function () {
         updateUserInfo();
     });
+    /*自动生成名字*/
+    $("#btn-translate").click(function () {
+        var ch = $("#et-param-note").val();
+        translate(ch);
+    });
 
+    /*密码框隐藏与显示*/
+    $('#et-pswd-edit').password()
+        .password('focus')
+        .on('show.bs.password', function(e) {
+            $('#eventLog').text('On show event');
+            $('#methods').prop('checked', true);
+        }).on('hide.bs.password', function(e) {
+        $('#eventLog').text('On hide event');
+        $('#methods').prop('checked', false);
+    });
+    $('#et-new-pswd-edit').password()
+        .password('focus')
+        .on('show.bs.password', function(e) {
+            $('#eventLog').text('On show event');
+            $('#methods').prop('checked', true);
+        }).on('hide.bs.password', function(e) {
+        $('#eventLog').text('On hide event');
+        $('#methods').prop('checked', false);
+    });
 });
 
 function updateUserInfo() {
@@ -518,4 +524,60 @@ function showOkMsg(msg) {
  */
 function clearHint() {
     $("#row-hint").html("");
+}
+
+function translate(query) {
+    var appid = '2015063000000001';
+    var key = '12345678';
+    var salt = (new Date).getTime();
+// 多个query可以用\n连接  如 query='apple\norange\nbanana\npear'
+    var from = 'zh';
+    var to = 'en';
+    var str1 = appid + query + salt +key;
+    var sign = MD5(str1);
+    $.ajax({
+        url: 'http://api.fanyi.baidu.com/api/trans/vip/translate',
+        type: 'get',
+        dataType: 'jsonp',
+        data: {
+            q: query,
+            appid: appid,
+            salt: salt,
+            from: from,
+            to: to,
+            sign: sign
+        },
+        success: function (data) {
+            // alert(JSON.stringify(data));
+            var list= data.trans_result;
+            if (list !== null && list.length > 0) {
+                var obj = list[0];
+                var en = obj.dst;
+                if (en.indexOf(" ") === -1) {
+                    var result = en.toLowerCase();
+                    result = result.replace("'", "");
+                    result = result.replace("-", "");
+                    result = result.replace(",", "");
+                    $("#et-param-name").val(result);
+                } else {
+                    var words = en.split(' ')
+                    var result = "";
+                    for (var i = 0; i < words.length; i++) {
+                        var word = words[i];
+                        if (i === 0) {
+                            result += (word.substring(0, 1).toLowerCase()+word.substring(1).toLowerCase());
+                        } else {
+                            result += (word.substring(0, 1).toUpperCase()+word.substring(1).toLowerCase());
+                        }
+                    }
+                    result = result.replace("'", "");
+                    result = result.replace("-", "");
+                    result = result.replace(",", "");
+                    $("#et-param-name").val(result);
+                }
+            } else {
+                alert("翻译失败");
+            }
+        }
+    });
 }

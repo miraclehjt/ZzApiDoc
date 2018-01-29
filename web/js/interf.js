@@ -604,6 +604,9 @@ function translate(query) {
                 var en = obj.dst;
                 if (en.indexOf(" ") === -1) {
                     var result = en.toLowerCase();
+                    result = result.replace("'", "");
+                    result = result.replace("-", "");
+                    result = result.replace(",", "");
                     var version = $("#et-interface-version").val();
                     var method = $("#select-interface-type").find("option:selected").text();
                     $("#et-interface-path").val("v"+version+"/"+method.toUpperCase()+"/"+result);
@@ -619,6 +622,8 @@ function translate(query) {
                         }
                     }
                     result = result.replace("'", "");
+                    result = result.replace("-", "");
+                    result = result.replace(",", "");
                     var version = $("#et-interface-version").val();
                     var method = $("#select-interface-type").find("option:selected").text();
                     $("#et-interface-path").val("v"+version+"/"+method.toUpperCase()+"/"+result);
