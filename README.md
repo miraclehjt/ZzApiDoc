@@ -1,82 +1,52 @@
 # ZzApiDoc
-小周接口文档在线管理工具-服务端
 
+项目托管地址：[https://github.com/zhouzhuo810/ZzApiDoc](https://github.com/zhouzhuo810/ZzApiDoc)
 
-[客户端地址](https://github.com/zhouzhuo810/ZzApiDoc-Android)
+>小周接口文档在线管理工具-服务+Web端
+
+[在线演示地址](http://zhouzhuo.tpddns.cn:7070/ZzApiDoc/)
 
 ### 开发工具
 - InteliJ IDEA 2017.1.2
+
+### 功能简介
+- 项目管理;
+- 接口分组管理;
+- 接口管理;
+- 请求参数管理;
+- 返回参数管理;
+- 全局错误码管理;
+- PDF文档导出;
+- Android RxJava+Retrofit2+OkHttp3接口调用代码和实体类代码下载;
 
 ### 生成文档示例
 
 [点击查看](test.pdf)
 
-## v1.0开发完成
+### 界面截图
 
-### 开发进度
+![home](web/img/home.png)
 
-```
-1.登录   完成
-  
-2.注册   完成
-  
-3.添加项目  完成
-  
-4.删除项目  完成
-  
-5.修改项目  完成
-  
-6.添加接口  完成
-  
-7.删除接口  完成
-  
-8.修改接口  完成
-  
-9.添加接口分组 完成
-    
-10.删除接口分组 完成
-  
-11.修改接口分组 完成
-  
-12.添加字典  完成
-  
-13.获取字典  完成
-  
-14.获取接口列表  完成
-  
-15.获取接口详情  完成
-  
-16.获取项目列表  完成
-  
-17.获取项目详情  完成
-  
-18.导出JSON 完成
-  
-19.修改密码 完成
-  
-20.获取分组列表  完成
-  
-21.添加接口请求参数 完成
-  
-22.删除接口请求参数 完成
-   
-23.添加接口返回参数 完成
-   
-24.删除接口返回参数 完成
-  
-25.获取某个接口的请求参数 完成
-  
-26.获取某个接口的返回参数 完成
-  
-27.获取接口详情  完成
-  
-28.导出PDF接口文档  完成
-  
-29.导入JSON工程  完成
-  
-30.生成空接口示例  完成
-```
+![group](web/img/group.png)
 
+![interface](web/img/interface.png)
+
+![req](web/img/req.png)
+
+![resp](web/img/resp.png)
+
+![err](web/img/err.png)
+
+
+>个人邮箱 
+
+<admin@zhouzhuo810.me>
+
+>QQ交流群:154107392 
+
+### 打赏支持
+
+![付款码](web/img/pay.png)
 
 ## License
 ```text
