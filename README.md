@@ -6,10 +6,9 @@
 
 [在线演示地址](http://zhouzhuo.tpddns.cn:7070/ZzApiDoc/)
 
-使用本地Tomcat配置：
+> 使用本地Tomcat配置：
 
-[ZzApiDoc-v1.0.zip](tomcat/ZzApiDoc-v1.0.zip)
-
+[本地配置说明](https://github.com/zhouzhuo810/ZzApiDoc/wiki/%E6%9C%AC%E5%9C%B0%E9%85%8D%E7%BD%AE%E8%AF%B4%E6%98%8E)
 
 ### 开发工具
 - InteliJ IDEA 2017.1.2
