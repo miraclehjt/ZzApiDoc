@@ -90,6 +90,7 @@ public interface Api0 {
 
 ### 打赏支持
 
+![赞赏吗](web/img/wx.png)
 ![付款码](web/img/pay.png)
 
 ## License
