@@ -6,7 +6,7 @@
 
 [在线演示地址](http://zhouzhuo.tpddns.cn:7070/ZzApiDoc/)
 
-> 使用本地Tomcat配置：
+> 如果想放自己电脑或服务器, 查看本地Tomcat配置说明：
 
 [本地配置说明](https://github.com/zhouzhuo810/ZzApiDoc/wiki/%E6%9C%AC%E5%9C%B0%E9%85%8D%E7%BD%AE%E8%AF%B4%E6%98%8E)
 
