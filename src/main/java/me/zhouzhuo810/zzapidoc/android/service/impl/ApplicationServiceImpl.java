@@ -1398,8 +1398,8 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
         FileUtils.saveFileToPathWithName("apply plugin: 'com.android.application'\n" +
                 "\n" +
                 "android {\n" +
-                "    compileSdkVersion 25\n" +
-                "    buildToolsVersion \"25.0.3\"\n" +
+                "    compileSdkVersion 27\n" +
+                "    buildToolsVersion \"27.0.3\"\n" +
                 "    defaultConfig {\n" +
                 "        multiDexEnabled " + (app.getMultiDex() == null ? false : app.getMultiDex()) + "\n" +
                 "        applicationId \"" + app.getPackageName() + "\"\n" +
@@ -1466,7 +1466,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 "    //bugly\n" +
                 "    compile 'com.tencent.bugly:crashreport:latest.release'\n" +
                 "    //zzandframe\n" +
-                "    compile 'com.github.zhouzhuo810:ZzAndFrame:1.2.0'\n" +
+                "    compile 'com.github.zhouzhuo810:ZzAndFrame:1.2.6'\n" +
                 "    //xutils\n" +
                 "    compile 'org.xutils:xutils:3.3.38'\n" +
                 "    //RxPermissions\n" +
@@ -6576,6 +6576,9 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationEntity> i
                 "        maven {\n" +
                 "            url \"https://jitpack.io\"\n" +
                 "        }\n" +
+                "        maven {\n" +
+                "            url \"https://maven.google.com\"\n" +
+                "        }\n"+
                 "    }\n" +
                 "}\n" +
                 "\n" +
