@@ -113,7 +113,8 @@
                                     <th>错误码管理</th>
                                     <th>操作</th>
                                     <th>PDF下载</th>
-                                    <th>实体类下载</th>
+                                    <th>Android模型下载</th>
+                                    <th>iOS模型下载</th>
                                 </tr>
                                 </thead>
                                 <tbody id="project-list">

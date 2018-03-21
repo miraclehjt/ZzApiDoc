@@ -44,6 +44,8 @@ public interface InterfaceService extends BaseService<InterfaceEntity> {
 
     ResponseEntity<byte[]> downloadApi(String projectId, String userId);
 
+    ResponseEntity<byte[]> downloadIOSApi(String projectId, String userId);
+
     ResponseEntity<byte[]> downloadInterfaceApi(String projectId, String interfaceId, String userId);
 
     BaseResult deleteInterfaceWeb(String ids, String userId);

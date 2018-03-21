@@ -290,6 +290,8 @@ function getProjectList(userId, index) {
                         '<span class="glyphicon glyphicon-save" aria-hidden="true"></span> 点击下载</a></td>' +
                         '<td><a href="v1/interface/downloadApi?userId='+userId+'&projectId='+value.id+'" target="_blank" class="btn btn-primary">' +
                         '<span class="glyphicon glyphicon-save" aria-hidden="true"></span> 点击下载</a></td>' +
+                        '<td><a href="v1/interface/downloadIOSApi?userId='+userId+'&projectId='+value.id+'" target="_blank" class="btn btn-primary">' +
+                        '<span class="glyphicon glyphicon-save" aria-hidden="true"></span> 点击下载</a></td>' +
                         '</tr>';
                 });
                 $("#project-list").html(c);
@@ -349,6 +351,8 @@ function justUpdateList(userId, index) {
                         '<td><a href="v1/interface/downloadPdf?userId='+userId+'&projectId='+value.id+'" target="_blank" class="btn btn-primary">' +
                         '<span class="glyphicon glyphicon-save" aria-hidden="true"></span> 点击下载</a></td>' +
                         '<td><a href="v1/interface/downloadApi?userId='+userId+'&projectId='+value.id+'" target="_blank" class="btn btn-primary">' +
+                        '<span class="glyphicon glyphicon-save" aria-hidden="true"></span> 点击下载</a></td>' +
+                        '<td><a href="v1/interface/downloadIOSApi?userId='+userId+'&projectId='+value.id+'" target="_blank" class="btn btn-primary">' +
                         '<span class="glyphicon glyphicon-save" aria-hidden="true"></span> 点击下载</a></td>' +
                         '</tr>';
                 });

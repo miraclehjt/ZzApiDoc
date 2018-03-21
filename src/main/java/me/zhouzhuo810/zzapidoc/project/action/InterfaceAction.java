@@ -220,6 +220,15 @@ public class InterfaceAction extends BaseController<InterfaceEntity> {
     }
 
     @ResponseBody
+    @RequestMapping(value = "/downloadIOSApi", method = RequestMethod.GET)
+    public ResponseEntity<byte[]> downloadIOSApi(
+            @RequestParam(value = "projectId") String projectId,
+            @RequestParam(value = "userId") String userId
+    ) throws IOException {
+        return getService().downloadIOSApi(projectId, userId);
+    }
+
+    @ResponseBody
     @RequestMapping(value = "/downloadInterfaceApi", method = RequestMethod.GET)
     public ResponseEntity<byte[]> downloadInterfaceApi(
             @RequestParam(value = "projectId") String projectId,

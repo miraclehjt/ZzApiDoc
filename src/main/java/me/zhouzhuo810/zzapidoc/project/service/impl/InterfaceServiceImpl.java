@@ -375,14 +375,14 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
     public WebResult getInterfaceByGroupIdWeb(String groupId, int indexPage, String search, String userId) {
         UserEntity user = mUserService.get(userId);
         if (user == null) {
-            return new WebResult(1, 1,  0);
+            return new WebResult(1, 1, 0);
         }
         InterfaceGroupEntity group = mInterfaceGroupService.get(groupId);
         if (group == null) {
             return new WebResult(1, 1, 0);
         }
-        int rowCount = getBaseDao().executeCriteriaRow(me.zhouzhuo810.zzapidoc.common.utils.StringUtils.isEmpty(search)?InterfaceUtils.getInterfaceByGroupId(groupId):InterfaceUtils.getInterfaceByGroupId(groupId, search));
-        List<InterfaceEntity> list = getBaseDao().executeCriteria(me.zhouzhuo810.zzapidoc.common.utils.StringUtils.isEmpty(search)?InterfaceUtils.getInterfaceByGroupId(groupId):InterfaceUtils.getInterfaceByGroupId(groupId, search), indexPage-1, 10, Order.desc("createTime"));
+        int rowCount = getBaseDao().executeCriteriaRow(me.zhouzhuo810.zzapidoc.common.utils.StringUtils.isEmpty(search) ? InterfaceUtils.getInterfaceByGroupId(groupId) : InterfaceUtils.getInterfaceByGroupId(groupId, search));
+        List<InterfaceEntity> list = getBaseDao().executeCriteria(me.zhouzhuo810.zzapidoc.common.utils.StringUtils.isEmpty(search) ? InterfaceUtils.getInterfaceByGroupId(groupId) : InterfaceUtils.getInterfaceByGroupId(groupId, search), indexPage - 1, 10, Order.desc("createTime"));
         int pageCount = rowCount / 10;
         if (rowCount % 10 > 0) {
             pageCount++;
@@ -1642,7 +1642,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                         String[][] values = new String[globalErrorCodes.size()][2];
                         for (int i = 0; i < globalErrorCodes.size(); i++) {
                             ErrorCodeEntity entity = globalErrorCodes.get(i);
-                            values[i][0] = entity.getCode()+"";
+                            values[i][0] = entity.getCode() + "";
                             values[i][1] = entity.getNote() == null ? "" : entity.getNote();
                         }
                         addTable(document, "全局错误码说明", new String[]{"错误码", "说明"}, columnWidths, values, null, false, fontChinese);
@@ -1677,14 +1677,14 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                                 String[][] values = new String[groupErrorCodes.size()][2];
                                 for (int j = 0; j < groupErrorCodes.size(); j++) {
                                     ErrorCodeEntity entity = groupErrorCodes.get(j);
-                                    values[j][0] = entity.getCode()+"";
+                                    values[j][0] = entity.getCode() + "";
                                     values[j][1] = entity.getNote() == null ? "" : entity.getNote();
                                 }
                                 addTable(document, "错误码说明", new String[]{"错误码", "说明"}, columnWidths, values, null, true, fontChinese);
                             }
                             addTextLine(document, "", fontChinese);
 
-                            List<InterfaceEntity> list = getBaseDao().executeCriteria(InterfaceUtils.getInterfaceByGroupId(interfaceGroupEntity.getId()),Order.asc("createTime"));
+                            List<InterfaceEntity> list = getBaseDao().executeCriteria(InterfaceUtils.getInterfaceByGroupId(interfaceGroupEntity.getId()), Order.asc("createTime"));
                             if (list == null) {
                                 continue;
                             }
@@ -1719,7 +1719,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                                     String[][] values = new String[interfaceErrorCodes.size()][2];
                                     for (int j = 0; j < interfaceErrorCodes.size(); j++) {
                                         ErrorCodeEntity err = interfaceErrorCodes.get(j);
-                                        values[j][0] = err.getCode()+"";
+                                        values[j][0] = err.getCode() + "";
                                         values[j][1] = err.getNote() == null ? "" : err.getNote();
                                     }
                                     addTable(document, "错误码说明", new String[]{"错误码", "说明"}, columnWidths, values, null, true, fontChinese);
@@ -1936,7 +1936,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
                 values[i][3] = entity.getDefaultValue() == null ? "" : entity.getDefaultValue();
                 values[i][4] = entity.getNote() == null ? "" : entity.getNote();
             }
-            addTable(document, "全局请求参数", new String[]{"名称", "必选", "类型", "默认值", "说明"}, columnWidths, values, null,true,  font);
+            addTable(document, "全局请求参数", new String[]{"名称", "必选", "类型", "默认值", "说明"}, columnWidths, values, null, true, font);
         }
 
         List<RequestArgEntity> args = mRequestArgService.getBaseDao().executeCriteria(ResponseArgUtils.getArgByInterfaceIdAndPid(id, "0"));
@@ -2536,6 +2536,74 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
         return null;
     }
 
+    @Override
+    public ResponseEntity<byte[]> downloadIOSApi(String projectId, String userId) {
+        UserEntity user = mUserService.get(userId);
+        if (user == null) {
+            return null;
+        }
+
+        ProjectEntity project = mProjectService.get(projectId);
+        if (project == null) {
+            return null;
+        }
+
+        try {
+            HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+            String realPath = request.getRealPath("");
+            if (realPath != null) {
+                String mPath = realPath + File.separator + "API";
+                File dir = new File(mPath);
+                if (!dir.exists()) {
+                    dir.mkdirs();
+                }
+                CacheEntity cacheEntity = new CacheEntity();
+                cacheEntity.setCachePath(mPath);
+                try {
+                    List<CacheEntity> cacheEntities = mCacheService.executeCriteria(new Criterion[]{
+                            Restrictions.eq("deleteFlag", BaseEntity.DELETE_FLAG_NO),
+                            Restrictions.eq("cachePath", mPath)});
+                    if (cacheEntities == null || cacheEntities.size() == 0) {
+                        mCacheService.save(cacheEntity);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    LOGGER.error("API ERROR", e);
+                }
+                /*Api*/
+                String appName = project.getName();
+                String appDirPath = mPath + File.separator + appName;
+                File appDir = new File(appDirPath);
+                if (!appDir.exists()) {
+                    /*如果不存在，创建app目录*/
+                    appDir.mkdirs();
+                } else {
+                    /*如果存在，删除该目录里的所有文件*/
+                    me.zhouzhuo810.zzapidoc.common.utils.FileUtils.deleteFiles(appDirPath);
+                }
+
+                String javaDir = appDirPath + File.separator + "api";
+                ApiTool.createIOSApi(convertToJson(project), javaDir);
+
+                /*压缩文件*/
+                String zipName = System.currentTimeMillis() + ".zip";
+                String zipPath = mPath + File.separator + zipName;
+                ZipUtils.doCompress(appDirPath, zipPath);
+
+                //压缩完毕，删除源文件
+                FileUtil.deleteContents(new File(appDirPath));
+
+                HttpHeaders headers = new HttpHeaders();
+                headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+                headers.setContentDispositionFormData("attachment", zipName);
+                return new ResponseEntity<byte[]>(org.apache.commons.io.FileUtils.readFileToByteArray(new File(zipPath)), headers, HttpStatus.CREATED);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 
     /***********************************下载 API 结束**************************************/
 
@@ -2634,7 +2702,7 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
         }
         if (ids != null && ids.length() > 0) {
             if (ids.contains(",")) {
-                String [] id = ids.split(",");
+                String[] id = ids.split(",");
                 for (String s : id) {
                     InterfaceEntity entity = getBaseDao().get(s);
                     if (entity == null) {

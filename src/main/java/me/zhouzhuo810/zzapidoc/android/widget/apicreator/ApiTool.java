@@ -5,10 +5,13 @@ import com.google.gson.GsonBuilder;
 import me.zhouzhuo810.zzapidoc.android.widget.apicreator.bean.ArgEntity;
 import me.zhouzhuo810.zzapidoc.common.utils.FileUtils;
 import me.zhouzhuo810.zzapidoc.project.entity.ApiEntity;
+import org.apache.tools.ant.util.DateUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -150,8 +153,8 @@ public class ApiTool {
 
                                                     //方法名
                                                     String m = url.substring(url.lastIndexOf("/") + 1, url.length());
-                                                    if (m.length()>0) {
-                                                        m = m.substring(0,1).toLowerCase()+m.substring(1);
+                                                    if (m.length() > 0) {
+                                                        m = m.substring(0, 1).toLowerCase() + m.substring(1);
                                                     }
 
                                                     //请求方式GET或POST
@@ -380,8 +383,8 @@ public class ApiTool {
 
                                             //方法名
                                             String m = url.substring(url.lastIndexOf("/") + 1, url.length());
-                                            if (m.length()>0) {
-                                                m = m.substring(0,1).toLowerCase()+m.substring(1);
+                                            if (m.length() > 0) {
+                                                m = m.substring(0, 1).toLowerCase() + m.substring(1);
                                             }
                                             //请求方式GET或POST
                                             String method = childrenBean.getRequestMethod();
@@ -477,6 +480,133 @@ public class ApiTool {
         }
     }
 
+    public static void createIOSApi(String json, String path) {
+        File file = new File(path);
+        if (!file.exists()) {
+            file.mkdirs();
+        }
+        try {
+            Gson gson = new GsonBuilder().create();
+            ApiEntity api = gson.fromJson(json, ApiEntity.class);
+
+            if (api != null) {
+
+                List<ApiEntity.ModulesBean> modules = api.getModules();
+                if (modules != null) {
+                    for (int i = 0; i < modules.size(); i++) {
+                        ApiEntity.ModulesBean modulesBean = modules.get(i);
+                        //全局参数
+                        String requestArgs = modulesBean.getRequestArgs();
+                        if (requestArgs != null && !requestArgs.equals("[]")) {
+                            ArgEntity argEntity = gson.fromJson("{\"data\":" + requestArgs + "}", ArgEntity.class);
+                            if (argEntity != null && argEntity.getData() != null) {
+                                //有全局参数
+                                List<ArgEntity.DataBean> data1 = argEntity.getData();
+                                for (int i4 = 0; i4 < data1.size(); i4++) {
+                                    ArgEntity.DataBean dataBean1 = data1.get(i4);
+                                    String name1 = dataBean1.getName();
+                                    String type1 = dataBean1.getType();
+
+                                    //接口分组
+                                    List<ApiEntity.ModulesBean.FoldersBean> folders = modulesBean.getFolders();
+                                    if (folders != null) {
+
+                                        for (int i1 = 0; i1 < folders.size(); i1++) {
+                                            ApiEntity.ModulesBean.FoldersBean foldersBean = folders.get(i1);
+                                            String ip = foldersBean.getIp();
+
+                                            //接口
+                                            List<ApiEntity.ModulesBean.FoldersBean.ChildrenBean> children = foldersBean.getChildren();
+                                            if (children != null) {
+                                                for (ApiEntity.ModulesBean.FoldersBean.ChildrenBean childrenBean : children) {
+                                                    //接口地址
+                                                    String url = childrenBean.getUrl();
+                                                    System.out.println(url);
+
+                                                    //方法名
+                                                    String m = url.substring(url.lastIndexOf("/") + 1, url.length());
+                                                    if (m.length() > 0) {
+                                                        m = m.substring(0, 1).toLowerCase() + m.substring(1);
+                                                    }
+                                                    String clazzName = m.substring(0, 1).toUpperCase() + m.substring(1, m.length());
+                                                    try {
+                                                        String responseData = childrenBean.getResponseArgs();
+                                                        JSONArray root = new JSONArray(responseData);
+                                                        StringBuilder sbEntity = new StringBuilder();
+                                                        generateModel2IOS(root, sbEntity, path + File.separator + "model"+i1, clazzName);
+                                                        sbEntity.append("\n@end");
+                                                        System.out.println(sbEntity.toString());
+                                                    } catch (Exception e) {
+                                                        e.printStackTrace();
+                                                        System.out.println(url + "接口的返回json实例解析异常");
+                                                    }
+                                                }
+                                            }
+                                            //TODO 创建Api
+                                        }
+                                        //TODO 创建Api调用
+                                    }
+                                }
+                            } else {
+                                //无全局参数
+
+                            }
+                        } else {
+                            //无全局参数
+
+                            //接口分组
+                            List<ApiEntity.ModulesBean.FoldersBean> folders = modulesBean.getFolders();
+                            if (folders != null) {
+
+                                for (int i1 = 0; i1 < folders.size(); i1++) {
+                                    ApiEntity.ModulesBean.FoldersBean foldersBean = folders.get(i1);
+                                    StringBuilder sb = new StringBuilder();
+
+                                    //接口
+                                    List<ApiEntity.ModulesBean.FoldersBean.ChildrenBean> children = foldersBean.getChildren();
+                                    if (children != null) {
+                                        for (ApiEntity.ModulesBean.FoldersBean.ChildrenBean childrenBean : children) {
+                                            //接口地址
+                                            String url = childrenBean.getUrl();
+                                            System.out.println(url);
+
+                                            //方法名
+                                            String m = url.substring(url.lastIndexOf("/") + 1, url.length());
+                                            if (m.length() > 0) {
+                                                m = m.substring(0, 1).toLowerCase() + m.substring(1);
+                                            }
+                                            String clazzName = m.substring(0, 1).toUpperCase() + m.substring(1, m.length());
+                                            try {
+                                                String responseData = childrenBean.getResponseArgs();
+                                                JSONArray root = new JSONArray(responseData);
+                                                StringBuilder sbEntity = new StringBuilder();
+                                                generateModel2IOS(root, sbEntity, path + File.separator + "model", clazzName);
+                                                sbEntity.append("\n@end");
+                                                System.out.println(sbEntity.toString());
+                                            } catch (Exception e) {
+                                                e.printStackTrace();
+                                                System.out.println(url + "接口的返回json实例解析异常");
+                                            }
+
+                                        }
+                                    }
+                                    //TODO 创建Api
+                                }
+                                //TODO 创建Api调用
+                            }
+
+                        }
+                    }
+                }
+            } else {
+                System.out.println("格式解析异常");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("格式解析异常");
+        }
+    }
+
     /**
      * 带注释
      */
@@ -484,6 +614,87 @@ public class ApiTool {
         for (int i = 0; i < jsonArray.length(); i++) {
             JSONObject jsonObject = jsonArray.getJSONObject(i);
             generateJavaBean3(jsonObject, sb);
+        }
+
+    }
+
+    /**
+     * 带注释ios
+     */
+    private static void generateModel2IOS(JSONArray jsonArray, StringBuilder sbEntity, String path, String clazzName) {
+        String beanClazz = "GF" + clazzName + "Model";
+        //实体类内容
+        sbEntity.append("//\n" +
+                "//  " + beanClazz + ".h\n" +
+                "//  GoFactory\n" +
+                "//\n" +
+                "//  Created by ZzApiDoc on " + DateUtils.format(new Date(), "yyyy/m/d") + ".\n" +
+                "//  Copyright © 2018年 KQZK. All rights reserved.\n" +
+                "//");
+        sbEntity.append("\n");
+        sbEntity.append("\n#import <Foundation/Foundation.h>");
+        StringBuilder sbImp = new StringBuilder();
+        for (int i = 0; i < jsonArray.length(); i++) {
+            JSONObject jsonObject = jsonArray.getJSONObject(i);
+            generateImport3IOS(jsonObject, sbEntity, sbImp, clazzName);
+        }
+        sbEntity.append(sbImp.toString());
+        sbEntity.append("\n@interface ").append(beanClazz).append(" : NSObject");
+        // TODO: 2018/3/21 import
+        for (int i = 0; i < jsonArray.length(); i++) {
+            JSONObject jsonObject = jsonArray.getJSONObject(i);
+            generateModel3IOS(jsonObject, sbEntity, path, clazzName);
+        }
+        sbEntity.append("\n@end");
+        try {
+            FileUtils.saveFileToPathWithName(sbEntity.toString(), path, beanClazz + ".h");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    /**
+     * 带注释ios
+     */
+    private static void generateImport2IOS(JSONArray jsonArray, StringBuilder sb, String clazzName) {
+        StringBuilder sbImp = new StringBuilder();
+        for (int i = 0; i < jsonArray.length(); i++) {
+            JSONObject jsonObject = jsonArray.getJSONObject(i);
+            generateImport3IOS(jsonObject, sb, sbImp, clazzName);
+        }
+        sb.append(sbImp.toString());
+    }
+
+    private static void generateImport3IOS(JSONObject jsonObject, StringBuilder sbEntity, StringBuilder sbImp, String clazzName) {
+        String name = jsonObject.getString("name");
+        if (name != null) {
+            name = name.trim();
+        } else {
+            name = "unKnown";
+        }
+        String type = jsonObject.getString("type");
+        System.out.println("import type=" + type + ", name=" + name);
+        switch (type) {
+            case "object":
+                sbImp.append("\n#import \"GF").append(clazzName).append(name.substring(0, 1).toUpperCase()).append(name.substring(1, name.length())).append("Model").append(".h\"");
+/*                JSONArray children = jsonObject.getJSONArray("children");
+                if (children != null && children.length() > 0) {
+                    StringBuilder sbImp2 = new StringBuilder();
+                    for (int j = 0; j < children.length(); j++) {
+                        JSONObject jsonObject1 = children.getJSONObject(j);
+                        generateImport3IOS(jsonObject1, sbEntity, sbImp2);
+                    }
+                    sbEntity.append(sbImp2.toString());
+                }*/
+                break;
+            case "array[object]":
+                sbImp.append("\n#import \"GF").append(clazzName).append(name.substring(0, 1).toUpperCase()).append(name.substring(1, name.length())).append("Model").append(".h\"");
+/*                JSONArray children2 = jsonObject.getJSONArray("children");
+                if (children2 != null && children2.length() > 0) {
+                    generateImport2IOS(children2, sbEntity);
+                }*/
+                break;
         }
 
     }
@@ -580,6 +791,75 @@ public class ApiTool {
         }
     }
 
+    private static void generateModel3IOS(JSONObject jsonObject, StringBuilder sb, String path, String clazzName) {
+
+        String name = jsonObject.getString("name");
+        if (name != null) {
+            name = name.trim();
+        }
+        String type = jsonObject.getString("type");
+        String desc = null;
+        try {
+            desc = jsonObject.getString("description");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        System.out.println("type=" + type + ", name=" + name);
+        switch (type) {
+            case "int":
+            case "float":
+            case "string":
+                generateStringIOS(name, desc, sb);
+                break;
+            case "object":
+                String objName = "GF" + clazzName + name.substring(0, 1).toUpperCase() + name.substring(1, name.length()) + "Model";
+                sb.append("\n@property(nonatomic,strong) ").append(objName).append(" *").append(name).append(";");
+                JSONArray children = jsonObject.getJSONArray("children");
+                if (children != null && children.length() > 0) {
+                    StringBuilder sb2 = new StringBuilder();
+                    String beanClazz = "GF" + clazzName + "Model";
+                    //实体类内容
+                    sb2.append("//\n" +
+                            "//  " + beanClazz + ".h\n" +
+                            "//  GoFactory\n" +
+                            "//\n" +
+                            "//  Created by ZzApiDoc on " + DateUtils.format(new Date(), "yyyy/m/d") + ".\n" +
+                            "//  Copyright © 2018年 KQZK. All rights reserved.\n" +
+                            "//");
+                    sb2.append("\n");
+                    sb2.append("\n#import <Foundation/Foundation.h>");
+                    StringBuilder sbImp = new StringBuilder();
+                    for (int i = 0; i < children.length(); i++) {
+                        JSONObject jsonObject0 = children.getJSONObject(i);
+                        generateImport3IOS(jsonObject0, sb2, sbImp, clazzName);
+                    }
+                    sb2.append(sbImp.toString());
+                    sb2.append("\n@interface ").append(beanClazz).append(" : NSObject");
+                    for (int j = 0; j < children.length(); j++) {
+                        JSONObject jsonObject1 = children.getJSONObject(j);
+                        generateModel3IOS(jsonObject1, sb2, path, clazzName);
+                    }
+                    sb2.append("\n@end");
+                    try {
+                        FileUtils.saveFileToPathWithName(sb2.toString(), path, objName + ".h");
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                break;
+            case "array[object]":
+                String arryName = clazzName + name.substring(0, 1).toUpperCase() + name.substring(1, name.length());
+                String filename = "GF"+arryName+"Model";
+                sb.append("\n@property(nonatomic,strong) NSArray<").append(filename).append("*> *").append(name).append(";");
+                JSONArray children2 = jsonObject.getJSONArray("children");
+                if (children2 != null && children2.length() > 0) {
+                    generateModel2IOS(children2, new StringBuilder(), path, arryName);
+                }
+
+                break;
+        }
+    }
+
     private static void generateString(String name, String desc, StringBuilder sb) {
         sb.append("\n       private String ").append(name).append("; ").append(desc == null ? "" : " //" + desc);
         //setter
@@ -590,6 +870,10 @@ public class ApiTool {
         sb.append("\n       public String get").append(name.substring(0, 1).toUpperCase()).append(name.substring(1, name.length())).append("() {");
         sb.append("\n           return ").append(name).append(";");
         sb.append("\n       }");
+    }
+
+    private static void generateStringIOS(String name, String desc, StringBuilder sb) {
+        sb.append("\n@property(nonatomic,copy) NSString *").append(name).append("; ").append(desc == null ? "" : " //" + desc);
     }
 
 }
