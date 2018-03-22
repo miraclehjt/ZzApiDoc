@@ -128,6 +128,8 @@
                                     <th>请求参数</th>
                                     <th>返回参数</th>
                                     <th>操作</th>
+                                    <th>生成json示例</th>
+                                    <th>查看json示例</th>
                                 </tr>
                                 </thead>
                                 <tbody id="project-list">
@@ -242,7 +244,8 @@
                             <div class="input-group">
                                 <input class="form-control" type="text" id="et-interface-path" placeholder="请求路径">
                                 <span class="input-group-btn">
-                                    <button id="btn-translate" class="btn btn-primary btn-sm" type="button">自动生成</button>
+                                    <button id="btn-translate" class="btn btn-primary btn-sm"
+                                            type="button">自动生成</button>
                                 </span>
                             </div>
                         </div>
@@ -317,6 +320,29 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
                 <button type="button" class="btn btn-primary" data-dismiss="modal" id="btn-user-ok">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 查看示例json对话框 -->
+<div class="modal fade" id="jsonModal" tabindex="-1" role="dialog" aria-labelledby="jsonModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="jsonModalLabel">空返回示例</h4>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label for="et-empty-example" class="control-label">JSON：</label>
+                        <textarea class="form-control" id="et-empty-example"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">好的</button>
             </div>
         </div>
     </div>

@@ -539,6 +539,25 @@ public class InterfaceServiceImpl extends BaseServiceImpl<InterfaceEntity> imple
         return new BaseResult(1, "ok", map.build());
     }
 
+    @Override
+    public BaseResult getInterfaceEmptyExample(String interfaceId, String userId) {
+        UserEntity user = mUserService.get(userId);
+        if (user == null) {
+            return new BaseResult(0, "用户不合法");
+        }
+        InterfaceEntity entity = getBaseDao().get(interfaceId);
+        if (entity == null) {
+            return new BaseResult(0, "接口不存在或已被删除！", new HashMap<String, String>());
+        }
+        MapUtils map = new MapUtils();
+        map.put("id", entity.getId());
+        map.put("name", entity.getName());
+        map.put("note", entity.getNote() == null ? "" : entity.getNote());
+        map.put("httpMethod", entity.getHttpMethodName());
+        map.put("example", entity.getExample());
+        return new BaseResult(1, "ok", map.build());
+    }
+
     private void addChildResponseArg(List<Map<String, Object>> response, String space, String interfaceId, String id) {
         List<ResponseArgEntity> responseArgEntities = mResponseArgService.executeCriteria(ResponseArgUtils.getArgByInterfaceIdAndPid(interfaceId, id));
         if (responseArgEntities != null && responseArgEntities.size() > 0) {

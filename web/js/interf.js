@@ -5,7 +5,7 @@ $(document).ready(function () {
     var pic = localStorage.getItem("userPic");
     var projectName = localStorage.getItem("projectName");
     var groupName = localStorage.getItem("groupName");
-    $("#table-title").text(projectName+" / "+ groupName+" 的接口");
+    $("#table-title").text(projectName + " / " + groupName + " 的接口");
     if (userId === null || userId === "") {
         doExitLogin();
     } else {
@@ -16,23 +16,24 @@ $(document).ready(function () {
         getProjectList(groupId, userId, 1);
     }
     //请求参数
-    $(document).on("click",".btn-see-req",function(){
+    $(document).on("click", ".btn-see-req", function () {
         var colDbId = $(this).parent().parent().find(".db-id");
         var name = $(this).parent().parent().find(".name").text();
         localStorage.setItem("interfaceName", name);
         localStorage.setItem("interfaceId", colDbId.text());
         localStorage.setItem("pid", "0");
-        location.href ="reqArg";
+        location.href = "reqArg";
     });
     //返回参数
-    $(document).on("click",".btn-see-res",function(){
+    $(document).on("click", ".btn-see-res", function () {
         var name = $(this).parent().parent().find(".name").text();
         localStorage.setItem("interfaceName", name);
         var colDbId = $(this).parent().parent().find(".db-id");
         localStorage.setItem("interfaceId", colDbId.text());
         localStorage.setItem("pid", "0");
-        location.href ="respArg";
+        location.href = "respArg";
     });
+
     //编辑按钮
     $(document).on("click", ".btn-edit-interface", function () {
         var colDbId = $(this).parent().parent().find(".db-id");
@@ -47,6 +48,17 @@ $(document).ready(function () {
         $("#et-interface-path-edit").val(path);
         $("#et-interface-note-edit").val(note);
         getHttpMethodsEdit(methodId);
+    });
+
+    /*生成示例*/
+    $(document).on("click", ".btn-generate-interf-code", function () {
+        var colDbId = $(this).parent().parent().find(".db-id");
+        generateInterfCode(colDbId.text());
+    });
+    /*查看示例*/
+    $(document).on("click", ".btn-see-interf-code", function () {
+        var colDbId = $(this).parent().parent().find(".db-id");
+        seeCode(colDbId.text());
     });
 
     //搜索按钮
@@ -127,19 +139,19 @@ $(document).ready(function () {
     //密码框隐藏与显示
     $('#et-pswd-edit').password()
         .password('focus')
-        .on('show.bs.password', function(e) {
+        .on('show.bs.password', function (e) {
             $('#eventLog').text('On show event');
             $('#methods').prop('checked', true);
-        }).on('hide.bs.password', function(e) {
+        }).on('hide.bs.password', function (e) {
         $('#eventLog').text('On hide event');
         $('#methods').prop('checked', false);
     });
     $('#et-new-pswd-edit').password()
         .password('focus')
-        .on('show.bs.password', function(e) {
+        .on('show.bs.password', function (e) {
             $('#eventLog').text('On show event');
             $('#methods').prop('checked', true);
-        }).on('hide.bs.password', function(e) {
+        }).on('hide.bs.password', function (e) {
         $('#eventLog').text('On hide event');
         $('#methods').prop('checked', false);
     });
@@ -191,9 +203,9 @@ function getHttpMethods(defValue) {
                     var sameOne = "";
                     $.each(data.data, function (n, value) {
                         sel.append(
-                            "<option value='"+value.id+"'>"+value.name+"</option>"
+                            "<option value='" + value.id + "'>" + value.name + "</option>"
                         );
-                        if(n === 0) {
+                        if (n === 0) {
                             firstOne = value.id;
                         }
                         if (defValue === value.id) {
@@ -226,9 +238,9 @@ function getHttpMethodsEdit(defValue) {
                     var sameOne = "";
                     $.each(data.data, function (n, value) {
                         sel.append(
-                            "<option value='"+value.id+"'>"+value.name+"</option>"
+                            "<option value='" + value.id + "'>" + value.name + "</option>"
                         );
-                        if(n === 0) {
+                        if (n === 0) {
                             firstOne = value.id;
                         }
                         if (defValue === value.id) {
@@ -293,7 +305,7 @@ function doLogin() {
 function doExitLogin() {
     //清空缓存
     localStorage.clear();
-    location.href ="home";
+    location.href = "home";
 }
 /*获取项目列表*/
 function getProjectList(groupId, userId, index) {
@@ -307,11 +319,11 @@ function getProjectList(groupId, userId, index) {
         showHintMsg("请先选择分组");
         return;
     }
-    var url = "/ZzApiDoc/v1/interface/getInterfaceByGroupIdWeb?groupId="+groupId+"&userId=" + userId + "&page=" + index;
+    var url = "/ZzApiDoc/v1/interface/getInterfaceByGroupIdWeb?groupId=" + groupId + "&userId=" + userId + "&page=" + index;
     var search = $("#et-search").val();
     if (search === null || search.length === 0) {
     } else {
-        url += ("&search="+search);
+        url += ("&search=" + search);
     }
     $.get(url, function (data, status) {
         if (status === 'success') {
@@ -331,7 +343,10 @@ function getProjectList(groupId, userId, index) {
                     '<td><button type="button" class="btn-see-req btn">请求参数</button></td>' +
                     '<td><button type="button" class="btn-see-res btn">返回参数</button></td>' +
                     '<td><button type="button" class="btn-edit-interface btn btn-primary"  data-toggle="modal" data-target="#editModel">' +
-                    '<span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> 编辑</button></td></tr>';
+                    '<span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> 编辑</button></td>' +
+                    '<td><button type="button" class="btn-generate-interf-code btn btn-primary">一键生成</button></td>' +
+                    '<td><button type="button" class="btn-see-interf-code btn btn-primary" data-toggle="modal" data-target="#jsonModal">点击查看</button></td>' +
+                    '</tr>';
             });
             $("#project-list").html(c);
 
@@ -372,11 +387,11 @@ function justUpdateList(groupId, userId, index) {
         showHintMsg("请先选择分组");
         return;
     }
-    var url = "/ZzApiDoc/v1/interface/getInterfaceByGroupIdWeb?groupId="+groupId+"&userId=" + userId + "&page=" + index;
+    var url = "/ZzApiDoc/v1/interface/getInterfaceByGroupIdWeb?groupId=" + groupId + "&userId=" + userId + "&page=" + index;
     var search = $("#et-search").val();
     if (search === null || search.length === 0) {
     } else {
-        url.append("&search="+search);
+        url.append("&search=" + search);
     }
     $.get(url,
         function (data, status) {
@@ -397,7 +412,10 @@ function justUpdateList(groupId, userId, index) {
                         '<td><button type="button" class="btn-see-req btn">请求参数</button></td>' +
                         '<td><button type="button" class="btn-see-res btn">返回参数</button></td>' +
                         '<td><button type="button" class="btn-edit-interface btn btn-primary"  data-toggle="modal" data-target="#editModel">' +
-                        '<span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> 编辑</button></td></tr>';
+                        '<span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> 编辑</button></td>' +
+                        '<td><button type="button" class="btn-generate-interf-code btn btn-primary">一键生成</button></td>' +
+                        '<td><button type="button" class="btn-see-interf-code btn btn-primary" data-toggle="modal" data-target="#jsonModal">点击查看</button></td>' +
+                        '</tr>';
                 });
                 $("#project-list").html(c);
             }
@@ -556,7 +574,7 @@ function addResParam() {
  */
 function showHintMsg(msg) {
     $("#row-hint").html('<div class="alert alert-warning" id="tv-hint"> <a href="#" class="close" data-dismiss="alert"> &times;</a><label id="tv-hint-content">' + msg + '</label></div>');
-    window.setTimeout("clearHint()",1500);//使用字符串执行方法
+    window.setTimeout("clearHint()", 1500);//使用字符串执行方法
 }
 /**
  * 拼接成功html
@@ -565,7 +583,7 @@ function showHintMsg(msg) {
  */
 function showOkMsg(msg) {
     $("#row-hint").html('<div class="alert alert-success" id="tv-hint"> <a href="#" class="close" data-dismiss="alert"> &times;</a><label id="tv-hint-content">' + msg + '</label></div>');
-    window.setTimeout("clearHint()",1500);//使用字符串执行方法
+    window.setTimeout("clearHint()", 1500);//使用字符串执行方法
 }
 
 /**
@@ -582,7 +600,7 @@ function translate(query) {
 // 多个query可以用\n连接  如 query='apple\norange\nbanana\npear'
     var from = 'zh';
     var to = 'en';
-    var str1 = appid + query + salt +key;
+    var str1 = appid + query + salt + key;
     var sign = MD5(str1);
     $.ajax({
         url: 'http://api.fanyi.baidu.com/api/trans/vip/translate',
@@ -598,7 +616,7 @@ function translate(query) {
         },
         success: function (data) {
             // alert(JSON.stringify(data));
-            var list= data.trans_result;
+            var list = data.trans_result;
             if (list !== null && list.length > 0) {
                 var obj = list[0];
                 var en = obj.dst;
@@ -609,16 +627,16 @@ function translate(query) {
                     result = result.replace(",", "");
                     var version = $("#et-interface-version").val();
                     var method = $("#select-interface-type").find("option:selected").text();
-                    $("#et-interface-path").val("v"+version+"/"+method.toUpperCase()+"/"+result);
+                    $("#et-interface-path").val("v" + version + "/" + method.toUpperCase() + "/" + result);
                 } else {
                     var words = en.split(' ')
                     var result = "";
                     for (var i = 0; i < words.length; i++) {
                         var word = words[i];
                         if (i === 0) {
-                            result += (word.substring(0, 1).toLowerCase()+word.substring(1).toLowerCase());
+                            result += (word.substring(0, 1).toLowerCase() + word.substring(1).toLowerCase());
                         } else {
-                            result += (word.substring(0, 1).toUpperCase()+word.substring(1).toLowerCase());
+                            result += (word.substring(0, 1).toUpperCase() + word.substring(1).toLowerCase());
                         }
                     }
                     result = result.replace("'", "");
@@ -626,11 +644,55 @@ function translate(query) {
                     result = result.replace(",", "");
                     var version = $("#et-interface-version").val();
                     var method = $("#select-interface-type").find("option:selected").text();
-                    $("#et-interface-path").val("v"+version+"/"+method.toUpperCase()+"/"+result);
+                    $("#et-interface-path").val("v" + version + "/" + method.toUpperCase() + "/" + result);
                 }
             } else {
                 alert("翻译失败");
             }
         }
     });
+}
+
+/**
+ * 生成返回空示例
+ */
+function generateInterfCode(interfaceId) {
+    var userId = localStorage.getItem("userId");
+    $.post("/ZzApiDoc/v1/interface/generateEmptyExample", {
+            userId: userId,
+            interfaceId: interfaceId
+        },
+        function (data, status) {
+            if (status === 'success') {
+                if (data.code === 0) {
+                    //error msg
+                    showHintMsg(data.msg);
+                } else {
+                    showOkMsg(data.msg);
+                }
+            }
+
+        });
+}
+
+/**
+ * 查看返回空示例
+ */
+function seeCode(interfaceId) {
+    var userId = localStorage.getItem("userId");
+    $.get("/ZzApiDoc/v1/interface/getInterfaceEmptyExample", {
+            userId: userId,
+            interfaceId: interfaceId
+        },
+        function (data, status) {
+            if (status === 'success') {
+                if (data.code === 0) {
+                    //error msg
+                    showHintMsg(data.msg);
+                } else {
+                    var example = data.data.example;
+                    $("#et-empty-example").val(example);
+                }
+            }
+        });
 }

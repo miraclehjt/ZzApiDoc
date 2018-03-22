@@ -247,7 +247,8 @@ function getProjectList(projectId, userId, index) {
                         '<td><button type="button" class="btn-see-group btn">接口管理</button></td>' +
                         '<td><button type="button" class="btn-edit-group btn btn-primary"  data-toggle="modal" data-target="#editModel">' +
                         '<span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> 编辑</button></td>' +
-                        '<td><button type="button" class="btn-generate-code btn btn-primary">一键生成</button></td></tr>';
+                        '<td><button type="button" class="btn-generate-code btn btn-primary">一键生成</button></td>' +
+                        '</tr>';
                 });
                 $("#project-list").html(c);
 

@@ -28,6 +28,8 @@ public interface InterfaceService extends BaseService<InterfaceEntity> {
 
     BaseResult getInterfaceDetails(String interfaceId, String userId);
 
+    BaseResult getInterfaceEmptyExample(String interfaceId, String userId);
+
     ResponseEntity<byte[]> download(String projectId, String userId);
 
     ResponseEntity<byte[]> downloadPdf(String projectId, String userId);

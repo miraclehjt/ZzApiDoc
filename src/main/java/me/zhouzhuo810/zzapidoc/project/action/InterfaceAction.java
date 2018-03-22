@@ -164,6 +164,15 @@ public class InterfaceAction extends BaseController<InterfaceEntity> {
     }
 
     @ResponseBody
+    @RequestMapping(value = "/getInterfaceEmptyExample", method = RequestMethod.GET)
+    public BaseResult getInterfaceEmptyExample(
+            @RequestParam(value = "interfaceId") String interfaceId,
+            @RequestParam(value = "userId") String userId
+    ) {
+        return getService().getInterfaceEmptyExample(interfaceId, userId);
+    }
+
+    @ResponseBody
     @RequestMapping(value = "/addInterfaceExample", method = RequestMethod.POST)
     public BaseResult addInterfaceExample(
             @RequestParam(value = "interfaceId") String interfaceId,
@@ -184,7 +193,7 @@ public class InterfaceAction extends BaseController<InterfaceEntity> {
 
 
     @ResponseBody
-    @RequestMapping(value = "/generateEmptyExample", method = RequestMethod.GET)
+    @RequestMapping(value = "/generateEmptyExample", method = RequestMethod.POST)
     public BaseResult generateEmptyExample(
             @RequestParam(value = "interfaceId") String interfaceId,
             @RequestParam(value = "userId") String userId
