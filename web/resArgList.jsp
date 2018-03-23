@@ -232,7 +232,7 @@
             <div class="modal-body">
                 <form class="form-horizontal" id="form-pid">
                     <div class="form-group form-group-sm">
-                        <label class="col-sm-2 control-label" for="select-param-type">参数类型</label>
+                        <label class="col-sm-2 control-label" for="select-param-type">上级参数</label>
                         <div class="col-sm-10">
                             <select class="selectpicker" id="select-param-pid">
                             </select>
