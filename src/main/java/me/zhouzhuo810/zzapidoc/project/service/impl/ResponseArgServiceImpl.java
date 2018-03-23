@@ -131,6 +131,7 @@ public class ResponseArgServiceImpl extends BaseServiceImpl<ResponseArgEntity> i
             return new BaseResult(0, "删除失败");
         }
     }
+
     @Override
     public BaseResult deleteResponseArgWeb(String ids, String userId) {
         UserEntity user = mUserService.get(userId);
@@ -139,7 +140,7 @@ public class ResponseArgServiceImpl extends BaseServiceImpl<ResponseArgEntity> i
         }
         if (ids != null && ids.length() > 0) {
             if (ids.contains(",")) {
-                String [] id = ids.split(",");
+                String[] id = ids.split(",");
                 for (String s : id) {
                     ResponseArgEntity entity = getBaseDao().get(s);
                     if (entity == null) {
@@ -261,7 +262,7 @@ public class ResponseArgServiceImpl extends BaseServiceImpl<ResponseArgEntity> i
     }
 
     @Override
-    public BaseResult importResponseArg(String interfaceId, String userId, String json) {
+    public BaseResult importResponseArg(String interfaceId, String userId, String pid, String json) {
         UserEntity user = mUserService.get(userId);
         if (user == null) {
             return new BaseResult(0, "用户不合法");
@@ -271,7 +272,7 @@ public class ResponseArgServiceImpl extends BaseServiceImpl<ResponseArgEntity> i
             return new BaseResult(0, "接口不存在或已被删除！");
         }
         JSONObject obj = new JSONObject(json);
-        parseObj(interfaceEntity.getProjectId(), interfaceId, userId, user.getName(), obj, "0");
+        parseObj(interfaceEntity.getProjectId(), interfaceId, userId, user.getName(), obj, pid == null ? "0" : pid);
         return new BaseResult(1, "参数导入成功！");
     }
 
@@ -304,6 +305,79 @@ public class ResponseArgServiceImpl extends BaseServiceImpl<ResponseArgEntity> i
                 }
             }
         }
+    }
+
+    @Override
+    public BaseResult updateResponseArgPid(String pid, String responseArgIds, String userId) {
+        UserEntity user = mUserService.get(userId);
+        if (user == null) {
+            return new BaseResult(0, "用户不合法");
+        }
+        if (responseArgIds != null && responseArgIds.length() > 0) {
+            if (responseArgIds.contains(",")) {
+                String[] id = responseArgIds.split(",");
+                for (String s : id) {
+                    ResponseArgEntity arg = getBaseDao().get(s);
+                    if (arg != null) {
+                        arg.setModifyTime(new Date());
+                        arg.setModifyUserID(user.getId());
+                        arg.setModifyUserName(user.getName());
+                        arg.setPid(pid == null ? "0" : pid);
+                        try {
+                            update(arg);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            } else {
+                ResponseArgEntity arg = getBaseDao().get(responseArgIds);
+                if (arg != null) {
+                    arg.setModifyTime(new Date());
+                    arg.setModifyUserID(user.getId());
+                    arg.setModifyUserName(user.getName());
+                    arg.setPid(pid == null ? "0" : pid);
+                    try {
+                        update(arg);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    return new BaseResult(0, "返回参数不存在或已被删除！");
+                }
+            }
+        } else {
+            return new BaseResult(0, "请先选择要修改的行！");
+        }
+        return new BaseResult(1, "修改成功！");
+    }
+
+    @Override
+    public BaseResult getResponseArgByInterfaceId(String interfaceId, String userId) {
+        UserEntity user = mUserService.get(userId);
+        if (user == null) {
+            return new BaseResult(0, "用户不合法");
+        }
+        List<ResponseArgEntity> args = getBaseDao().executeCriteria(ResponseArgUtils.getArgByInterfaceId(interfaceId),
+                Order.asc("createTime"));
+        List<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
+        if (args != null) {
+            for (ResponseArgEntity arg : args) {
+                MapUtils map = new MapUtils();
+                map.put("id", arg.getId());
+                map.put("name", arg.getName());
+                map.put("note", arg.getNote());
+                map.put("defValue", arg.getDefaultValue() == null ? "" : arg.getDefaultValue());
+                map.put("pid", arg.getPid());
+                map.put("type", arg.getTypeId());
+                map.put("createTime", DataUtils.formatDate(arg.getCreateTime()));
+                map.put("createUserName", arg.getCreateUserName());
+                map.put("interfaceId", arg.getInterfaceId());
+                map.put("isGlobal", arg.getGlobal());
+                result.add(map.build());
+            }
+        }
+        return new BaseResult(1, "ok", result);
     }
 
     private String addArg(String pid, String projectId, String interfaceId, String userId, String userName, String name, String note, int typeId) {

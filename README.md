@@ -46,7 +46,7 @@
 [点击查看](test.pdf)
 
 
-### 实体类代码示例
+### Android实体类代码示例
 
 
 ```java
@@ -95,6 +95,37 @@ public interface Api0 {
    Observable<UserLoginResult> userLogin(@Field("phone") String phone,@Field("password") String password);   
 }
 ```
+
+### iOS模型示例
+
+```objc
+//
+//  LoginTestModel.h
+//  GoFactory
+//
+//  Created by ZzApiDoc on 2018/33/23.
+//  Copyright © 2018年 zhouzhuo810. All rights reserved.
+//
+
+#import <Foundation/Foundation.h>
+@interface LoginTestModel : NSObject
+@property(nonatomic,copy) NSString *code;  //
+@property(nonatomic,copy) NSString *msg;  //
+@end
+```
+
+### 更新日志
+
+> 2018-03-23
+
+- 新增:WEB页使用JSON导入返回参数的功能；
+- 新增:WEB页返回参数更换上级参数的功能；
+- 修改:修复iOS模型在无全局参数时导出不全问题；
+
+> 2018-03-22
+- 新增:项目列表iOS模型导出功能；
+- 新增:接口列表一键生成接口空返回示例功能；
+- 新增:接口列表查看接口返回示例功能；
 
 ### 联系与交流
 

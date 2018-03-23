@@ -63,6 +63,16 @@ public class ResponseArgAction extends BaseController<ResponseArgEntity> {
     }
 
     @ResponseBody
+    @RequestMapping(value = "/updateResponseArgPid", method = RequestMethod.POST)
+    public BaseResult updateResponseArgPid(
+            @RequestParam(value = "responseArgIds") String responseArgIds,
+            @RequestParam(value = "pid") String pid,
+            @RequestParam(value = "userId") String userId
+    ) {
+        return getService().updateResponseArgPid(pid, responseArgIds, userId);
+    }
+
+    @ResponseBody
     @RequestMapping(value = "/deleteResponseArg", method = RequestMethod.POST)
     public BaseResult deleteInterface(
             @RequestParam(value = "id") String id,
@@ -92,6 +102,15 @@ public class ResponseArgAction extends BaseController<ResponseArgEntity> {
         return getService().getResponseArgByInterfaceIdAndPid(interfaceId, projectId, pid, global, userId);
     }
 
+    @ResponseBody
+    @RequestMapping(value = "/getResponseArgByInterfaceId", method = RequestMethod.GET)
+    public BaseResult getResponseArgByInterfaceId(
+            @RequestParam(value = "interfaceId") String interfaceId,
+            @RequestParam(value = "userId") String userId
+    ) {
+        return getService().getResponseArgByInterfaceId(interfaceId, userId);
+    }
+
 
     @ResponseBody
     @RequestMapping(value = "/getResponseArgDetails", method = RequestMethod.GET)
@@ -107,9 +126,10 @@ public class ResponseArgAction extends BaseController<ResponseArgEntity> {
     public BaseResult importResponseArg(
             @RequestParam(value = "interfaceId") String interfaceId,
             @RequestParam(value = "userId") String userId,
+            @RequestParam(value = "pid", required = false) String pid,
             @RequestParam(value = "json") String json
     ) {
-        return getService().importResponseArg(interfaceId, userId, json);
+        return getService().importResponseArg(interfaceId, userId, pid, json);
     }
 
 

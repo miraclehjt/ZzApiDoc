@@ -56,6 +56,12 @@ $(document).ready(function () {
         var pid = localStorage.getItem("pid");
         getProjectList(interfaceId, userId, pid);
     });
+    /*JSON导入按钮*/
+    $("#btn-imp-json").click(function () {
+        var interfaceId = localStorage.getItem("interfaceId");
+        var pid = localStorage.getItem("pid");
+        impJson(interfaceId, pid);
+    });
     /*删除按钮点击*/
     $("#btn-delete").click(function () {
         doDelete();
@@ -80,6 +86,18 @@ $(document).ready(function () {
     $("#btn-edit-save").click(function () {
         var responseArgId = localStorage.getItem("edit-res-id");
         editResParam(responseArgId);
+    });
+
+    /*更换上级按钮*/
+    $("#btn-pid-choose").click(function () {
+        var interfaceId = localStorage.getItem("interfaceId");
+        var pid = localStorage.getItem("pid");
+        fillPidItems(interfaceId, pid);
+    });
+    /*更换上级对话框保存按钮*/
+    $("#btn-pid-save").click(function () {
+        var pid = $("#select-param-pid").val();
+        doUpdatePid(pid);
     });
 
     /*用户名点击*/
@@ -111,19 +129,19 @@ $(document).ready(function () {
     /*密码框隐藏与显示*/
     $('#et-pswd-edit').password()
         .password('focus')
-        .on('show.bs.password', function(e) {
+        .on('show.bs.password', function (e) {
             $('#eventLog').text('On show event');
             $('#methods').prop('checked', true);
-        }).on('hide.bs.password', function(e) {
+        }).on('hide.bs.password', function (e) {
         $('#eventLog').text('On hide event');
         $('#methods').prop('checked', false);
     });
     $('#et-new-pswd-edit').password()
         .password('focus')
-        .on('show.bs.password', function(e) {
+        .on('show.bs.password', function (e) {
             $('#eventLog').text('On show event');
             $('#methods').prop('checked', true);
-        }).on('hide.bs.password', function(e) {
+        }).on('hide.bs.password', function (e) {
         $('#eventLog').text('On hide event');
         $('#methods').prop('checked', false);
     });
@@ -208,7 +226,7 @@ function doLogin() {
 function doExitLogin() {
     //清空缓存
     localStorage.clear();
-    location.href ="home";
+    location.href = "home";
 }
 
 /*获取项目列表*/
@@ -416,6 +434,41 @@ function doDelete() {
 
         });
 }
+
+/**
+ * 删除选中行
+ */
+function doUpdatePid(pid) {
+
+    var userId = localStorage.getItem("userId");
+    if (userId === null || userId.length === 0) {
+        $("#box-user-info").hide();
+        $("#form-login").show();
+        showHintMsg("登录已过期，请重新登录");
+        return;
+    }
+    var responseArgIds = getChooseRowsDbIds();
+    $.post("/ZzApiDoc/v1/responseArg/updateResponseArgPid", {
+            responseArgIds: responseArgIds,
+            userId: userId,
+            pid: pid
+        },
+        function (data, status) {
+            if (status === 'success') {
+                if (data.code === 0) {
+                    //error msg
+                    showHintMsg(data.msg);
+                } else {
+                    showOkMsg(data.msg);
+                    //重新加载数据
+                    var interfaceId = localStorage.getItem("interfaceId");
+                    var pid = localStorage.getItem("pid");
+                    getProjectList(interfaceId, userId, pid);
+                }
+            }
+
+        });
+}
 /**
  * 添加返回参数
  */
@@ -507,7 +560,7 @@ function addResParam() {
  */
 function showHintMsg(msg) {
     $("#row-hint").html('<div class="alert alert-warning" id="tv-hint"> <a href="#" class="close" data-dismiss="alert"> &times;</a><label id="tv-hint-content">' + msg + '</label></div>');
-    window.setTimeout("clearHint()",1500);//使用字符串执行方法
+    window.setTimeout("clearHint()", 1500);//使用字符串执行方法
 }
 /**
  * 拼接成功html
@@ -516,7 +569,7 @@ function showHintMsg(msg) {
  */
 function showOkMsg(msg) {
     $("#row-hint").html('<div class="alert alert-success" id="tv-hint"> <a href="#" class="close" data-dismiss="alert"> &times;</a><label id="tv-hint-content">' + msg + '</label></div>');
-    window.setTimeout("clearHint()",1500);//使用字符串执行方法
+    window.setTimeout("clearHint()", 1500);//使用字符串执行方法
 }
 
 /**
@@ -526,6 +579,66 @@ function clearHint() {
     $("#row-hint").html("");
 }
 
+/**
+ * json导入
+ * @param interfaceId
+ * @param pid
+ */
+function impJson(interfaceId, pid) {
+    var userId = localStorage.getItem("userId");
+    var jsonStr = $("#et-json").val();
+    $.post("/ZzApiDoc/v1/responseArg/importResponseArg", {
+            userId: userId,
+            pid: pid,
+            interfaceId: interfaceId,
+            json: jsonStr
+        },
+        function (data, status) {
+            if (status === 'success') {
+                if (data.code === 0) {
+                    //error msg
+                    showHintMsg(data.msg);
+                } else {
+                    showOkMsg(data.msg);
+                    //重新加载数据
+                    var interfaceId = localStorage.getItem("interfaceId");
+                    var pid = localStorage.getItem("pid");
+                    getProjectList(interfaceId, userId, pid);
+                }
+            }
+
+        });
+}
+/**
+ * 填充上级item
+ * @param interfaceId
+ * @param pid
+ */
+function fillPidItems(interfaceId, pid) {
+    var userId = localStorage.getItem("userId");
+    $.get("/ZzApiDoc/v1/responseArg/getResponseArgByInterfaceId", {
+            userId: userId,
+            interfaceId: interfaceId
+        },
+        function (data, status) {
+            if (status === 'success') {
+                if (data.code === 0) {
+                    //error msg
+                    showHintMsg(data.msg);
+                } else {
+                    // showOkMsg(data.msg);
+                    $('#select-param-pid.selectpicker').html("");
+                    $('#select-param-pid.selectpicker').append("<option value='0'>顶层</option>");
+                    $.each(data.data, function (n, value) {
+                        $('#select-param-pid.selectpicker').append("<option value=" + value.id + ">" + value.name + "</option>");
+                    });
+                    $('#select-param-pid').selectpicker('refresh');
+                    $('#select-param-pid').selectpicker('val', pid);
+                }
+            }
+        });
+}
+
 function translate(query) {
     var appid = '2015063000000001';
     var key = '12345678';
@@ -533,7 +646,7 @@ function translate(query) {
 // 多个query可以用\n连接  如 query='apple\norange\nbanana\npear'
     var from = 'zh';
     var to = 'en';
-    var str1 = appid + query + salt +key;
+    var str1 = appid + query + salt + key;
     var sign = MD5(str1);
     $.ajax({
         url: 'http://api.fanyi.baidu.com/api/trans/vip/translate',
@@ -549,7 +662,7 @@ function translate(query) {
         },
         success: function (data) {
             // alert(JSON.stringify(data));
-            var list= data.trans_result;
+            var list = data.trans_result;
             if (list !== null && list.length > 0) {
                 var obj = list[0];
                 var en = obj.dst;
@@ -565,9 +678,9 @@ function translate(query) {
                     for (var i = 0; i < words.length; i++) {
                         var word = words[i];
                         if (i === 0) {
-                            result += (word.substring(0, 1).toLowerCase()+word.substring(1).toLowerCase());
+                            result += (word.substring(0, 1).toLowerCase() + word.substring(1).toLowerCase());
                         } else {
-                            result += (word.substring(0, 1).toUpperCase()+word.substring(1).toLowerCase());
+                            result += (word.substring(0, 1).toUpperCase() + word.substring(1).toLowerCase());
                         }
                     }
                     result = result.replace("'", "");

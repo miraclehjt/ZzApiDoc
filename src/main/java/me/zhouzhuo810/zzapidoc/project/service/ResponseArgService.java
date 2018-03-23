@@ -29,7 +29,11 @@ public interface ResponseArgService extends BaseService<ResponseArgEntity> {
 
     List<ResponseArgEntity> getGlobalResponseArgs(String projectId);
 
-    BaseResult importResponseArg(String interfaceId, String userId, String json);
+    BaseResult importResponseArg(String interfaceId, String userId, String pid, String json);
 
     void parseObj(String projectId, String interfaceId, String userId, String userName, JSONObject obj, final String pid);
+
+    BaseResult updateResponseArgPid(String pid, String responseArgIds, String userId);
+
+    BaseResult getResponseArgByInterfaceId(String interfaceId, String userId);
 }

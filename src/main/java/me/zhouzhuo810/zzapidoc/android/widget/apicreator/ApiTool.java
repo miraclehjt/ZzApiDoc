@@ -580,7 +580,7 @@ public class ApiTool {
                                                 String responseData = childrenBean.getResponseArgs();
                                                 JSONArray root = new JSONArray(responseData);
                                                 StringBuilder sbEntity = new StringBuilder();
-                                                generateModel2IOS(root, sbEntity, path + File.separator + "model", clazzName);
+                                                generateModel2IOS(root, sbEntity, path + File.separator + "model"+i1, clazzName);
                                                 sbEntity.append("\n@end");
                                                 System.out.println(sbEntity.toString());
                                             } catch (Exception e) {

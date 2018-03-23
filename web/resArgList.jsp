@@ -40,7 +40,8 @@
             <div id="box-user-info" class="navbar-right">
                 <a id="tv-user-name" class="tv-white btn-link" data-toggle="modal" data-target="#userModel"></a>
                 <button id="btn-unregister" type="button" class="btn btn-danger">
-                    <span class="glyphicon glyphicon-off" aria-hidden="true"></span> 注销</button>
+                    <span class="glyphicon glyphicon-off" aria-hidden="true"></span> 注销
+                </button>
             </div>
             <form id="form-login" class="navbar-form navbar-right">
                 <div class="form-group">
@@ -80,13 +81,25 @@
             <div id="btn-box">
                 <!-- Standard button -->
                 <button type="button" class="btn btn-primary" id="btn-refresh">
-                    <span class="glyphicon glyphicon-repeat" aria-hidden="true"></span> 刷新</button>
+                    <span class="glyphicon glyphicon-repeat" aria-hidden="true"></span> 刷新
+                </button>
                 <!-- Standard button -->
                 <button type="button" class="btn btn-primary" id="btn-add" data-toggle="modal" data-target="#addModel">
-                    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> 新增</button>
+                    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> 新增
+                </button>
+                <!-- Standard button -->
+                <button type="button" class="btn btn-primary" id="btn-imp" data-toggle="modal" data-target="#jsonModal">
+                    <span class="glyphicon glyphicon-send" aria-hidden="true"></span> JSON导入
+                </button>
+                <!-- Standard button -->
+                <button type="button" class="btn btn-primary" id="btn-pid-choose" data-toggle="modal"
+                        data-target="#pidModal">
+                    <span class="glyphicon glyphicon-level-up" aria-hidden="true"></span> 更换上级
+                </button>
                 <!-- Indicates a dangerous or potentially negative action -->
                 <button type="button" class="btn btn-danger" id="btn-delete">
-                    <span class="glyphicon glyphicon-trash" aria-hidden="true"></span> 删除</button>
+                    <span class="glyphicon glyphicon-trash" aria-hidden="true"></span> 删除
+                </button>
             </div>
             <div class="col-md-12 left-table">
                 <div class="panel panel-primary">
@@ -207,6 +220,34 @@
     </div>
 </div>
 
+<!-- 选择上级对话框 -->
+<div class="modal fade" id="pidModal" tabindex="-1" role="dialog" aria-labelledby="pidModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="pidModalLabel">选择上级参数</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" id="form-pid">
+                    <div class="form-group form-group-sm">
+                        <label class="col-sm-2 control-label" for="select-param-type">参数类型</label>
+                        <div class="col-sm-10">
+                            <select class="selectpicker" id="select-param-pid">
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="btn-pid-save">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- 新增对话框 -->
 <div class="modal fade" id="addModel" tabindex="-1" role="dialog" aria-labelledby="addTitle">
     <div class="modal-dialog" role="document">
@@ -260,7 +301,8 @@
                             <div class="input-group">
                                 <input class="form-control" type="text" id="et-param-name" placeholder="参数名称">
                                 <span class="input-group-btn">
-                                    <button id="btn-translate" class="btn btn-primary btn-sm" type="button">自动生成</button>
+                                    <button id="btn-translate" class="btn btn-primary btn-sm"
+                                            type="button">自动生成</button>
                                 </span>
                             </div>
                         </div>
@@ -339,6 +381,31 @@
         </div>
     </div>
 </div>
+
+<!-- 查看示例json对话框 -->
+<div class="modal fade" id="jsonModal" tabindex="-1" role="dialog" aria-labelledby="jsonModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="jsonModalLabel">导入返回参数</h4>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label for="et-json" class="control-label">JSON：</label>
+                        <textarea class="form-control" id="et-json"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button id="btn-imp-json" type="button" class="btn btn-default" data-dismiss="modal">开始导入</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 </body>
 
