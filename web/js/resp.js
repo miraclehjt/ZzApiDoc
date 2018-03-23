@@ -6,7 +6,7 @@ $(document).ready(function () {
     var projectName = localStorage.getItem("projectName");
     var groupName = localStorage.getItem("groupName");
     var interfName = localStorage.getItem("interfaceName");
-    $("#table-title").text(projectName + " / " + groupName + " / " + interfName + " 的请求参数");
+    $("#table-title").text(projectName + " / " + groupName + " / " + interfName + " 的返回参数");
 
     if (userId === null || userId === "") {
         doExitLogin();
